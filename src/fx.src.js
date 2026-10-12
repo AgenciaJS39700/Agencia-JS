@@ -102,7 +102,7 @@ if (spot) { spot.style.setProperty("--mx", (nx + 0.5) * 100 + "%"); spot.style.s
 }
 
 /* 3) Entrada escalonada de tarjetas y listas (sustituye al fundido simple en estos bloques) */
-["#servicios .grid > a", "#planes article", "#proceso ol > li", "#tecnologia .grid > div"].forEach(function (sel) {
+["#servicios .grid > a", "#planes article"].forEach(function (sel) {
 var nodos = [].slice.call(document.querySelectorAll(sel));
 if (!nodos.length) { return; }
 nodos.forEach(function (n) { n.classList.remove("reveal"); });

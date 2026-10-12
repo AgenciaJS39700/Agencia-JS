@@ -230,7 +230,24 @@ footer nav[aria-label="Legal"]{row-gap:0}
 @keyframes sv-prog{to{transform:scaleX(1)}}
 .sv-also{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-top:.5rem;font-size:.82rem;color:#d4d4d8}
 .sv-also li:not(:first-child){border:1px solid rgba(255,255,255,.12);border-radius:9999px;padding:.3rem .8rem}
-@media(max-width:1023px){.sv-stage{order:-1}}
+@media(max-width:1023px){
+.sv{overflow:clip}
+.sv-grid{display:block}
+.sv-stage{position:sticky;top:3.6rem;z-index:6;padding:.6rem 0 .2rem;margin-bottom:.8rem;background:linear-gradient(180deg,#0b0c10 92%,rgba(11,12,16,0));height:calc(15.5rem*1.8333*.6 + .8rem)}
+.sv-phone{width:15.5rem;transform:scale(.6);transform-origin:top center;animation:none}
+.sv-halo,.sv-note{display:none}
+.sv-tabs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;padding-top:.2rem}
+.sv-item{display:contents}
+.sv-item button{border:1px solid rgba(255,255,255,.14);border-radius:.9rem;min-height:54px;padding:.55rem .75rem;gap:.5rem;background:rgba(255,255,255,.03)}
+.sv-item button[aria-selected=true]{border-color:rgba(212,175,55,.85);background:rgba(212,175,55,.12)}
+.sv-tt{font-size:.88rem}
+.sv-prog{display:none!important}
+.sv-item [role=tabpanel]{grid-column:1/-1;order:9;padding:.85rem 1rem;border:1px solid rgba(212,175,55,.35);border-radius:.9rem;background:rgba(212,175,55,.05)}
+.sv-item [role=tabpanel] p{font-size:.9rem;line-height:1.5}
+.sv-meta a{margin-left:0}
+.sv-also{display:none}
+}
+.sv-cm{display:none}
 /* pantalla 0: web */
 .sv-bar{display:flex;align-items:center;gap:.25rem;height:1.6rem;padding:0 .5rem;border-radius:.6rem;background:#1a1b1f}
 .sv-bar i{width:.4rem;height:.4rem;border-radius:50%;background:#444}
@@ -311,7 +328,6 @@ footer nav[aria-label="Legal"]{row-gap:0}
 /* pantalla 3: video */
 .sv-reel{position:absolute;inset:0;background:radial-gradient(80% 50% at 50% 30%,rgba(212,175,55,.35),transparent 70%),linear-gradient(180deg,#1a1230,#0a0a0c 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
 .sv-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0a0a0c}
-.sv-reel:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 25%,transparent 55%,rgba(0,0,0,.65));pointer-events:none}
 .sv-heart,.sv-cm,.sv-prog2{z-index:2}
 .sv-play{width:3.6rem;height:3.6rem;border-radius:50%;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.5);position:relative}
 .sv-play:after{content:"";position:absolute;left:1.35rem;top:1.05rem;border-left:1.05rem solid #fff;border-top:.75rem solid transparent;border-bottom:.75rem solid transparent}
@@ -588,7 +604,7 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 <div id="phone" class="phone relative w-52 rounded-[2.5rem] border-[10px] border-panel bg-panel ring-1 ring-gold/60 shadow-2xl shadow-gold/15 sm:w-60">
 <div class="absolute left-1/2 top-2 z-10 h-4 w-16 -translate-x-1/2 rounded-full bg-ink" aria-hidden="true"></div>
 <div class="relative aspect-[9/16] overflow-hidden rounded-[1.8rem] bg-ink">
-<video id="video-muestra" class="absolute inset-0 h-full w-full object-cover" muted loop playsinline preload="none" poster="/video-muestra-poster.webp" aria-label="Muestra de vídeo publicitario vertical"></video>
+<video id="video-muestra" class="absolute inset-0 h-full w-full object-cover" muted loop playsinline preload="none" poster="/video-muestra-poster.webp" aria-label="Muestra de vídeo publicitario vertical: pastelería Dulce Ámbar (demo)"></video>
 <button id="video-play" type="button" aria-label="Reproducir vídeo" class="absolute inset-0 hidden items-center justify-center bg-black/40 text-white transition hover:bg-black/30 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60">
 <span class="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/50 backdrop-blur"><svg class="ic h-7 w-7" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></span>
 </button>
@@ -598,46 +614,25 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 </div>
 </div>
 </section>
-<!-- 7. CÓMO TRABAJAMOS -->
-<section id="proceso" class="py-14 sm:py-16 lg:py-20">
+<!-- 8. INFRAESTRUCTURA (franja mínima) -->
+<section id="tecnologia" class="silver-surface border-y-2 border-gold/70 py-4">
 <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-<div class="reveal mx-auto max-w-2xl text-center">
-<p class="text-xs font-semibold uppercase tracking-[0.25em] text-silver">Cómo trabajamos</p>
-<h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">De la primera conversación a tu web publicada</h2>
-</div>
-<ol class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-<li class="reveal rounded-card border border-white/10 bg-navy p-5 transition hover:border-gold/60 motion-reduce:transition-none"><span class="flex h-9 w-9 items-center justify-center rounded-full silver-surface font-bold text-ink">1</span><h3 class="mt-4 font-bold">Hablamos</h3><p class="mt-1 text-sm text-mute">Nos cuentas tu negocio y tus objetivos por WhatsApp o llamada.</p></li>
-<li class="reveal rounded-card border border-white/10 bg-navy p-5 transition hover:border-gold/60 motion-reduce:transition-none"><span class="flex h-9 w-9 items-center justify-center rounded-full silver-surface font-bold text-ink">2</span><h3 class="mt-4 font-bold">Propuesta clara</h3><p class="mt-1 text-sm text-mute">Presupuesto con alcance, precio y cuota de mantenimiento.</p></li>
-<li class="reveal rounded-card border border-white/10 bg-navy p-5 transition hover:border-gold/60 motion-reduce:transition-none"><span class="flex h-9 w-9 items-center justify-center rounded-full silver-surface font-bold text-ink">3</span><h3 class="mt-4 font-bold">Diseño y desarrollo</h3><p class="mt-1 text-sm text-mute">Creamos tu web con tu contenido, rápida y adaptada al móvil.</p></li>
-<li class="reveal rounded-card border border-white/10 bg-navy p-5 transition hover:border-gold/60 motion-reduce:transition-none"><span class="flex h-9 w-9 items-center justify-center rounded-full silver-surface font-bold text-ink">4</span><h3 class="mt-4 font-bold">Publicación y mejora</h3><p class="mt-1 text-sm text-mute">La publicamos y la mantenemos activa según tu plan.</p></li>
-</ol>
+<h2 class="sr-only">Infraestructura y compromiso técnico</h2>
+<ul class="reveal flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-semibold text-ink sm:text-sm">
+<li class="flex items-center gap-2"><svg class="ic h-4 w-4 flex-none" aria-hidden="true" focusable="false"><use href="#i-globe"/></svg>Edge en Cloudflare</li>
+<li class="flex items-center gap-2"><svg class="ic h-4 w-4 flex-none" aria-hidden="true" focusable="false"><use href="#i-gauge"/></svg>Core Web Vitals</li>
+<li class="flex items-center gap-2"><svg class="ic h-4 w-4 flex-none" aria-hidden="true" focusable="false"><use href="#i-search-check"/></svg>SEO on-page</li>
+<li class="flex items-center gap-2"><svg class="ic h-4 w-4 flex-none" aria-hidden="true" focusable="false"><use href="#i-shield-check"/></svg>Mantenimiento activo</li>
+</ul>
 </div>
 </section>
-<!-- 8. INFRAESTRUCTURA Y COMPROMISO TÉCNICO (franja corta) -->
-<section id="tecnologia" class="silver-surface border-y-2 border-gold/70 py-12 sm:py-14">
-<div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-<h2 class="reveal text-center text-xs font-semibold uppercase tracking-[0.25em] text-zinc-700">Infraestructura y compromiso técnico</h2>
-<div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-<div class="reveal flex items-start gap-3"><svg class="ic h-6 w-6 flex-none text-zinc-900" aria-hidden="true" focusable="false"><use href="#i-globe"/></svg><div><h3 class="text-sm font-bold text-ink">Arquitectura Edge en Cloudflare</h3><p class="mt-1 text-xs text-zinc-700">Tu web se sirve desde una red global, cerca de cada visitante.</p></div></div>
-<div class="reveal flex items-start gap-3"><svg class="ic h-6 w-6 flex-none text-zinc-900" aria-hidden="true" focusable="false"><use href="#i-gauge"/></svg><div><h3 class="text-sm font-bold text-ink">Core Web Vitals y velocidad</h3><p class="mt-1 text-xs text-zinc-700">Carga ultrarrápida, con foco en móvil.</p></div></div>
-<div class="reveal flex items-start gap-3"><svg class="ic h-6 w-6 flex-none text-zinc-900" aria-hidden="true" focusable="false"><use href="#i-search-check"/></svg><div><h3 class="text-sm font-bold text-ink">SEO on-page estructurado</h3><p class="mt-1 text-xs text-zinc-700">Títulos, encabezados y datos de negocio local.</p></div></div>
-<div class="reveal flex items-start gap-3"><svg class="ic h-6 w-6 flex-none text-zinc-900" aria-hidden="true" focusable="false"><use href="#i-shield-check"/></svg><div><h3 class="text-sm font-bold text-ink">Mantenimiento técnico activo</h3><p class="mt-1 text-xs text-zinc-700">Actualizaciones y soporte según tu plan.</p></div></div>
-</div>
-</div>
-</section>
-<!-- 9. FAQ -->
-<section id="faq" class="py-14 sm:py-16 lg:py-20">
+<!-- 9. FAQ (una sola pestaña desplegable) -->
+<section id="faq" class="py-8 sm:py-10">
 <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-<div class="reveal text-center">
-<p class="text-xs font-semibold uppercase tracking-[0.25em] text-silver">Preguntas frecuentes</p>
-<h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">Resolvemos tus dudas</h2>
-</div>
-<div id="faq-list" class="mt-10 space-y-3"></div>
-<div class="mt-6 text-center">
-<button id="faq-more" type="button" aria-expanded="false" class="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/20 px-6 py-2.5 text-sm font-semibold transition hover:border-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
-<span>Ver más preguntas</span> <svg class="ic h-4 w-4" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg>
+<button id="faq-toggle" type="button" aria-expanded="false" aria-controls="faq-wrap" class="flex min-h-[56px] w-full items-center justify-between gap-4 rounded-2xl border border-white/15 bg-navy px-5 py-4 text-left text-lg font-bold transition hover:border-gold/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+<span>Preguntas frecuentes</span><svg class="ic h-5 w-5 flex-none transition-transform duration-300 motion-reduce:transition-none" aria-hidden="true" focusable="false"><use href="#i-chevron-down"/></svg>
 </button>
-</div>
+<div id="faq-wrap" class="faq-panel"><div><div id="faq-list" class="space-y-3 pt-4"></div></div></div>
 </div>
 </section>
 <!-- 4. PLANES -->
@@ -996,11 +991,10 @@ var FAQ = [
 ["¿Cómo funciona la producción de vídeo a la carta?", "Es un servicio aparte, con presupuesto personalizado. Nos cuentas qué quieres promocionar (oferta, temporada, lanzamiento o contenido para redes) y creamos vídeos mensuales personalizados en formato vertical, pensados para Reels y TikTok."],
 ["¿Qué soporte ofrecéis y cómo os contacto?", "Atendemos por WhatsApp (628 22 47 19 y 688 93 33 08), por email (Agencia39700@gmail.com) y en nuestras redes sociales. El plan Presencia 360° incluye soporte prioritario."]
 ];
-var VISIBLES = 6;
 var list = document.getElementById("faq-list");
 FAQ.forEach(function (item, i) {
 var wrap = document.createElement("div");
-wrap.className = "faq-item rounded-2xl border border-white/10 bg-navy transition-colors" + (i >= VISIBLES ? " hidden faq-extra" : "");
+wrap.className = "faq-item rounded-2xl border border-white/10 bg-navy transition-colors";
 var h = document.createElement("h3");
 var btn = document.createElement("button");
 btn.type = "button";
@@ -1047,14 +1041,16 @@ wrap.appendChild(h);
 wrap.appendChild(panel);
 list.appendChild(wrap);
 });
-var more = document.getElementById("faq-more");
-more.addEventListener("click", function () {
-var abrir = more.getAttribute("aria-expanded") !== "true";
-list.querySelectorAll(".faq-extra").forEach(function (el) { el.classList.toggle("hidden", !abrir); });
-more.setAttribute("aria-expanded", abrir ? "true" : "false");
-more.firstElementChild.textContent = abrir ? "Ver menos preguntas" : "Ver más preguntas";
-more.lastElementChild.style.transform = abrir ? "rotate(180deg)" : "";
-});
+var ftog = document.getElementById("faq-toggle");
+var fwrap = document.getElementById("faq-wrap");
+function faqAbrir(abrir) {
+ftog.setAttribute("aria-expanded", abrir ? "true" : "false");
+fwrap.classList.toggle("open", abrir);
+ftog.lastElementChild.style.transform = abrir ? "rotate(180deg)" : "";
+}
+ftog.addEventListener("click", function () { faqAbrir(ftog.getAttribute("aria-expanded") !== "true"); });
+document.querySelectorAll('a[href="#faq"]').forEach(function (a) { a.addEventListener("click", function () { faqAbrir(true); }); });
+if (location.hash === "#faq") { faqAbrir(true); }
 /* Formulario: envío por WhatsApp o email (sin servidor) */
 var form = document.getElementById("form-contacto");
 var estado = document.getElementById("form-estado");
