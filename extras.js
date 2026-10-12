@@ -32,14 +32,14 @@ var PREGUNTAS = [
 var PLANES = {
 impulso: { n: "Impulso Digital", p: "349 € (oferta, precio habitual 399 €)", d: "Web profesional adaptada a móvil, SEO local básico, botones de WhatsApp y llamada, mapa y formulario, con mantenimiento de 29 €/mes." },
 pro: { n: "Acelerador Pro", p: "desde 699 €", d: "Todo Impulso Digital, web con más secciones y multi-idioma, ficha de Google optimizada, medición de visitas y 2 cambios al mes, con mantenimiento de 49 €/mes (primer mes gratis)." },
-p360: { n: "Presencia 360°", p: "desde 1200 €", d: "Todo Acelerador Pro, textos profesionales, auditoría SEO local, informe mensual, 4 cambios al mes y soporte prioritario, con mantenimiento de 79 €/mes (2 meses gratis)." }
+p360: { n: "Presencia 360°", p: "desde 1200 €", d: "Todo Acelerador Pro, 2 tarjetas NFC para Google, textos profesionales, auditoría SEO local, informe mensual, 4 cambios al mes y soporte prioritario, con mantenimiento de 79 €/mes (2 meses gratis)." }
 };
 function recomendar(r) {
 var plan = "impulso";
 if (r.objetivo === 3 || r.ficha <= 2) { plan = "pro"; }
 if (r.web === 2) { plan = "p360"; }
 var nota = "";
-if (r.objetivo === 3) { nota = "Además, con las tarjetas NFC para Google (se piden aparte) tus clientes dejan su reseña con solo acercar el móvil."; }
+if (r.objetivo === 3) { nota = "Además, con las tarjetas NFC para Google (30 € una, 50 € dos) tus clientes dejan su reseña con solo acercar el móvil."; }
 if (r.objetivo === 1 || r.objetivo === 2) {
 nota = r.objetivo === 2
 ? "La venta online se presupuesta a medida; en la auditoría te explicamos cómo encajarla."
@@ -243,9 +243,9 @@ if (abrirQuiz()) { e.preventDefault(); }
    ===================================================================== */
 var RESPUESTAS = {
 precio: "Las webs empiezan desde 349 €: es la oferta de lanzamiento del plan Impulso Digital (precio habitual 399 €), IVA no incluido. El presupuesto final se ajusta a tu negocio. Una tienda online o un sistema de reservas con agenda se presupuestan a medida.",
-planes: "Tenemos tres planes:\n• Impulso Digital, 349 € (en oferta ahora, habitual 399 €): web profesional adaptada a móvil, SEO local básico, WhatsApp, mapa y formulario. Mantenimiento 29 €/mes.\n• Acelerador Pro, desde 699 €: todo lo anterior, web con más secciones y multi-idioma, ficha de Google optimizada y medición de visitas. Mantenimiento 49 €/mes (primer mes gratis).\n• Presencia 360°, desde 1200 €: todo lo anterior, textos profesionales, auditoría SEO local, informe mensual y soporte prioritario. Mantenimiento 79 €/mes (2 meses gratis).\nPrecios sin IVA. Las tarjetas NFC se piden aparte.",
-nfc: "Tu cliente acerca el móvil a la tarjeta y se abre directamente tu ficha de Google para que deje su opinión, sin buscar tu negocio ni escribir nada. No necesita batería ni app y funciona con Android y con iPhone XS o posteriores. Se piden aparte, con cualquier plan: escríbenos por WhatsApp con las unidades que necesitas y te damos el precio. Hace más fácil dejar la reseña, pero la valoración la decide siempre el cliente.",
-plazo: "Trabajamos para entregar tu web en tiempo récord. El plazo exacto depende del contenido que nos facilites (logo, textos, fotos, horarios y servicios) y te lo indicamos en el presupuesto, antes de empezar.",
+planes: "Tenemos tres planes:\n• Impulso Digital, 349 € (en oferta ahora, habitual 399 €): web profesional adaptada a móvil, SEO local básico, WhatsApp, mapa y formulario. Mantenimiento 29 €/mes.\n• Acelerador Pro, desde 699 €: todo lo anterior, web con más secciones y multi-idioma, ficha de Google optimizada y medición de visitas. Mantenimiento 49 €/mes (primer mes gratis).\n• Presencia 360°, desde 1200 €: todo lo anterior, 2 tarjetas NFC incluidas, textos profesionales, auditoría SEO local, informe mensual y soporte prioritario. Mantenimiento 79 €/mes (2 meses gratis).\nPrecios sin IVA. Las tarjetas NFC se piden aparte en los otros planes: 30 € una, 50 € dos.",
+nfc: "Tu cliente acerca el móvil a la tarjeta y se abre directamente tu ficha de Google para que deje su opinión, sin buscar tu negocio ni escribir nada. No necesita batería ni app y funciona con Android y con iPhone XS o posteriores. Cuesta 30 € una tarjeta y 50 € dos (IVA no incluido). Se piden aparte con cualquier plan; el plan Presencia 360° ya incluye 2 tarjetas. Hace más fácil dejar la reseña, pero la valoración la decide siempre el cliente.",
+plazo: "Depende del contenido que nos facilites (logo, textos, fotos, horarios y servicios). Te indicamos el plazo estimado en el presupuesto, antes de empezar.",
 mant: "El mantenimiento incluye la parte técnica de tu web, los cambios de contenido de tu plan y soporte por WhatsApp o email. Son 29 €/mes en Impulso Digital, 49 €/mes en Acelerador Pro y 79 €/mes en Presencia 360°, IVA no incluido. En Acelerador Pro el primer mes es gratis y en Presencia 360° los dos primeros.",
 video: "Hacemos 1 o 2 vídeos al mes en formato vertical para Reels y TikTok. Es un servicio aparte, a la carta y con presupuesto personalizado."
 };
