@@ -5,3 +5,4 @@ assetsignore.txt
 README.md
 node_modules
 .git
+src
