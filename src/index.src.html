@@ -44,10 +44,10 @@
 .esc-text{position:relative;z-index:2;height:100%;max-width:46rem;margin:0 auto;padding:0 1.25rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;text-align:center}
 .esc-k{font-size:.75rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:#e8c766}
 .esc-h{font-size:clamp(2rem,6.5vw,4.2rem);font-weight:800;line-height:1.05;color:#fafafa}
-.esc-h span{background:linear-gradient(180deg,#fff,#8a8a93);-webkit-background-clip:text;background-clip:text;color:transparent}
+.esc-h span{background:linear-gradient(100deg,#fff 0%,#e8c766 55%,#d4af37 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .esc-h .w{display:inline-block;will-change:transform,opacity}
 .esc-h>.w{color:#fafafa;background:none;-webkit-background-clip:border-box;background-clip:border-box}
-.esc-h .hl{background:linear-gradient(100deg,#8a8a93 0%,#fff 25%,#e8c766 50%,#d4af37 75%,#fff 100%);background-size:260% 100%;background-position:0 0;-webkit-background-clip:text;background-clip:text;color:transparent}
+.esc-h .hl{background:linear-gradient(100deg,#8a8a93 0%,#fff 25%,#e8c766 50%,#d4af37 75%,#fff 100%);background-size:260% 100%;background-position:62% 0;-webkit-background-clip:text;background-clip:text;color:transparent}
 .esc-h>span:has(.w){display:inline-block;white-space:nowrap;background:none;-webkit-background-clip:border-box;background-clip:border-box;color:inherit}
 .esc-orb{position:absolute;border-radius:50%;filter:blur(40px);pointer-events:none;will-change:transform}
 .esc-orb.o1{width:38vw;height:38vw;left:-8vw;top:10%;background:radial-gradient(circle,rgba(212,175,55,.38),transparent 65%)}
@@ -233,7 +233,7 @@ footer nav[aria-label="Legal"]{row-gap:0}
 @media(max-width:1023px){
 .sv{overflow:clip}
 .sv-grid{display:block}
-.sv-stage{position:sticky;top:3.6rem;z-index:6;padding:.6rem 0 .2rem;margin-bottom:.8rem;background:linear-gradient(180deg,#0b0c10 92%,rgba(11,12,16,0));height:calc(15.5rem*1.8333*.6 + .8rem)}
+.sv-stage{padding:.6rem 0 .2rem;margin-bottom:.8rem;height:calc(15.5rem*1.8333*.6 + .8rem)}
 .sv-phone{width:15.5rem;transform:scale(.6);transform-origin:top center;animation:none}
 .sv-halo,.sv-note{display:none}
 .sv-tabs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;padding-top:.2rem}
@@ -247,6 +247,7 @@ footer nav[aria-label="Legal"]{row-gap:0}
 .sv-meta a{margin-left:0}
 .sv-also{display:none}
 }
+@media(max-width:1023px) and (min-height:680px){.sv-stage{position:sticky;top:3.6rem;z-index:6;background:linear-gradient(180deg,#0b0c10 92%,rgba(11,12,16,0))}}
 .sv-cm{display:none}
 /* pantalla 0: web */
 .sv-bar{display:flex;align-items:center;gap:.25rem;height:1.6rem;padding:0 .5rem;border-radius:.6rem;background:#1a1b1f}

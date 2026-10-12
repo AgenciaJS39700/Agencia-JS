@@ -85,7 +85,7 @@ if (orb1) { tl.fromTo(orb1, { yPercent: 40, xPercent: -10 }, { yPercent: -45, xP
 if (orb2) { tl.fromTo(orb2, { yPercent: -50, xPercent: 10 }, { yPercent: 55, xPercent: -14, duration: 2.2 }, 0); }
 tl.fromTo(kick, { y: 20, opacity: 0, letterSpacing: "0.6em" }, { y: 0, opacity: 1, letterSpacing: "0.25em", duration: 0.4, ease: "power2.out" }, 0.45)
 .fromTo(palabras, { opacity: 0.1, y: 36, filter: "blur(12px)" }, { opacity: 1, y: 0, filter: "blur(0px)", stagger: 0.16, duration: 0.45, ease: "power2.out", clearProps: "filter" }, 0.6)
-.fromTo(head.querySelectorAll(".hl"), { backgroundPosition: "100% 0" }, { backgroundPosition: "0% 0", stagger: 0.1, duration: 0.7, ease: "power1.inOut" }, 1.1)
+.fromTo(head.querySelectorAll(".hl"), { backgroundPosition: "0% 0" }, { backgroundPosition: "62% 0", stagger: 0.1, duration: 0.7, ease: "power1.inOut" }, 1.1)
 .fromTo(sub, { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power2.out" }, 1.45)
 .fromTo(btn, { y: 26, opacity: 0, scale: 0.92 }, { y: 0, opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 1.7);
 /* Puntero: capas con distinta profundidad y foco de luz (solo con ratón) */
@@ -100,6 +100,10 @@ if (spot) { spot.style.setProperty("--mx", (nx + 0.5) * 100 + "%"); spot.style.s
 });
 }
 }
+
+/* Recalcular posiciones cuando termina de cargar todo (imágenes, fuentes) para que el pin no se descuadre */
+window.addEventListener("load", function () { ST.refresh(); });
+if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function () { ST.refresh(); }); }
 
 /* 3) Entrada escalonada de tarjetas y listas (sustituye al fundido simple en estos bloques) */
 ["#servicios .grid > a", "#planes article"].forEach(function (sel) {
