@@ -249,7 +249,7 @@ plazo: "Depende del contenido que nos facilites (logo, textos, fotos, horarios y
 mant: "El mantenimiento incluye la parte técnica de tu web, los cambios de contenido de tu plan y soporte por WhatsApp o email. Son 29 €/mes en Impulso Digital, 49 €/mes en Acelerador Pro y 79 €/mes en Presencia 360°, IVA no incluido. En Acelerador Pro el primer mes es gratis y en Presencia 360° los dos primeros.",
 video: "Creamos vídeos mensuales personalizados para tus redes, en formato vertical para Reels y TikTok. Es un servicio aparte, a la carta y con presupuesto personalizado.",
 auditoria: "La auditoría es gratuita y sin compromiso: revisamos tu ficha de Google, tu web y tus redes y te explicamos qué mejorar para que más clientes te encuentren. Pulsa «Pedir auditoría gratis», responde unas preguntas rápidas y déjanos tu correo, tu web y tus redes.",
-contacto: "Puedes escribirnos por WhatsApp al 628 22 47 19 o al 688 93 33 08, llamar al 628 22 47 19 o escribir a Agencia39700@gmail.com. También nos tienes en Instagram, Facebook y TikTok."
+contacto: "Puedes escribirnos o llamarnos por WhatsApp y teléfono al 628 22 47 19 o al 688 93 33 08, o escribir a Agencia39700@gmail.com. También nos tienes en Instagram, Facebook y TikTok."
 };
 var CHIPS = [
 ["¿Cuánto cuesta una web?", "precio"],

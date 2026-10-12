@@ -13,7 +13,7 @@ var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var actual = 0, timer = null, detenido = reduce, visible = false, encima = false;
 var DURACION = 7000;
 var vid = sec.querySelector(".sv-vid");
-var VIDEO_SRC = "/video-muestra.mp4";
+var VIDEO_SRC = "/video-pasteleria.mp4";
 function video(activo) {
 if (!vid) { return; }
 if (activo && visible) {
