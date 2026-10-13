@@ -94,6 +94,11 @@ async function consultar(env, mensajes) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // www → dominio sin www (evita contenido duplicado para Google)
+    if (url.hostname === "www.agencia-js.com") {
+      url.hostname = "agencia-js.com";
+      return Response.redirect(url.toString(), 301);
+    }
     if (url.pathname !== "/api/chat") {
       return env.ASSETS ? env.ASSETS.fetch(request) : new Response("No encontrado", { status: 404 });
     }
