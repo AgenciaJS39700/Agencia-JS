@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://agencia-js.com/sitemap.xml
