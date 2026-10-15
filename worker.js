@@ -99,6 +99,10 @@ export default {
       url.hostname = "agencia-js.com";
       return Response.redirect(url.toString(), 301);
     }
+    // Enlace corto del QR de las tarjetas de visita → sección de auditoría (con origen medible)
+    if (url.pathname === "/A" || url.pathname === "/a") {
+      return Response.redirect("https://agencia-js.com/?utm_source=tarjeta&utm_medium=qr#auditoria", 302);
+    }
     if (url.pathname !== "/api/chat") {
       return env.ASSETS ? env.ASSETS.fetch(request) : new Response("No encontrado", { status: 404 });
     }
