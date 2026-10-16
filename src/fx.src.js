@@ -53,7 +53,7 @@ if (txt) { gsap.to(txt, { y: desk ? -70 : -40, opacity: 0.08, ease: "none", scro
 
 /* 2) ESCENA: la imagen se expande suavemente hasta ocupar toda la pantalla */
 var esc = document.querySelector(".esc");
-if (esc) {
+if (esc && desk) { /* en móvil la escena está oculta */
 var frame = esc.querySelector(".esc-frame");
 var eimg = esc.querySelector(".esc-img");
 var kick = esc.querySelector(".esc-k"), head = esc.querySelector(".esc-h"), sub = esc.querySelector(".esc-p"), btn = esc.querySelector(".esc-btn");

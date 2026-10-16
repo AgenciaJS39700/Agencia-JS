@@ -16,7 +16,7 @@ var vid = sec.querySelector(".sv-vid");
 var VIDEO_SRC = "/video-pasteleria.mp4";
 function video(activo) {
 if (!vid) { return; }
-if (activo && visible) {
+if (activo && visible && vid.offsetParent !== null) { /* en móvil la maqueta está oculta */
 if (!vid.getAttribute("src")) { vid.src = VIDEO_SRC; }
 var pr = vid.play();
 if (pr && pr.catch) { pr.catch(function () {}); }
