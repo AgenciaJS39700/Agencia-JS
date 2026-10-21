@@ -236,6 +236,106 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
 .terr:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 30%,rgba(8,20,17,.8))}
 .terr .wrap{position:relative;z-index:1;padding:60px 0}
 @media(min-width:900px){.dock{left:auto;right:28px;width:440px;margin:0;bottom:28px}}
+
+/* ===== carta visual v2 ===== */
+.ltools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.lang{flex-wrap:wrap}
+.lang button{padding:8px 11px}
+.cur{display:inline-flex;align-items:center;gap:6px;background:#efe6d6;border-radius:999px;padding:4px 6px 4px 12px;font-weight:700;font-size:14px;color:var(--mute)}
+.cur select{border:0;background:#fff;border-radius:999px;padding:7px 10px;font:inherit;font-weight:800;color:var(--g);cursor:pointer}
+.curn{font-size:13px;color:var(--mute);margin:-12px 0 18px}
+.ctools{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}
+.explore{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:6px 18px 6px 6px;background:var(--g);color:var(--cream);font:inherit;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 14px 30px -14px rgba(15,42,36,.8);transition:transform .2s}
+.explore:hover{transform:translateY(-2px)}
+.explore .pv{position:relative;width:44px;height:44px;border-radius:50%;overflow:hidden;flex:none}
+.explore .pv video,.explore .pv img{width:100%;height:100%;object-fit:cover}
+.explore .pv:after{content:"▶";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:14px;background:rgba(0,0,0,.25)}
+.vt{display:inline-flex;background:#efe6d6;border-radius:999px;padding:4px}
+.vt button{border:0;background:none;padding:7px 12px;border-radius:999px;font:inherit;font-weight:700;font-size:13.5px;color:var(--mute);cursor:pointer}
+.vt button[aria-pressed=true]{background:#fff;color:var(--g);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.tabs button .tc{display:inline-block;margin-left:6px;font-size:11px;background:#efe6d6;color:var(--mute);border-radius:999px;padding:1px 7px;vertical-align:2px}
+.tabs button[aria-selected=true] .tc{background:var(--terra);color:#fff}
+.grid.cards{grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:760px){.grid.cards{grid-template-columns:repeat(3,1fr);gap:18px}}
+@media(min-width:1100px){.grid.cards{grid-template-columns:repeat(4,1fr)}}
+.grid.cards .item{display:block;padding:0;min-height:0;aspect-ratio:3/4;border:0;border-radius:22px;overflow:hidden;background:#173d35;box-shadow:0 18px 36px -24px rgba(15,42,36,.7)}
+.grid.cards .item:hover{box-shadow:0 26px 50px -24px rgba(15,42,36,.8)}
+.grid.cards .ico{position:absolute;inset:0;width:100%;height:100%;border-radius:0;background:#173d35}
+.grid.cards .body{position:absolute;left:0;right:0;bottom:0;padding:48px 58px 14px 14px;background:linear-gradient(180deg,rgba(8,20,17,0),rgba(8,20,17,.55) 35%,rgba(8,20,17,.92));color:#fff}
+.grid.cards h3{font-size:17px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+.grid.cards .body p{display:none}
+@media(min-width:760px){.grid.cards h3{font-size:20px}.grid.cards .body p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:rgba(255,255,255,.82);font-size:13px}}
+.grid.cards .tags{margin-top:6px;gap:4px}
+.grid.cards .tag{background:rgba(255,255,255,.18);color:#fff;font-size:10.5px;padding:2px 7px;backdrop-filter:blur(6px)}
+.grid.cards .price{position:absolute;left:10px;top:10px;background:rgba(251,247,240,.95);border-radius:999px;padding:3px 11px;font-size:16px;line-height:1.4;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.grid.cards .price small{display:block;font-family:var(--sans);font-size:10.5px;color:var(--mute);font-weight:700;line-height:1.1;margin-bottom:3px}
+.grid.cards .star{top:10px;right:10px;font-size:10px;padding:4px 8px}
+.grid.cards .addq{right:10px;bottom:12px;width:40px;height:40px}
+.cv{display:block;font-family:var(--sans);font-size:12px;color:var(--mute);font-weight:700;line-height:1.2}
+.sum .cv{text-align:right}
+.price small{display:block;font-family:var(--sans);font-size:12px;color:var(--mute);font-weight:700}
+.grid.list .body p{display:block}
+.fly{position:fixed;z-index:130;width:64px;height:64px;border-radius:50%;object-fit:cover;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+/* upsell */
+.ups{position:fixed;left:16px;right:16px;bottom:142px;z-index:75;max-width:560px;margin-inline:auto;background:#fff;border-radius:20px;padding:14px;box-shadow:0 24px 60px -18px rgba(0,0,0,.45);border:1px solid #efe5d4;transform:translateY(20px);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.ups.on{transform:none;opacity:1;pointer-events:auto}
+.ups p{font-weight:800;font-size:14.5px;display:flex;gap:8px;align-items:center}
+.ups .row{display:flex;gap:10px;align-items:center;margin-top:10px}
+.ups .row img{width:52px;height:52px;border-radius:14px;object-fit:cover}
+.ups .row b{display:block;font-size:14.5px;line-height:1.2}.ups .row small{color:var(--mute);font-size:12.5px}
+.ups .bt{display:flex;gap:8px;margin-top:12px}
+.ups .bt button{flex:1;min-height:44px;border-radius:12px;border:0;font:inherit;font-weight:800;cursor:pointer}
+.ups .y{background:var(--gold);color:#1d1a16}.ups .n{background:#efe6d6;color:var(--ink)}
+body.lock .ups{display:none}
+@media(min-width:900px){.ups{left:auto;right:28px;width:440px;margin:0;bottom:104px}}
+.upc{margin-top:18px;background:#fff;border:1.5px dashed #e2cfa9;border-radius:16px;padding:12px}
+.upc>p{font-weight:800;font-size:14px}
+/* nutricion */
+.nut{grid-template-columns:repeat(5,1fr);gap:6px}
+.nut div{padding:9px 4px}.nut b{font-size:18px}
+.nut .sg b{color:var(--terra)}
+.mac{display:flex;gap:16px;align-items:center;margin:4px 0 14px}
+.donut{width:92px;height:92px;border-radius:50%;flex:none;position:relative;transform:scale(.6) rotate(-90deg);opacity:0;transition:transform .8s cubic-bezier(.2,.8,.2,1),opacity .5s}
+.donut.go{transform:none;opacity:1}
+.donut:after{content:"";position:absolute;inset:16px;border-radius:50%;background:var(--paper)}
+.donut span{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;font-family:var(--serif);font-weight:700;font-size:18px;color:var(--g);line-height:1;text-align:center}
+.donut span small{display:block;font-family:var(--sans);font-size:10px;color:var(--mute);font-weight:700}
+.leg{display:grid;gap:5px;font-size:13.5px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:0}
+.dia{display:flex;gap:8px;align-items:flex-start;border-radius:14px;padding:10px 12px;font-size:13.5px;font-weight:700;margin-bottom:12px}
+.dia.ok{background:#e3f2e5;color:#1d6b33}.dia.no{background:#fdecdc;color:#9a4b12}
+.dia small{display:block;font-weight:600;opacity:.85}
+/* reels */
+.reel{position:fixed;inset:0;z-index:95;background:radial-gradient(circle at 50% 30%,#163a32,#050a09 70%);display:none}
+.reel.open{display:block}
+.rtrack{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none;margin-inline:auto;max-width:520px}
+.rtrack::-webkit-scrollbar{display:none}
+.rs{position:relative;height:100svh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#0f2a24}
+.rs video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform 6s linear}
+.rs.on video{transform:scale(1.12)}
+.rs .ov{position:absolute;left:0;right:0;bottom:0;padding:140px 20px calc(26px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.55) 30%,rgba(0,0,0,.9));color:#fff}
+.rs .ov>*{opacity:0;transform:translateY(18px);transition:opacity .5s,transform .6s cubic-bezier(.2,.8,.2,1)}
+.rs.on .ov>*{opacity:1;transform:none}
+.rs.on .ov>*:nth-child(2){transition-delay:.08s}.rs.on .ov>*:nth-child(3){transition-delay:.16s}.rs.on .ov>*:nth-child(4){transition-delay:.24s}.rs.on .ov>*:nth-child(5){transition-delay:.32s}
+.rs .rk{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.rs h3{font-family:var(--serif);font-size:34px;line-height:1.05;margin-top:6px}
+.rs .ds{color:rgba(255,255,255,.82);margin-top:6px}
+.rs .ch{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.rs .ch span{background:rgba(255,255,255,.16);backdrop-filter:blur(8px);border-radius:999px;padding:5px 10px;font-size:12.5px;font-weight:700}
+.rs .ra{display:flex;gap:10px;margin-top:16px}
+.rs .ra button{min-height:52px;border-radius:16px;border:0;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
+.rs .ra .y{flex:1;background:var(--gold);color:#1d1a16}
+.rs .ra .i{padding:0 18px;background:rgba(255,255,255,.16);color:#fff;backdrop-filter:blur(8px)}
+.rs .rst{position:absolute;top:26px;left:16px;z-index:2;background:var(--terra);color:#fff;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+.rbar{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:min(488px,calc(100% - 32px));display:flex;gap:3px;z-index:2}
+.rbar i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.3);transition:background .3s}
+.rbar i.on{background:#fff}
+.rx{position:fixed;top:24px;right:16px;z-index:3;width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.45);color:#fff;font-size:26px;cursor:pointer;backdrop-filter:blur(6px)}
+@media(min-width:620px){.rx{right:calc(50% - 250px)}}
+.rhint{position:fixed;left:50%;bottom:190px;transform:translateX(-50%);z-index:3;color:#fff;font-weight:800;font-size:14px;background:rgba(0,0,0,.45);padding:8px 14px;border-radius:999px;pointer-events:none;animation:bob 1.6s ease-in-out infinite;transition:opacity .4s;white-space:nowrap}
+.rhint.off{opacity:0}
+@keyframes bob{50%{transform:translate(-50%,-8px)}}
+@media(prefers-reduced-motion:reduce){.rs .ov>*{opacity:1!important;transform:none!important}.donut{opacity:1!important;transform:none!important}}
 </style>
 </head>
 <body>
@@ -265,12 +365,14 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
   <div class="wrap">
     <div class="head reveal">
       <div><p class="kick" data-t="k_carta">La carta</p><h2 id="t-carta" data-t="h_carta">Para compartir (o no)</h2></div>
-      <div class="lang" role="group" aria-label="Idioma de la carta"><button type="button" data-l="es" aria-pressed="true">ES</button><button type="button" data-l="en" aria-pressed="false">EN</button><button type="button" data-l="fr" aria-pressed="false">FR</button></div>
+      <div class="ltools"><div class="lang" role="group" aria-label="Idioma de la carta"><button type="button" data-l="es" aria-pressed="true">ES</button><button type="button" data-l="en" aria-pressed="false">EN</button><button type="button" data-l="fr" aria-pressed="false">FR</button><button type="button" data-l="de" aria-pressed="false">DE</button><button type="button" data-l="it" aria-pressed="false">IT</button><button type="button" data-l="pt" aria-pressed="false">PT</button></div><label class="cur"><span aria-hidden="true">💱</span><select id="cur" aria-label="Moneda"></select></label></div>
     </div>
     <p class="mesa reveal" id="mesa"></p>
+    <div class="ctools reveal"><button type="button" class="explore" id="explore"><span class="pv" aria-hidden="true"><video class="lv" src="vid/rabas.mp4" poster="img/rabas.webp" muted loop playsinline preload="none"></video></span><span id="explore-t">Ver la carta en vídeo</span></button><div class="vt" role="group" aria-label="Vista"><button type="button" data-v="cards" aria-pressed="true" id="vt-c">▦ Fotos</button><button type="button" data-v="list" aria-pressed="false" id="vt-l">☰ Lista</button></div></div>
     <div class="tabs reveal" role="tablist" aria-label="Secciones de la carta" id="tabs"><span class="ind" id="ind"></span></div>
     <div class="filters reveal" id="filters"></div>
-    <div class="grid" id="grid" role="tabpanel" aria-live="polite"></div>
+    <p class="curn" id="curn" hidden></p>
+    <div class="grid cards" id="grid" role="tabpanel" aria-live="polite"></div>
     <p class="note" data-t="note">Toca un plato para ver alérgenos e información nutricional. Precios con IVA incluido.</p>
   </div>
 </section>
@@ -346,6 +448,8 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
 </div></div>
 <div class="dock" id="dock"><button type="button" class="cartbar" id="cartbar"><span id="cb-l"></span><b id="cb-r"></b></button><button type="button" class="fab" id="fab" aria-label="Camarero virtual">🤵<small id="fab-s"></small></button></div>
 <div class="toast" id="toast" role="status"></div>
+<div class="ups" id="ups" role="dialog" aria-live="polite" aria-label="Sugerencia"></div>
+<div class="reel" id="reel" role="dialog" aria-modal="true" aria-label="Carta en vídeo"><div class="rbar" id="rbar" aria-hidden="true"></div><button type="button" class="rx" id="rx" aria-label="Cerrar">×</button><div class="rtrack" id="rtrack"></div><p class="rhint" id="rhint"></p></div>
 
 <script>
 (function(){
@@ -373,6 +477,53 @@ var M=[
  {c:"bebidas",i:"🍷",s:1,p:"3,00",v:1,gf:1,a:"s",n:[140,0,14,0],es:["Vermut de grifo","Con naranja y aceituna"],en:["Draught vermouth","With orange and olive"],fr:["Vermouth pression","Orange et olive"]},
  {c:"bebidas",i:"🍺",p:"2,50",v:1,gf:0,a:"g",n:[150,1,12,0],es:["Caña","Cerveza de barril"],en:["Small draught beer","Draught beer"],fr:["Demi","Bière pression"]},
  {c:"bebidas",i:"🥤",p:"2,80",v:1,gf:1,a:"",n:[90,0,22,0],es:["Refrescos","Varios sabores"],en:["Soft drinks","Several flavours"],fr:["Sodas","Plusieurs parfums"]}];
+/* ---------- idiomas extra (DE · IT · PT) ---------- */
+T.de={k_carta:"Die Karte",h_carta:"Zum Teilen (oder auch nicht)",note:"Tippe auf ein Gericht für Allergene und Nährwerte oder auf + zum Bestellen. Preise inkl. MwSt.",veg:"Vegetarisch",gf:"Glutenfrei",lact:"Laktosefrei",light:"Leicht",eco:"Regional",all:"Alles",star:"Empfehlung",empty:"Keine Gerichte mit diesem Filter.",alg:"Allergene",kcal:"kcal",prot:"Eiweiß",carb:"Kohlenh.",fat:"Fett",none:"Keine Hauptallergene",daily:"des Referenzwerts (2.000 kcal)",bio:"Nährwerte pro Portion, Richtwerte.",ask_dish:"Fragen",table:"Tisch",here:"📍 Tisch {m} · bestellen und zahlen per Handy",order:"Deine Bestellung",view:"Bestellung ansehen",account:"Rechnung",addto:"Zur Bestellung",added:"Zur Bestellung hinzugefügt",cart_empty:"Noch nichts ausgewählt. Tippe bei einem Gericht auf +.",note_ph:"Hinweis für die Küche (ohne Zwiebel, blutig…)",send:"An die Küche senden",sent:"Bestellung an die Küche gesendet!",ordered:"Bereits bestellt",st1:"Erhalten",st2:"In der Küche",st3:"Serviert",total:"Gesamt",subtotal:"Zwischensumme",tip:"Trinkgeld",split:"Rechnung teilen",each:"Pro Person",pay:"Rechnung bezahlen",paynow:"Bezahlen",card:"Karte",demo_pay:"Demo-Zahlung: Es wird nichts abgebucht.",paid:"Zahlung erfolgreich!",thanks:"Danke für deinen Besuch. Hinterlässt du uns eine Google-Bewertung?",review:"Bewertung schreiben",review_demo:"Auf der echten Website öffnet dieser Button die Google-Bewertung des Lokals.",call:"🙋 Kellner rufen",bill:"🧾 Rechnung bitte",called:"Erledigt: Ein Kellner kommt zu Tisch {m}.",billed:"Erledigt: Wir bringen die Rechnung an Tisch {m}. Du kannst auch hier bezahlen.",waiter:"Virtueller Kellner",online:"● Online · antwortet sofort",fab:"Soll ich dir helfen?",hi:"Hallo! Ich bin der virtuelle Kellner der Bar Marea 👋 Frag mich nach Allergenen, Empfehlungen oder Getränken, und ich füge es deiner Bestellung hinzu.",ask_ph:"Deine Frage…",for_x:"Für dich ({x}) empfehle ich:",rec:"Am häufigsten bestellt:",drink:"Zum Trinken:",dess:"Zum Nachtisch:",pair:"Passt perfekt zu:",fallback:"Hm, das habe ich nicht ganz verstanden 🤔 Frag nach Allergenen (Gluten, Milch, Nüsse, Meeresfrüchte), „etwas Leichtes“, „was empfiehlst du“ oder „was trinke ich“.",disc:"Richtwerte: Bei schweren Allergien bitte immer beim Personal nachfragen.",nf:"Gerade habe ich kein Gericht, das alles erfüllt. Frag den Kellner, die Küche macht dir gern etwas."};
+T.it={k_carta:"Il menù",h_carta:"Da condividere (o no)",note:"Tocca un piatto per allergeni e valori nutrizionali, o + per aggiungerlo all'ordine. IVA inclusa.",veg:"Vegetariano",gf:"Senza glutine",lact:"Senza lattosio",light:"Leggero",eco:"Km 0",all:"Tutto",star:"Consigliato",empty:"Nessun piatto con questo filtro.",alg:"Allergeni",kcal:"kcal",prot:"Proteine",carb:"Carboidr.",fat:"Grassi",none:"Nessun allergene principale",daily:"dell'assunzione di riferimento (2.000 kcal)",bio:"Valori nutrizionali indicativi per porzione.",ask_dish:"Chiedi",table:"Tavolo",here:"📍 Tavolo {m} · ordina e paga dal telefono",order:"Il tuo ordine",view:"Vedi ordine",account:"Conto",addto:"Aggiungi all'ordine",added:"Aggiunto all'ordine",cart_empty:"Ancora niente. Tocca + su un piatto.",note_ph:"Nota per la cucina (senza cipolla, al sangue…)",send:"Invia in cucina",sent:"Ordine inviato in cucina!",ordered:"Già ordinato",st1:"Ricevuto",st2:"In cucina",st3:"Servito",total:"Totale",subtotal:"Subtotale",tip:"Mancia",split:"Dividi il conto",each:"A testa",pay:"Paga il conto",paynow:"Paga",card:"Carta",demo_pay:"Pagamento dimostrativo: nessun addebito.",paid:"Pagamento completato!",thanks:"Grazie della visita. Ci lasci una recensione su Google?",review:"Lascia una recensione",review_demo:"Sul sito reale, questo pulsante apre la recensione Google del locale.",call:"🙋 Chiama il cameriere",bill:"🧾 Chiedi il conto",called:"Fatto: un cameriere arriva al tavolo {m}.",billed:"Fatto: ti portiamo il conto al tavolo {m}. Puoi anche pagare da qui.",waiter:"Cameriere virtuale",online:"● Online · risponde subito",fab:"Ti aiuto a scegliere?",hi:"Ciao! Sono il cameriere virtuale di Bar Marea 👋 Chiedimi di allergeni, cosa ordinare o cosa bere, e lo aggiungo al tuo ordine.",ask_ph:"Scrivi la tua domanda…",for_x:"Per te ({x}) ti consiglio:",rec:"I più ordinati:",drink:"Da bere:",dess:"Per dessert:",pair:"Si abbina benissimo con:",fallback:"Mmm, non sono sicuro di aver capito 🤔 Prova con allergeni (glutine, latte, frutta secca, frutti di mare), «qualcosa di leggero», «cosa mi consigli» o «cosa bevo».",disc:"Informazioni indicative: in caso di allergia grave, chiedi sempre conferma al personale.",nf:"Al momento non ho piatti che rispettino tutto. Chiedi al cameriere e la cucina ti preparerà qualcosa."};
+T.pt={k_carta:"A ementa",h_carta:"Para partilhar (ou não)",note:"Toque num prato para ver alergénios e informação nutricional, ou + para o adicionar ao pedido. IVA incluído.",veg:"Vegetariano",gf:"Sem glúten",lact:"Sem lactose",light:"Leve",eco:"Local",all:"Tudo",star:"Recomendado",empty:"Não há pratos com esse filtro.",alg:"Alergénios",kcal:"kcal",prot:"Proteína",carb:"Hidratos",fat:"Gordura",none:"Sem alergénios principais",daily:"da dose diária de referência (2.000 kcal)",bio:"Valores nutricionais indicativos por dose.",ask_dish:"Perguntar",table:"Mesa",here:"📍 Mesa {m} · peça e pague pelo telemóvel",order:"O seu pedido",view:"Ver pedido",account:"Conta",addto:"Adicionar ao pedido",added:"Adicionado ao pedido",cart_empty:"Ainda não adicionou nada. Toque em + num prato.",note_ph:"Nota para a cozinha (sem cebola, mal passado…)",send:"Enviar para a cozinha",sent:"Pedido enviado para a cozinha!",ordered:"Já pedido",st1:"Recebido",st2:"Na cozinha",st3:"Servido",total:"Total",subtotal:"Subtotal",tip:"Gorjeta",split:"Dividir a conta",each:"Cada um paga",pay:"Pagar a conta",paynow:"Pagar",card:"Cartão",demo_pay:"Pagamento de demonstração: não é cobrado nada.",paid:"Pagamento concluído!",thanks:"Obrigado pela visita. Deixa-nos uma avaliação no Google?",review:"Deixar avaliação",review_demo:"No site real, este botão abre a avaliação Google do restaurante.",call:"🙋 Chamar o empregado",bill:"🧾 Pedir a conta",called:"Feito: um empregado vai à mesa {m}.",billed:"Feito: levamos a conta à mesa {m}. Também pode pagar aqui.",waiter:"Empregado virtual",online:"● Online · responde na hora",fab:"Ajudo-o a escolher?",hi:"Olá! Sou o empregado virtual do Bar Marea 👋 Pergunte-me sobre alergénios, o que pedir ou o que beber, e eu adiciono ao seu pedido.",ask_ph:"Escreva a sua pergunta…",for_x:"Para si ({x}) recomendo:",rec:"Os mais pedidos:",drink:"Para beber:",dess:"Para sobremesa:",pair:"Combina muito bem com:",fallback:"Hmm, não tenho a certeza de ter percebido 🤔 Experimente alergénios (glúten, lácteos, frutos secos, marisco), «algo leve», «o que recomenda» ou «o que bebo».",disc:"Informação indicativa: se tiver uma alergia grave, confirme sempre com o pessoal.",nf:"De momento não tenho pratos que cumpram tudo isso. Pergunte ao empregado e a cozinha prepara-lhe algo."};
+var X={
+ es:{q:["Soy celíaco","Soy diabético","¿Qué me recomiendas?","Algo ligero","¿Qué bebo?","Sin lácteos"],sugar:"Azúcar",diab:"Bajo en azúcar",hc:"≈ {r} raciones de hidratos (1 ración = 10 g)",diab_ok:"Apto para diabéticos: {s} g de azúcar",diab_no:"Alto en azúcar: {s} g. Consúltalo si eres diabético.",dish_i:"{n}: {k} kcal, {c} g de hidratos y {s} g de azúcar por ración. Alérgenos: {a}.",cur_l:"Moneda",cur_n:"Precios aproximados en {c} · la cuenta se cobra en euros.",up_d:"¿Le pongo algo de beber? Con esto va genial:",up_f:"¿Algo para picar con la bebida?",up_s:"¿Algo dulce para terminar?",up_y:"Añadir",up_n:"No, gracias",explore:"Ver la carta en vídeo",swipe:"Desliza para ver más ↑",info:"Info",vcards:"Fotos",vlist:"Lista",diab_tip:"Para diabéticos, platos con poco azúcar (te indico azúcar e hidratos):"},
+ en:{q:["I'm coeliac","I'm diabetic","What do you recommend?","Something light","What should I drink?","Dairy free"],sugar:"Sugar",diab:"Low sugar",hc:"≈ {r} carb portions (1 portion = 10 g)",diab_ok:"Diabetic friendly: {s} g sugar",diab_no:"High in sugar: {s} g. Check with us if you're diabetic.",dish_i:"{n}: {k} kcal, {c} g carbs and {s} g sugar per portion. Allergens: {a}.",cur_l:"Currency",cur_n:"Approximate prices in {c} · the bill is charged in euros.",up_d:"Something to drink? This goes great with it:",up_f:"Something to nibble with your drink?",up_s:"Something sweet to finish?",up_y:"Add",up_n:"No, thanks",explore:"Watch the menu",swipe:"Swipe up for more ↑",info:"Info",vcards:"Photos",vlist:"List",diab_tip:"Low-sugar dishes for diabetics (sugar and carbs shown):"},
+ fr:{q:["Je suis cœliaque","Je suis diabétique","Que me conseillez-vous ?","Quelque chose de léger","Que boire ?","Sans lactose"],sugar:"Sucres",diab:"Peu sucré",hc:"≈ {r} portions de glucides (1 portion = 10 g)",diab_ok:"Adapté aux diabétiques : {s} g de sucres",diab_no:"Riche en sucres : {s} g. Demandez-nous si vous êtes diabétique.",dish_i:"{n} : {k} kcal, {c} g de glucides et {s} g de sucres par portion. Allergènes : {a}.",cur_l:"Devise",cur_n:"Prix approximatifs en {c} · l'addition est réglée en euros.",up_d:"Quelque chose à boire ? Ça va parfaitement avec :",up_f:"Quelque chose à grignoter avec la boisson ?",up_s:"Une petite douceur pour finir ?",up_y:"Ajouter",up_n:"Non merci",explore:"Voir la carte en vidéo",swipe:"Glissez pour voir plus ↑",info:"Info",vcards:"Photos",vlist:"Liste",diab_tip:"Plats peu sucrés pour diabétiques (sucres et glucides indiqués) :"},
+ de:{q:["Ich habe Zöliakie","Ich bin Diabetiker","Was empfiehlst du?","Etwas Leichtes","Was soll ich trinken?","Laktosefrei"],sugar:"Zucker",diab:"Zuckerarm",hc:"≈ {r} KE (1 KE = 10 g Kohlenhydrate)",diab_ok:"Für Diabetiker geeignet: {s} g Zucker",diab_no:"Viel Zucker: {s} g. Frag uns, wenn du Diabetiker bist.",dish_i:"{n}: {k} kcal, {c} g Kohlenhydrate und {s} g Zucker pro Portion. Allergene: {a}.",cur_l:"Währung",cur_n:"Ungefähre Preise in {c} · abgerechnet wird in Euro.",up_d:"Etwas zu trinken? Das passt perfekt dazu:",up_f:"Etwas zum Knabbern zum Getränk?",up_s:"Etwas Süßes zum Abschluss?",up_y:"Hinzufügen",up_n:"Nein, danke",explore:"Karte als Video",swipe:"Wische für mehr ↑",info:"Info",vcards:"Fotos",vlist:"Liste",diab_tip:"Zuckerarme Gerichte für Diabetiker (Zucker und Kohlenhydrate):"},
+ it:{q:["Sono celiaco","Sono diabetico","Cosa mi consigli?","Qualcosa di leggero","Cosa bevo?","Senza lattosio"],sugar:"Zuccheri",diab:"Poco zucchero",hc:"≈ {r} porzioni di carboidrati (1 porzione = 10 g)",diab_ok:"Adatto ai diabetici: {s} g di zuccheri",diab_no:"Ricco di zuccheri: {s} g. Chiedici se sei diabetico.",dish_i:"{n}: {k} kcal, {c} g di carboidrati e {s} g di zuccheri per porzione. Allergeni: {a}.",cur_l:"Valuta",cur_n:"Prezzi indicativi in {c} · il conto si paga in euro.",up_d:"Qualcosa da bere? Ci sta benissimo:",up_f:"Qualcosa da stuzzicare con il drink?",up_s:"Qualcosa di dolce per finire?",up_y:"Aggiungi",up_n:"No, grazie",explore:"Guarda il menù in video",swipe:"Scorri per vedere altro ↑",info:"Info",vcards:"Foto",vlist:"Lista",diab_tip:"Piatti con poco zucchero per diabetici (zuccheri e carboidrati):"},
+ pt:{q:["Sou celíaco","Sou diabético","O que recomenda?","Algo leve","O que bebo?","Sem lactose"],sugar:"Açúcar",diab:"Pouco açúcar",hc:"≈ {r} porções de hidratos (1 porção = 10 g)",diab_ok:"Adequado para diabéticos: {s} g de açúcar",diab_no:"Rico em açúcar: {s} g. Pergunte-nos se for diabético.",dish_i:"{n}: {k} kcal, {c} g de hidratos e {s} g de açúcar por dose. Alergénios: {a}.",cur_l:"Moeda",cur_n:"Preços aproximados em {c} · a conta é cobrada em euros.",up_d:"Algo para beber? Fica ótimo com:",up_f:"Algo para petiscar com a bebida?",up_s:"Algo doce para terminar?",up_y:"Adicionar",up_n:"Não, obrigado",explore:"Ver a ementa em vídeo",swipe:"Deslize para ver mais ↑",info:"Info",vcards:"Fotos",vlist:"Lista",diab_tip:"Pratos com pouco açúcar para diabéticos (açúcar e hidratos):"}};
+Object.keys(X).forEach(function(l){for(var k in X[l])T[l][k]=X[l][k]});
+var A2={g:["Gluten","Glutine","Glúten"],l:["Milch","Latte","Leite"],h:["Ei","Uova","Ovo"],p:["Fisch","Pesce","Peixe"],m:["Weichtiere","Molluschi","Moluscos"],f:["Schalenfrüchte","Frutta a guscio","Frutos de casca rija"],s:["Sulfite","Solfiti","Sulfitos"]};
+for(var ak in A2){ALG[ak].de=A2[ak][0];ALG[ak].it=A2[ak][1];ALG[ak].pt=A2[ak][2]}
+var C2={picar:["Zum Knabbern","Stuzzichini","Para petiscar"],raciones:["Zum Teilen","Da condividere","Para partilhar"],bocatas:["Bocadillos","Panini","Sandes"],postres:["Desserts","Dolci","Sobremesas"],bebidas:["Getränke","Bevande","Bebidas"]};
+CATS.forEach(function(c){c.de=C2[c.id][0];c.it=C2[c.id][1];c.pt=C2[c.id][2]});
+var M2=[
+ [["Klassische Gilda","Sardelle, Chili und Olive"],["Gilda classica","Acciuga, peperoncino e oliva"],["Gilda clássica","Anchova, malagueta e azeitona"]],
+ [["Käseplatte","Regionale Käse mit Quitte"],["Tagliere di formaggi","Formaggi locali con cotognata"],["Tábua de queijos","Queijos da região com marmelada"]],
+ [["Patatas bravas","Scharfe Haussoße und Aioli"],["Patatas bravas","Salsa piccante della casa e aioli"],["Batatas bravas","Molho picante da casa e alioli"]],
+ [["Kantabrische Sardellen","Acht Filets in Olivenöl"],["Acciughe del Cantabrico","Otto filetti in olio d'oliva"],["Anchovas do Cantábrico","Oito lombos em azeite"]],
+ [["Tortilla des Hauses","Ganz, saftig, mit Zwiebeln"],["Tortilla della casa","Intera, morbida, con cipolla"],["Tortilha da casa","Inteira, suculenta, com cebola"]],
+ [["Frittierter Tintenfisch","Mit Zitrone und Aioli"],["Calamari fritti","Con limone e aioli"],["Lulas fritas","Com limão e alioli"]],
+ [["Hausgemachte Croquetas (8)","Iberico-Schinken oder Steinpilz"],["Crocchette della casa (8)","Prosciutto iberico o porcini"],["Croquetes caseiros (8)","Presunto ibérico ou cogumelos"]],
+ [["Gartensalat","Tomate, optional Thunfisch, Walnüsse"],["Insalata dell'orto","Pomodoro, tonno a scelta, noci"],["Salada da horta","Tomate, atum opcional, nozes"]],
+ [["Tintenfisch-Bocadillo","Knuspriges Brot und milde Aioli"],["Panino ai calamari","Pane croccante e aioli delicata"],["Sandes de lulas","Pão estaladiço e alioli suave"]],
+ [["Rindfleisch-Pepito","Mit gerösteter Paprika"],["Pepito di manzo","Con peperoni arrostiti"],["Prego de novilho","Com pimentos assados"]],
+ [["Gemüse-Bocadillo","Gegrilltes Gemüse und Käse"],["Panino vegetariano","Verdure grigliate e formaggio"],["Sandes vegetariana","Legumes grelhados e queijo"]],
+ [["Käsekuchen","Cremig, gebacken"],["Cheesecake","Cremosa, al forno"],["Cheesecake","Cremoso, no forno"]],
+ [["Hausgemachter Flan","Mit Sahne"],["Flan della casa","Con panna"],["Pudim caseiro","Com natas"]],
+ [["Wermut vom Fass","Mit Orange und Olive"],["Vermouth alla spina","Con arancia e oliva"],["Vermute de pressão","Com laranja e azeitona"]],
+ [["Kleines Bier","Fassbier"],["Birra piccola","Birra alla spina"],["Imperial","Cerveja de pressão"]],
+ [["Softdrinks","Verschiedene Sorten"],["Bibite","Vari gusti"],["Refrigerantes","Vários sabores"]]];
+var SUG=[1,1,2,0,4,1,3,6,3,5,7,28,30,12,0,22];
+M.forEach(function(m,i){m.de=M2[i][0];m.it=M2[i][1];m.pt=M2[i][2];m.sg=SUG[i];m.id=i});
+var LANGS=["es","en","fr","de","it","pt"],LOC={es:"es-ES",en:"en-GB",fr:"fr-FR",de:"de-DE",it:"it-IT",pt:"pt-PT"};
+function lowS(m){return m.sg<=5}
+/* ---------- divisas ---------- */
+var RATES={EUR:1,USD:1.16,GBP:0.87,CHF:0.93,JPY:172,CNY:8.3,MXN:21.5,CAD:1.6,AUD:1.77,BRL:6.3,SEK:11,NOK:11.7,DKK:7.46,PLN:4.25};
+var CUR=(function(){var r=null;try{r=localStorage.getItem("bm_cur")}catch(e){}if(r&&RATES[r])return r;var g=((navigator.language||"").split("-")[1]||"").toUpperCase();return {US:"USD",GB:"GBP",CH:"CHF",JP:"JPY",CN:"CNY",MX:"MXN",CA:"CAD",AU:"AUD",BR:"BRL",SE:"SEK",NO:"NOK",DK:"DKK",PL:"PLN"}[g]||"EUR"})();
+function money(n,c){c=c||CUR;try{return new Intl.NumberFormat(LOC[L]||"es-ES",{style:"currency",currency:c,maximumFractionDigits:c==="JPY"?0:2}).format(n)}catch(e){return n.toFixed(2)+" "+c}}
+function conv(n){return CUR==="EUR"?"":"≈ "+money(n*RATES[CUR])}
+function cv(n,tag){var c=conv(n);return c?"<"+(tag||"small")+' class="cv">'+c+"</"+(tag||"small")+">":""}
+function loadRates(){var urls=["https://api.frankfurter.dev/v1/latest?base=EUR","https://api.frankfurter.app/latest?from=EUR"];(function tryU(i){if(i>=urls.length||!window.fetch)return;fetch(urls[i]).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){if(!d||!d.rates)throw 0;for(var k in d.rates)if(RATES[k])RATES[k]=d.rates[k];if(CUR!=="EUR"){drawGrid();drawCurNote()}}).catch(function(){tryU(i+1)})})(0)}
+function drawCurSel(){var sel=$("#cur");sel.setAttribute("aria-label",t("cur_l"));sel.innerHTML=Object.keys(RATES).map(function(c){return '<option value="'+c+'"'+(c===CUR?" selected":"")+">"+c+"</option>"}).join("")}
+function drawCurNote(){var n=$("#curn");if(CUR==="EUR"){n.hidden=true}else{n.hidden=false;n.textContent="💱 "+f(t("cur_n"),{c:CUR})}}
+
 var ECO={1:1,3:1,4:1,7:1};
 var IMG=["gilda","quesos","bravas","anchoas","tortilla","rabas","croquetas","ensalada","bocata","pepito","vegetal","tarta","flan","vermut","cana","refrescos"];
 var VID={};IMG.forEach(function(n,i){VID[i]=n});
@@ -383,7 +534,7 @@ function im(i){return "img/"+IMG[i]+".webp"}
 function thumb(m,c){return '<img class="'+(c||"thumb")+'" src="'+im(m.id)+'" alt="" loading="lazy" width="720" height="720">'}
 var L=(function(){var n=(navigator.language||"es").slice(0,2).toLowerCase();return T[n]?n:"es"})();
 var MESA=((new URLSearchParams(location.search).get("mesa")||"7").replace(/\D/g,"").slice(0,3))||"7";
-var cat="picar",fV=0,fG=0,fL=0,fK=0;
+var cat="picar",fV=0,fG=0,fL=0,fK=0,fD=0,VIEW="cards",upShown={},upNo=0,upT;
 var cart={},ordered={},stage=0,tip=0,split=1,pm="apple",note="",view="cart",greeted=0;
 var $=function(s){return document.querySelector(s)};
 var tabs=$("#tabs"),ind=$("#ind"),grid=$("#grid"),filters=$("#filters");
@@ -400,23 +551,26 @@ var toastT;function toast(x){var n=$("#toast");n.textContent=x;n.classList.add("
 /* ---------- carta ---------- */
 function drawTabs(){
   [].slice.call(tabs.querySelectorAll("button")).forEach(function(b){b.remove()});
-  CATS.forEach(function(c){var b=document.createElement("button");b.type="button";b.setAttribute("role","tab");b.textContent=c[L];b.setAttribute("aria-selected",c.id===cat);b.addEventListener("click",function(){cat=c.id;drawTabs();drawGrid()});tabs.appendChild(b)});
+  CATS.forEach(function(c){var b=document.createElement("button");b.type="button";b.setAttribute("role","tab");var nn=M.filter(function(m){return m.c===c.id&&okF(m)}).length;b.innerHTML=esc(c[L])+'<span class="tc">'+nn+'</span>';b.setAttribute("aria-selected",c.id===cat);b.addEventListener("click",function(){cat=c.id;drawTabs();drawGrid()});tabs.appendChild(b)});
   requestAnimationFrame(moveInd);
 }
 function moveInd(){var a=tabs.querySelector('[aria-selected="true"]');if(!a)return;ind.style.left=a.offsetLeft+"px";ind.style.width=a.offsetWidth+"px";var tl=a.offsetLeft-16,tr=a.offsetLeft+a.offsetWidth-tabs.clientWidth+16;if(tabs.scrollLeft>tl)tabs.scrollLeft=tl;else if(tabs.scrollLeft<tr)tabs.scrollLeft=tr}
-function drawFilters(){filters.innerHTML="";[["v","veg","🌱"],["g","gf","🌾"],["l","lact","🥛"],["k","light","🍃"]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="chip";var on={v:fV,g:fG,l:fL,k:fK}[x[0]];b.setAttribute("aria-pressed",!!on);b.textContent=x[2]+" "+t(x[1]);b.addEventListener("click",function(){if(x[0]==="v")fV=!fV;else if(x[0]==="g")fG=!fG;else if(x[0]==="l")fL=!fL;else fK=!fK;drawFilters();drawGrid()});filters.appendChild(b)})}
+function okF(m){return (!fV||m.v)&&(!fG||m.gf)&&(!fL||!has(m,"l"))&&(!fK||m.n[0]<300)&&(!fD||lowS(m))}
+function drawFilters(){filters.innerHTML="";[["v","veg","🌱"],["g","gf","🌾"],["l","lact","🥛"],["k","light","🍃"],["d","diab","🩸"]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="chip";var on={v:fV,g:fG,l:fL,k:fK,d:fD}[x[0]];b.setAttribute("aria-pressed",!!on);b.textContent=x[2]+" "+t(x[1]);b.addEventListener("click",function(){if(x[0]==="v")fV=!fV;else if(x[0]==="g")fG=!fG;else if(x[0]==="l")fL=!fL;else if(x[0]==="d")fD=!fD;else fK=!fK;drawFilters();drawTabs();drawGrid()});filters.appendChild(b)})}
 function drawGrid(){
-  var list=M.map(function(m,i){m.id=i;return m}).filter(function(m){return m.c===cat&&(!fV||m.v)&&(!fG||m.gf)&&(!fL||!has(m,"l"))&&(!fK||m.n[0]<300)});
-  grid.innerHTML="";
+  var list=M.map(function(m,i){m.id=i;return m}).filter(function(m){return m.c===cat&&okF(m)});
+  grid.className="grid "+VIEW;grid.innerHTML="";
   if(!list.length){grid.innerHTML='<p class="empty">'+t("empty")+'</p>';return}
   list.forEach(function(m,k){
     var c=document.createElement("div");c.className="cell";
     var b=document.createElement("button");b.type="button";b.className="item";
-    var tags=(m.v?'<span class="tag v">🌱 '+t("veg")+'</span>':'')+(m.gf?'<span class="tag gf">'+t("gf")+'</span>':'')+(ECO[m.id]?'<span class="tag eco">📍 '+t("eco")+'</span>':'')+'<span class="tag">'+m.n[0]+' kcal</span>';
-    b.innerHTML=(m.s?'<span class="star">'+t("star")+'</span>':'')+'<span class="ico" aria-hidden="true">'+vthumb(m)+'</span><span><h3>'+nm(m)+'</h3><p>'+m[L][1]+'</p><span class="tags">'+tags+'</span></span><span class="price">'+m.p+' €</span>';
+    var C=VIEW==="cards";
+    var tags=C?((m.v?'<span class="tag" title="'+esc(t("veg"))+'">🌱</span>':'')+(m.gf?'<span class="tag">'+t("gf")+'</span>':'')+'<span class="tag">'+m.n[0]+' kcal</span>'+(lowS(m)?'':'<span class="tag" title="'+esc(t("sugar"))+'">🍬 '+m.sg+' g</span>'))
+      :((m.v?'<span class="tag v">🌱 '+t("veg")+'</span>':'')+(m.gf?'<span class="tag gf">'+t("gf")+'</span>':'')+(ECO[m.id]?'<span class="tag eco">📍 '+t("eco")+'</span>':'')+'<span class="tag">'+m.n[0]+' kcal</span><span class="tag">🍬 '+m.sg+' g</span>');
+    b.innerHTML=(m.s?'<span class="star">'+t("star")+'</span>':'')+'<span class="ico" aria-hidden="true">'+vthumb(m)+'</span><span class="body"><h3>'+nm(m)+'</h3><p>'+m[L][1]+'</p><span class="tags">'+tags+'</span></span><span class="price">'+m.p+' €'+cv(pr(m))+'</span>';
     b.addEventListener("click",function(){openDish(m)});
     var a=document.createElement("button");a.type="button";a.className="addq";a.textContent="+";a.setAttribute("aria-label",t("addto")+": "+nm(m));
-    a.addEventListener("click",function(){add(m.id)});
+    a.addEventListener("click",function(){add(m.id,{up:1,from:c})});
     c.appendChild(b);c.appendChild(a);grid.appendChild(c);var vv=c.querySelector("video");if(vv)watch(vv);
     setTimeout(function(){c.classList.add("in")},40+k*70);
   });
@@ -429,18 +583,31 @@ function closeS(el){el.classList.remove("show");setTimeout(function(){el.classLi
 $("#shx").addEventListener("click",function(){closeS($("#sheet"))});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){var o=document.querySelectorAll(".sheet.show");if(o.length)closeS(o[o.length-1])}});
 function algTxt(m){var a=m.a?m.a.split(","):[];return a.length?a.map(function(x){return ALG[x][L]}).join(", "):t("none")}
+function macro(m){var p=m.n[1]*4,c=m.n[2]*4,g=m.n[3]*9,tt=p+c+g||1,a=p/tt*100,b=a+c/tt*100;
+  return '<div class="mac"><div class="donut" style="background:conic-gradient(#2fa35a 0 '+a+'%,#d9a441 0 '+b+'%,#c8653a 0)"><span>'+m.n[0]+'<small>kcal</small></span></div><div class="leg"><span><i style="background:#2fa35a"></i>'+t("prot")+' · '+Math.round(p/tt*100)+' %</span><span><i style="background:#d9a441"></i>'+t("carb")+' · '+Math.round(c/tt*100)+' %</span><span><i style="background:#c8653a"></i>'+t("fat")+' · '+Math.round(g/tt*100)+' %</span></div></div>'}
 function openDish(m){
   var a=m.a?m.a.split(","):[];
   var algs=a.length?a.map(function(x){return '<span>'+ALG[x].i+' '+ALG[x][L]+'</span>'}).join(""):'<span>✅ '+t("none")+'</span>';
   var pct=Math.round(m.n[0]/20);
-  $("#sh-b").innerHTML=(VID[m.id]?'<video class="shm" src="vid/'+VID[m.id]+'.mp4" poster="'+im(m.id)+'" autoplay muted loop playsinline></video>':'<img class="shm" src="'+im(m.id)+'" alt="">')+'<h3 id="sh-t">'+nm(m)+'</h3><p style="color:var(--mute)">'+m[L][1]+'</p><div class="tags">'+(m.v?'<span class="tag v">🌱 '+t("veg")+'</span>':'')+(m.gf?'<span class="tag gf">'+t("gf")+'</span>':'')+(ECO[m.id]?'<span class="tag eco">📍 '+t("eco")+'</span>':'')+'</div><p class="price" style="margin-top:8px">'+m.p+' €</p><p style="font-weight:800;margin-top:14px">'+t("alg")+'</p><div class="alg">'+algs+'</div><div class="nut"><div><b>'+m.n[0]+'</b><small>'+t("kcal")+'</small></div><div><b>'+m.n[1]+' g</b><small>'+t("prot")+'</small></div><div><b>'+m.n[2]+' g</b><small>'+t("carb")+'</small></div><div><b>'+m.n[3]+' g</b><small>'+t("fat")+'</small></div></div><div class="kbar"><i id="kb"></i></div><p class="small"><b>'+pct+' %</b> '+t("daily")+'. '+t("bio")+'</p><div class="btn2"><button class="btn btn-soft" type="button" id="shask">🤵 '+t("ask_dish")+'</button><button class="btn btn-dark" type="button" id="shok">+ '+t("addto")+'</button></div>';
+  $("#sh-b").innerHTML=(VID[m.id]?'<video class="shm" src="vid/'+VID[m.id]+'.mp4" poster="'+im(m.id)+'" autoplay muted loop playsinline></video>':'<img class="shm" src="'+im(m.id)+'" alt="">')+'<h3 id="sh-t">'+nm(m)+'</h3><p style="color:var(--mute)">'+m[L][1]+'</p><div class="tags">'+(m.v?'<span class="tag v">🌱 '+t("veg")+'</span>':'')+(m.gf?'<span class="tag gf">'+t("gf")+'</span>':'')+(ECO[m.id]?'<span class="tag eco">📍 '+t("eco")+'</span>':'')+'</div><p class="price" style="margin-top:8px">'+m.p+' €'+cv(pr(m))+'</p><p style="font-weight:800;margin-top:14px">'+t("alg")+'</p><div class="alg">'+algs+'</div><div class="nut"><div><b>'+m.n[0]+'</b><small>'+t("kcal")+'</small></div><div><b>'+m.n[1]+' g</b><small>'+t("prot")+'</small></div><div><b>'+m.n[2]+' g</b><small>'+t("carb")+'</small></div><div class="sg"><b>'+m.sg+' g</b><small>'+t("sugar")+'</small></div><div><b>'+m.n[3]+' g</b><small>'+t("fat")+'</small></div></div>'+macro(m)+'<div class="dia '+(lowS(m)?"ok":"no")+'"><span aria-hidden="true">🩸</span><span>'+f(t(lowS(m)?"diab_ok":"diab_no"),{s:m.sg})+'<small>'+f(t("hc"),{r:(Math.round(m.n[2]/5)/2).toString().replace(".",L==="en"?".":",")})+'</small></span></div><div class="kbar"><i id="kb"></i></div><p class="small"><b>'+pct+' %</b> '+t("daily")+'. '+t("bio")+'</p><div class="btn2"><button class="btn btn-soft" type="button" id="shask">🤵 '+t("ask_dish")+'</button><button class="btn btn-dark" type="button" id="shok">+ '+t("addto")+'</button></div>';
   openS($("#sheet"));
-  setTimeout(function(){var k=$("#kb");if(k)k.style.width=Math.min(100,pct)+"%"},250);
-  $("#shok").addEventListener("click",function(){add(m.id);closeS($("#sheet"))});
+  setTimeout(function(){var k=$("#kb");if(k)k.style.width=Math.min(100,pct)+"%";var dn=$("#sh-b .donut");if(dn)dn.classList.add("go")},250);
+  $("#shok").addEventListener("click",function(){closeS($("#sheet"));add(m.id,{up:1})});
   $("#shask").addEventListener("click",function(){closeS($("#sheet"));setTimeout(function(){openChat();ask(nm(m))},380)});
 }
 /* ---------- pedido ---------- */
-function add(i){cart[i]=(cart[i]||0)+1;bar(true);toast("✓ "+t("added")+": "+nm(M[i]));if($("#cart").classList.contains("open"))drawCart()}
+function add(i,o){o=o||{};cart[i]=(cart[i]||0)+1;bar(true);if(o.from)fly(o.from);toast("✓ "+t("added")+": "+nm(M[i]));if($("#cart").classList.contains("open"))drawCart();if(o.up)setTimeout(function(){upsell(i)},o.from?700:450)}
+function fly(el){if(RM)return;var src=el.querySelector("video,img");var cb=$("#cartbar");if(!src||!cb||!cb.animate)return;var r=src.getBoundingClientRect(),t2=cb.getBoundingClientRect();if(!t2.width)return;var im2=document.createElement("img");im2.src=src.poster||src.src;im2.className="fly";im2.alt="";document.body.appendChild(im2);var x0=r.left+r.width/2-32,y0=r.top+r.height/2-32,x1=t2.left+28-32,y1=t2.top+t2.height/2-32;im2.style.left=x0+"px";im2.style.top=y0+"px";var an=im2.animate([{transform:"translate(0,0) scale(1.4)",opacity:1},{transform:"translate("+(x1-x0)*0.5+"px,"+((y1-y0)*0.5-120)+"px) scale(1)",opacity:1,offset:.55},{transform:"translate("+(x1-x0)+"px,"+(y1-y0)+"px) scale(.3)",opacity:.3}],{duration:750,easing:"cubic-bezier(.5,0,.3,1)"});an.onfinish=function(){im2.remove()}}
+function inAll(fn){var all={};for(var k in cart)all[k]=1;for(var k2 in ordered)all[k2]=1;return Object.keys(all).some(function(k){return fn(M[k])})}
+function upPick(i){var m=M[i],isD=function(x){return x.c==="bebidas"},isF=function(x){return x.c!=="bebidas"&&x.c!=="postres"};
+  if(isF(m)&&!inAll(isD)){return {k:"up_d",m:M[(has(m,"p")||has(m,"m"))?13:14]}}
+  if(isD(m)&&!inAll(isF)){return {k:"up_f",m:M[cart[0]||ordered[0]?2:0]}}
+  if(isF(m)&&cnt(cart)+cnt(ordered)>=3&&!inAll(function(x){return x.c==="postres"})){return {k:"up_s",m:M[11]}}
+  return null}
+function upsell(i){if(upNo>=2||document.body.classList.contains("lock"))return;var u=upPick(i);if(!u||upShown[u.k+u.m.id])return;upShown[u.k+u.m.id]=1;var box=$("#ups");
+  box.innerHTML='<p><span aria-hidden="true">🤵</span>'+t(u.k)+'</p><div class="row">'+thumb(u.m,"")+'<span><b>'+nm(u.m)+'</b><small>'+u.m.p+' € · '+u.m.n[0]+' kcal</small></span></div><div class="bt"><button type="button" class="n" data-u="n">'+t("up_n")+'</button><button type="button" class="y" data-u="'+u.m.id+'">+ '+t("up_y")+'</button></div>';
+  box.classList.add("on");clearTimeout(upT);upT=setTimeout(function(){box.classList.remove("on")},10000)}
+$("#ups").addEventListener("click",function(e){var b=e.target.closest("[data-u]");if(!b)return;var box=$("#ups");box.classList.remove("on");clearTimeout(upT);if(b.dataset.u==="n"){upNo++;return}add(+b.dataset.u)});
 function bar(b){
   var cb=$("#cartbar"),n=cnt(cart),o=cnt(ordered);
   if(n){$("#cb-l").textContent="🛒 "+t("view")+" · "+n;$("#cb-r").textContent=eur(sum(cart))}
@@ -449,19 +616,22 @@ function bar(b){
   if(b){cb.classList.remove("bump");void cb.offsetWidth;cb.classList.add("bump")}
 }
 function lines(o,edit){var h="";for(var k in o){var m=M[k];h+='<div class="line"><span class="e" aria-hidden="true">'+thumb(m,"mini")+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € × '+o[k]+'</small></span>'+(edit?'<span class="qty"><button type="button" data-act="dec" data-i="'+k+'" aria-label="−">−</button><span>'+o[k]+'</span><button type="button" data-act="inc" data-i="'+k+'" aria-label="+">+</button></span>':'<b>'+eur(pr(m)*o[k])+'</b>')+'</div>'}return h}
+function upCart(){var isD=function(x){return x.c==="bebidas"},isF=function(x){return x.c!=="bebidas"&&x.c!=="postres"},L2=[],k="";
+  if(inAll(isF)&&!inAll(isD)){k="up_d";L2=[M[13],M[14]]}else if(inAll(isF)&&!inAll(function(x){return x.c==="postres"})){k="up_s";L2=[M[11],M[12]]}else if(inAll(isD)&&!inAll(isF)){k="up_f";L2=[M[0],M[2]]}
+  if(!k)return "";return '<div class="upc"><p>🤵 '+t(k)+'</p>'+L2.map(function(m){return '<div class="sug"><span class="e" aria-hidden="true">'+thumb(m,"mini")+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € · '+m.n[0]+' kcal</small></span><button type="button" data-act="addc" data-i="'+m.id+'" aria-label="'+esc(t("addto")+": "+nm(m))+'">+</button></div>'}).join("")+'</div>'}
 function drawCart(){
   var b=$("#ct-b"),h="";
   if(view==="cart"){
     h='<h3 id="ct-t">'+t("order")+' · '+t("table")+' '+MESA+'</h3>';
     if(!cnt(cart)&&!cnt(ordered))h+='<p style="color:var(--mute);margin:18px 0">'+t("cart_empty")+'</p>';
-    if(cnt(cart)){h+=lines(cart,1)+'<textarea class="nt" id="nt" maxlength="160" placeholder="'+esc(t("note_ph"))+'">'+esc(note)+'</textarea><div class="sum t"><span>'+t("total")+'</span><span>'+eur(sum(cart))+'</span></div><button class="btn btn-gold" type="button" data-act="send" style="width:100%;margin-top:14px">🍳 '+t("send")+'</button>'}
+    if(cnt(cart)){h+=lines(cart,1)+'<textarea class="nt" id="nt" maxlength="160" placeholder="'+esc(t("note_ph"))+'">'+esc(note)+'</textarea><div class="sum t"><span>'+t("total")+'</span><span>'+eur(sum(cart))+cv(sum(cart))+'</span></div>'+upCart()+'<button class="btn btn-gold" type="button" data-act="send" style="width:100%;margin-top:14px">🍳 '+t("send")+'</button>'}
     if(cnt(ordered)){
-      h+='<p class="lbl" style="margin-top:22px">'+t("ordered")+'</p><div class="track">'+[["📝","st1"],["🔥","st2"],["🍽️","st3"]].map(function(s,i){return '<div class="'+(stage>i?"on":"")+(stage===i+1&&i<2?" now":"")+'"><i>'+s[0]+'</i>'+t(s[1])+'</div>'}).join("")+'</div>'+lines(ordered,0)+'<div class="sum t"><span>'+t("account")+'</span><span>'+eur(sum(ordered))+'</span></div><button class="btn btn-dark" type="button" data-act="pay" style="width:100%;margin-top:14px">💳 '+t("pay")+'</button>';
+      h+='<p class="lbl" style="margin-top:22px">'+t("ordered")+'</p><div class="track">'+[["📝","st1"],["🔥","st2"],["🍽️","st3"]].map(function(s,i){return '<div class="'+(stage>i?"on":"")+(stage===i+1&&i<2?" now":"")+'"><i>'+s[0]+'</i>'+t(s[1])+'</div>'}).join("")+'</div>'+lines(ordered,0)+'<div class="sum t"><span>'+t("account")+'</span><span>'+eur(sum(ordered))+cv(sum(ordered))+'</span></div><button class="btn btn-dark" type="button" data-act="pay" style="width:100%;margin-top:14px">💳 '+t("pay")+'</button>';
     }
     h+='<div class="acts" style="padding:14px 0 0"><button type="button" data-act="call">'+t("call")+'</button><button type="button" data-act="bill">'+t("bill")+'</button></div>';
   }else if(view==="pay"){
     var s=sum(ordered),tt=s*(1+tip/100);
-    h='<h3 id="ct-t">'+t("pay")+'</h3><div class="sum"><span>'+t("subtotal")+'</span><span>'+eur(s)+'</span></div><p class="lbl">'+t("tip")+'</p><div class="seg">'+[0,5,10].map(function(x){return '<button type="button" class="chip" data-act="tip" data-v="'+x+'" aria-pressed="'+(tip===x)+'">'+(x?x+" %":"—")+'</button>'}).join("")+'</div><p class="lbl">'+t("split")+'</p><div class="seg">'+[1,2,3,4].map(function(x){return '<button type="button" class="chip" data-act="split" data-v="'+x+'" aria-pressed="'+(split===x)+'">'+(x===1?"1":"÷ "+x)+'</button>'}).join("")+'</div><div class="pm">'+[["apple","Apple Pay"],["google","G Pay"],["card","💳 "+t("card")],["bizum","Bizum"]].map(function(x){return '<button type="button" data-act="pm" data-v="'+x[0]+'" aria-pressed="'+(pm===x[0])+'">'+x[1]+'</button>'}).join("")+'</div><div class="sum t"><span>'+t("total")+'</span><span>'+eur(tt)+'</span></div>'+(split>1?'<div class="sum"><span>'+t("each")+' ('+split+')</span><span>'+eur(tt/split)+'</span></div>':'')+'<button class="btn btn-gold" type="button" data-act="dopay" style="width:100%;margin-top:14px">🔒 '+t("paynow")+' '+eur(split>1?tt/split:tt)+'</button><p class="small" style="text-align:center;margin-top:10px">'+t("demo_pay")+'</p>';
+    h='<h3 id="ct-t">'+t("pay")+'</h3><div class="sum"><span>'+t("subtotal")+'</span><span>'+eur(s)+'</span></div><p class="lbl">'+t("tip")+'</p><div class="seg">'+[0,5,10].map(function(x){return '<button type="button" class="chip" data-act="tip" data-v="'+x+'" aria-pressed="'+(tip===x)+'">'+(x?x+" %":"—")+'</button>'}).join("")+'</div><p class="lbl">'+t("split")+'</p><div class="seg">'+[1,2,3,4].map(function(x){return '<button type="button" class="chip" data-act="split" data-v="'+x+'" aria-pressed="'+(split===x)+'">'+(x===1?"1":"÷ "+x)+'</button>'}).join("")+'</div><div class="pm">'+[["apple","Apple Pay"],["google","G Pay"],["card","💳 "+t("card")],["bizum","Bizum"]].map(function(x){return '<button type="button" data-act="pm" data-v="'+x[0]+'" aria-pressed="'+(pm===x[0])+'">'+x[1]+'</button>'}).join("")+'</div><div class="sum t"><span>'+t("total")+'</span><span>'+eur(tt)+cv(tt)+'</span></div>'+(split>1?'<div class="sum"><span>'+t("each")+' ('+split+')</span><span>'+eur(tt/split)+'</span></div>':'')+'<button class="btn btn-gold" type="button" data-act="dopay" style="width:100%;margin-top:14px">🔒 '+t("paynow")+' '+eur(split>1?tt/split:tt)+'</button><p class="small" style="text-align:center;margin-top:10px">'+t("demo_pay")+'</p>';
   }else{
     h='<div class="okk"><svg width="96" height="96" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="none" stroke="#2fa35a" stroke-width="4"/><path d="M19 33l9 9 17-19" fill="none" stroke="#2fa35a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><h3 id="ct-t">'+t("paid")+'</h3><p style="color:var(--mute);margin:8px 0 16px">'+t("thanks")+'</p><p style="font-size:26px;letter-spacing:4px;color:var(--gold)" aria-hidden="true">★★★★★</p><button class="btn btn-dark" type="button" data-act="review" style="width:100%;margin-top:12px">'+t("review")+'</button><p class="small" style="margin-top:10px">'+t("demo_pay")+'</p></div>';
   }
@@ -471,6 +641,7 @@ function drawCart(){
 $("#ct-b").addEventListener("click",function(e){
   var x=e.target.closest("[data-act]");if(!x)return;var a=x.dataset.act,i=x.dataset.i;
   if(a==="inc"){cart[i]++}
+  else if(a==="addc"){cart[i]=(cart[i]||0)+1;toast("✓ "+t("added")+": "+nm(M[i]))}
   else if(a==="dec"){cart[i]--;if(cart[i]<1)delete cart[i]}
   else if(a==="send"){for(var k in cart)ordered[k]=(ordered[k]||0)+cart[k];cart={};note="";stage=1;toast("🍳 "+t("sent"));run()}
   else if(a==="pay"){view="pay"}
@@ -489,7 +660,7 @@ $("#cartbar").addEventListener("click",function(){if(view==="done")view="cart";i
 var log=$("#log");
 function norm(s){return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/œ/g,"oe")}
 function msg(html,who){var d=document.createElement("div");d.className="msg "+who;if(who==="u")d.textContent=html;else d.innerHTML=html;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
-function cards(list){return list.map(function(m){return '<div class="sug"><span class="e" aria-hidden="true">'+thumb(m,"mini")+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € · '+m.n[0]+' kcal</small></span><button type="button" data-add="'+m.id+'" aria-label="'+esc(t("addto")+": "+nm(m))+'">+</button></div>'}).join("")}
+function cards(list,dia){return list.map(function(m){return '<div class="sug"><span class="e" aria-hidden="true">'+thumb(m,"mini")+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € · '+(dia?'🍬 '+m.sg+' g · '+m.n[0]+' kcal':m.n[0]+' kcal')+'</small></span><button type="button" data-add="'+m.id+'" aria-label="'+esc(t("addto")+": "+nm(m))+'">+</button></div>'}).join("")}
 function drawChatUI(){
   $("#ch-t").textContent=t("waiter");$("#ch-s").textContent=t("online");$("#askin").placeholder=t("ask_ph");$("#fab-s").textContent=t("fab");$("#fab").setAttribute("aria-label",t("waiter"));
   $("#quick").innerHTML=t("q").map(function(q){return '<button type="button" class="chip" data-q="'+esc(q)+'">'+esc(q)+'</button>'}).join("");
@@ -497,31 +668,32 @@ function drawChatUI(){
 }
 function openChat(){openS($("#chat"));if(!greeted){greeted=1;typing(function(){msg(t("hi"),"b")})}}
 function typing(cb){var d=msg('<span class="dots" aria-label="…"><span></span><span></span><span></span></span>',"b");setTimeout(function(){d.remove();cb()},650+Math.random()*400)}
-var STOP={clasica:1,classic:1,classique:1,casera:1,caseras:1,homemade:1,maison:1,house:1,temporada:1,seasonal:1,saison:1,classique:1};
-function findDish(n){var best=null,bs=0;M.forEach(function(m){var sc=0;["es","en","fr"].forEach(function(l){norm(m[l][0]).split(/[^a-z]+/).forEach(function(w){if(w.length>=5&&!STOP[w]&&n.indexOf(w)>-1)sc++})});if(sc>bs){bs=sc;best=m}});return best}
+var STOP={hausgemachte:1,hausgemachter:1,klassische:1,classica:1,caseiros:1,caseiro:1,classica:1,della:1,clasica:1,classic:1,classique:1,casera:1,caseras:1,homemade:1,maison:1,house:1,temporada:1,seasonal:1,saison:1,classique:1};
+function findDish(n){var best=null,bs=0;M.forEach(function(m){var sc=0;LANGS.forEach(function(l){norm(m[l][0]).split(/[^a-z]+/).forEach(function(w){if(w.length>=5&&!STOP[w]&&n.indexOf(w)>-1)sc++})});if(sc>bs){bs=sc;best=m}});return best}
 function answer(q){
   var n=norm(q),cons=[],lab=[],allergy=0;
-  var neg=/\b(sin|no|without|sans|alerg|allerg|intoler)/.test(n);
-  if(/camarer|waiter|serveur/.test(n)&&!/virtual|virtuel/.test(n)){toast("🙋 "+f(t("called"),{m:MESA}));return msg(f(t("called"),{m:MESA}),"b")}
-  if(/cuenta|\bbill\b|check|addition|cobr|pagar|\bpay\b|payer/.test(n)){toast("🧾 "+f(t("billed"),{m:MESA}));return msg(f(t("billed"),{m:MESA})+'<div class="sug"><span class="e">💳</span><span><b>'+t("pay")+'</b></span><button type="button" data-pay="1" aria-label="'+esc(t("pay"))+'">→</button></div>',"b")}
-  if(/celia|coelia|celiac|coeliac|gluten/.test(n)){cons.push(function(m){return m.gf});lab.push(t("gf"));allergy=1}
+  var neg=/\b(sin|no|without|sans|ohne|kein|senza|sem|alerg|allerg|intoler)/.test(n);var dia=0;
+  if(/camarer|waiter|serveur|kellner|empregad|garcom/.test(n)&&!/virtu/.test(n)){toast("🙋 "+f(t("called"),{m:MESA}));return msg(f(t("called"),{m:MESA}),"b")}
+  if(/cuenta|\bbill\b|check|addition|cobr|pagar|\bpay\b|payer|rechnung|zahlen|\bconto\b|\bconta\b/.test(n)){toast("🧾 "+f(t("billed"),{m:MESA}));return msg(f(t("billed"),{m:MESA})+'<div class="sug"><span class="e">💳</span><span><b>'+t("pay")+'</b></span><button type="button" data-pay="1" aria-label="'+esc(t("pay"))+'">→</button></div>',"b")}
+  if(/diabet|azuc|sugar|zucker|zuccher|acucar|sucre|glucem|glukos|carbohid|\bcarbs?\b|hidrat/.test(n)){cons.push(lowS);lab.push(t("diab"));dia=1}
+  if(/celia|coelia|celiac|coeliac|gluten|zoliak/.test(n)){cons.push(function(m){return m.gf});lab.push(t("gf"));allergy=1}
   if(/vegeta|vegan|veggie/.test(n)){cons.push(function(m){return m.v});lab.push(t("veg"))}
-  if(/lact|leche|dairy|lait|milk/.test(n)){cons.push(function(m){return !has(m,"l")});lab.push(t("lact"));allergy=1}
-  if(/frutos secos|nuez|nueces|\bnuts?\b|noix|fruits a coque|cacahu|almendr/.test(n)){cons.push(function(m){return !has(m,"f")});lab.push("🌰 ✕");allergy=1}
-  if(/marisc|pescad|\bfish|seafood|poisson|fruits de mer|shellfish|crustac|molus/.test(n)&&neg){cons.push(function(m){return !has(m,"p")&&!has(m,"m")});lab.push("🐟 ✕");allergy=1}
-  if(/liger|light|dieta|calori|kcal|leger|healthy|\bsan[oa]\b|sain/.test(n)){cons.push(function(m){return m.n[0]<300});lab.push(t("light"))}
-  var drink=/beb|vino|cervez|drink|wine|beer|boire|\bvin\b|biere|vermu|refresc|soda/.test(n);
-  var dess=/postre|dulce|dessert|sweet|sucre/.test(n);
+  if(/lact|leche|dairy|lait|milk|laktos|milch|latt|leite/.test(n)){cons.push(function(m){return !has(m,"l")});lab.push(t("lact"));allergy=1}
+  if(/frutos secos|nuez|nueces|\bnuts?\b|noix|fruits a coque|cacahu|almendr|nuss|nusse|noci|frutta secca|nozes|amendoa/.test(n)){cons.push(function(m){return !has(m,"f")});lab.push("🌰 ✕");allergy=1}
+  if(/marisc|pescad|\bfish|seafood|poisson|fruits de mer|shellfish|crustac|molus|fisch|meeresfr|pesce|frutti di mare|peixe/.test(n)&&neg){cons.push(function(m){return !has(m,"p")&&!has(m,"m")});lab.push("🐟 ✕");allergy=1}
+  if(/liger|light|dieta|calori|kalor|kcal|leger|leicht|legger|\bleve\b|healthy|\bsan[oa]\b|sain|gesund/.test(n)){cons.push(function(m){return m.n[0]<300});lab.push(t("light"))}
+  var drink=/beb|vino|cervez|drink|wine|beer|boire|\bvin\b|biere|vermu|refresc|soda|trink|getrank|\bbier\b|\bwein|\bbere\b|bevand|birra|cervej|vinho/.test(n);
+  var dess=/postre|dulce|dessert|sweet|nachtisch|\bsuss|dolc|sobremesa|\bdoce/.test(n)&&!dia;
   M.forEach(function(m,i){m.id=i});
   if(cons.length){
-    var list=M.filter(function(m){return (drink?m.c==="bebidas":m.c!=="bebidas")&&cons.every(function(c){return c(m)})}).sort(function(a,b){return (b.s|0)-(a.s|0)}).slice(0,4);
-    return msg(list.length?f(t("for_x"),{x:lab.join(" + ")})+cards(list)+(allergy?'<span class="small">⚠️ '+t("disc")+'</span>':''):t("nf"),"b");
+    var list=M.filter(function(m){return (drink?m.c==="bebidas":m.c!=="bebidas")&&cons.every(function(c){return c(m)})}).sort(function(a,b){return (b.s|0)-(a.s|0)}).slice(0,dia?6:4);
+    return msg(list.length?(dia?t("diab_tip")+" ":"")+f(t("for_x"),{x:lab.join(" + ")})+cards(list,dia)+(allergy?'<span class="small">⚠️ '+t("disc")+'</span>':''):t("nf"),"b");
   }
   var d=findDish(n);
-  if(d){var pair=M[(has(d,"p")||has(d,"m")||d.c==="postres")?13:14];if(d.c==="bebidas")pair=M[0];return msg(f(t("dish_i"),{n:"<b>"+nm(d)+"</b>",k:d.n[0],a:algTxt(d)})+cards([d])+'<p style="margin-top:10px">'+t("pair")+'</p>'+cards([pair])+'<span class="small">⚠️ '+t("disc")+'</span>',"b")}
+  if(d){var pair=M[(has(d,"p")||has(d,"m")||d.c==="postres")?13:14];if(d.c==="bebidas")pair=M[0];return msg(f(t("dish_i"),{n:"<b>"+nm(d)+"</b>",k:d.n[0],c:d.n[2],s:d.sg,a:algTxt(d)})+cards([d])+'<p style="margin-top:10px">'+t("pair")+'</p>'+cards([pair])+'<span class="small">⚠️ '+t("disc")+'</span>',"b")}
   if(drink)return msg(t("drink")+cards(M.filter(function(m){return m.c==="bebidas"})),"b");
   if(dess)return msg(t("dess")+cards(M.filter(function(m){return m.c==="postres"})),"b");
-  if(/recom|suger|popular|mejor|\bbest\b|conseil|que pido|what should|especialidad|speciali|tipic|typical|hambre|hungry|faim/.test(n))return msg(t("rec")+cards(M.filter(function(m){return m.s&&m.c!=="bebidas"})),"b");
+  if(/recom|suger|popular|mejor|\bbest\b|conseil|consigl|empfehl|que pido|what should|especialidad|speciali|tipic|typical|hambre|hungry|faim|hunger|fame|fome/.test(n))return msg(t("rec")+cards(M.filter(function(m){return m.s&&m.c!=="bebidas"})),"b");
   return msg(t("fallback"),"b");
 }
 function ask(q){q=q.trim().slice(0,200);if(!q)return;msg(q,"u");typing(function(){answer(q)})}
@@ -531,9 +703,36 @@ $("#acts").addEventListener("click",function(e){var b=e.target.closest("[data-ac
 log.addEventListener("click",function(e){var b=e.target.closest("[data-add]");if(b){add(+b.dataset.add);b.textContent="✓";b.disabled=true;return}var p=e.target.closest("[data-pay]");if(p&&cnt(ordered)){closeS($("#chat"));view="pay";setTimeout(function(){drawCart();openS($("#cart"))},380)}else if(p){toast(f(t("billed"),{m:MESA}))}});
 $("#fab").addEventListener("click",openChat);
 /* ---------- idioma ---------- */
-function setLang(l){L=l;document.documentElement.lang=L;[].slice.call(document.querySelectorAll(".lang button")).forEach(function(x){x.setAttribute("aria-pressed",x.dataset.l===L)});[].slice.call(document.querySelectorAll("[data-t]")).forEach(function(n){n.textContent=t(n.dataset.t)});$("#mesa").textContent=f(t("here"),{m:MESA});drawTabs();drawFilters();drawGrid();drawChatUI();bar();if($("#cart").classList.contains("open"))drawCart()}
+function setLang(l){L=l;document.documentElement.lang=L;[].slice.call(document.querySelectorAll(".lang button")).forEach(function(x){x.setAttribute("aria-pressed",x.dataset.l===L)});[].slice.call(document.querySelectorAll("[data-t]")).forEach(function(n){n.textContent=t(n.dataset.t)});$("#mesa").textContent=f(t("here"),{m:MESA});drawTabs();drawFilters();drawGrid();drawChatUI();drawCurSel();drawCurNote();$("#ups").classList.remove("on");$("#explore-t").textContent=t("explore");$("#vt-c").textContent="▦ "+t("vcards");$("#vt-l").textContent="☰ "+t("vlist");bar();if($("#cart").classList.contains("open"))drawCart()}
 [].slice.call(document.querySelectorAll(".lang button")).forEach(function(b){b.addEventListener("click",function(){setLang(b.dataset.l)})});
 window.addEventListener("resize",moveInd);
+/* ---------- vista + divisa ---------- */
+[].slice.call(document.querySelectorAll(".vt button")).forEach(function(b){b.addEventListener("click",function(){VIEW=b.dataset.v;[].slice.call(document.querySelectorAll(".vt button")).forEach(function(x){x.setAttribute("aria-pressed",x===b)});drawGrid()})});
+$("#cur").addEventListener("change",function(e){CUR=e.target.value;try{localStorage.setItem("bm_cur",CUR)}catch(er){}drawGrid();drawCurNote();if($("#cart").classList.contains("open"))drawCart()});
+/* ---------- carta en vídeo (reels) ---------- */
+var reel=$("#reel"),rtrack=$("#rtrack"),rio=null,rList=[];
+function openReel(){
+  rList=CATS.reduce(function(a,c){return a.concat(M.filter(function(m){return m.c===c.id&&okF(m)}))},[]);
+  if(!rList.length)rList=M.slice();
+  rtrack.innerHTML=rList.map(function(m,k){var cn=CATS.filter(function(c){return c.id===m.c})[0][L];var a=m.a?m.a.split(","):[];
+    return '<section class="rs" data-k="'+k+'" aria-label="'+esc(nm(m))+'">'+(m.s?'<span class="rst">★ '+t("star")+'</span>':'')+'<video src="vid/'+VID[m.id]+'.mp4" poster="'+im(m.id)+'" muted loop playsinline preload="none" aria-hidden="true"></video><div class="ov"><p class="rk">'+esc(cn)+' · '+(k+1)+'/'+rList.length+'</p><h3>'+nm(m)+'</h3><p class="ds">'+m[L][1]+'</p><div class="ch"><span>🔥 '+m.n[0]+' kcal</span><span>🍬 '+m.sg+' g</span>'+(m.v?'<span>🌱 '+t("veg")+'</span>':'')+(m.gf?'<span>'+t("gf")+'</span>':'')+(conv(pr(m))?'<span>💱 '+conv(pr(m))+'</span>':'')+(a.length?'<span>'+a.map(function(x){return ALG[x].i}).join(" ")+'</span>':'<span>✅ '+t("none")+'</span>')+'</div><div class="ra"><button type="button" class="y" data-radd="'+m.id+'">+ '+t("up_y")+' · '+m.p+' €</button><button type="button" class="i" data-rinfo="'+m.id+'">'+t("info")+'</button></div></div></section>'}).join("");
+  $("#rbar").innerHTML=rList.map(function(){return "<i></i>"}).join("");
+  $("#rhint").textContent=t("swipe");$("#rhint").classList.remove("off");
+  last=document.activeElement;reel.classList.add("open");document.body.classList.add("lock");
+  var start=0;rList.some(function(m,k){if(m.c===cat){start=k;return true}});
+  rtrack.scrollTop=start*rtrack.clientHeight;
+  if(rio)rio.disconnect();
+  rio=new IntersectionObserver(function(es){es.forEach(function(e){var sl=e.target,v=sl.querySelector("video");if(e.isIntersecting){sl.classList.add("on");v.preload="auto";if(!RM){var p=v.play();if(p&&p.catch)p.catch(function(){})}var k=+sl.dataset.k;[].slice.call($("#rbar").children).forEach(function(b,j){b.classList.toggle("on",j<=k)});var nx=sl.nextElementSibling;if(nx)nx.querySelector("video").preload="auto"}else{sl.classList.remove("on");v.pause()}})},{root:rtrack,threshold:.6});
+  [].slice.call(rtrack.children).forEach(function(sl){rio.observe(sl)});
+  $("#rx").focus();
+}
+function closeReel(){reel.classList.remove("open");if(rio)rio.disconnect();[].slice.call(rtrack.querySelectorAll("video")).forEach(function(v){v.pause()});rtrack.innerHTML="";if(!document.querySelector(".sheet.open"))document.body.classList.remove("lock");if(last&&last.focus)last.focus()}
+$("#explore").addEventListener("click",openReel);
+$("#rx").addEventListener("click",closeReel);
+rtrack.addEventListener("scroll",function(){if(rtrack.scrollTop>40)$("#rhint").classList.add("off")},{passive:true});
+rtrack.addEventListener("click",function(e){var a=e.target.closest("[data-radd]");if(a){add(+a.dataset.radd);a.textContent="✓ "+t("added");setTimeout(function(){a.innerHTML="+ "+t("up_y")+" · "+M[+a.dataset.radd].p+" €"},1800);return}var i=e.target.closest("[data-rinfo]");if(i){closeReel();openDish(M[+i.dataset.rinfo])}});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&reel.classList.contains("open"))closeReel()});
+loadRates();
 setLang(L);
 /* horario */
 var H=[["Lunes","Cerrado"],["Martes","12:30 – 16:00 · 19:30 – 00:00"],["Miércoles","12:30 – 16:00 · 19:30 – 00:00"],["Jueves","12:30 – 16:00 · 19:30 – 00:00"],["Viernes","12:30 – 16:30 · 19:30 – 01:00"],["Sábado","12:00 – 01:00"],["Domingo","12:00 – 17:00"]];
