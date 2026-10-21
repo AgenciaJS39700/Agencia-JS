@@ -219,7 +219,7 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
 .hframe{position:absolute;inset:0;border-radius:999px 999px 32px 32px;overflow:hidden;box-shadow:0 40px 80px -30px rgba(0,0,0,.6);border:6px solid rgba(246,239,227,.12)}
 .hframe video{width:100%;height:100%;object-fit:cover}
 .hcard{position:absolute;display:flex;align-items:center;gap:10px;background:var(--paper);color:var(--ink);border-radius:18px;padding:8px 14px 8px 8px;box-shadow:0 20px 40px -14px rgba(0,0,0,.5);animation:flt 6s ease-in-out infinite;font-size:14px}
-.hcard img{width:48px;height:48px;border-radius:12px;object-fit:cover}
+.hcard img,.hcard video{width:48px;height:48px;border-radius:12px;object-fit:cover}
 .hcard b{display:block;font-size:14px;line-height:1.2}.hcard small{color:var(--mute);font-size:12px}
 .hc1{left:-8%;bottom:12%}.hc2{right:-6%;top:14%;padding:12px 16px;animation-delay:-3s}
 .hc2 .dot{width:10px;height:10px;border-radius:50%;background:#2fa35a;box-shadow:0 0 0 4px rgba(47,163,90,.2)}
@@ -232,7 +232,7 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
 .b h3,.b p{z-index:1}.b{display:flex;flex-direction:column;justify-content:flex-end;color:var(--cream)}
 .b2{color:var(--cream)}.b1,.b2,.b4{background:#173d35}
 .terr{position:relative;min-height:min(70svh,560px);display:grid;align-items:end;color:var(--cream);overflow:hidden}
-.terr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.terr video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .terr:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 30%,rgba(8,20,17,.8))}
 .terr .wrap{position:relative;z-index:1;padding:60px 0}
 @media(min-width:900px){.dock{left:auto;right:28px;width:440px;margin:0;bottom:28px}}
@@ -254,7 +254,7 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
       <div class="ctas h-in d3"><a class="btn btn-gold" href="#carta">Ver la carta</a><a class="btn btn-line" href="#reserva">Reservar mesa</a></div>
       <div class="meta h-in d4"><span><b>★ 4,8</b> en Google</span><span><b>Cocina</b> abierta hasta las 23:30</span><span><b>Terraza</b> todo el año</span></div>
     </div>
-    <div class="hmed h-in d2"><svg class="spin hring" viewBox="0 0 520 520" aria-hidden="true"><circle cx="260" cy="260" r="250" fill="none" stroke="rgba(217,164,65,.45)" stroke-dasharray="2 12" stroke-width="3"/></svg><div class="hframe"><video class="lv" src="vid/hero.mp4" poster="img/hero.webp" muted loop playsinline preload="metadata" aria-label="Vermut de grifo sirviéndose en la barra"></video></div><div class="hcard hc1"><img src="img/tortilla.webp" alt="" width="720" height="720"><span><b>Tortilla de la casa</b><small>Sale cada hora</small></span></div><div class="hcard hc2"><span class="dot"></span><span><b>Terraza abierta</b><small>Hoy hasta las 00:00</small></span></div></div>
+    <div class="hmed h-in d2"><svg class="spin hring" viewBox="0 0 520 520" aria-hidden="true"><circle cx="260" cy="260" r="250" fill="none" stroke="rgba(217,164,65,.45)" stroke-dasharray="2 12" stroke-width="3"/></svg><div class="hframe"><video class="lv" src="vid/hero.mp4" poster="img/hero.webp" muted loop playsinline preload="metadata" aria-label="Vermut de grifo sirviéndose en la barra"></video></div><div class="hcard hc1"><video class="lv" src="vid/tortilla.mp4" poster="img/tortilla.webp" muted loop playsinline preload="none" aria-hidden="true"></video><span><b>Tortilla de la casa</b><small>Sale cada hora</small></span></div><div class="hcard hc2"><span class="dot"></span><span><b>Terraza abierta</b><small>Hoy hasta las 00:00</small></span></div></div>
   </div>
   <svg class="wave" viewBox="0 0 1440 80" preserveAspectRatio="none" height="60" width="100%" aria-hidden="true"><path fill="currentColor" d="M0 40c240-40 480-40 720 0s480 40 720 0v40H0z"/></svg>
 </section>
@@ -282,13 +282,13 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
     <div class="bento">
       <article class="b b1 reveal tilt"><h3>Tortilla de la casa</h3><p>Jugosa, con cebolla pochada a fuego lento. Sale cada hora, recién hecha.</p><video class="bgm lv" src="vid/tortilla.mp4" poster="img/tortilla.webp" muted loop playsinline preload="none" aria-hidden="true"></video></article>
       <article class="b b2 reveal tilt"><h3>Vermut de grifo</h3><p>Con su naranja, su aceituna y su sifón. El clásico de los domingos.</p><video class="bgm lv" src="vid/vermut.mp4" poster="img/vermut.webp" muted loop playsinline preload="none" aria-hidden="true"></video></article>
-      <article class="b reveal tilt"><h3>Gildas</h3><p>Anchoa, guindilla y aceituna. Sin más.</p><img class="bgm" src="img/gilda.webp" alt="" loading="lazy"></article>
+      <article class="b reveal tilt"><h3>Gildas</h3><p>Anchoa, guindilla y aceituna. Sin más.</p><video class="bgm lv" src="vid/gilda.mp4" poster="img/gilda.webp" muted loop playsinline preload="none" aria-hidden="true"></video></article>
       <article class="b b4 reveal tilt"><h3>Rabas</h3><p>Crujientes, con limón y alioli.</p><video class="bgm lv" src="vid/rabas.mp4" poster="img/rabas.webp" muted loop playsinline preload="none" aria-hidden="true"></video></article>
     </div>
   </div>
 </section>
 
-<section class="terr" aria-label="Nuestra terraza"><img src="img/terraza.webp" alt="Terraza de Bar Marea al atardecer con mesas y vermut" loading="lazy" width="1280" height="720"><div class="wrap"><p class="kick" style="color:var(--gold)">Terraza todo el año</p><h2>El mejor sitio para ver caer el sol</h2></div></section>
+<section class="terr" aria-label="Nuestra terraza"><video class="lv" src="vid/terraza.mp4" poster="img/terraza.webp" muted loop playsinline preload="none" aria-label="Terraza de Bar Marea al atardecer"></video><div class="wrap"><p class="kick" style="color:var(--gold)">Terraza todo el año</p><h2>El mejor sitio para ver caer el sol</h2></div></section>
 
 <section class="info" id="visitanos" aria-labelledby="t-info">
   <div class="wrap">
@@ -375,7 +375,10 @@ var M=[
  {c:"bebidas",i:"🥤",p:"2,80",v:1,gf:1,a:"",n:[90,0,22,0],es:["Refrescos","Varios sabores"],en:["Soft drinks","Several flavours"],fr:["Sodas","Plusieurs parfums"]}];
 var ECO={1:1,3:1,4:1,7:1};
 var IMG=["gilda","quesos","bravas","anchoas","tortilla","rabas","croquetas","ensalada","bocata","pepito","vegetal","tarta","flan","vermut","cana","refrescos"];
-var VID={4:"tortilla",5:"rabas",6:"croquetas",11:"tarta",13:"vermut"};
+var VID={};IMG.forEach(function(n,i){VID[i]=n});
+var RM=matchMedia("(prefers-reduced-motion: reduce)").matches,vio=null;
+function watch(v){if(!("IntersectionObserver" in window))return;if(!vio)vio=new IntersectionObserver(function(es){es.forEach(function(e){var x=e.target;if(e.isIntersecting&&!RM){x.preload="auto";var p=x.play();if(p&&p.catch)p.catch(function(){})}else x.pause()})},{threshold:.2});vio.observe(v)}
+function vthumb(m){return '<video class="thumb lv" src="vid/'+VID[m.id]+'.mp4" poster="'+im(m.id)+'" muted loop playsinline preload="none" aria-hidden="true"></video>'}
 function im(i){return "img/"+IMG[i]+".webp"}
 function thumb(m,c){return '<img class="'+(c||"thumb")+'" src="'+im(m.id)+'" alt="" loading="lazy" width="720" height="720">'}
 var L=(function(){var n=(navigator.language||"es").slice(0,2).toLowerCase();return T[n]?n:"es"})();
@@ -410,11 +413,11 @@ function drawGrid(){
     var c=document.createElement("div");c.className="cell";
     var b=document.createElement("button");b.type="button";b.className="item";
     var tags=(m.v?'<span class="tag v">🌱 '+t("veg")+'</span>':'')+(m.gf?'<span class="tag gf">'+t("gf")+'</span>':'')+(ECO[m.id]?'<span class="tag eco">📍 '+t("eco")+'</span>':'')+'<span class="tag">'+m.n[0]+' kcal</span>';
-    b.innerHTML=(m.s?'<span class="star">'+t("star")+'</span>':'')+'<span class="ico" aria-hidden="true">'+thumb(m)+(VID[m.id]?'<i class="vb">▶</i>':'')+'</span><span><h3>'+nm(m)+'</h3><p>'+m[L][1]+'</p><span class="tags">'+tags+'</span></span><span class="price">'+m.p+' €</span>';
+    b.innerHTML=(m.s?'<span class="star">'+t("star")+'</span>':'')+'<span class="ico" aria-hidden="true">'+vthumb(m)+'</span><span><h3>'+nm(m)+'</h3><p>'+m[L][1]+'</p><span class="tags">'+tags+'</span></span><span class="price">'+m.p+' €</span>';
     b.addEventListener("click",function(){openDish(m)});
     var a=document.createElement("button");a.type="button";a.className="addq";a.textContent="+";a.setAttribute("aria-label",t("addto")+": "+nm(m));
     a.addEventListener("click",function(){add(m.id)});
-    c.appendChild(b);c.appendChild(a);grid.appendChild(c);
+    c.appendChild(b);c.appendChild(a);grid.appendChild(c);var vv=c.querySelector("video");if(vv)watch(vv);
     setTimeout(function(){c.classList.add("in")},40+k*70);
   });
 }
@@ -538,10 +541,7 @@ var d=(new Date().getDay()+6)%7;$("#hrs").innerHTML=H.map(function(h,i){return '
 if(d===0){$("#openNow").innerHTML='<i style="background:#c8653a;box-shadow:0 0 0 4px rgba(200,101,58,.18)"></i><span>Hoy cerrado</span>'}
 var rd=$("#rd");rd.min=new Date().toISOString().slice(0,10);rd.value=rd.min;
 $("#fres").addEventListener("submit",function(e){e.preventDefault();var f=e.target;var msg="Hola, he visto la demo de Bar Marea en agencia-js.com y me gustaría una web así para mi negocio.\n(Reserva de ejemplo: "+f.n.value+", "+f.d.value+" a las "+f.h.value+", "+f.p.value+" personas, "+f.z.value+")";window.open("https://wa.me/34688933308?text="+encodeURIComponent(msg),"_blank","noopener")});
-/* vídeos: solo se reproducen cuando se ven */
-var rm=matchMedia("(prefers-reduced-motion: reduce)").matches;
-var vio=new IntersectionObserver(function(es){es.forEach(function(e){var v=e.target;if(e.isIntersecting&&!rm){v.preload="auto";var p=v.play();if(p&&p.catch)p.catch(function(){})}else v.pause()})},{threshold:.25});
-[].slice.call(document.querySelectorAll("video.lv")).forEach(function(v){vio.observe(v)});
+[].slice.call(document.querySelectorAll("video.lv")).forEach(watch);
 /* header + reveal + tilt */
 var hdr=$("#hdr");addEventListener("scroll",function(){hdr.classList.toggle("on",scrollY>40)},{passive:true});
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("vis");io.unobserve(e.target)}})},{threshold:.15});
