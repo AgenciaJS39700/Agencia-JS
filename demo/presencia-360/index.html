@@ -401,6 +401,7 @@ footer a{color:inherit}
 .ck-cfg{display:none;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:14px;font-weight:700}.ck.cfg .ck-cfg{display:flex}.ck-cfg input{accent-color:var(--red)}
 .ck-b{display:flex;gap:8px;flex-wrap:wrap}.ck-b .btn{min-height:44px;padding:0 16px;font-size:13px}
 @media(min-width:900px){.ch-fab,.ch{bottom:24px}}
+@media(max-width:560px){.shop-g{grid-template-columns:1fr 1fr;gap:10px}.shop-c .cat-b{padding:12px}.shop-c h3{font-size:16px}.shop-c p{font-size:12.5px}.shop-p{flex-direction:column;align-items:stretch;gap:6px}.shop-p .btn{width:100%}.gc-i b{font-size:20px}}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TattooParlor","name":"Tinta Negra (demo)","description":"Estudio de tatuaje privado: realismo, fine line, blackwork y cover up.","address":{"@type":"PostalAddress","streetAddress":"Calle Ejemplo, 12","addressCountry":"ES"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"230"},"openingHours":"Tu-Sa 10:00-20:00"}</script>
 </head>
@@ -599,6 +600,7 @@ footer a{color:inherit}
       <li class="rv"><b>1–3 meses</b><h3>Cicatrizado</h3><p>Revisamos cómo ha quedado. Si hace falta, el retoque va incluido.</p></li>
     </ol>
     <div class="cui-x"><div><h3>Evita las primeras semanas</h3><p>Sol directo · Piscina, mar y sauna · Rascar o arrancar costras · Ropa que roce</p></div><div><h3>Llámanos si notas</h3><p>Enrojecimiento que crece, calor, pus o fiebre. Ante la duda, consulta también con tu médico.</p></div></div>
+    <a class="btn btn-red" href="#tienda" style="margin-top:18px">Ver productos de cuidado</a>
   </div>
 </section>
 
@@ -619,7 +621,7 @@ footer a{color:inherit}
 <section class="shop" id="tienda" aria-labelledby="t-shop">
   <div class="wrap">
     <div class="fl-head"><div><p class="kick">14 · Tienda</p><h2 id="t-shop" class="rv">Cuida <span class="out">tu tinta</span></h2></div><p style="max-width:380px;color:#b3ac9f">Lo que usamos en el estudio, para que tu tatuaje cure perfecto. Recógelo en el estudio o recíbelo en casa.</p></div>
-    <div class="shop-g" id="shopG"></div>
+    <div class="shop-g" id="shopG"><article class="shop-c"><div class="shop-i"><img src="img/shop/balsamo.webp" alt="Bálsamo de cuidado" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Bálsamo de cuidado</h3><p>Vegano, sin perfume. 50 ml</p><div class="shop-p"><b>14,90 €</b><button type="button" class="btn btn-red" data-add="balsamo">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/jabon.webp" alt="Jabón neutro" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Jabón neutro</h3><p>pH suave para los primeros días. 250 ml</p><div class="shop-p"><b>9,90 €</b><button type="button" class="btn btn-red" data-add="jabon">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/film.webp" alt="Film protector" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Film protector</h3><p>Segunda piel transpirable. 2 m</p><div class="shop-p"><b>12,50 €</b><button type="button" class="btn btn-red" data-add="film">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/solar.webp" alt="Stick solar SPF 50" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Stick solar SPF 50</h3><p>Protege el color del sol</p><div class="shop-p"><b>11,90 €</b><button type="button" class="btn btn-red" data-add="solar">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/camiseta.webp" alt="Camiseta Rosa" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Camiseta Rosa</h3><p>Algodón orgánico. Unisex</p><div class="shop-p"><b>24 €</b><button type="button" class="btn btn-red" data-add="camiseta">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/gorra.webp" alt="Gorra Daga" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Gorra Daga</h3><p>Bordado rojo. Talla única</p><div class="shop-p"><b>22 €</b><button type="button" class="btn btn-red" data-add="gorra">Añadir</button></div></div></article><article class="shop-c gc"><div class="shop-i gc-i"><span>TINTA NEGRA</span><b>Tarjeta regalo</b></div><div class="cat-b"><h3>Tarjeta regalo</h3><p>De 50 a 200 €, válida 12 meses</p><div class="shop-p"><b>desde 50 €</b><a class="btn btn-ghost" href="#regalo">Elegir</a></div></div></article></div>
   </div>
 </section>
 
@@ -888,8 +890,7 @@ $$(".ba").forEach(function(f){var r=f.querySelector("input");r.addEventListener(
 var SHOP=[{k:"balsamo",n:"Bálsamo de cuidado",d:"Vegano, sin perfume. 50 ml",p:14.9},{k:"jabon",n:"Jabón neutro",d:"pH suave para los primeros días. 250 ml",p:9.9},{k:"film",n:"Film protector",d:"Segunda piel transpirable. 2 m",p:12.5},{k:"solar",n:"Stick solar SPF 50",d:"Protege el color del sol",p:11.9},{k:"camiseta",n:"Camiseta Rosa",d:"Algodón orgánico. Unisex",p:24},{k:"gorra",n:"Gorra Daga",d:"Bordado rojo. Talla única",p:22}];
 var cart={};try{cart=JSON.parse(localStorage.getItem("tn_cart")||"{}")}catch(e){}
 function saveCart(){try{localStorage.setItem("tn_cart",JSON.stringify(cart))}catch(e){}}
-var sg2=$("#shopG");SHOP.forEach(function(p){var a=document.createElement("article");a.className="shop-c";a.innerHTML='<div class="shop-i"><img src="img/shop/'+p.k+'.webp" alt="'+p.n+'" loading="lazy"></div><div class="cat-b"><h3>'+p.n+'</h3><p>'+p.d+'</p><div class="shop-p"><b>'+eur(p.p)+'</b><button type="button" class="btn btn-red" data-add="'+p.k+'">Añadir</button></div></div>';sg2.appendChild(a)});
-var gcA=document.createElement("article");gcA.className="shop-c gc";gcA.innerHTML='<div class="shop-i gc-i"><span>TINTA NEGRA</span><b>Tarjeta regalo</b></div><div class="cat-b"><h3>Tarjeta regalo</h3><p>De 50 a 200 €, válida 12 meses</p><div class="shop-p"><b>desde 50 €</b><a class="btn btn-ghost" href="#regalo">Elegir</a></div></div>';sg2.appendChild(gcA);
+var sg2=$("#shopG");
 function cartCount(){var n=0;for(var k in cart)n+=cart[k];$("#cartN").textContent=n;$("#cartB").classList.toggle("has",n>0)}
 function cartOpen(){$("#cart").classList.add("on");$("#cart").setAttribute("aria-hidden","false");ov.classList.add("on");drawCart()}
 function cartClose(){$("#cart").classList.remove("on");$("#cart").setAttribute("aria-hidden","true");ov.classList.remove("on")}
