@@ -206,6 +206,36 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
 .ask{display:flex;gap:8px;padding:10px 16px 16px}
 .ask input{flex:1;min-height:48px;border:1.5px solid #e2d6c1;border-radius:999px;padding:0 16px;font:inherit;background:#fff;width:auto}
 .ask button{width:48px;height:48px;border-radius:50%;border:0;background:var(--g);color:var(--cream);font-size:18px;cursor:pointer;flex:none}
+
+.ico{width:84px;height:84px;padding:0;overflow:hidden;position:relative;background:#f3ebdc}
+.thumb{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.item:hover .thumb{transform:scale(1.08)}
+.vb{position:absolute;right:5px;bottom:5px;width:22px;height:22px;border-radius:50%;background:rgba(15,42,36,.85);color:#fff;font-style:normal;font-size:9px;display:grid;place-items:center}
+.mini{width:44px;height:44px;border-radius:12px;object-fit:cover;display:block}
+.line .e,.sug .e{font-size:0}
+.shm{width:100%;aspect-ratio:16/11;object-fit:cover;border-radius:18px;margin:6px 0 14px;background:#efe6d6}
+.hmed{position:relative;width:min(470px,100%);aspect-ratio:4/5;justify-self:center}
+.hring{position:absolute;inset:-8%;width:116%;height:116%;transform-origin:50% 50%}
+.hframe{position:absolute;inset:0;border-radius:999px 999px 32px 32px;overflow:hidden;box-shadow:0 40px 80px -30px rgba(0,0,0,.6);border:6px solid rgba(246,239,227,.12)}
+.hframe video{width:100%;height:100%;object-fit:cover}
+.hcard{position:absolute;display:flex;align-items:center;gap:10px;background:var(--paper);color:var(--ink);border-radius:18px;padding:8px 14px 8px 8px;box-shadow:0 20px 40px -14px rgba(0,0,0,.5);animation:flt 6s ease-in-out infinite;font-size:14px}
+.hcard img{width:48px;height:48px;border-radius:12px;object-fit:cover}
+.hcard b{display:block;font-size:14px;line-height:1.2}.hcard small{color:var(--mute);font-size:12px}
+.hc1{left:-8%;bottom:12%}.hc2{right:-6%;top:14%;padding:12px 16px;animation-delay:-3s}
+.hc2 .dot{width:10px;height:10px;border-radius:50%;background:#2fa35a;box-shadow:0 0 0 4px rgba(47,163,90,.2)}
+@keyframes flt{50%{transform:translateY(-10px)}}
+@media(max-width:860px){.hmed{width:min(330px,82%);order:-1;margin-top:8px}.hc1{left:-10%}.hc2{right:-10%}}
+.b{background:#173d35}
+.b .bgm{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.b:hover .bgm{transform:scale(1.06)}
+.b:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(8,20,17,.85));z-index:0}
+.b h3,.b p{z-index:1}.b{display:flex;flex-direction:column;justify-content:flex-end;color:var(--cream)}
+.b2{color:var(--cream)}.b1,.b2,.b4{background:#173d35}
+.terr{position:relative;min-height:min(70svh,560px);display:grid;align-items:end;color:var(--cream);overflow:hidden}
+.terr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.terr:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 30%,rgba(8,20,17,.8))}
+.terr .wrap{position:relative;z-index:1;padding:60px 0}
+@media(min-width:900px){.dock{left:auto;right:28px;width:440px;margin:0;bottom:28px}}
 </style>
 </head>
 <body>
@@ -224,20 +254,7 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
       <div class="ctas h-in d3"><a class="btn btn-gold" href="#carta">Ver la carta</a><a class="btn btn-line" href="#reserva">Reservar mesa</a></div>
       <div class="meta h-in d4"><span><b>★ 4,8</b> en Google</span><span><b>Cocina</b> abierta hasta las 23:30</span><span><b>Terraza</b> todo el año</span></div>
     </div>
-    <div class="plate" aria-hidden="true">
-      <svg viewBox="0 0 520 520">
-        <g class="spin"><circle cx="260" cy="260" r="240" fill="none" stroke="rgba(217,164,65,.35)" stroke-dasharray="2 12" stroke-width="3"/></g>
-        <circle cx="260" cy="270" r="200" fill="#f6efe3"/><circle cx="260" cy="270" r="168" fill="#fbf7f0" stroke="#e8dcc6" stroke-width="4"/>
-        <g id="tapas">
-          <ellipse cx="200" cy="250" rx="70" ry="44" fill="#f2c14e"/><ellipse cx="200" cy="244" rx="70" ry="40" fill="#f7d779"/><path d="M160 236q40-22 82 0" stroke="#e0a832" stroke-width="5" fill="none"/>
-          <circle cx="318" cy="222" r="34" fill="#c8653a"/><circle cx="308" cy="214" r="8" fill="#e9a07a"/><circle cx="330" cy="230" r="6" fill="#e9a07a"/>
-          <rect x="250" y="292" width="120" height="40" rx="12" fill="#8a5a2b"/><rect x="256" y="284" width="108" height="16" rx="8" fill="#d23f2f"/><circle cx="276" cy="292" r="5" fill="#2d6b3c"/><circle cx="312" cy="290" r="5" fill="#2d6b3c"/><circle cx="346" cy="292" r="5" fill="#2d6b3c"/>
-          <g fill="#2d6b3c"><circle cx="170" cy="318" r="12"/><circle cx="196" cy="330" r="12"/><circle cx="182" cy="300" r="11"/></g>
-        </g>
-        <g class="steam" stroke="#f6efe3" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"><path d="M200 190q-14-20 0-40t0-40"/><path d="M240 180q-14-20 0-40t0-40"/><path d="M318 170q-14-20 0-40t0-40"/></g>
-        <g transform="translate(400 330) rotate(12)"><path d="M0 0h64l-8 92H8z" fill="rgba(255,255,255,.18)" stroke="#f6efe3" stroke-width="4"/><path d="M5 30h54l-5 58H10z" fill="#9e2b1f"/><circle cx="20" cy="44" r="7" fill="#2d6b3c"/><rect x="40" y="-30" width="5" height="60" rx="2" fill="#d9a441" transform="rotate(14)"/></g>
-      </svg>
-    </div>
+    <div class="hmed h-in d2"><svg class="spin hring" viewBox="0 0 520 520" aria-hidden="true"><circle cx="260" cy="260" r="250" fill="none" stroke="rgba(217,164,65,.45)" stroke-dasharray="2 12" stroke-width="3"/></svg><div class="hframe"><video class="lv" src="vid/hero.mp4" poster="img/hero.webp" muted loop playsinline preload="metadata" aria-label="Vermut de grifo sirviéndose en la barra"></video></div><div class="hcard hc1"><img src="img/tortilla.webp" alt="" width="720" height="720"><span><b>Tortilla de la casa</b><small>Sale cada hora</small></span></div><div class="hcard hc2"><span class="dot"></span><span><b>Terraza abierta</b><small>Hoy hasta las 00:00</small></span></div></div>
   </div>
   <svg class="wave" viewBox="0 0 1440 80" preserveAspectRatio="none" height="60" width="100%" aria-hidden="true"><path fill="currentColor" d="M0 40c240-40 480-40 720 0s480 40 720 0v40H0z"/></svg>
 </section>
@@ -263,13 +280,15 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
     <p class="kick reveal" style="color:var(--gold)">Lo que nos piden siempre</p>
     <h2 id="t-esp" class="reveal">Nuestras especialidades</h2>
     <div class="bento">
-      <article class="b b1 reveal tilt"><h3>Tortilla de la casa</h3><p>Jugosa, con cebolla pochada a fuego lento. Sale cada hora, recién hecha.</p><span class="big" aria-hidden="true">🍳</span></article>
-      <article class="b b2 reveal tilt"><h3>Vermut de grifo</h3><p>Con su naranja, su aceituna y su sifón. El clásico de los domingos.</p><span class="big" aria-hidden="true">🍷</span></article>
-      <article class="b reveal tilt"><h3>Gildas</h3><p>Anchoa, guindilla y aceituna. Sin más.</p><span class="big" aria-hidden="true">🫒</span></article>
-      <article class="b b4 reveal tilt"><h3>Rabas</h3><p>Crujientes, con limón y alioli.</p><span class="big" aria-hidden="true">🦑</span></article>
+      <article class="b b1 reveal tilt"><h3>Tortilla de la casa</h3><p>Jugosa, con cebolla pochada a fuego lento. Sale cada hora, recién hecha.</p><video class="bgm lv" src="vid/tortilla.mp4" poster="img/tortilla.webp" muted loop playsinline preload="none" aria-hidden="true"></video></article>
+      <article class="b b2 reveal tilt"><h3>Vermut de grifo</h3><p>Con su naranja, su aceituna y su sifón. El clásico de los domingos.</p><video class="bgm lv" src="vid/vermut.mp4" poster="img/vermut.webp" muted loop playsinline preload="none" aria-hidden="true"></video></article>
+      <article class="b reveal tilt"><h3>Gildas</h3><p>Anchoa, guindilla y aceituna. Sin más.</p><img class="bgm" src="img/gilda.webp" alt="" loading="lazy"></article>
+      <article class="b b4 reveal tilt"><h3>Rabas</h3><p>Crujientes, con limón y alioli.</p><video class="bgm lv" src="vid/rabas.mp4" poster="img/rabas.webp" muted loop playsinline preload="none" aria-hidden="true"></video></article>
     </div>
   </div>
 </section>
+
+<section class="terr" aria-label="Nuestra terraza"><img src="img/terraza.webp" alt="Terraza de Bar Marea al atardecer con mesas y vermut" loading="lazy" width="1280" height="720"><div class="wrap"><p class="kick" style="color:var(--gold)">Terraza todo el año</p><h2>El mejor sitio para ver caer el sol</h2></div></section>
 
 <section class="info" id="visitanos" aria-labelledby="t-info">
   <div class="wrap">
@@ -355,6 +374,10 @@ var M=[
  {c:"bebidas",i:"🍺",p:"2,50",v:1,gf:0,a:"g",n:[150,1,12,0],es:["Caña","Cerveza de barril"],en:["Small draught beer","Draught beer"],fr:["Demi","Bière pression"]},
  {c:"bebidas",i:"🥤",p:"2,80",v:1,gf:1,a:"",n:[90,0,22,0],es:["Refrescos","Varios sabores"],en:["Soft drinks","Several flavours"],fr:["Sodas","Plusieurs parfums"]}];
 var ECO={1:1,3:1,4:1,7:1};
+var IMG=["gilda","quesos","bravas","anchoas","tortilla","rabas","croquetas","ensalada","bocata","pepito","vegetal","tarta","flan","vermut","cana","refrescos"];
+var VID={4:"tortilla",5:"rabas",6:"croquetas",11:"tarta",13:"vermut"};
+function im(i){return "img/"+IMG[i]+".webp"}
+function thumb(m,c){return '<img class="'+(c||"thumb")+'" src="'+im(m.id)+'" alt="" loading="lazy" width="720" height="720">'}
 var L=(function(){var n=(navigator.language||"es").slice(0,2).toLowerCase();return T[n]?n:"es"})();
 var MESA=((new URLSearchParams(location.search).get("mesa")||"7").replace(/\D/g,"").slice(0,3))||"7";
 var cat="picar",fV=0,fG=0,fL=0,fK=0;
@@ -377,7 +400,7 @@ function drawTabs(){
   CATS.forEach(function(c){var b=document.createElement("button");b.type="button";b.setAttribute("role","tab");b.textContent=c[L];b.setAttribute("aria-selected",c.id===cat);b.addEventListener("click",function(){cat=c.id;drawTabs();drawGrid()});tabs.appendChild(b)});
   requestAnimationFrame(moveInd);
 }
-function moveInd(){var a=tabs.querySelector('[aria-selected="true"]');if(!a)return;ind.style.left=a.offsetLeft+"px";ind.style.width=a.offsetWidth+"px";a.scrollIntoView({block:"nearest",inline:"nearest"})}
+function moveInd(){var a=tabs.querySelector('[aria-selected="true"]');if(!a)return;ind.style.left=a.offsetLeft+"px";ind.style.width=a.offsetWidth+"px";var tl=a.offsetLeft-16,tr=a.offsetLeft+a.offsetWidth-tabs.clientWidth+16;if(tabs.scrollLeft>tl)tabs.scrollLeft=tl;else if(tabs.scrollLeft<tr)tabs.scrollLeft=tr}
 function drawFilters(){filters.innerHTML="";[["v","veg","🌱"],["g","gf","🌾"],["l","lact","🥛"],["k","light","🍃"]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="chip";var on={v:fV,g:fG,l:fL,k:fK}[x[0]];b.setAttribute("aria-pressed",!!on);b.textContent=x[2]+" "+t(x[1]);b.addEventListener("click",function(){if(x[0]==="v")fV=!fV;else if(x[0]==="g")fG=!fG;else if(x[0]==="l")fL=!fL;else fK=!fK;drawFilters();drawGrid()});filters.appendChild(b)})}
 function drawGrid(){
   var list=M.map(function(m,i){m.id=i;return m}).filter(function(m){return m.c===cat&&(!fV||m.v)&&(!fG||m.gf)&&(!fL||!has(m,"l"))&&(!fK||m.n[0]<300)});
@@ -387,7 +410,7 @@ function drawGrid(){
     var c=document.createElement("div");c.className="cell";
     var b=document.createElement("button");b.type="button";b.className="item";
     var tags=(m.v?'<span class="tag v">🌱 '+t("veg")+'</span>':'')+(m.gf?'<span class="tag gf">'+t("gf")+'</span>':'')+(ECO[m.id]?'<span class="tag eco">📍 '+t("eco")+'</span>':'')+'<span class="tag">'+m.n[0]+' kcal</span>';
-    b.innerHTML=(m.s?'<span class="star">'+t("star")+'</span>':'')+'<span class="ico" aria-hidden="true">'+m.i+'</span><span><h3>'+nm(m)+'</h3><p>'+m[L][1]+'</p><span class="tags">'+tags+'</span></span><span class="price">'+m.p+' €</span>';
+    b.innerHTML=(m.s?'<span class="star">'+t("star")+'</span>':'')+'<span class="ico" aria-hidden="true">'+thumb(m)+(VID[m.id]?'<i class="vb">▶</i>':'')+'</span><span><h3>'+nm(m)+'</h3><p>'+m[L][1]+'</p><span class="tags">'+tags+'</span></span><span class="price">'+m.p+' €</span>';
     b.addEventListener("click",function(){openDish(m)});
     var a=document.createElement("button");a.type="button";a.className="addq";a.textContent="+";a.setAttribute("aria-label",t("addto")+": "+nm(m));
     a.addEventListener("click",function(){add(m.id)});
@@ -407,7 +430,7 @@ function openDish(m){
   var a=m.a?m.a.split(","):[];
   var algs=a.length?a.map(function(x){return '<span>'+ALG[x].i+' '+ALG[x][L]+'</span>'}).join(""):'<span>✅ '+t("none")+'</span>';
   var pct=Math.round(m.n[0]/20);
-  $("#sh-b").innerHTML='<div style="font-size:54px">'+m.i+'</div><h3 id="sh-t">'+nm(m)+'</h3><p style="color:var(--mute)">'+m[L][1]+'</p><div class="tags">'+(m.v?'<span class="tag v">🌱 '+t("veg")+'</span>':'')+(m.gf?'<span class="tag gf">'+t("gf")+'</span>':'')+(ECO[m.id]?'<span class="tag eco">📍 '+t("eco")+'</span>':'')+'</div><p class="price" style="margin-top:8px">'+m.p+' €</p><p style="font-weight:800;margin-top:14px">'+t("alg")+'</p><div class="alg">'+algs+'</div><div class="nut"><div><b>'+m.n[0]+'</b><small>'+t("kcal")+'</small></div><div><b>'+m.n[1]+' g</b><small>'+t("prot")+'</small></div><div><b>'+m.n[2]+' g</b><small>'+t("carb")+'</small></div><div><b>'+m.n[3]+' g</b><small>'+t("fat")+'</small></div></div><div class="kbar"><i id="kb"></i></div><p class="small"><b>'+pct+' %</b> '+t("daily")+'. '+t("bio")+'</p><div class="btn2"><button class="btn btn-soft" type="button" id="shask">🤵 '+t("ask_dish")+'</button><button class="btn btn-dark" type="button" id="shok">+ '+t("addto")+'</button></div>';
+  $("#sh-b").innerHTML=(VID[m.id]?'<video class="shm" src="vid/'+VID[m.id]+'.mp4" poster="'+im(m.id)+'" autoplay muted loop playsinline></video>':'<img class="shm" src="'+im(m.id)+'" alt="">')+'<h3 id="sh-t">'+nm(m)+'</h3><p style="color:var(--mute)">'+m[L][1]+'</p><div class="tags">'+(m.v?'<span class="tag v">🌱 '+t("veg")+'</span>':'')+(m.gf?'<span class="tag gf">'+t("gf")+'</span>':'')+(ECO[m.id]?'<span class="tag eco">📍 '+t("eco")+'</span>':'')+'</div><p class="price" style="margin-top:8px">'+m.p+' €</p><p style="font-weight:800;margin-top:14px">'+t("alg")+'</p><div class="alg">'+algs+'</div><div class="nut"><div><b>'+m.n[0]+'</b><small>'+t("kcal")+'</small></div><div><b>'+m.n[1]+' g</b><small>'+t("prot")+'</small></div><div><b>'+m.n[2]+' g</b><small>'+t("carb")+'</small></div><div><b>'+m.n[3]+' g</b><small>'+t("fat")+'</small></div></div><div class="kbar"><i id="kb"></i></div><p class="small"><b>'+pct+' %</b> '+t("daily")+'. '+t("bio")+'</p><div class="btn2"><button class="btn btn-soft" type="button" id="shask">🤵 '+t("ask_dish")+'</button><button class="btn btn-dark" type="button" id="shok">+ '+t("addto")+'</button></div>';
   openS($("#sheet"));
   setTimeout(function(){var k=$("#kb");if(k)k.style.width=Math.min(100,pct)+"%"},250);
   $("#shok").addEventListener("click",function(){add(m.id);closeS($("#sheet"))});
@@ -422,7 +445,7 @@ function bar(b){
   cb.classList.toggle("on",!!(n||o));
   if(b){cb.classList.remove("bump");void cb.offsetWidth;cb.classList.add("bump")}
 }
-function lines(o,edit){var h="";for(var k in o){var m=M[k];h+='<div class="line"><span class="e" aria-hidden="true">'+m.i+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € × '+o[k]+'</small></span>'+(edit?'<span class="qty"><button type="button" data-act="dec" data-i="'+k+'" aria-label="−">−</button><span>'+o[k]+'</span><button type="button" data-act="inc" data-i="'+k+'" aria-label="+">+</button></span>':'<b>'+eur(pr(m)*o[k])+'</b>')+'</div>'}return h}
+function lines(o,edit){var h="";for(var k in o){var m=M[k];h+='<div class="line"><span class="e" aria-hidden="true">'+thumb(m,"mini")+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € × '+o[k]+'</small></span>'+(edit?'<span class="qty"><button type="button" data-act="dec" data-i="'+k+'" aria-label="−">−</button><span>'+o[k]+'</span><button type="button" data-act="inc" data-i="'+k+'" aria-label="+">+</button></span>':'<b>'+eur(pr(m)*o[k])+'</b>')+'</div>'}return h}
 function drawCart(){
   var b=$("#ct-b"),h="";
   if(view==="cart"){
@@ -463,7 +486,7 @@ $("#cartbar").addEventListener("click",function(){if(view==="done")view="cart";i
 var log=$("#log");
 function norm(s){return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/œ/g,"oe")}
 function msg(html,who){var d=document.createElement("div");d.className="msg "+who;if(who==="u")d.textContent=html;else d.innerHTML=html;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
-function cards(list){return list.map(function(m){return '<div class="sug"><span class="e" aria-hidden="true">'+m.i+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € · '+m.n[0]+' kcal</small></span><button type="button" data-add="'+m.id+'" aria-label="'+esc(t("addto")+": "+nm(m))+'">+</button></div>'}).join("")}
+function cards(list){return list.map(function(m){return '<div class="sug"><span class="e" aria-hidden="true">'+thumb(m,"mini")+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € · '+m.n[0]+' kcal</small></span><button type="button" data-add="'+m.id+'" aria-label="'+esc(t("addto")+": "+nm(m))+'">+</button></div>'}).join("")}
 function drawChatUI(){
   $("#ch-t").textContent=t("waiter");$("#ch-s").textContent=t("online");$("#askin").placeholder=t("ask_ph");$("#fab-s").textContent=t("fab");$("#fab").setAttribute("aria-label",t("waiter"));
   $("#quick").innerHTML=t("q").map(function(q){return '<button type="button" class="chip" data-q="'+esc(q)+'">'+esc(q)+'</button>'}).join("");
@@ -515,6 +538,10 @@ var d=(new Date().getDay()+6)%7;$("#hrs").innerHTML=H.map(function(h,i){return '
 if(d===0){$("#openNow").innerHTML='<i style="background:#c8653a;box-shadow:0 0 0 4px rgba(200,101,58,.18)"></i><span>Hoy cerrado</span>'}
 var rd=$("#rd");rd.min=new Date().toISOString().slice(0,10);rd.value=rd.min;
 $("#fres").addEventListener("submit",function(e){e.preventDefault();var f=e.target;var msg="Hola, he visto la demo de Bar Marea en agencia-js.com y me gustaría una web así para mi negocio.\n(Reserva de ejemplo: "+f.n.value+", "+f.d.value+" a las "+f.h.value+", "+f.p.value+" personas, "+f.z.value+")";window.open("https://wa.me/34688933308?text="+encodeURIComponent(msg),"_blank","noopener")});
+/* vídeos: solo se reproducen cuando se ven */
+var rm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+var vio=new IntersectionObserver(function(es){es.forEach(function(e){var v=e.target;if(e.isIntersecting&&!rm){v.preload="auto";var p=v.play();if(p&&p.catch)p.catch(function(){})}else v.pause()})},{threshold:.25});
+[].slice.call(document.querySelectorAll("video.lv")).forEach(function(v){vio.observe(v)});
 /* header + reveal + tilt */
 var hdr=$("#hdr");addEventListener("scroll",function(){hdr.classList.toggle("on",scrollY>40)},{passive:true});
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("vis");io.unobserve(e.target)}})},{threshold:.15});
