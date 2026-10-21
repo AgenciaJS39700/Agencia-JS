@@ -76,7 +76,7 @@ xp.classList.add("on");
 var ini = desk ? "inset(12% 14% 12% 14% round 36px)" : "inset(9% 5% 13% 5% round 26px)";
 var tl = gsap.timeline({ defaults: { ease: "none" }, scrollTrigger: { trigger: xp, start: "top top", end: "+=140%", pin: true, scrub: 0.7, anticipatePin: 1 } });
 tl.fromTo(frame, { clipPath: ini }, { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: 1 }, 0);
-if (art) { tl.fromTo(art, { scale: 1.35, yPercent: 8, opacity: 0.1 }, { scale: 1, yPercent: -6, opacity: 0.3, duration: 1 }, 0); }
+if (art) { tl.fromTo(art, { scale: 1.25, yPercent: 6, opacity: 0.25 }, { scale: 1, yPercent: -4, opacity: 0.6, duration: 1 }, 0); }
 tl.fromTo(txt, { y: 50, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.14, duration: 0.45, ease: "power2.out" }, 0.45);
 });
 
