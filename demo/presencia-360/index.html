@@ -1,26 +1,366 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Demo Presencia 360° · Agencia JS</title><meta name="robots" content="noindex">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="#0a0a0c">
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tinta Negra · Estudio de tatuaje (demo)</title>
+<meta name="description" content="Demo de web premium para estudio de tatuajes: galería flash animada, artistas, proceso y reserva guiada por WhatsApp. Diseño de Agencia JS.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0a'/%3E%3Cpath d='M32 8v40M24 40l8 16 8-16M22 20h20' stroke='%23e1251b' stroke-width='5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
-:root{--gold:#E8C766;--ink:#0a0a0c;--mute:#a1a1aa}
-*{box-sizing:border-box;margin:0}body{min-height:100svh;display:grid;place-items:center;padding:24px 16px;background:radial-gradient(700px 500px at 85% 0%,rgba(59,130,246,.25),transparent 60%),radial-gradient(600px 500px at 0% 100%,rgba(232,199,102,.14),transparent 60%),var(--ink);color:#fff;font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:560px;width:100%;text-align:center;padding:40px 28px;border:1px solid rgba(255,255,255,.1);border-radius:28px;background:rgba(20,20,24,.85)}
-.pill{display:inline-block;padding:6px 14px;border-radius:999px;border:1px solid rgba(232,199,102,.5);color:var(--gold);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-h1{margin:18px 0 10px;font-size:clamp(28px,7vw,40px);line-height:1.1}h1 span{color:var(--gold)}
-p{color:var(--mute)}.btns{display:flex;flex-direction:column;gap:12px;margin-top:28px}
-a{display:inline-flex;align-items:center;justify-content:center;min-height:50px;border-radius:999px;font-weight:700;text-decoration:none}
-.wa{background:#25D366;color:#062e17}.back{border:1px solid rgba(255,255,255,.25);color:#fff}
-a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
-@media(min-width:520px){.btns{flex-direction:row}.btns a{flex:1}}
-</style></head><body><main>
-<span class="pill">Demo en preparación</span>
-<h1>Plan <span>Presencia 360°</span></h1>
-<p>La web completa con todo incluido: textos profesionales, tarjetas NFC y seguimiento de posicionamiento.</p>
-<p style="margin-top:12px">Estamos preparando una tienda de ejemplo para que veas cómo quedaría tu web con este plan. Mientras tanto, te enseñamos ejemplos reales por WhatsApp.</p>
-<div class="btns">
-<a class="wa" href="https://wa.me/34688933308?text=Hola%2C%20quiero%20ver%20ejemplos%20del%20plan%20Presencia%20360%C2%B0" target="_blank" rel="noopener">Pedir ejemplos por WhatsApp</a>
-<a class="back" href="/#planes">Volver a los planes</a>
+:root{--bk:#0a0a0a;--bk2:#121212;--bone:#ece6da;--mute:#8d877c;--red:#e1251b;--line:rgba(236,230,218,.12);--disp:"Arial Black","Helvetica Neue",Impact,system-ui,sans-serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--serif:ui-serif,Georgia,serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);background:var(--bk);color:var(--bone);line-height:1.55;overflow-x:hidden}
+::selection{background:var(--red);color:#fff}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:4px}
+.wrap{width:min(1240px,100% - 32px);margin-inline:auto}
+.grain{pointer-events:none;position:fixed;inset:-50%;z-index:90;opacity:.06;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:gr 1s steps(4) infinite}
+@keyframes gr{0%{transform:translate(0,0)}25%{transform:translate(-5%,3%)}50%{transform:translate(4%,-4%)}75%{transform:translate(-3%,5%)}}
+.kick{font-size:12px;font-weight:800;letter-spacing:.32em;text-transform:uppercase;color:var(--red)}
+h2{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(40px,8vw,112px);line-height:.88;letter-spacing:-.02em}
+.out{color:transparent;-webkit-text-stroke:1.5px var(--bone)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 28px;border-radius:999px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:14px;text-decoration:none;border:0;cursor:pointer;transition:transform .3s,background .3s,color .3s}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:#fff;color:#000}
+.btn-ghost{border:1.5px solid var(--line);color:var(--bone);background:transparent}
+.btn-ghost:hover{border-color:var(--bone)}
+/* cursor */
+.cur{position:fixed;left:0;top:0;width:38px;height:38px;border:1.5px solid var(--bone);border-radius:50%;pointer-events:none;z-index:100;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s,border-color .25s;mix-blend-mode:difference;display:none}
+.cur.big{width:90px;height:90px;background:#fff;border-color:#fff}
+@media(hover:hover) and (pointer:fine){.cur{display:block}}
+/* header */
+.hdr{position:fixed;inset:0 0 auto;z-index:60;mix-blend-mode:difference}
+.hdr .wrap{display:flex;justify-content:space-between;align-items:center;height:76px}
+.logo{font-family:var(--disp);font-weight:900;letter-spacing:.08em;text-decoration:none;font-size:18px;text-transform:uppercase;color:#fff}
+.nav{display:flex;gap:28px}
+.nav a{text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#fff}
+@media(max-width:760px){.nav a:not(:last-child){display:none}}
+/* hero */
+.hero{position:relative;min-height:100svh;display:grid;align-items:end;overflow:hidden;padding:120px 0 40px}
+.hero .art{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.hero .art svg{width:min(760px,96vw);height:auto;opacity:.95}
+.draw path,.draw circle,.draw ellipse,.draw line,.draw polyline{fill:none;stroke:var(--bone);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.draw .r{stroke:var(--red)}
+.hero h1{position:relative;font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(64px,17vw,250px);line-height:.8;letter-spacing:-.04em}
+.hero h1 .l{display:block;overflow:hidden}
+.hero h1 .l span{display:inline-block;transform:translateY(105%);animation:up 1.1s cubic-bezier(.2,.8,.1,1) forwards}
+.hero h1 .l:nth-child(2) span{animation-delay:.12s}
+@keyframes up{to{transform:none}}
+.hero .row{position:relative;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-top:26px}
+.hero .row p{max-width:430px;color:#bdb6aa;font-size:17px}
+.hero .ctas{display:flex;gap:10px;flex-wrap:wrap}
+.badge{position:absolute;right:4%;top:22%;width:150px;height:150px}
+.badge text{font:800 11px var(--sans);letter-spacing:.32em;fill:var(--bone);text-transform:uppercase}
+.badge .rot{transform-origin:75px 75px;animation:rot 16s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+@media(max-width:760px){.badge{width:110px;height:110px;top:14%}}
+/* marquee */
+.mq{border-block:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:22px 0}
+.mq .tr{display:inline-flex;gap:46px;animation:mq 30s linear infinite;font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(28px,4vw,52px)}
+.mq .tr span:nth-child(even){color:transparent;-webkit-text-stroke:1.2px var(--bone)}
+.mq .tr span:after{content:"✕";color:var(--red);margin-left:46px;-webkit-text-stroke:0}
+@keyframes mq{to{transform:translateX(-50%)}}
+/* manifiesto */
+.mani{padding:140px 0}
+.mani p{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(30px,5.4vw,72px);line-height:1;letter-spacing:-.01em}
+.mani .w{opacity:.14;transition:opacity .3s}
+.mani .w.on{opacity:1}
+.mani .w.r{color:var(--red)}
+/* estilos */
+.est{padding:40px 0 120px;position:relative}
+.list{margin-top:40px;border-top:1px solid var(--line)}
+.li{display:grid;grid-template-columns:70px 1fr auto;align-items:center;gap:18px;padding:26px 0;border-bottom:1px solid var(--line);text-decoration:none;position:relative}
+.li .n{font-weight:800;color:var(--mute);font-size:14px}
+.li h3{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(30px,5vw,64px);line-height:1;transition:transform .4s cubic-bezier(.2,.8,.2,1),color .3s}
+.li p{color:var(--mute);font-size:14px;max-width:260px;text-align:right}
+.li:hover h3{transform:translateX(18px);color:var(--red)}
+.prev{position:fixed;left:0;top:0;width:250px;height:250px;border-radius:20px;background:#151515;border:1px solid var(--line);pointer-events:none;z-index:50;opacity:0;transform:translate(-50%,-50%) scale(.8);transition:opacity .25s,transform .25s;display:grid;place-items:center}
+.prev.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.prev svg{width:78%}
+@media(max-width:760px){.li{grid-template-columns:40px 1fr}.li p{display:none}.prev{display:none}}
+/* flash */
+.flash{padding:120px 0;background:var(--bk2)}
+.fl-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
+@media(max-width:860px){.fgrid{grid-template-columns:1fr 1fr}}
+.fc{position:relative;aspect-ratio:4/5;border-radius:22px;background:var(--bone);color:#0a0a0a;overflow:hidden;cursor:pointer;border:0;font:inherit;text-align:left;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.fc:hover{transform:translateY(-6px) rotate(-.6deg)}
+.fc svg{position:absolute;inset:8% 10% 20%;width:80%;height:72%}
+.fc .draw path,.fc .draw circle,.fc .draw ellipse,.fc .draw line,.fc .draw polyline{stroke:#0a0a0a;stroke-width:2.6}
+.fc .draw .r{stroke:var(--red)}
+.fc .cap{position:absolute;left:18px;right:18px;bottom:16px;display:flex;justify-content:space-between;align-items:flex-end}
+.fc b{font-family:var(--disp);text-transform:uppercase;font-size:20px;line-height:1}
+.fc small{font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#6b655c}
+.fc .av{position:absolute;top:14px;left:14px;background:#0a0a0a;color:var(--bone);font-weight:800;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.fc .av.no{background:var(--red)}
+/* artistas */
+.art{padding:120px 0}
+.agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
+@media(max-width:860px){.agrid{grid-template-columns:1fr}}
+.ac{border:1px solid var(--line);border-radius:24px;padding:26px;position:relative;overflow:hidden;transition:border-color .3s,background .3s}
+.ac:hover{border-color:var(--red);background:#120d0c}
+.mono{width:86px;height:86px;border-radius:50%;display:grid;place-items:center;font-family:var(--disp);font-size:30px;background:var(--bone);color:#0a0a0a;margin-bottom:18px}
+.ac h3{font-family:var(--disp);text-transform:uppercase;font-size:28px;line-height:1}
+.ac .sp{color:var(--red);font-weight:800;font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin:8px 0 12px}
+.ac p{color:#b3ac9f;font-size:15px}
+.ac .ig{display:inline-block;margin-top:16px;font-weight:700;font-size:14px;text-decoration:none;border-bottom:1px solid var(--line)}
+/* proceso horizontal */
+.pro{position:relative;overflow:hidden}
+.pro .pin{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:100px 0}
+.track{display:flex;gap:18px;padding-left:max(16px,calc((100vw - 1240px)/2));margin-top:40px;will-change:transform}
+.step{flex:none;width:min(440px,82vw);min-height:360px;border-radius:26px;padding:30px;background:#141414;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between}
+.step .k{font-family:var(--disp);font-size:120px;line-height:.8;color:transparent;-webkit-text-stroke:1.5px var(--red)}
+.step h3{font-family:var(--disp);text-transform:uppercase;font-size:32px;line-height:1;margin-bottom:10px}
+.step p{color:#b3ac9f}
+@media(max-width:860px){.track{flex-direction:column;padding:0 16px}.step{width:100%;min-height:0}.step .k{font-size:80px}}
+/* reserva */
+.res{padding:120px 0;background:var(--bone);color:#0a0a0a}
+.res h2 .out{-webkit-text-stroke-color:#0a0a0a}
+.res .box{margin-top:40px;background:#fff;border-radius:28px;padding:30px;box-shadow:0 30px 80px -40px rgba(0,0,0,.4)}
+.bar{height:6px;border-radius:6px;background:#eee7da;overflow:hidden;margin-bottom:26px}
+.bar i{display:block;height:100%;width:20%;background:var(--red);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.stp{display:none}.stp.on{display:block;animation:fi .45s ease}
+@keyframes fi{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+.stp h3{font-family:var(--disp);text-transform:uppercase;font-size:clamp(24px,3.4vw,36px);margin-bottom:18px}
+.opts{display:flex;flex-wrap:wrap;gap:10px}
+.opt{border:1.5px solid #dcd3c4;background:#fff;border-radius:999px;padding:12px 18px;font-weight:700;cursor:pointer;font-size:15px}
+.opt[aria-pressed=true]{background:#0a0a0a;color:#fff;border-color:#0a0a0a}
+.range{width:100%;accent-color:var(--red)}
+.sz{font-family:var(--disp);font-size:40px}
+.res input,.res textarea{width:100%;min-height:52px;border:1.5px solid #dcd3c4;border-radius:14px;padding:12px 14px;font:inherit;margin-top:6px}
+.res label{display:block;font-weight:700;font-size:14px;margin-top:12px}
+.nav2{display:flex;justify-content:space-between;margin-top:26px;gap:10px}
+.btn-dk{background:#0a0a0a;color:#fff}
+.btn-ln{border:1.5px solid #cfc6b5;background:transparent;color:#0a0a0a}
+/* faq */
+.faq{padding:120px 0}
+details{border-bottom:1px solid var(--line);padding:22px 0}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:20px;font-family:var(--disp);text-transform:uppercase;font-size:clamp(20px,2.6vw,28px)}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";color:var(--red);transition:transform .3s}
+details[open] summary:after{transform:rotate(45deg)}
+details p{color:#b3ac9f;margin-top:12px;max-width:760px}
+footer{border-top:1px solid var(--line);padding:60px 0 100px}
+footer .big{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(48px,12vw,180px);line-height:.85;letter-spacing:-.04em}
+footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:30px;color:var(--mute);font-size:14px}
+/* modal */
+.mod{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.75);display:none;place-items:center;padding:16px;backdrop-filter:blur(6px)}
+.mod.open{display:grid}
+.mod .in{width:min(520px,100%);background:var(--bone);color:#0a0a0a;border-radius:26px;padding:26px;position:relative;animation:fi .4s ease}
+.mod svg{width:60%;margin:0 auto 10px;display:block}
+.mod .draw path,.mod .draw circle,.mod .draw ellipse,.mod .draw line,.mod .draw polyline{stroke:#0a0a0a;stroke-width:2.6}
+.mod .draw .r{stroke:var(--red)}
+.mod h3{font-family:var(--disp);text-transform:uppercase;font-size:30px}
+.mod .x{position:absolute;right:14px;top:12px;width:42px;height:42px;border-radius:50%;border:0;background:#0a0a0a;color:#fff;font-size:22px;cursor:pointer}
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s,transform 1s cubic-bezier(.2,.8,.2,1)}
+.rv.vis{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.hero h1 .l span{transform:none}.mani .w{opacity:1}.grain{display:none}}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="cur" id="cur" aria-hidden="true"></div>
+<header class="hdr"><div class="wrap">
+  <a class="logo" href="#top">Tinta Negra</a>
+  <nav class="nav" aria-label="Principal"><a href="#estilos">Estilos</a><a href="#flash">Flash</a><a href="#artistas">Artistas</a><a href="#reserva">Reservar</a></nav>
+</div></header>
+
+<main id="top">
+<section class="hero">
+  <div class="art" aria-hidden="true">
+    <svg viewBox="0 0 600 600" class="draw" id="heroArt">
+      <!-- daga -->
+      <path d="M300 70 L312 120 L312 360 L300 420 L288 360 L288 120 Z"/>
+      <path d="M300 120 L300 380"/>
+      <path d="M240 360 Q300 340 360 360 Q300 384 240 360 Z"/>
+      <path d="M292 384 h16 v70 h-16 z"/>
+      <circle cx="300" cy="470" r="16" class="r"/>
+      <!-- serpiente -->
+      <path class="r" d="M300 150 C 380 150 400 210 330 230 C 250 250 220 300 300 320 C 380 340 390 400 320 420 C 270 434 236 470 270 510"/>
+      <path class="r" d="M270 510 C 284 530 316 528 320 510 C 324 492 300 486 288 498"/>
+      <path class="r" d="M300 150 C 290 136 270 132 258 142"/>
+      <!-- flores -->
+      <path d="M170 250 C 150 230 160 200 185 205 C 190 185 220 185 222 208 C 245 205 255 232 236 246 C 248 268 224 286 206 270 C 196 292 165 285 170 260 Z"/>
+      <circle cx="204" cy="244" r="12"/>
+      <path d="M420 300 C 402 284 410 258 432 262 C 436 246 462 246 464 266 C 484 264 492 288 476 300 C 486 318 466 334 450 320 C 442 338 414 332 420 310 Z"/>
+      <circle cx="448" cy="292" r="10"/>
+      <path d="M236 246 C 260 260 270 280 288 290"/>
+      <path d="M420 300 C 380 300 350 300 312 300"/>
+      <!-- hojas -->
+      <path d="M160 300 C 130 300 120 330 150 340 C 160 320 170 312 160 300 Z"/>
+      <path d="M470 340 C 500 340 510 370 480 380 C 470 360 460 352 470 340 Z"/>
+      <!-- destellos -->
+      <path d="M120 140 v30 M105 155 h30"/><path d="M480 130 v24 M468 142 h24"/><path d="M500 470 v20 M490 480 h20"/>
+    </svg>
+  </div>
+  <svg class="badge" viewBox="0 0 150 150" aria-hidden="true"><g class="rot"><path id="cp" d="M75,75 m-58,0 a58,58 0 1,1 116,0 a58,58 0 1,1 -116,0" fill="none"/><text><textPath href="#cp">Estudio privado · Cita previa · Desde 2014 ·</textPath></text></g><circle cx="75" cy="75" r="8" fill="#e1251b"/></svg>
+  <div class="wrap">
+    <h1><span class="l"><span>Tinta</span></span><span class="l"><span class="out">Negra</span></span></h1>
+    <div class="row">
+      <p>Estudio de tatuaje privado. Diseños únicos, hechos a mano para ti. Blackwork, fine line y realismo, con material estéril de un solo uso.</p>
+      <div class="ctas"><a class="btn btn-red mag" href="#reserva">Pedir cita</a><a class="btn btn-ghost mag" href="#flash">Ver flash</a></div>
+    </div>
+  </div>
+</section>
+
+<div class="mq" aria-hidden="true"><div class="tr"><span>Blackwork</span><span>Fine line</span><span>Realismo</span><span>Tradicional</span><span>Lettering</span><span>Cover up</span><span>Blackwork</span><span>Fine line</span><span>Realismo</span><span>Tradicional</span><span>Lettering</span><span>Cover up</span></div></div>
+
+<section class="mani"><div class="wrap"><p id="mani">No copiamos tatuajes. Escuchamos tu historia y la convertimos en una pieza que solo llevarás tú, para siempre.</p></div></section>
+
+<section class="est" id="estilos" aria-labelledby="t-est">
+  <div class="wrap">
+    <p class="kick">01 · Estilos</p>
+    <h2 id="t-est" class="rv">Lo que <span class="out">hacemos</span></h2>
+    <div class="list">
+      <a class="li" href="#reserva" data-art="rose"><span class="n">01</span><h3>Blackwork</h3><p>Negro sólido, contrastes potentes y geometría.</p></a>
+      <a class="li" href="#reserva" data-art="moon"><span class="n">02</span><h3>Fine line</h3><p>Líneas finas y delicadas, piezas minimalistas.</p></a>
+      <a class="li" href="#reserva" data-art="eye"><span class="n">03</span><h3>Realismo</h3><p>Retratos y escenas en sombreado suave.</p></a>
+      <a class="li" href="#reserva" data-art="swallow"><span class="n">04</span><h3>Tradicional</h3><p>Old school de líneas gruesas y colores planos.</p></a>
+      <a class="li" href="#reserva" data-art="dagger"><span class="n">05</span><h3>Cover up</h3><p>Tapamos o renovamos ese tatuaje que ya no te gusta.</p></a>
+    </div>
+  </div>
+  <div class="prev" id="prev" aria-hidden="true"></div>
+</section>
+
+<section class="flash" id="flash" aria-labelledby="t-fl">
+  <div class="wrap">
+    <div class="fl-head"><div><p class="kick">02 · Flash del mes</p><h2 id="t-fl" class="rv">Diseños <span class="out">listos</span></h2></div><p style="max-width:360px;color:#b3ac9f">Diseños originales de nuestros artistas. Cada uno se tatúa una sola vez. Toca uno para reservarlo.</p></div>
+    <div class="fgrid" id="fgrid"></div>
+  </div>
+</section>
+
+<section class="art" id="artistas" aria-labelledby="t-ar">
+  <div class="wrap">
+    <p class="kick">03 · El equipo</p>
+    <h2 id="t-ar" class="rv">Artistas <span class="out">residentes</span></h2>
+    <div class="agrid">
+      <article class="ac rv"><div class="mono">AL</div><h3>Alba</h3><p class="sp">Fine line · Botánico</p><p>Piezas delicadas y florales que acompañan la forma del cuerpo.</p><a class="ig" href="#reserva">Reservar con Alba →</a></article>
+      <article class="ac rv"><div class="mono">MK</div><h3>Marko</h3><p class="sp">Blackwork · Geométrico</p><p>Negro sólido, mandalas y composiciones de gran formato.</p><a class="ig" href="#reserva">Reservar con Marko →</a></article>
+      <article class="ac rv"><div class="mono">ST</div><h3>Sara</h3><p class="sp">Realismo · Retrato</p><p>Retratos y escenas en negro y gris con mucho detalle.</p><a class="ig" href="#reserva">Reservar con Sara →</a></article>
+    </div>
+  </div>
+</section>
+
+<section class="pro" id="proceso" aria-labelledby="t-pr">
+  <div class="pin" id="pin">
+    <div class="wrap"><p class="kick">04 · Cómo trabajamos</p><h2 id="t-pr">De la idea <span class="out">a la piel</span></h2></div>
+    <div class="track" id="track">
+      <div class="step"><span class="k">01</span><div><h3>Cuéntanos tu idea</h3><p>Rellena el formulario de reserva con estilo, zona y tamaño. Puedes enviarnos referencias por WhatsApp.</p></div></div>
+      <div class="step"><span class="k">02</span><div><h3>Diseño a medida</h3><p>Tu artista prepara un boceto único y lo ajustamos contigo hasta que sea exactamente lo que buscas.</p></div></div>
+      <div class="step"><span class="k">03</span><div><h3>La sesión</h3><p>Estudio privado, material estéril de un solo uso y sin prisas. Tú marcas el ritmo.</p></div></div>
+      <div class="step"><span class="k">04</span><div><h3>Cuidados y retoque</h3><p>Te damos la guía de cuidados y revisamos la cicatrización. El retoque, si hace falta, va incluido.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="res" id="reserva" aria-labelledby="t-res">
+  <div class="wrap">
+    <p class="kick">05 · Reserva</p>
+    <h2 id="t-res">Pide tu <span class="out">cita</span></h2>
+    <div class="box">
+      <div class="bar" aria-hidden="true"><i id="pbar"></i></div>
+      <form id="fres" novalidate>
+        <div class="stp on" data-s="1"><h3>¿Qué estilo buscas?</h3><div class="opts" data-k="estilo"><button type="button" class="opt">Blackwork</button><button type="button" class="opt">Fine line</button><button type="button" class="opt">Realismo</button><button type="button" class="opt">Tradicional</button><button type="button" class="opt">Cover up</button><button type="button" class="opt">No lo sé aún</button></div></div>
+        <div class="stp" data-s="2"><h3>¿En qué zona?</h3><div class="opts" data-k="zona"><button type="button" class="opt">Brazo</button><button type="button" class="opt">Antebrazo</button><button type="button" class="opt">Mano</button><button type="button" class="opt">Pierna</button><button type="button" class="opt">Espalda</button><button type="button" class="opt">Pecho</button><button type="button" class="opt">Costillas</button><button type="button" class="opt">Otra</button></div></div>
+        <div class="stp" data-s="3"><h3>Tamaño aproximado</h3><p class="sz"><span id="szv">10</span> cm</p><input class="range" id="sz" type="range" min="3" max="40" value="10" aria-label="Tamaño en centímetros"><p style="color:#6b655c;font-size:14px;margin-top:8px">Una referencia: 10 cm es como la palma de la mano.</p></div>
+        <div class="stp" data-s="4"><h3>¿Con quién?</h3><div class="opts" data-k="artista"><button type="button" class="opt">Alba</button><button type="button" class="opt">Marko</button><button type="button" class="opt">Sara</button><button type="button" class="opt">Me da igual</button></div></div>
+        <div class="stp" data-s="5"><h3>Tus datos</h3><label for="fn">Nombre</label><input id="fn" autocomplete="name"><label for="fi">Cuéntanos tu idea</label><textarea id="fi" rows="3" placeholder="Por ejemplo: una golondrina fine line con una fecha"></textarea></div>
+        <div class="nav2"><button type="button" class="btn btn-ln" id="back">Atrás</button><button type="button" class="btn btn-dk" id="next">Siguiente</button></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="faq" aria-labelledby="t-fq">
+  <div class="wrap">
+    <p class="kick">06 · Dudas</p>
+    <h2 id="t-fq" class="rv">Antes de <span class="out">tatuarte</span></h2>
+    <div style="margin-top:34px">
+      <details><summary>¿Necesito pagar una señal?</summary><p>Sí, una pequeña señal reserva tu fecha y el tiempo de diseño de tu artista. Se descuenta del total el día de la sesión.</p></details>
+      <details><summary>¿Duele mucho?</summary><p>Depende de la zona y de cada persona. Te recomendamos la mejor zona según tu idea y hacemos pausas siempre que lo necesites.</p></details>
+      <details><summary>¿Cómo cuido el tatuaje?</summary><p>Te entregamos una guía de cuidados por escrito: limpieza suave, crema específica, nada de sol ni piscina durante las primeras semanas.</p></details>
+      <details><summary>¿Puedo traer mi propio diseño?</summary><p>Claro. Lo adaptamos a tu piel y a la zona para que envejezca bien, respetando siempre el trabajo de otros artistas.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">
+  <div class="big">Tinta <span class="out">Negra</span></div>
+  <div class="row"><span>Estudio privado · Solo con cita previa</span><span>Web de demostración diseñada por <a href="/" style="color:#e1251b">Agencia JS</a> · Contenido de ejemplo</span></div>
+</div></footer>
+
+<div class="mod" id="mod" role="dialog" aria-modal="true" aria-labelledby="mod-t"><div class="in"><button class="x" type="button" aria-label="Cerrar" id="modx">×</button><div id="modb"></div></div></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return(r||document).querySelector(s)},$$=function(s,r){return[].slice.call((r||document).querySelectorAll(s))};
+var RM=matchMedia("(prefers-reduced-motion: reduce)").matches, FINE=matchMedia("(hover:hover) and (pointer:fine)").matches;
+var WA="34688933308";
+/* dibujos flash (SVG line art) */
+var ART={
+ rose:'<path d="M64 96 C 56 70 80 50 100 58 C 122 48 148 66 140 94 C 156 112 140 140 118 138 C 108 152 84 152 76 136 C 54 134 46 108 64 96 Z"/><path d="M100 96 c-8 0 -12 8 -6 12 c8 6 18 -2 16 -10 c-2 -12 -20 -14 -28 -4 c-10 12 -2 30 14 30 c18 0 28 -14 24 -28 c-4 -14 -18 -20 -30 -18"/><path d="M76 136 C 84 126 92 122 100 124"/><path d="M118 138 C 114 128 112 120 116 112"/><path d="M100 150 C 100 180 98 210 100 245"/><path d="M100 184 C 80 172 60 178 54 198 C 76 202 92 196 100 188 Z"/><path d="M100 214 C 120 202 140 208 146 228 C 124 232 108 226 100 218 Z"/><path class="r" d="M58 72 l-10 -8 M146 70 l10 -10 M154 120 l14 2"/>',
+ dagger:'<path d="M100 20 L110 60 L110 170 L100 200 L90 170 L90 60 Z"/><path d="M100 60 L100 180"/><path d="M60 170 Q100 156 140 170 Q100 186 60 170 Z"/><path d="M94 186 h12 v44 h-12 z"/><circle cx="100" cy="240" r="10" class="r"/><path class="r" d="M100 120 C 140 100 150 140 120 150 C 90 160 70 190 100 200"/>',
+ swallow:'<path d="M40 120 C 70 100 100 96 120 110 C 140 90 170 86 190 96 C 166 104 150 116 140 130 C 120 150 90 154 70 146 C 60 160 46 170 30 172 C 40 156 44 142 40 120 Z"/><path d="M120 110 C 128 118 130 128 126 138"/><circle cx="150" cy="104" r="3"/><path d="M190 96 L206 92 L192 104"/><path class="r" d="M70 146 C 80 132 96 126 112 128"/><path d="M60 80 v18 M51 89 h18"/>',
+ moon:'<path d="M130 50 C 80 50 50 90 56 132 C 62 176 104 200 146 186 C 112 180 90 150 92 118 C 94 86 112 62 130 50 Z"/><path d="M150 80 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4 Z" class="r"/><circle cx="160" cy="140" r="3"/><circle cx="140" cy="200" r="2"/><path d="M60 50 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3 Z"/>',
+ eye:'<path d="M30 120 C 70 70 130 70 170 120 C 130 170 70 170 30 120 Z"/><circle cx="100" cy="120" r="26"/><circle cx="100" cy="120" r="10" class="r"/><path d="M100 40 v24 M60 52 l12 18 M140 52 l-12 18 M30 82 l18 12 M170 82 l-18 12"/><path d="M100 200 v20 M90 210 h20"/>',
+ snake:'<path class="r" d="M100 40 C 150 40 160 80 120 92 C 70 106 60 140 100 152 C 140 164 146 200 104 210 C 76 216 60 236 80 252"/><path d="M80 252 C 90 262 110 260 112 248 C 114 236 100 232 92 240"/><path d="M100 40 C 92 30 78 28 70 36 C 64 44 72 52 82 48"/><path d="M110 92 l6 6 M96 104 l6 6 M88 120 l6 6 M108 152 l6 6 M124 170 l6 6 M120 192 l6 6"/>'
+};
+var VB='viewBox="0 0 200 260"';
+var FL=[{k:"rose",n:"Rosa botánica",a:"Alba",ok:1},{k:"dagger",n:"Daga y serpiente",a:"Marko",ok:1},{k:"swallow",n:"Golondrina",a:"Alba",ok:0},{k:"moon",n:"Luna y estrellas",a:"Alba",ok:1},{k:"eye",n:"Ojo místico",a:"Marko",ok:1},{k:"snake",n:"Serpiente",a:"Sara",ok:1}];
+var fg=$("#fgrid");
+FL.forEach(function(f){var b=document.createElement("button");b.type="button";b.className="fc rv";b.innerHTML='<span class="av'+(f.ok?'':' no')+'">'+(f.ok?'Disponible':'Reservado')+'</span><svg class="draw" '+VB+' aria-hidden="true">'+ART[f.k]+'</svg><span class="cap"><span><small>'+f.a+'</small><br><b>'+f.n+'</b></span><span aria-hidden="true">↗</span></span>';b.setAttribute("aria-label",f.n+" de "+f.a+(f.ok?", disponible":", reservado"));b.addEventListener("click",function(){openMod(f)});fg.appendChild(b)});
+function prepDraw(svg){$$("path,circle,ellipse,line,polyline",svg).forEach(function(p){var L=p.getTotalLength?p.getTotalLength():300;p.style.strokeDasharray=L;p.style.strokeDashoffset=RM?0:L;p.dataset.len=L})}
+function playDraw(svg,dur,delay){if(RM)return;$$("path,circle,ellipse,line,polyline",svg).forEach(function(p,i){p.style.transition="stroke-dashoffset "+(dur||1.6)+"s cubic-bezier(.6,.1,.2,1) "+((delay||0)+i*.06)+"s";requestAnimationFrame(function(){p.style.strokeDashoffset=0})})}
+$$(".fc svg").forEach(prepDraw);
+/* modal */
+var mod=$("#mod");
+function openMod(f){$("#modb").innerHTML='<svg class="draw" '+VB+' aria-hidden="true">'+ART[f.k]+'</svg><p style="font-weight:800;letter-spacing:.14em;font-size:12px;text-transform:uppercase;color:#6b655c">Flash de '+f.a+'</p><h3 id="mod-t">'+f.n+'</h3><p style="margin:8px 0 18px;color:#4d483f">'+(f.ok?'Diseño único: se tatúa una sola vez. Resérvalo y lo adaptamos a la zona que elijas.':'Este diseño ya está reservado. Podemos crear uno parecido solo para ti.')+'</p><a class="btn btn-red" style="width:100%" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent("Hola, he visto la demo de Tinta Negra en agencia-js.com y quiero una web así para mi estudio. (Flash de ejemplo: "+f.n+")")+'">'+(f.ok?'Reservar este diseño':'Pedir uno parecido')+'</a>';mod.classList.add("open");var s=$("#modb svg");prepDraw(s);playDraw(s,1.4,.1);$("#modx").focus()}
+function closeMod(){mod.classList.remove("open")}
+$("#modx").addEventListener("click",closeMod);mod.addEventListener("click",function(e){if(e.target===mod)closeMod()});document.addEventListener("keydown",function(e){if(e.key==="Escape")closeMod()});
+/* hero draw */
+var ha=$("#heroArt");prepDraw(ha);setTimeout(function(){playDraw(ha,2.4,0)},250);
+/* reveal + flash draw */
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;e.target.classList.add("vis");var s=e.target.querySelector("svg.draw");if(s)playDraw(s,1.8,.2);io.unobserve(e.target)})},{threshold:.2});
+$$(".rv").forEach(function(n,i){n.style.transitionDelay=(i%3)*90+"ms";io.observe(n)});
+/* manifiesto palabra a palabra */
+var mp=$("#mani");var red=["historia","solo","siempre."];mp.innerHTML=mp.textContent.split(" ").map(function(w){return '<span class="w'+(red.indexOf(w.toLowerCase())>-1?' r':'')+'">'+w+'</span>'}).join(" ");
+var ws=$$(".w",mp);function mani(){var r=mp.getBoundingClientRect(),vh=innerHeight;var p=Math.min(1,Math.max(0,(vh*.85-r.top)/(r.height+vh*.4)));var n=Math.round(p*ws.length);ws.forEach(function(w,i){w.classList.toggle("on",i<n)})}
+if(RM)ws.forEach(function(w){w.classList.add("on")});else{addEventListener("scroll",mani,{passive:true});mani()}
+/* cursor + preview + magnetic */
+if(FINE&&!RM){var cur=$("#cur"),pv=$("#prev"),x=innerWidth/2,y=innerHeight/2,cx=x,cy=y;
+ addEventListener("pointermove",function(e){x=e.clientX;y=e.clientY;pv.style.left=x+"px";pv.style.top=y+"px"});
+ (function loop(){cx+=(x-cx)*.2;cy+=(y-cy)*.2;cur.style.left=cx+"px";cur.style.top=cy+"px";requestAnimationFrame(loop)})();
+ $$("a,button").forEach(function(a){a.addEventListener("pointerenter",function(){cur.classList.add("big")});a.addEventListener("pointerleave",function(){cur.classList.remove("big")})});
+ $$(".li").forEach(function(li){li.addEventListener("pointerenter",function(){pv.innerHTML='<svg class="draw" '+VB+'>'+ART[li.dataset.art]+'</svg>';var s=pv.querySelector("svg");prepDraw(s);pv.classList.add("on");playDraw(s,1,0)});li.addEventListener("pointerleave",function(){pv.classList.remove("on")})});
+ $$(".mag").forEach(function(m){m.addEventListener("pointermove",function(e){var r=m.getBoundingClientRect();m.style.transform="translate("+((e.clientX-r.left-r.width/2)*.25)+"px,"+((e.clientY-r.top-r.height/2)*.35)+"px)"});m.addEventListener("pointerleave",function(){m.style.transform=""})});
+}
+/* proceso: scroll horizontal anclado (escritorio) */
+var pin=$("#pin"),track=$("#track"),pro=$("#proceso");
+function hz(){if(innerWidth<861||RM){pro.style.height="";pin.style.position="";track.style.transform="";return}
+ var dist=track.scrollWidth-innerWidth+64;pro.style.height=(innerHeight+dist)+"px";pin.style.position="sticky";pin.style.top="0";
+ var r=pro.getBoundingClientRect();var p=Math.min(1,Math.max(0,-r.top/(pro.offsetHeight-innerHeight)));track.style.transform="translateX("+(-dist*p)+"px)"}
+addEventListener("scroll",hz,{passive:true});addEventListener("resize",hz);hz();
+/* hero parallax */
+if(!RM){addEventListener("scroll",function(){var y=scrollY;if(y<innerHeight*1.2){ha.style.transform="translateY("+(y*.25)+"px) rotate("+(y*.02)+"deg)";$(".hero h1").style.transform="translateY("+(y*-.12)+"px)"}},{passive:true})}
+/* reserva por pasos */
+var S=1,N=5,data={};
+$$(".opts").forEach(function(g){$$(".opt",g).forEach(function(o){o.setAttribute("aria-pressed","false");o.addEventListener("click",function(){$$(".opt",g).forEach(function(x){x.setAttribute("aria-pressed",x===o)});data[g.dataset.k]=o.textContent;setTimeout(function(){if(S<N)go(S+1)},250)})})});
+var sz=$("#sz");sz.addEventListener("input",function(){$("#szv").textContent=sz.value});
+function go(n){S=n;$$(".stp").forEach(function(s){s.classList.toggle("on",+s.dataset.s===S)});$("#pbar").style.width=(S/N*100)+"%";$("#back").style.visibility=S===1?"hidden":"visible";$("#next").textContent=S===N?"Enviar por WhatsApp":"Siguiente"}
+$("#back").addEventListener("click",function(){if(S>1)go(S-1)});
+$("#next").addEventListener("click",function(){if(S<N){go(S+1);return}var msg="Hola, he visto la demo de Tinta Negra en agencia-js.com y quiero una web así para mi estudio.\n(Reserva de ejemplo: "+(data.estilo||"-")+", "+(data.zona||"-")+", "+sz.value+" cm, artista: "+(data.artista||"-")+". Nombre: "+($("#fn").value||"-")+". Idea: "+($("#fi").value||"-")+")";window.open("https://wa.me/"+WA+"?text="+encodeURIComponent(msg),"_blank","noopener")});
+go(1);
+})();
+</script>
+<div id="ajs-demo" style="position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:10px;padding:8px 10px 8px 16px;border-radius:999px;background:rgba(10,10,12,.92);color:#fff;font:600 13px/1.2 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35);border:1px solid rgba(232,199,102,.45);backdrop-filter:blur(8px);white-space:nowrap;max-width:calc(100vw - 24px)">
+<span style="color:#E8C766">Demo</span><span style="opacity:.85;overflow:hidden;text-overflow:ellipsis">Plan Presencia 360° · Agencia JS</span>
+<a href="/#planes" style="display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;background:#E8C766;color:#111;text-decoration:none;font-weight:700">Volver</a>
+<button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
 </div>
-<p style="margin-top:22px;font-size:14px"><span style="white-space:nowrap">688 93 33 08</span> · <span style="white-space:nowrap">628 22 47 19</span> · <span style="white-space:nowrap">info@agencia-js.com</span></p>
-</main></body></html>
+</body>
+</html>

@@ -1,26 +1,327 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Demo Acelerador Pro · Agencia JS</title><meta name="robots" content="noindex">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="#0a0a0c">
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bar Marea · Tapas, vermut y cocina de mercado (demo)</title>
+<meta name="description" content="Demo de web para bar de tapas con carta animada en varios idiomas, alérgenos y reservas por WhatsApp. Diseño de Agencia JS.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f2a24">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230f2a24'/%3E%3Cpath d='M10 40c6-6 12-6 18 0s12 6 18 0 8-4 8-4' stroke='%23d9a441' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M10 28c6-6 12-6 18 0s12 6 18 0 8-4 8-4' stroke='%23f6efe3' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
-:root{--gold:#E8C766;--ink:#0a0a0c;--mute:#a1a1aa}
-*{box-sizing:border-box;margin:0}body{min-height:100svh;display:grid;place-items:center;padding:24px 16px;background:radial-gradient(700px 500px at 85% 0%,rgba(59,130,246,.25),transparent 60%),radial-gradient(600px 500px at 0% 100%,rgba(232,199,102,.14),transparent 60%),var(--ink);color:#fff;font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:560px;width:100%;text-align:center;padding:40px 28px;border:1px solid rgba(255,255,255,.1);border-radius:28px;background:rgba(20,20,24,.85)}
-.pill{display:inline-block;padding:6px 14px;border-radius:999px;border:1px solid rgba(232,199,102,.5);color:var(--gold);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-h1{margin:18px 0 10px;font-size:clamp(28px,7vw,40px);line-height:1.1}h1 span{color:var(--gold)}
-p{color:var(--mute)}.btns{display:flex;flex-direction:column;gap:12px;margin-top:28px}
-a{display:inline-flex;align-items:center;justify-content:center;min-height:50px;border-radius:999px;font-weight:700;text-decoration:none}
-.wa{background:#25D366;color:#062e17}.back{border:1px solid rgba(255,255,255,.25);color:#fff}
-a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
-@media(min-width:520px){.btns{flex-direction:row}.btns a{flex:1}}
-</style></head><body><main>
-<span class="pill">Demo en preparación</span>
-<h1>Plan <span>Acelerador Pro</span></h1>
-<p>Más secciones, varios idiomas y tu ficha de Google optimizada para captar más clientes.</p>
-<p style="margin-top:12px">Estamos preparando una tienda de ejemplo para que veas cómo quedaría tu web con este plan. Mientras tanto, te enseñamos ejemplos reales por WhatsApp.</p>
-<div class="btns">
-<a class="wa" href="https://wa.me/34688933308?text=Hola%2C%20quiero%20ver%20ejemplos%20del%20plan%20Acelerador%20Pro" target="_blank" rel="noopener">Pedir ejemplos por WhatsApp</a>
-<a class="back" href="/#planes">Volver a los planes</a>
+:root{--g:#0f2a24;--g2:#163a32;--cream:#f6efe3;--paper:#fbf7f0;--ink:#1d1a16;--terra:#c8653a;--gold:#d9a441;--mute:#6f6a60;--serif:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.6;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+.wrap{width:min(1160px,100% - 32px);margin-inline:auto}
+.serif{font-family:var(--serif)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:999px;font-weight:700;text-decoration:none;border:0;cursor:pointer;font-size:16px;transition:transform .25s,box-shadow .25s,background .25s}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:var(--gold);color:#1d1a16;box-shadow:0 12px 30px -10px rgba(217,164,65,.7)}
+.btn-line{border:1.5px solid rgba(246,239,227,.5);color:var(--cream);background:transparent}
+.btn-dark{background:var(--g);color:var(--cream)}
+.kick{font-size:13px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--terra)}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,58px);line-height:1.05;letter-spacing:-.01em}
+/* header */
+.hdr{position:fixed;inset:0 0 auto;z-index:50;transition:background .35s,box-shadow .35s}
+.hdr.on{background:rgba(15,42,36,.92);backdrop-filter:blur(10px);box-shadow:0 8px 30px rgba(0,0,0,.18)}
+.hdr .wrap{display:flex;align-items:center;justify-content:space-between;height:70px}
+.logo{display:flex;align-items:center;gap:10px;color:var(--cream);text-decoration:none;font-family:var(--serif);font-size:24px;font-weight:600}
+.nav{display:flex;gap:26px;align-items:center}
+.nav a{color:var(--cream);text-decoration:none;font-weight:600;font-size:15px;opacity:.85}
+.nav a:hover{opacity:1;color:var(--gold)}
+.nav .btn{min-height:42px;padding:0 18px;font-size:14px}
+@media(max-width:760px){.nav a:not(.btn){display:none}}
+/* hero */
+.hero{position:relative;min-height:100svh;background:radial-gradient(1200px 700px at 80% 10%,#1f4a40 0,transparent 60%),radial-gradient(900px 600px at 0% 100%,#2a1a10 0,transparent 55%),var(--g);color:var(--cream);overflow:hidden;display:grid;align-items:center}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:center;padding:110px 0 70px}
+.hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(46px,8.4vw,104px);line-height:.95;letter-spacing:-.02em}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero p{font-size:clamp(17px,2.2vw,20px);opacity:.85;max-width:520px;margin:22px 0 30px}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+.hero .meta{display:flex;gap:22px;flex-wrap:wrap;margin-top:34px;font-size:14px;opacity:.8}
+.hero .meta b{color:var(--gold)}
+.plate{position:relative;aspect-ratio:1;width:min(520px,100%);justify-self:center}
+.plate svg{width:100%;height:100%}
+.steam path{stroke-dasharray:60;animation:steam 3.6s ease-in-out infinite}
+.steam path:nth-child(2){animation-delay:1.2s}.steam path:nth-child(3){animation-delay:2.4s}
+@keyframes steam{0%{stroke-dashoffset:60;opacity:0;transform:translateY(10px)}40%{opacity:.8}100%{stroke-dashoffset:-60;opacity:0;transform:translateY(-30px)}}
+.spin{transform-origin:260px 260px;animation:spin 60s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.h-in{opacity:0;transform:translateY(24px);animation:hin .9s cubic-bezier(.2,.8,.2,1) forwards}
+.h-in.d1{animation-delay:.12s}.h-in.d2{animation-delay:.24s}.h-in.d3{animation-delay:.36s}.h-in.d4{animation-delay:.5s}
+@keyframes hin{to{opacity:1;transform:none}}
+.wave{position:absolute;left:0;right:0;bottom:-1px;color:var(--paper)}
+@media(max-width:860px){.hero .wrap{grid-template-columns:1fr;padding-top:100px}.plate{width:min(360px,86%);order:-1;margin-top:10px}}
+/* marquee */
+.mq{background:var(--terra);color:#fff;overflow:hidden;white-space:nowrap;padding:14px 0;font-family:var(--serif);font-size:22px;font-style:italic}
+.mq .tr{display:inline-flex;gap:40px;animation:mq 28s linear infinite;padding-left:40px}
+.mq span:after{content:"✦";margin-left:40px;font-style:normal;color:#ffe2b8}
+@keyframes mq{to{transform:translateX(-50%)}}
+/* carta */
+.carta{padding:100px 0 90px}
+.carta .head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+.lang{display:inline-flex;background:#efe6d6;border-radius:999px;padding:4px}
+.lang button{border:0;background:none;padding:8px 14px;border-radius:999px;font-weight:700;cursor:pointer;font-size:14px;color:var(--mute)}
+.lang button[aria-pressed=true]{background:var(--g);color:var(--cream)}
+.tabs{position:relative;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid #e6dccb;margin-bottom:22px;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;border:0;background:none;padding:14px 16px;font-weight:700;font-size:15px;color:var(--mute);cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--g)}
+.tabs .ind{position:absolute;bottom:-1px;height:3px;border-radius:3px;background:var(--terra);transition:left .45s cubic-bezier(.2,.8,.2,1),width .45s cubic-bezier(.2,.8,.2,1)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.chip{border:1.5px solid #dcd0bc;background:#fff;border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px;cursor:pointer;color:var(--ink)}
+.chip[aria-pressed=true]{background:var(--g);border-color:var(--g);color:var(--cream)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.item{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:start;background:#fff;border:1px solid #efe5d4;border-radius:20px;padding:18px;cursor:pointer;text-align:left;font:inherit;color:inherit;transition:transform .3s,box-shadow .3s,border-color .3s;opacity:0;transform:translateY(16px)}
+.item.in{opacity:1;transform:none;transition:opacity .5s,transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .3s,border-color .3s}
+.item:hover{box-shadow:0 18px 40px -22px rgba(15,42,36,.45);border-color:#e2cfa9}
+.ico{width:58px;height:58px;border-radius:16px;background:#f3ebdc;display:grid;place-items:center;font-size:28px}
+.item h3{font-family:var(--serif);font-size:21px;font-weight:600;line-height:1.2}
+.item p{font-size:14px;color:var(--mute);margin-top:4px}
+.price{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--g);white-space:nowrap}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 9px;background:#f3ebdc;color:#7a5a2a}
+.tag.v{background:#e3f2e5;color:#1d6b33}.tag.gf{background:#fdecdc;color:#9a4b12}
+.star{position:absolute;top:-10px;right:14px;background:var(--terra);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.06em;padding:4px 10px;border-radius:999px;text-transform:uppercase}
+.empty{padding:30px;text-align:center;color:var(--mute)}
+.note{font-size:13px;color:var(--mute);margin-top:18px}
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:80;display:none;align-items:flex-end;justify-content:center;background:rgba(10,20,17,.55);backdrop-filter:blur(4px)}
+.sheet.open{display:flex}
+.sheet .in{width:min(560px,100%);background:var(--paper);border-radius:26px 26px 0 0;padding:26px 22px 30px;transform:translateY(100%);transition:transform .45s cubic-bezier(.2,.8,.2,1);max-height:90svh;overflow:auto}
+.sheet.show .in{transform:none}
+@media(min-width:700px){.sheet{align-items:center}.sheet .in{border-radius:26px}}
+.sheet h3{font-family:var(--serif);font-size:28px;line-height:1.1}
+.alg{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.alg span{font-size:13px;background:#fff;border:1px solid #e8dcc6;border-radius:10px;padding:6px 10px}
+.nut{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 18px}
+.nut div{background:#fff;border:1px solid #efe5d4;border-radius:14px;padding:10px;text-align:center}
+.nut b{display:block;font-family:var(--serif);font-size:20px;color:var(--g)}
+.nut small{font-size:11.5px;color:var(--mute)}
+.x{position:absolute;right:16px;top:14px;width:40px;height:40px;border-radius:50%;border:0;background:#efe6d6;font-size:22px;cursor:pointer}
+/* especialidades */
+.esp{background:var(--g);color:var(--cream);padding:100px 0;position:relative;overflow:hidden}
+.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:190px;gap:14px;margin-top:34px}
+.b{position:relative;border-radius:24px;padding:22px;overflow:hidden;background:#173d35;border:1px solid rgba(246,239,227,.08);transform-style:preserve-3d;transition:transform .4s}
+.b h3{font-family:var(--serif);font-size:24px;font-weight:600;position:relative;z-index:1}
+.b p{opacity:.75;font-size:14.5px;position:relative;z-index:1;max-width:280px}
+.b .big{position:absolute;right:-10px;bottom:-24px;font-size:120px;opacity:.9;filter:drop-shadow(0 20px 30px rgba(0,0,0,.35))}
+.b1{grid-column:span 2;grid-row:span 2;background:linear-gradient(150deg,#c8653a,#8f3d1f)}
+.b1 .big{font-size:220px}
+.b2{grid-column:span 2;background:linear-gradient(150deg,#d9a441,#a8771f);color:#1d1a16}
+.b4{background:#21483f}
+@media(max-width:860px){.bento{grid-template-columns:1fr 1fr;grid-auto-rows:190px}.b1{grid-column:span 2;grid-row:span 1}.b2{grid-column:span 2}.b1 .big{font-size:120px}.b .big{font-size:64px;right:8px;bottom:6px;opacity:.9}.b p{max-width:100%;padding-right:0}.b:not(.b1):not(.b2) p{font-size:13px}.b:not(.b1):not(.b2) .big{top:14px;bottom:auto;right:12px;font-size:34px}}
+/* horario / reserva */
+.info{padding:100px 0}
+.info .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:30px}
+@media(max-width:860px){.info .cols{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid #efe5d4;border-radius:24px;padding:26px}
+.hrs{list-style:none;margin-top:10px}
+.hrs li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed #e6dccb}
+.hrs li.today{color:var(--terra);font-weight:700}
+.open-now{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-top:10px}
+.open-now i{width:10px;height:10px;border-radius:50%;background:#2fa35a;box-shadow:0 0 0 4px rgba(47,163,90,.18)}
+form label{display:block;font-weight:700;font-size:14px;margin:12px 0 6px}
+form input,form select{width:100%;min-height:48px;border:1.5px solid #e2d6c1;border-radius:14px;padding:0 14px;font:inherit;background:var(--paper)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.map{margin-top:16px;border-radius:18px;overflow:hidden;background:repeating-linear-gradient(45deg,#ece2d0 0 14px,#f3ebdd 14px 28px);height:170px;display:grid;place-items:center;color:var(--mute);font-weight:700}
+footer{background:#0b1f1b;color:#cfd8d4;padding:44px 0 90px;font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .9s,transform .9s cubic-bezier(.2,.8,.2,1)}
+.reveal.vis{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal,.item,.h-in{opacity:1!important;transform:none!important}}
+</style>
+</head>
+<body>
+<header class="hdr" id="hdr"><div class="wrap">
+  <a class="logo" href="#inicio" aria-label="Bar Marea, inicio"><svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 40c6-6 12-6 18 0s12 6 18 0 10-5 10-5" stroke="#d9a441" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M8 27c6-6 12-6 18 0s12 6 18 0 10-5 10-5" stroke="#f6efe3" stroke-width="5" fill="none" stroke-linecap="round"/></svg>Bar Marea</a>
+  <nav class="nav" aria-label="Principal"><a href="#carta">Carta</a><a href="#especialidades">Especialidades</a><a href="#visitanos">Horario</a><a class="btn btn-gold" href="#reserva">Reservar</a></nav>
+</div></header>
+
+<main id="inicio">
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <p class="kick h-in" style="color:var(--gold)">Tapas · Vermut · Cocina de mercado</p>
+      <h1 class="h-in d1">Aquí se viene a <em>picar</em>, brindar y quedarse.</h1>
+      <p class="h-in d2">Tapas de toda la vida con producto del día, vermut de grifo y una terraza que no querrás dejar. Mira la carta, elige y reserva en un minuto.</p>
+      <div class="ctas h-in d3"><a class="btn btn-gold" href="#carta">Ver la carta</a><a class="btn btn-line" href="#reserva">Reservar mesa</a></div>
+      <div class="meta h-in d4"><span><b>★ 4,8</b> en Google</span><span><b>Cocina</b> abierta hasta las 23:30</span><span><b>Terraza</b> todo el año</span></div>
+    </div>
+    <div class="plate" aria-hidden="true">
+      <svg viewBox="0 0 520 520">
+        <g class="spin"><circle cx="260" cy="260" r="240" fill="none" stroke="rgba(217,164,65,.35)" stroke-dasharray="2 12" stroke-width="3"/></g>
+        <circle cx="260" cy="270" r="200" fill="#f6efe3"/><circle cx="260" cy="270" r="168" fill="#fbf7f0" stroke="#e8dcc6" stroke-width="4"/>
+        <g id="tapas">
+          <ellipse cx="200" cy="250" rx="70" ry="44" fill="#f2c14e"/><ellipse cx="200" cy="244" rx="70" ry="40" fill="#f7d779"/><path d="M160 236q40-22 82 0" stroke="#e0a832" stroke-width="5" fill="none"/>
+          <circle cx="318" cy="222" r="34" fill="#c8653a"/><circle cx="308" cy="214" r="8" fill="#e9a07a"/><circle cx="330" cy="230" r="6" fill="#e9a07a"/>
+          <rect x="250" y="292" width="120" height="40" rx="12" fill="#8a5a2b"/><rect x="256" y="284" width="108" height="16" rx="8" fill="#d23f2f"/><circle cx="276" cy="292" r="5" fill="#2d6b3c"/><circle cx="312" cy="290" r="5" fill="#2d6b3c"/><circle cx="346" cy="292" r="5" fill="#2d6b3c"/>
+          <g fill="#2d6b3c"><circle cx="170" cy="318" r="12"/><circle cx="196" cy="330" r="12"/><circle cx="182" cy="300" r="11"/></g>
+        </g>
+        <g class="steam" stroke="#f6efe3" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"><path d="M200 190q-14-20 0-40t0-40"/><path d="M240 180q-14-20 0-40t0-40"/><path d="M318 170q-14-20 0-40t0-40"/></g>
+        <g transform="translate(400 330) rotate(12)"><path d="M0 0h64l-8 92H8z" fill="rgba(255,255,255,.18)" stroke="#f6efe3" stroke-width="4"/><path d="M5 30h54l-5 58H10z" fill="#9e2b1f"/><circle cx="20" cy="44" r="7" fill="#2d6b3c"/><rect x="40" y="-30" width="5" height="60" rx="2" fill="#d9a441" transform="rotate(14)"/></g>
+      </svg>
+    </div>
+  </div>
+  <svg class="wave" viewBox="0 0 1440 80" preserveAspectRatio="none" height="60" width="100%" aria-hidden="true"><path fill="currentColor" d="M0 40c240-40 480-40 720 0s480 40 720 0v40H0z"/></svg>
+</section>
+
+<div class="mq" aria-hidden="true"><div class="tr"><span>Vermut de grifo</span><span>Gildas</span><span>Tortilla jugosa</span><span>Rabas</span><span>Anchoas del Cantábrico</span><span>Croquetas caseras</span><span>Vermut de grifo</span><span>Gildas</span><span>Tortilla jugosa</span><span>Rabas</span><span>Anchoas del Cantábrico</span><span>Croquetas caseras</span></div></div>
+
+<section class="carta" id="carta" aria-labelledby="t-carta">
+  <div class="wrap">
+    <div class="head reveal">
+      <div><p class="kick" data-t="k_carta">La carta</p><h2 id="t-carta" data-t="h_carta">Para compartir (o no)</h2></div>
+      <div class="lang" role="group" aria-label="Idioma de la carta"><button type="button" data-l="es" aria-pressed="true">ES</button><button type="button" data-l="en" aria-pressed="false">EN</button><button type="button" data-l="fr" aria-pressed="false">FR</button></div>
+    </div>
+    <div class="tabs reveal" role="tablist" aria-label="Secciones de la carta" id="tabs"><span class="ind" id="ind"></span></div>
+    <div class="filters reveal" id="filters"></div>
+    <div class="grid" id="grid" role="tabpanel" aria-live="polite"></div>
+    <p class="note" data-t="note">Toca un plato para ver alérgenos e información nutricional. Precios con IVA incluido.</p>
+  </div>
+</section>
+
+<section class="esp" id="especialidades" aria-labelledby="t-esp">
+  <div class="wrap">
+    <p class="kick reveal" style="color:var(--gold)">Lo que nos piden siempre</p>
+    <h2 id="t-esp" class="reveal">Nuestras especialidades</h2>
+    <div class="bento">
+      <article class="b b1 reveal tilt"><h3>Tortilla de la casa</h3><p>Jugosa, con cebolla pochada a fuego lento. Sale cada hora, recién hecha.</p><span class="big" aria-hidden="true">🍳</span></article>
+      <article class="b b2 reveal tilt"><h3>Vermut de grifo</h3><p>Con su naranja, su aceituna y su sifón. El clásico de los domingos.</p><span class="big" aria-hidden="true">🍷</span></article>
+      <article class="b reveal tilt"><h3>Gildas</h3><p>Anchoa, guindilla y aceituna. Sin más.</p><span class="big" aria-hidden="true">🫒</span></article>
+      <article class="b b4 reveal tilt"><h3>Rabas</h3><p>Crujientes, con limón y alioli.</p><span class="big" aria-hidden="true">🦑</span></article>
+    </div>
+  </div>
+</section>
+
+<section class="info" id="visitanos" aria-labelledby="t-info">
+  <div class="wrap">
+    <p class="kick reveal">Visítanos</p>
+    <h2 id="t-info" class="reveal">Te guardamos sitio</h2>
+    <div class="cols">
+      <div class="card reveal">
+        <h3 class="serif" style="font-size:24px">Horario</h3>
+        <div class="open-now" id="openNow"><i></i><span>Abierto ahora</span></div>
+        <ul class="hrs" id="hrs"></ul>
+        <div class="map" role="img" aria-label="Mapa de ejemplo">📍 Calle del Puerto, 12 · Mapa de Google</div>
+      </div>
+      <div class="card reveal" id="reserva">
+        <h3 class="serif" style="font-size:24px">Reserva tu mesa</h3>
+        <p style="color:var(--mute);font-size:15px">Te confirmamos por WhatsApp en minutos.</p>
+        <form id="fres">
+          <label for="rn">Nombre</label><input id="rn" name="n" autocomplete="name" required>
+          <div class="row2">
+            <div><label for="rd">Día</label><input id="rd" name="d" type="date" required></div>
+            <div><label for="rh">Hora</label><select id="rh" name="h"><option>13:30</option><option>14:00</option><option>14:30</option><option>20:30</option><option>21:00</option><option selected>21:30</option><option>22:00</option></select></div>
+          </div>
+          <div class="row2">
+            <div><label for="rp">Personas</label><select id="rp" name="p"><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7+</option></select></div>
+            <div><label for="rz">Zona</label><select id="rz" name="z"><option>Terraza</option><option>Interior</option><option>Barra</option></select></div>
+          </div>
+          <button class="btn btn-dark" type="submit" style="width:100%;margin-top:18px">Reservar por WhatsApp</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">
+  <div><b class="serif" style="font-size:20px;color:#f6efe3">Bar Marea</b><br>Tapas, vermut y cocina de mercado.</div>
+  <div>Web de demostración diseñada por <a href="/" style="color:#d9a441">Agencia JS</a>.<br>Datos, carta y precios de ejemplo.</div>
+</div></footer>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t"><div class="in" style="position:relative">
+  <button class="x" type="button" aria-label="Cerrar" id="shx">×</button>
+  <div id="sh-b"></div>
+</div></div>
+
+<script>
+(function(){
+"use strict";
+var L="es";
+var T={
+ es:{k_carta:"La carta",h_carta:"Para compartir (o no)",note:"Toca un plato para ver alérgenos e información nutricional. Precios con IVA incluido.",veg:"Vegetariano",gf:"Sin gluten",all:"Todo",star:"Recomendado",empty:"No hay platos con ese filtro.",alg:"Alérgenos",kcal:"kcal",prot:"Proteína",carb:"Hidratos",fat:"Grasas",none:"Sin alérgenos principales",add:"Pedir al camarero"},
+ en:{k_carta:"The menu",h_carta:"Made for sharing (or not)",note:"Tap a dish to see allergens and nutrition facts. VAT included.",veg:"Vegetarian",gf:"Gluten free",all:"All",star:"Chef's pick",empty:"No dishes match that filter.",alg:"Allergens",kcal:"kcal",prot:"Protein",carb:"Carbs",fat:"Fat",none:"No major allergens",add:"Ask the waiter"},
+ fr:{k_carta:"La carte",h_carta:"À partager (ou pas)",note:"Touchez un plat pour voir les allergènes et les valeurs nutritionnelles. TVA incluse.",veg:"Végétarien",gf:"Sans gluten",all:"Tout",star:"Coup de cœur",empty:"Aucun plat pour ce filtre.",alg:"Allergènes",kcal:"kcal",prot:"Protéines",carb:"Glucides",fat:"Lipides",none:"Sans allergènes majeurs",add:"Demander au serveur"}};
+var ALG={g:{es:"Gluten",en:"Gluten",fr:"Gluten",i:"🌾"},l:{es:"Lácteos",en:"Dairy",fr:"Lait",i:"🥛"},h:{es:"Huevo",en:"Egg",fr:"Œuf",i:"🥚"},p:{es:"Pescado",en:"Fish",fr:"Poisson",i:"🐟"},m:{es:"Moluscos",en:"Molluscs",fr:"Mollusques",i:"🦑"},f:{es:"Frutos secos",en:"Nuts",fr:"Fruits à coque",i:"🌰"},s:{es:"Sulfitos",en:"Sulphites",fr:"Sulfites",i:"🍷"}};
+var CATS=[{id:"picar",es:"Para picar",en:"Starters",fr:"À grignoter"},{id:"raciones",es:"Raciones",en:"Sharing plates",fr:"Plats à partager"},{id:"bocatas",es:"Bocadillos",en:"Sandwiches",fr:"Sandwichs"},{id:"postres",es:"Postres",en:"Desserts",fr:"Desserts"},{id:"bebidas",es:"Bebidas",en:"Drinks",fr:"Boissons"}];
+var M=[
+ {c:"picar",i:"🫒",p:"3,50",v:0,gf:1,a:"p",n:[150,9,3,12],es:["Gilda clásica","Anchoa, guindilla y aceituna"],en:["Classic gilda","Anchovy, chilli pepper and olive"],fr:["Gilda classique","Anchois, piment et olive"]},
+ {c:"picar",i:"🧀",p:"9,50",v:1,gf:1,a:"l",n:[320,21,1,26],es:["Tabla de quesos","Quesos de la tierra con membrillo"],en:["Cheese board","Local cheeses with quince"],fr:["Plateau de fromages","Fromages locaux et coing"]},
+ {c:"picar",i:"🥔",s:1,p:"6,00",v:1,gf:1,a:"h",n:[410,6,38,26],es:["Patatas bravas","Salsa brava de la casa y alioli"],en:["Patatas bravas","House spicy sauce and aioli"],fr:["Patatas bravas","Sauce piquante maison et aïoli"]},
+ {c:"picar",i:"🐟",p:"12,00",v:0,gf:1,a:"p",n:[210,22,1,13],es:["Anchoas del Cantábrico","Ocho lomos en aceite de oliva"],en:["Cantabrian anchovies","Eight fillets in olive oil"],fr:["Anchois du Cantabrique","Huit filets à l'huile d'olive"]},
+ {c:"raciones",i:"🍳",s:1,p:"14,00",v:1,gf:1,a:"h",n:[520,22,30,34],es:["Tortilla de la casa","Entera, jugosa, con cebolla"],en:["House Spanish omelette","Whole, juicy, with onion"],fr:["Tortilla maison","Entière, moelleuse, aux oignons"]},
+ {c:"raciones",i:"🦑",p:"11,50",v:0,gf:0,a:"g,m,h",n:[460,24,32,26],es:["Rabas","Con limón y alioli"],en:["Fried squid","With lemon and aioli"],fr:["Calamars frits","Citron et aïoli"]},
+ {c:"raciones",i:"🥘",p:"9,00",v:0,gf:0,a:"g,l,h",n:[380,14,30,22],es:["Croquetas caseras (8)","Jamón ibérico o boletus"],en:["Homemade croquettes (8)","Iberian ham or mushroom"],fr:["Croquettes maison (8)","Jambon ibérique ou cèpes"]},
+ {c:"raciones",i:"🥗",p:"10,50",v:1,gf:1,a:"f",n:[290,8,18,21],es:["Ensalada de la huerta","Tomate, bonito opcional, nueces"],en:["Garden salad","Tomato, optional tuna, walnuts"],fr:["Salade du potager","Tomate, thon en option, noix"]},
+ {c:"bocatas",i:"🥖",s:1,p:"7,50",v:0,gf:0,a:"g,m",n:[610,28,64,24],es:["Bocata de calamares","Pan crujiente y alioli suave"],en:["Squid sandwich","Crusty bread and mild aioli"],fr:["Sandwich aux calamars","Pain croustillant, aïoli doux"]},
+ {c:"bocatas",i:"🥪",p:"8,00",v:0,gf:0,a:"g,l",n:[580,30,52,26],es:["Pepito de ternera","Con pimientos asados"],en:["Beef pepito","With roasted peppers"],fr:["Pepito de bœuf","Aux poivrons rôtis"]},
+ {c:"bocatas",i:"🍆",p:"7,00",v:1,gf:0,a:"g,l",n:[490,16,56,20],es:["Vegetal de temporada","Verduras a la brasa y queso"],en:["Seasonal veggie","Grilled vegetables and cheese"],fr:["Végétarien de saison","Légumes grillés et fromage"]},
+ {c:"postres",i:"🍰",s:1,p:"5,50",v:1,gf:0,a:"g,l,h",n:[420,8,40,26],es:["Tarta de queso","Cremosa, al horno"],en:["Cheesecake","Creamy, baked"],fr:["Cheesecake","Crémeux, au four"]},
+ {c:"postres",i:"🍮",p:"4,50",v:1,gf:1,a:"l,h",n:[300,7,38,13],es:["Flan casero","Con nata"],en:["Homemade flan","With whipped cream"],fr:["Flan maison","Avec chantilly"]},
+ {c:"bebidas",i:"🍷",s:1,p:"3,00",v:1,gf:1,a:"s",n:[140,0,14,0],es:["Vermut de grifo","Con naranja y aceituna"],en:["Draught vermouth","With orange and olive"],fr:["Vermouth pression","Orange et olive"]},
+ {c:"bebidas",i:"🍺",p:"2,50",v:1,gf:0,a:"g",n:[150,1,12,0],es:["Caña","Cerveza de barril"],en:["Small draught beer","Draught beer"],fr:["Demi","Bière pression"]},
+ {c:"bebidas",i:"🥤",p:"2,80",v:1,gf:1,a:"",n:[90,0,22,0],es:["Refrescos","Varios sabores"],en:["Soft drinks","Several flavours"],fr:["Sodas","Plusieurs parfums"]}];
+var cat="picar", fV=0, fG=0;
+var $=function(s){return document.querySelector(s)};
+var tabs=$("#tabs"), ind=$("#ind"), grid=$("#grid"), filters=$("#filters");
+function t(k){return T[L][k]}
+function drawTabs(){
+  [].slice.call(tabs.querySelectorAll("button")).forEach(function(b){b.remove()});
+  CATS.forEach(function(c){var b=document.createElement("button");b.type="button";b.setAttribute("role","tab");b.dataset.c=c.id;b.textContent=c[L];b.setAttribute("aria-selected",c.id===cat);b.addEventListener("click",function(){cat=c.id;drawTabs();drawGrid()});tabs.appendChild(b)});
+  requestAnimationFrame(moveInd);
+}
+function moveInd(){var a=tabs.querySelector('[aria-selected="true"]');if(!a)return;ind.style.left=a.offsetLeft+"px";ind.style.width=a.offsetWidth+"px";a.scrollIntoView({block:"nearest",inline:"nearest"})}
+function drawFilters(){filters.innerHTML="";[["v",t("veg"),"🌱"],["g",t("gf"),"🌾"]].forEach(function(f){var b=document.createElement("button");b.type="button";b.className="chip";var on=f[0]==="v"?fV:fG;b.setAttribute("aria-pressed",!!on);b.textContent=f[2]+" "+f[1];b.addEventListener("click",function(){if(f[0]==="v")fV=!fV;else fG=!fG;drawFilters();drawGrid()});filters.appendChild(b)})}
+function drawGrid(){
+  var list=M.filter(function(m){return m.c===cat&&(!fV||m.v)&&(!fG||m.gf)});
+  grid.innerHTML="";
+  if(!list.length){grid.innerHTML='<p class="empty">'+t("empty")+'</p>';return}
+  list.forEach(function(m,k){
+    var b=document.createElement("button");b.type="button";b.className="item";
+    var tags=(m.v?'<span class="tag v">🌱 '+t("veg")+'</span>':'')+(m.gf?'<span class="tag gf">'+t("gf")+'</span>':'');
+    b.innerHTML=(m.s?'<span class="star">'+t("star")+'</span>':'')+'<span class="ico" aria-hidden="true">'+m.i+'</span><span><h3>'+m[L][0]+'</h3><p>'+m[L][1]+'</p><span class="tags">'+tags+'</span></span><span class="price">'+m.p+' €</span>';
+    b.addEventListener("click",function(){openSheet(m)});
+    grid.appendChild(b);
+    setTimeout(function(){b.classList.add("in")},40+k*70);
+  });
+}
+var sheet=$("#sheet");
+function openSheet(m){
+  var a=m.a?m.a.split(","):[];
+  var algs=a.length?a.map(function(x){return '<span>'+ALG[x].i+' '+ALG[x][L]+'</span>'}).join(""):'<span>✅ '+t("none")+'</span>';
+  $("#sh-b").innerHTML='<div style="font-size:54px">'+m.i+'</div><h3 id="sh-t">'+m[L][0]+'</h3><p style="color:var(--mute)">'+m[L][1]+'</p><p class="price" style="margin-top:8px">'+m.p+' €</p><p style="font-weight:800;margin-top:14px">'+t("alg")+'</p><div class="alg">'+algs+'</div><div class="nut"><div><b>'+m.n[0]+'</b><small>'+t("kcal")+'</small></div><div><b>'+m.n[1]+' g</b><small>'+t("prot")+'</small></div><div><b>'+m.n[2]+' g</b><small>'+t("carb")+'</small></div><div><b>'+m.n[3]+' g</b><small>'+t("fat")+'</small></div></div><button class="btn btn-dark" type="button" style="width:100%" id="shok">'+t("add")+'</button>';
+  sheet.classList.add("open");requestAnimationFrame(function(){sheet.classList.add("show")});
+  $("#shok").addEventListener("click",closeSheet);$("#shx").focus();
+}
+function closeSheet(){sheet.classList.remove("show");setTimeout(function(){sheet.classList.remove("open")},350)}
+$("#shx").addEventListener("click",closeSheet);sheet.addEventListener("click",function(e){if(e.target===sheet)closeSheet()});document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet()});
+[].slice.call(document.querySelectorAll(".lang button")).forEach(function(b){b.addEventListener("click",function(){L=b.dataset.l;document.documentElement.lang=L;[].slice.call(document.querySelectorAll(".lang button")).forEach(function(x){x.setAttribute("aria-pressed",x===b)});[].slice.call(document.querySelectorAll("[data-t]")).forEach(function(n){n.textContent=t(n.dataset.t)});drawTabs();drawFilters();drawGrid()})});
+window.addEventListener("resize",moveInd);
+drawTabs();drawFilters();drawGrid();
+/* horario */
+var H=[["Lunes","Cerrado"],["Martes","12:30 – 16:00 · 19:30 – 00:00"],["Miércoles","12:30 – 16:00 · 19:30 – 00:00"],["Jueves","12:30 – 16:00 · 19:30 – 00:00"],["Viernes","12:30 – 16:30 · 19:30 – 01:00"],["Sábado","12:00 – 01:00"],["Domingo","12:00 – 17:00"]];
+var d=(new Date().getDay()+6)%7;$("#hrs").innerHTML=H.map(function(h,i){return '<li class="'+(i===d?"today":"")+'"><span>'+h[0]+'</span><span>'+h[1]+'</span></li>'}).join("");
+if(d===0){$("#openNow").innerHTML='<i style="background:#c8653a;box-shadow:0 0 0 4px rgba(200,101,58,.18)"></i><span>Hoy cerrado</span>'}
+var rd=$("#rd");rd.min=new Date().toISOString().slice(0,10);rd.value=rd.min;
+$("#fres").addEventListener("submit",function(e){e.preventDefault();var f=e.target;var msg="Hola, he visto la demo de Bar Marea en agencia-js.com y me gustaría una web así para mi negocio.\n(Reserva de ejemplo: "+f.n.value+", "+f.d.value+" a las "+f.h.value+", "+f.p.value+" personas, "+f.z.value+")";window.open("https://wa.me/34688933308?text="+encodeURIComponent(msg),"_blank","noopener")});
+/* header + reveal + tilt */
+var hdr=$("#hdr");addEventListener("scroll",function(){hdr.classList.toggle("on",scrollY>40)},{passive:true});
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("vis");io.unobserve(e.target)}})},{threshold:.15});
+[].slice.call(document.querySelectorAll(".reveal")).forEach(function(n,i){n.style.transitionDelay=(i%4)*80+"ms";io.observe(n)});
+if(matchMedia("(hover:hover) and (pointer:fine)").matches){[].slice.call(document.querySelectorAll(".tilt")).forEach(function(c){c.addEventListener("pointermove",function(e){var r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform="perspective(900px) rotateY("+x*8+"deg) rotateX("+(-y*8)+"deg)"});c.addEventListener("pointerleave",function(){c.style.transform=""})})}
+})();
+</script>
+<div id="ajs-demo" style="position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:10px;padding:8px 10px 8px 16px;border-radius:999px;background:rgba(10,10,12,.92);color:#fff;font:600 13px/1.2 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35);border:1px solid rgba(232,199,102,.45);backdrop-filter:blur(8px);white-space:nowrap;max-width:calc(100vw - 24px)">
+<span style="color:#E8C766">Demo</span><span style="opacity:.85;overflow:hidden;text-overflow:ellipsis">Plan Acelerador Pro · Agencia JS</span>
+<a href="/#planes" style="display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;background:#E8C766;color:#111;text-decoration:none;font-weight:700">Volver</a>
+<button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
 </div>
-<p style="margin-top:22px;font-size:14px"><span style="white-space:nowrap">688 93 33 08</span> · <span style="white-space:nowrap">628 22 47 19</span> · <span style="white-space:nowrap">info@agencia-js.com</span></p>
-</main></body></html>
+</body>
+</html>
