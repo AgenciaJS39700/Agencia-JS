@@ -158,6 +158,41 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
 .rv{opacity:0;transform:translateY(40px);transition:opacity 1s,transform 1s cubic-bezier(.2,.8,.2,1)}
 .rv.vis{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.hero h1 .l span{transform:none}.mani .w{opacity:1}.grain{display:none}}
+
+.hvid{position:absolute;inset:0;z-index:0}
+.hvid video{width:100%;height:100%;object-fit:cover;opacity:.5;filter:grayscale(.35) contrast(1.1)}
+.hvid:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.55) 0%,rgba(10,10,10,.25) 40%,var(--bk) 96%)}
+.hero .art{z-index:1;opacity:.35;mix-blend-mode:screen}
+.hero .wrap{position:relative;z-index:2}
+.prev{width:260px;height:330px;overflow:hidden;background:#111}
+.prev img{width:100%;height:100%;object-fit:cover}
+.port{padding:120px 0}
+.pgrid{columns:3 280px;column-gap:16px;margin-top:44px}
+.pw{position:relative;break-inside:avoid;margin:0 0 16px;border-radius:20px;overflow:hidden;cursor:zoom-in;background:#111;border:1px solid var(--line)}
+.pw img,.pw video{display:block;width:100%;height:auto;transition:transform .8s cubic-bezier(.2,.8,.2,1),filter .5s;filter:grayscale(.15)}
+.pw:hover img,.pw:hover video,.pw:focus-visible img{transform:scale(1.05);filter:none}
+.pw figcaption{position:absolute;left:0;right:0;bottom:0;padding:40px 16px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85));display:flex;justify-content:space-between;align-items:flex-end;gap:10px;font-size:13px;color:#cfc8bb;transform:translateY(8px);opacity:.9;transition:.4s}
+.pw figcaption b{font-family:var(--disp);text-transform:uppercase;color:var(--bone);font-size:14px;letter-spacing:.02em}
+.pw:hover figcaption{transform:none;opacity:1}
+@media(max-width:620px){.pgrid{columns:2 150px;column-gap:10px}.pw{margin-bottom:10px;border-radius:14px}.pw figcaption{font-size:11px;padding:30px 10px 10px;flex-direction:column;align-items:flex-start;gap:2px}.pw figcaption b{font-size:12px}}
+.lb{position:fixed;inset:0;z-index:120;background:rgba(5,5,5,.94);display:none;flex-direction:column;align-items:center;justify-content:center;padding:60px 16px 30px;gap:14px}
+.lb.on{display:flex;animation:lbin .35s ease}
+@keyframes lbin{from{opacity:0}}
+.lb img{max-width:min(1000px,100%);max-height:80svh;border-radius:14px;object-fit:contain}
+.lb p{color:#cfc8bb;font-weight:700;letter-spacing:.06em}
+.lb .x{position:absolute;top:16px;right:16px;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:#151515;color:var(--bone);font-size:24px;cursor:pointer}
+.aw{height:190px;margin:-26px -26px 0;overflow:hidden}
+.aw img{width:100%;height:100%;object-fit:cover;filter:grayscale(.3);transition:transform .8s,filter .5s}
+.ac:hover .aw img{transform:scale(1.06);filter:none}
+.ac .mono{position:relative;margin-top:-43px;border:4px solid var(--bk)}
+.si{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:16px;margin-bottom:14px;filter:grayscale(.2)}
+.step{gap:10px}
+.stu{position:relative;min-height:min(80svh,640px);display:grid;align-items:end;overflow:hidden;padding:80px 0}
+.stu video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.stu:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.2),rgba(10,10,10,.85))}
+.stu .wrap{position:relative;z-index:1}
+.stu ul{list-style:none;display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.stu li{border:1px solid var(--line);background:rgba(10,10,10,.55);backdrop-filter:blur(6px);padding:10px 16px;border-radius:999px;font-weight:700;font-size:14px}
 </style>
 </head>
 <body>
@@ -165,11 +200,12 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
 <div class="cur" id="cur" aria-hidden="true"></div>
 <header class="hdr"><div class="wrap">
   <a class="logo" href="#top">Tinta Negra</a>
-  <nav class="nav" aria-label="Principal"><a href="#estilos">Estilos</a><a href="#flash">Flash</a><a href="#artistas">Artistas</a><a href="#reserva">Reservar</a></nav>
+  <nav class="nav" aria-label="Principal"><a href="#estilos">Estilos</a><a href="#trabajos">Trabajos</a><a href="#flash">Flash</a><a href="#artistas">Artistas</a><a href="#reserva">Reservar</a></nav>
 </div></header>
 
 <main id="top">
 <section class="hero">
+  <div class="hvid" aria-hidden="true"><video class="lv" src="vid/hero.mp4" poster="img/hero.webp" muted loop playsinline preload="auto"></video></div>
   <div class="art" aria-hidden="true">
     <svg viewBox="0 0 600 600" class="draw" id="heroArt">
       <!-- daga -->
@@ -232,33 +268,45 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
   </div>
 </section>
 
+<section class="port" id="trabajos" aria-labelledby="t-po">
+  <div class="wrap">
+    <div class="fl-head"><div><p class="kick">03 · Trabajos</p><h2 id="t-po" class="rv">Piel <span class="out">real</span></h2></div><p style="max-width:360px;color:#b3ac9f">Una selección de piezas cicatrizadas y recién hechas en el estudio. Toca una para verla en grande.</p></div>
+    <div class="pgrid"><figure class="pw rv" tabindex="0" data-img="img/leon2.webp" data-cap="Realismo · Antebrazo · Sara"><video class="lv" src="vid/leon2.mp4" poster="img/leon2.webp" muted loop playsinline preload="none"></video><figcaption><b>Realismo</b><span>Antebrazo · Sara</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/serpiente.webp" data-cap="Fine line · Espalda · Alba"><video class="lv" src="vid/serpiente.mp4" poster="img/serpiente.webp" muted loop playsinline preload="none"></video><figcaption><b>Fine line</b><span>Espalda · Alba</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/retrato2.webp" data-cap="Realismo · Retrato · Brazo · Sara"><img src="img/retrato2.webp" alt="Tatuaje realismo · retrato en brazo por Sara" loading="lazy"><figcaption><b>Realismo · Retrato</b><span>Brazo · Sara</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/calavera.webp" data-cap="Blackwork · Muslo · Marko"><img src="img/calavera.webp" alt="Tatuaje blackwork en muslo por Marko" loading="lazy"><figcaption><b>Blackwork</b><span>Muslo · Marko</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/lobo2.webp" data-cap="Realismo · Omóplato · Sara"><img src="img/lobo2.webp" alt="Tatuaje realismo en omóplato por Sara" loading="lazy"><figcaption><b>Realismo</b><span>Omóplato · Sara</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/aguila.webp" data-cap="Blackwork · Pecho · Marko"><img src="img/aguila.webp" alt="Tatuaje blackwork en pecho por Marko" loading="lazy"><figcaption><b>Blackwork</b><span>Pecho · Marko</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/rosa.webp" data-cap="Realismo · Mano · Alba"><img src="img/rosa.webp" alt="Tatuaje realismo en mano por Alba" loading="lazy"><figcaption><b>Realismo</b><span>Mano · Alba</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/retrato.webp" data-cap="Realismo · Retrato · Brazo interior · Sara"><img src="img/retrato.webp" alt="Tatuaje realismo · retrato en brazo interior por Sara" loading="lazy"><figcaption><b>Realismo · Retrato</b><span>Brazo interior · Sara</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/lobo.webp" data-cap="Realismo · Omóplato · Sara"><img src="img/lobo.webp" alt="Tatuaje realismo en omóplato por Sara" loading="lazy"><figcaption><b>Realismo</b><span>Omóplato · Sara</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/leon.webp" data-cap="Realismo · Antebrazo · Sara"><img src="img/leon.webp" alt="Tatuaje realismo en antebrazo por Sara" loading="lazy"><figcaption><b>Realismo</b><span>Antebrazo · Sara</span></figcaption></figure></div>
+  </div>
+</section>
+
 <section class="art" id="artistas" aria-labelledby="t-ar">
   <div class="wrap">
-    <p class="kick">03 · El equipo</p>
+    <p class="kick">04 · El equipo</p>
     <h2 id="t-ar" class="rv">Artistas <span class="out">residentes</span></h2>
     <div class="agrid">
-      <article class="ac rv"><div class="mono">AL</div><h3>Alba</h3><p class="sp">Fine line · Botánico</p><p>Piezas delicadas y florales que acompañan la forma del cuerpo.</p><a class="ig" href="#reserva">Reservar con Alba →</a></article>
-      <article class="ac rv"><div class="mono">MK</div><h3>Marko</h3><p class="sp">Blackwork · Geométrico</p><p>Negro sólido, mandalas y composiciones de gran formato.</p><a class="ig" href="#reserva">Reservar con Marko →</a></article>
-      <article class="ac rv"><div class="mono">ST</div><h3>Sara</h3><p class="sp">Realismo · Retrato</p><p>Retratos y escenas en negro y gris con mucho detalle.</p><a class="ig" href="#reserva">Reservar con Sara →</a></article>
+      <article class="ac rv"><div class="aw"><img src="img/serpiente.webp" alt="" loading="lazy"></div><div class="mono">AL</div><h3>Alba</h3><p class="sp">Fine line · Botánico</p><p>Piezas delicadas y florales que acompañan la forma del cuerpo.</p><a class="ig" href="#reserva">Reservar con Alba →</a></article>
+      <article class="ac rv"><div class="aw"><img src="img/calavera.webp" alt="" loading="lazy"></div><div class="mono">MK</div><h3>Marko</h3><p class="sp">Blackwork · Geométrico</p><p>Negro sólido, mandalas y composiciones de gran formato.</p><a class="ig" href="#reserva">Reservar con Marko →</a></article>
+      <article class="ac rv"><div class="aw"><img src="img/retrato2.webp" alt="" loading="lazy"></div><div class="mono">ST</div><h3>Sara</h3><p class="sp">Realismo · Retrato</p><p>Retratos y escenas en negro y gris con mucho detalle.</p><a class="ig" href="#reserva">Reservar con Sara →</a></article>
     </div>
   </div>
 </section>
 
 <section class="pro" id="proceso" aria-labelledby="t-pr">
   <div class="pin" id="pin">
-    <div class="wrap"><p class="kick">04 · Cómo trabajamos</p><h2 id="t-pr">De la idea <span class="out">a la piel</span></h2></div>
+    <div class="wrap"><p class="kick">05 · Cómo trabajamos</p><h2 id="t-pr">De la idea <span class="out">a la piel</span></h2></div>
     <div class="track" id="track">
-      <div class="step"><span class="k">01</span><div><h3>Cuéntanos tu idea</h3><p>Rellena el formulario de reserva con estilo, zona y tamaño. Puedes enviarnos referencias por WhatsApp.</p></div></div>
-      <div class="step"><span class="k">02</span><div><h3>Diseño a medida</h3><p>Tu artista prepara un boceto único y lo ajustamos contigo hasta que sea exactamente lo que buscas.</p></div></div>
-      <div class="step"><span class="k">03</span><div><h3>La sesión</h3><p>Estudio privado, material estéril de un solo uso y sin prisas. Tú marcas el ritmo.</p></div></div>
-      <div class="step"><span class="k">04</span><div><h3>Cuidados y retoque</h3><p>Te damos la guía de cuidados y revisamos la cicatrización. El retoque, si hace falta, va incluido.</p></div></div>
+      <div class="step"><img class="si" src="img/estudio.webp" alt="" loading="lazy"><span class="k">01</span><div><h3>Cuéntanos tu idea</h3><p>Rellena el formulario de reserva con estilo, zona y tamaño. Puedes enviarnos referencias por WhatsApp.</p></div></div>
+      <div class="step"><img class="si" src="img/material.webp" alt="" loading="lazy"><span class="k">02</span><div><h3>Diseño a medida</h3><p>Tu artista prepara un boceto único y lo ajustamos contigo hasta que sea exactamente lo que buscas.</p></div></div>
+      <div class="step"><img class="si" src="img/hero.webp" alt="" loading="lazy"><span class="k">03</span><div><h3>La sesión</h3><p>Estudio privado, material estéril de un solo uso y sin prisas. Tú marcas el ritmo.</p></div></div>
+      <div class="step"><img class="si" src="img/leon.webp" alt="" loading="lazy"><span class="k">04</span><div><h3>Cuidados y retoque</h3><p>Te damos la guía de cuidados y revisamos la cicatrización. El retoque, si hace falta, va incluido.</p></div></div>
     </div>
   </div>
 </section>
 
+<section class="stu" aria-labelledby="t-stu">
+  <video class="lv" src="vid/estudio.mp4" poster="img/estudio.webp" muted loop playsinline preload="none" aria-hidden="true"></video>
+  <div class="wrap"><p class="kick">06 · El estudio</p><h2 id="t-stu" class="rv">Un espacio <span class="out">solo para ti</span></h2><ul><li>Estudio privado, solo con cita previa</li><li>Material estéril de un solo uso</li><li>Sin prisas: tú marcas el ritmo</li></ul></div>
+</section>
+
 <section class="res" id="reserva" aria-labelledby="t-res">
   <div class="wrap">
-    <p class="kick">05 · Reserva</p>
+    <p class="kick">07 · Reserva</p>
     <h2 id="t-res">Pide tu <span class="out">cita</span></h2>
     <div class="box">
       <div class="bar" aria-hidden="true"><i id="pbar"></i></div>
@@ -276,7 +324,7 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
 
 <section class="faq" aria-labelledby="t-fq">
   <div class="wrap">
-    <p class="kick">06 · Dudas</p>
+    <p class="kick">08 · Dudas</p>
     <h2 id="t-fq" class="rv">Antes de <span class="out">tatuarte</span></h2>
     <div style="margin-top:34px">
       <details><summary>¿Necesito pagar una señal?</summary><p>Sí, una pequeña señal reserva tu fecha y el tiempo de diseño de tu artista. Se descuenta del total el día de la sesión.</p></details>
@@ -293,6 +341,7 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
   <div class="row"><span>Estudio privado · Solo con cita previa</span><span>Web de demostración diseñada por <a href="/" style="color:#e1251b">Agencia JS</a> · Contenido de ejemplo</span></div>
 </div></footer>
 
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Trabajo ampliado"><button class="x" type="button" aria-label="Cerrar" id="lbx">×</button><img id="lbi" alt=""><p id="lbc"></p></div>
 <div class="mod" id="mod" role="dialog" aria-modal="true" aria-labelledby="mod-t"><div class="in"><button class="x" type="button" aria-label="Cerrar" id="modx">×</button><div id="modb"></div></div></div>
 
 <script>
@@ -331,12 +380,21 @@ $$(".rv").forEach(function(n,i){n.style.transitionDelay=(i%3)*90+"ms";io.observe
 var mp=$("#mani");var red=["historia","solo","siempre."];mp.innerHTML=mp.textContent.split(" ").map(function(w){return '<span class="w'+(red.indexOf(w.toLowerCase())>-1?' r':'')+'">'+w+'</span>'}).join(" ");
 var ws=$$(".w",mp);function mani(){var r=mp.getBoundingClientRect(),vh=innerHeight;var p=Math.min(1,Math.max(0,(vh*.85-r.top)/(r.height+vh*.4)));var n=Math.round(p*ws.length);ws.forEach(function(w,i){w.classList.toggle("on",i<n)})}
 if(RM)ws.forEach(function(w){w.classList.add("on")});else{addEventListener("scroll",mani,{passive:true});mani()}
+
+/* fotos y vídeo */
+var PIMG={rose:"calavera",moon:"serpiente",eye:"retrato2",swallow:"rosa",dagger:"lobo2"};
+Object.keys(PIMG).forEach(function(k){var i=new Image();i.src="img/"+PIMG[k]+".webp"});
+var vio="IntersectionObserver" in window?new IntersectionObserver(function(es){es.forEach(function(e){var v=e.target;if(e.isIntersecting&&!RM){var p=v.play();if(p&&p.catch)p.catch(function(){})}else v.pause()})},{threshold:.15}):null;
+$$("video.lv").forEach(function(v){if(vio)vio.observe(v)});
+var lb=$("#lb");function lbClose(){lb.classList.remove("on")}
+$$(".pw").forEach(function(f){function op(){$("#lbi").src=f.dataset.img;$("#lbi").alt=f.dataset.cap;$("#lbc").textContent=f.dataset.cap;lb.classList.add("on");$("#lbx").focus()}f.addEventListener("click",op);f.addEventListener("keydown",function(e){if(e.key==="Enter")op()})});
+$("#lbx").addEventListener("click",lbClose);lb.addEventListener("click",function(e){if(e.target===lb)lbClose()});document.addEventListener("keydown",function(e){if(e.key==="Escape")lbClose()});
 /* cursor + preview + magnetic */
 if(FINE&&!RM){var cur=$("#cur"),pv=$("#prev"),x=innerWidth/2,y=innerHeight/2,cx=x,cy=y;
  addEventListener("pointermove",function(e){x=e.clientX;y=e.clientY;pv.style.left=x+"px";pv.style.top=y+"px"});
  (function loop(){cx+=(x-cx)*.2;cy+=(y-cy)*.2;cur.style.left=cx+"px";cur.style.top=cy+"px";requestAnimationFrame(loop)})();
  $$("a,button").forEach(function(a){a.addEventListener("pointerenter",function(){cur.classList.add("big")});a.addEventListener("pointerleave",function(){cur.classList.remove("big")})});
- $$(".li").forEach(function(li){li.addEventListener("pointerenter",function(){pv.innerHTML='<svg class="draw" '+VB+'>'+ART[li.dataset.art]+'</svg>';var s=pv.querySelector("svg");prepDraw(s);pv.classList.add("on");playDraw(s,1,0)});li.addEventListener("pointerleave",function(){pv.classList.remove("on")})});
+ $$(".li").forEach(function(li){li.addEventListener("pointerenter",function(){pv.innerHTML='<img src="img/'+PIMG[li.dataset.art]+'.webp" alt="">';pv.classList.add("on")});li.addEventListener("pointerleave",function(){pv.classList.remove("on")})});
  $$(".mag").forEach(function(m){m.addEventListener("pointermove",function(e){var r=m.getBoundingClientRect();m.style.transform="translate("+((e.clientX-r.left-r.width/2)*.25)+"px,"+((e.clientY-r.top-r.height/2)*.35)+"px)"});m.addEventListener("pointerleave",function(){m.style.transform=""})});
 }
 /* proceso: scroll horizontal anclado (escritorio) */
