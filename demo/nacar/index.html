@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nácar · Nail Atelier — Alta manicura y probador virtual de uñas</title>
+<meta name="description" content="Nácar Nail Atelier: alta manicura, extensiones de gel, nail art y pedicura spa. Prueba tu diseño con el probador virtual de uñas y reserva online tu cita. Web de demostración de Agencia JS.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#f6f1ec">
+<meta property="og:title" content="Nácar · Nail Atelier">
+<meta property="og:description" content="Pruébate las uñas antes de reservarlas: probador virtual, tendencias 2026 y reserva online.">
+<meta property="og:image" content="img/hero.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f3d9e3'/%3E%3Cstop offset='.5' stop-color='%23dfe6f6'/%3E%3Cstop offset='1' stop-color='%23e6dbf5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%231c1715'/%3E%3Cpath d='M22 50V18c0-5 4-9 10-9s10 4 10 9v32' fill='url(%23g)'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#f6f1ec;--bg2:#efe7df;--card:#fffdfb;--ink:#1c1715;--mute:#7a6f68;--line:rgba(28,23,21,.12);--ox:#5b1f2a;--ox2:#7b2c3a;--gold:#b89552;
+--pearl-d:linear-gradient(115deg,#5b1f2a 0%,#9b4f6e 25%,#a8803a 50%,#6f4f9a 75%,#5b1f2a 100%);
+--pearl:linear-gradient(115deg,#f3d9e3 0%,#dfe6f6 28%,#f4ead2 52%,#e6dbf5 76%,#f3d9e3 100%);
+--serif:"Cormorant Garamond","Iowan Old Style",Georgia,serif;--sans:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--r:22px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img,video,canvas{display:block;max-width:100%}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ox);outline-offset:3px;border-radius:8px}
+.wrap{width:min(1180px,100% - 32px);margin-inline:auto}
+.kick{font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--ox)}
+.h2{font-family:var(--serif);font-weight:500;font-size:clamp(38px,6vw,72px);line-height:.98;letter-spacing:-.01em;margin:.25em 0 .3em}
+.h2 em,.pearl{font-style:italic;background:var(--pearl);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:pearl 9s linear infinite;-webkit-text-stroke:.4px rgba(91,31,42,.35)}
+.h2 em,.pearl{background-image:var(--pearl-d);-webkit-text-stroke:0}.book .h2 em{background-image:var(--pearl)}
+@keyframes pearl{to{background-position:300% 0}}
+.lead{color:var(--mute);font-size:clamp(16px,1.6vw,18px);max-width:58ch}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:52px;padding:0 1.6rem;border-radius:999px;border:0;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;transition:transform .25s,box-shadow .25s,background .25s;position:relative}
+.btn:active{transform:scale(.97)}
+.btn-ink{background:var(--ink);color:#fff;box-shadow:0 14px 30px -14px rgba(28,23,21,.7)}
+.btn-ink:before{content:"";position:absolute;inset:-2px;border-radius:inherit;background:var(--pearl);background-size:300% 100%;z-index:-1;animation:pearl 6s linear infinite;opacity:.9}
+.btn-ghost{background:rgba(255,255,255,.6);border:1px solid var(--line);backdrop-filter:blur(10px)}
+.btn-ox{background:var(--ox);color:#fff}
+.sec{padding:clamp(80px,11vw,140px) 0;position:relative}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+/* header */
+.hdr{position:fixed;inset:0 0 auto;z-index:60;transition:background .3s,box-shadow .3s}
+.hdr.sc{background:rgba(246,241,236,.82);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--line)}
+.hdr .wrap{display:flex;align-items:center;justify-content:space-between;height:74px}
+.logo{font-family:var(--serif);font-size:28px;font-weight:600;letter-spacing:.32em;text-decoration:none;display:flex;align-items:baseline;gap:.6em}
+.logo small{font-family:var(--sans);font-size:10px;letter-spacing:.3em;color:var(--mute);font-weight:700}
+.nav{display:flex;gap:28px;font-size:14px;font-weight:600}
+.nav a{text-decoration:none;opacity:.75;transition:opacity .2s}.nav a:hover{opacity:1}
+.hdr .btn{min-height:44px;padding:0 1.2rem;font-size:14px}
+@media(max-width:900px){.nav{display:none}.logo small{display:none}}
+/* hero */
+.hero{position:relative;min-height:100svh;display:grid;align-items:center;overflow:hidden;padding:110px 0 60px}
+.hero video,.hero .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:70% 50%}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(246,241,236,.97) 0%,rgba(246,241,236,.86) 34%,rgba(246,241,236,.2) 62%,rgba(246,241,236,0) 80%)}
+@media(max-width:820px){.hero:after{background:linear-gradient(180deg,rgba(246,241,236,.35) 0%,rgba(246,241,236,.75) 45%,rgba(246,241,236,.97) 75%)}.hero{align-items:end}}
+.hero .wrap{position:relative;z-index:2}
+.hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(54px,9.5vw,132px);line-height:.9;letter-spacing:-.02em;max-width:9ch}
+.hero h1 em{display:block}
+.hero .lead{margin:22px 0 30px;color:#4d433e;max-width:44ch}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:34px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;background:rgba(255,255,255,.62);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.7);font-size:13px;font-weight:600;box-shadow:0 10px 30px -18px rgba(0,0,0,.35)}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--pearl);background-size:300%;animation:pearl 4s linear infinite;box-shadow:0 0 0 3px rgba(91,31,42,.12)}
+.hero .scroll{position:absolute;left:50%;bottom:22px;z-index:2;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--mute);transform:translateX(-50%)}
+.hero h1 .w{display:inline-block;opacity:0;transform:translateY(40px) rotate(2deg);animation:wordin 1.1s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes wordin{to{opacity:1;transform:none}}
+/* marquee */
+.mq{overflow:hidden;border-block:1px solid var(--line);background:var(--card);padding:18px 0}
+.mq .tr{display:flex;gap:48px;width:max-content;animation:mq 40s linear infinite;font-family:var(--serif);font-style:italic;font-size:28px;white-space:nowrap}
+.mq .tr span:after{content:"✦";font-style:normal;font-size:14px;margin-left:48px;color:var(--gold);vertical-align:middle}
+@keyframes mq{to{transform:translateX(-50%)}}
+/* try-on */
+.try{background:var(--bg2)}
+.try-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(20px,4vw,56px);align-items:start;margin-top:40px}
+@media(max-width:940px){.try-grid{grid-template-columns:minmax(0,1fr)}}
+.stage-wrap{position:sticky;top:90px}
+@media(max-width:940px){.stage-wrap{position:relative;top:0}}
+.stage{position:relative;border-radius:28px;overflow:hidden;background:#e9e0d6;aspect-ratio:3/4;box-shadow:0 40px 80px -40px rgba(28,23,21,.55)}
+.stage canvas{width:100%;height:100%;object-fit:cover}
+.stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
+.stage .badge{position:absolute;left:14px;top:14px;z-index:2;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(28,23,21,.72);color:#fff;font-size:12px;font-weight:700;backdrop-filter:blur(8px)}
+.stage .badge b{width:8px;height:8px;border-radius:50%;background:#7be3a1;box-shadow:0 0 0 4px rgba(123,227,161,.25)}
+.stage .msg{position:absolute;inset:auto 14px 14px;z-index:2;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);font-size:13.5px;font-weight:600;display:none}
+.stage .msg.on{display:block}
+.stage .scan{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,.55) 50%,transparent 100%);background-size:100% 30%;background-repeat:no-repeat;opacity:0}
+.stage.scanning .scan{opacity:1;animation:scan 1.4s linear infinite}
+@keyframes scan{from{background-position:0 -30%}to{background-position:0 130%}}
+.stage-bar{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px}
+.seg button{border:0;background:none;padding:9px 14px;border-radius:999px;font-size:13.5px;font-weight:700;cursor:pointer;color:var(--mute)}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.skins{display:flex;gap:8px}
+.skins button{width:34px;height:34px;border-radius:50%;border:3px solid var(--card);cursor:pointer;box-shadow:0 0 0 1px var(--line)}
+.skins button[aria-pressed=true]{box-shadow:0 0 0 2px var(--ox)}
+.ibtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px;font-size:13.5px;font-weight:700;cursor:pointer}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:clamp(18px,3vw,30px)}
+.grp{padding:16px 0;border-bottom:1px solid var(--line)}
+.grp:first-child{padding-top:0}.grp:last-child{border:0;padding-bottom:0}
+.grp h3{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-bottom:10px;display:flex;justify-content:space-between}
+.grp h3 span{letter-spacing:0;text-transform:none;color:var(--ink);font-size:13px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1px solid var(--line);background:#fff;border-radius:14px;padding:8px 12px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color .2s,transform .2s}
+.opt:hover{transform:translateY(-1px)}
+.opt[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:#fff}
+.opt svg{width:18px;height:22px}
+.sw{display:flex;flex-wrap:wrap;gap:8px}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid #fff;cursor:pointer;box-shadow:0 0 0 1px var(--line),inset 0 -6px 10px rgba(0,0,0,.12);transition:transform .2s}
+.sw button:hover{transform:scale(1.1)}
+.sw button[aria-pressed=true]{box-shadow:0 0 0 2px var(--ink),inset 0 -6px 10px rgba(0,0,0,.12)}
+.sw label{width:34px;height:34px;border-radius:50%;background:conic-gradient(red,#ff0,lime,cyan,blue,#f0f,red);position:relative;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.sw label input{position:absolute;inset:0;opacity:0;cursor:pointer}
+input[type=range]{width:100%;accent-color:var(--ox)}
+.lenl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mute);font-weight:600;margin-top:2px}
+.sum{margin-top:6px;border-radius:20px;padding:16px;background:var(--bg);display:grid;gap:4px}
+.sum b{font-family:var(--serif);font-size:24px;font-weight:600;line-height:1.1}
+.sum small{color:var(--mute);font-size:13px}
+.sum .row{display:flex;gap:16px;font-size:13.5px;font-weight:700;margin-top:4px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.acts .btn{min-height:48px;font-size:14px;padding:0 1rem}
+.acts .full{grid-column:1/-1}
+.priv{font-size:12px;color:var(--mute);margin-top:12px}
+/* trends */
+.trk{display:grid;grid-auto-flow:column;grid-auto-columns:min(78vw,330px);gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:10px 0 26px;margin-top:34px;scrollbar-width:thin}
+.tc{scroll-snap-align:start;background:var(--card);border-radius:24px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column;transition:transform .35s,box-shadow .35s}
+.tc:hover{transform:translateY(-6px);box-shadow:0 30px 60px -30px rgba(28,23,21,.45)}
+.tc .im{aspect-ratio:1;overflow:hidden;position:relative}
+.tc .im img,.tc .im video{width:100%;height:100%;object-fit:cover;transition:transform .8s}
+.tc:hover .im img{transform:scale(1.06)}
+.tc .n{position:absolute;left:12px;top:12px;background:rgba(255,255,255,.88);border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800;letter-spacing:.1em}
+.tc .bd{padding:18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.tc h3{font-family:var(--serif);font-size:28px;font-weight:600;line-height:1}
+.tc p{color:var(--mute);font-size:14px;flex:1}
+.tc .btn{min-height:44px;font-size:14px}
+/* quiz */
+.quiz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center;margin-top:30px}
+@media(max-width:860px){.quiz{grid-template-columns:minmax(0,1fr)}}
+.qbox{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:clamp(20px,3vw,34px);min-height:380px;position:relative;overflow:hidden}
+.qbox .prog{height:4px;border-radius:4px;background:var(--bg2);margin-bottom:22px;overflow:hidden}.qbox .prog i{display:block;height:100%;background:var(--ox);transition:width .5s}
+.qbox h3{font-family:var(--serif);font-size:clamp(28px,3.4vw,40px);font-weight:500;line-height:1.05;margin-bottom:18px}
+.qopts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qopts button{text-align:left;border:1px solid var(--line);background:#fff;border-radius:18px;padding:16px;cursor:pointer;font-weight:700;font-size:15px;transition:all .2s}
+.qopts button:hover{border-color:var(--ink);transform:translateY(-2px)}
+.qopts button small{display:block;font-weight:500;color:var(--mute);font-size:12.5px;margin-top:2px}
+.qres{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:center}
+.qres img{border-radius:18px;aspect-ratio:1;object-fit:cover}
+.qres .tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.tag{font-size:11.5px;font-weight:700;border-radius:999px;padding:4px 10px;background:var(--bg2)}
+.qart{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:4/5}
+.qart video,.qart img{width:100%;height:100%;object-fit:cover}
+.qart .cap{position:absolute;left:16px;bottom:16px;right:16px;color:#fff;font-family:var(--serif);font-size:26px;font-style:italic;text-shadow:0 2px 20px rgba(0,0,0,.5)}
+/* services */
+.svc-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:34px 0 18px}
+.svc{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px}
+.sv{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:start;transition:border-color .2s}
+.sv h3{font-size:17px;font-weight:700}
+.sv p{grid-column:1/-1;color:var(--mute);font-size:14px}
+.sv .pr{font-family:var(--serif);font-size:26px;font-weight:600;line-height:1}
+.sv .meta{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.sv .meta small{color:var(--mute);font-weight:600}
+.sv .add{border:1px solid var(--ink);background:#fff;border-radius:999px;padding:7px 14px;font-weight:700;font-size:13px;cursor:pointer}
+.sv.on{border-color:var(--ox);box-shadow:0 0 0 1px var(--ox)}
+.sv.on .add{background:var(--ox);color:#fff;border-color:var(--ox)}
+.svbar{position:sticky;bottom:16px;z-index:20;margin-top:20px;display:none;align-items:center;justify-content:space-between;gap:12px;background:var(--ink);color:#fff;border-radius:999px;padding:10px 10px 10px 22px;box-shadow:0 20px 50px -20px rgba(0,0,0,.6)}
+.svbar.on{display:flex}
+.svbar .btn{min-height:44px;background:#fff;color:var(--ink)}
+/* studio */
+.studio{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;margin-top:36px}
+.studio .b{position:relative;border-radius:24px;overflow:hidden;min-height:260px;background:#ddd}
+.studio .b video,.studio .b img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.studio .b .t{position:absolute;inset:auto 0 0;padding:22px;color:#fff;background:linear-gradient(transparent,rgba(20,14,12,.78))}
+.studio .b h3{font-family:var(--serif);font-size:30px;font-weight:500;line-height:1}
+.studio .b p{font-size:14px;opacity:.88;margin-top:6px}
+.b1{grid-column:span 7;min-height:420px!important}.b2{grid-column:span 5}.b3{grid-column:span 5}.b4{grid-column:span 7}
+@media(max-width:820px){.studio .b{grid-column:span 12!important;min-height:300px}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
+.stats div{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px}
+.stats b{display:block;font-family:var(--serif);font-size:44px;font-weight:600;line-height:1}
+.stats span{font-size:13px;color:var(--mute);font-weight:600}
+@media(max-width:820px){.stats{grid-template-columns:1fr 1fr}}
+/* hygiene */
+.hyg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center}
+@media(max-width:860px){.hyg{grid-template-columns:minmax(0,1fr)}}
+.hyg img{border-radius:28px;aspect-ratio:4/3;object-fit:cover}
+.hl{display:grid;gap:12px;margin-top:22px}
+.hl div{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
+.hl i{width:44px;height:44px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:20px}
+.hl b{display:block}.hl span{color:var(--mute);font-size:14px}
+/* booking */
+.book{background:var(--ink);color:#f6f1ec}
+.book .lead{color:#b9aea6}.book .kick{color:#e8c9b0}
+.bk{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;margin-top:36px;align-items:start}
+@media(max-width:900px){.bk{grid-template-columns:minmax(0,1fr)}}
+.bkbox{background:#26201d;border:1px solid rgba(255,255,255,.08);border-radius:28px;padding:clamp(18px,3vw,30px)}
+.steps{display:flex;gap:6px;margin-bottom:22px}
+.steps i{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.12)}.steps i.on{background:var(--pearl);background-size:300%;animation:pearl 6s linear infinite}
+.bkbox h3{font-family:var(--serif);font-size:32px;font-weight:500;margin-bottom:14px}
+.bko{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:10px}
+.bko button{text-align:left;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#f6f1ec;border-radius:18px;padding:14px;cursor:pointer;font-weight:700}
+.bko button small{display:block;color:#b9aea6;font-weight:500;font-size:12.5px}
+.bko button[aria-pressed=true]{border-color:#e8c9b0;background:rgba(232,201,176,.12)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:460px}
+.cal .dh{font-size:11px;text-align:center;color:#b9aea6;font-weight:700}
+.cal button{aspect-ratio:1;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#f6f1ec;font-weight:700;cursor:pointer;font-size:14px}
+.cal button:disabled{opacity:.25;cursor:not-allowed}
+.cal button[aria-pressed=true]{background:#f6f1ec;color:var(--ink)}
+.calh{display:flex;justify-content:space-between;align-items:center;max-width:460px;margin-bottom:10px;font-weight:700}
+.calh button{background:none;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:999px;width:36px;height:36px;cursor:pointer}
+.slots{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.slots button{border:1px solid rgba(255,255,255,.18);background:none;color:#f6f1ec;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13.5px}
+.slots button:disabled{text-decoration:line-through;opacity:.3;cursor:not-allowed}
+.slots button[aria-pressed=true]{background:#e8c9b0;color:var(--ink);border-color:#e8c9b0}
+.fld{display:grid;gap:6px;margin-bottom:12px}
+.fld label{font-size:13px;font-weight:700;color:#d8cdc4}
+.fld input,.fld textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:14px;padding:13px 14px;font:inherit}
+.ck{display:flex;gap:10px;font-size:13px;color:#d8cdc4;align-items:flex-start;margin:6px 0}
+.ck input{margin-top:3px;accent-color:#e8c9b0;width:18px;height:18px;flex:none}
+.bnav{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+.bnav .btn{min-height:48px}
+.btn-l{background:#f6f1ec;color:var(--ink)}.btn-o{background:none;border:1px solid rgba(255,255,255,.25);color:#fff}
+.side{background:#26201d;border:1px solid rgba(255,255,255,.08);border-radius:28px;padding:22px;position:sticky;top:90px}
+.side h4{font-family:var(--serif);font-size:26px;font-weight:500;margin-bottom:10px}
+.side .ln{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.12)}
+.side .tot{display:flex;justify-content:space-between;margin-top:12px;font-weight:800}
+.side .dz{margin-top:14px;display:flex;gap:12px;align-items:center}
+.side canvas{width:84px;height:112px;border-radius:14px;background:#1a1513;flex:none}
+.side small{color:#b9aea6}
+.pay{background:#f6f1ec;color:var(--ink);border-radius:20px;padding:18px;margin-top:6px}
+.pay .pm{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.pay .pm button{border:1px solid var(--line);background:#fff;border-radius:12px;min-height:46px;font-weight:800;cursor:pointer}
+.pay .pm button[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.okbox{text-align:center;padding:10px 0}
+.okbox .ring{width:84px;height:84px;margin:0 auto 14px;border-radius:50%;background:var(--pearl);background-size:300%;animation:pearl 4s linear infinite;display:grid;place-items:center;font-size:34px;color:var(--ink)}
+/* gift */
+.gift{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center;margin-top:30px}
+@media(max-width:860px){.gift{grid-template-columns:minmax(0,1fr)}}
+.gcard{aspect-ratio:1.586;border-radius:24px;padding:26px;position:relative;overflow:hidden;color:var(--ink);box-shadow:0 40px 80px -40px rgba(28,23,21,.6);transform:perspective(900px) rotateY(-8deg) rotateX(4deg);transition:transform .5s,background .5s}
+.gcard:hover{transform:perspective(900px) rotateY(0) rotateX(0)}
+.gcard.perla{background:var(--pearl);background-size:300%;animation:pearl 10s linear infinite}
+.gcard.burdeos{background:linear-gradient(135deg,#3b1219,#7b2c3a 60%,#2a0c12);color:#f6e7dc}
+.gcard.oro{background:linear-gradient(135deg,#8a6a2c,#e7cf8c 40%,#a37f3b 70%,#f3e2b0);color:#2b2114}
+.gcard .lg{font-family:var(--serif);font-size:30px;letter-spacing:.3em;font-weight:600}
+.gcard .am{position:absolute;right:26px;top:22px;font-family:var(--serif);font-size:44px;font-weight:600}
+.gcard .to{position:absolute;left:26px;bottom:24px;right:26px}
+.gcard .to small{display:block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.7}
+.gcard .to b{font-family:var(--serif);font-size:26px;font-weight:500;font-style:italic}
+.gcard .to p{font-size:13px;opacity:.85;margin-top:2px}
+.gform .amts{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+.gform input,.gform textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;font:inherit;margin-bottom:10px}
+/* reviews & faq */
+.revs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px;margin-top:34px}
+.rc{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px}
+.rc .st{color:var(--gold);letter-spacing:3px}
+.rc p{font-family:var(--serif);font-size:21px;line-height:1.3;margin:10px 0 14px;font-style:italic}
+.rc small{color:var(--mute);font-weight:600}
+.note{font-size:12.5px;color:var(--mute);margin-top:14px}
+details{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 20px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:10px}
+summary:after{content:"+";font-size:22px;line-height:1;transition:transform .3s}
+details[open] summary:after{transform:rotate(45deg)}
+details p{color:var(--mute);margin-top:10px}
+/* contact & footer */
+.ct{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin-top:30px}
+@media(max-width:860px){.ct{grid-template-columns:minmax(0,1fr)}}
+.ctc{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:26px}
+.hrs div{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.hrs div.today{font-weight:800;color:var(--ox)}
+.map{position:relative;border-radius:28px;overflow:hidden;min-height:320px;background:#e7ddd2}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.map .pin{position:absolute;left:52%;top:46%;transform:translate(-50%,-100%);background:var(--ink);color:#fff;border-radius:999px;padding:8px 14px;font-weight:700;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.map .pin:after{content:"";position:absolute;left:50%;bottom:-6px;width:12px;height:12px;background:var(--ink);transform:translateX(-50%) rotate(45deg)}
+footer{padding:60px 0 120px;border-top:1px solid var(--line)}
+footer .big{font-family:var(--serif);font-size:clamp(60px,14vw,200px);letter-spacing:.2em;font-weight:500;line-height:.9;text-align:center}
+footer .row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--mute);margin-top:24px}
+footer a{color:inherit}
+/* chat */
+.cfab{position:fixed;right:18px;bottom:84px;z-index:70;width:60px;height:60px;border-radius:50%;border:0;cursor:pointer;background:var(--ink);color:#fff;font-size:24px;box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
+.cfab:after{content:"";position:absolute;inset:-4px;border-radius:50%;background:var(--pearl);background-size:300%;z-index:-1;animation:pearl 5s linear infinite}
+@media(min-width:900px){.cfab{bottom:28px;right:28px}}
+.chat{position:fixed;right:16px;bottom:154px;z-index:71;width:min(380px,calc(100% - 32px));max-height:min(560px,70svh);display:none;flex-direction:column;background:var(--card);border-radius:24px;border:1px solid var(--line);box-shadow:0 40px 80px -30px rgba(0,0,0,.5);overflow:hidden}
+.chat.on{display:flex}
+@media(min-width:900px){.chat{right:28px;bottom:100px}}
+.chat header{padding:14px 16px;background:var(--ink);color:#fff;display:flex;align-items:center;gap:10px}
+.chat header b{display:block;font-family:var(--serif);font-size:20px;font-weight:500}
+.chat header small{color:#b9aea6;font-size:12px}
+.chat header button{margin-left:auto;background:none;border:0;color:#fff;font-size:22px;cursor:pointer;width:36px;height:36px}
+.clog{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.m{max-width:86%;padding:10px 13px;border-radius:16px;font-size:14px}
+.m.b{background:var(--bg2);border-bottom-left-radius:4px}
+.m.u{background:var(--ink);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.cq{display:flex;gap:6px;overflow-x:auto;padding:0 14px 8px}
+.cq button{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+.cin{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+.cin input{flex:1;border:1px solid var(--line);border-radius:999px;padding:11px 14px;font:inherit;background:#fff}
+.cin button{border:0;background:var(--ox);color:#fff;border-radius:50%;width:44px;height:44px;cursor:pointer}
+.dots3 span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--mute);margin:0 2px;animation:bl 1s infinite}.dots3 span:nth-child(2){animation-delay:.15s}.dots3 span:nth-child(3){animation-delay:.3s}
+@keyframes bl{50%{opacity:.2}}
+/* toast, cookies, cursor */
+.toast{position:fixed;left:50%;top:86px;transform:translate(-50%,-14px);opacity:0;z-index:120;background:var(--ink);color:#fff;padding:12px 18px;border-radius:14px;font-weight:700;font-size:14px;transition:.35s;pointer-events:none;max-width:calc(100% - 32px);width:max-content}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.ckb{position:fixed;left:16px;right:16px;bottom:72px;z-index:90;max-width:520px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 30px 60px -30px rgba(0,0,0,.5);display:none;font-size:13.5px}
+.ckb.on{display:block}
+.ckb .r{display:flex;gap:8px;margin-top:10px}.ckb .btn{min-height:42px;font-size:13.5px;padding:0 1rem}
+.glow{position:fixed;left:0;top:0;width:380px;height:380px;border-radius:50%;pointer-events:none;z-index:1;background:radial-gradient(circle,rgba(230,219,245,.55),rgba(243,217,227,.25) 40%,transparent 70%);transform:translate(-50%,-50%);mix-blend-mode:multiply;opacity:0;transition:opacity .4s}
+@media(hover:hover) and (pointer:fine){.glow{opacity:1}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.hero h1 .w{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="glow" id="glow" aria-hidden="true"></div>
+<header class="hdr" id="hdr"><div class="wrap">
+  <a class="logo" href="#inicio">NÁCAR <small>NAIL ATELIER</small></a>
+  <nav class="nav" aria-label="Principal"><a href="#probador">Probador virtual</a><a href="#tendencias">Tendencias</a><a href="#servicios">Servicios</a><a href="#club">Club</a><a href="#regalo">Regalar</a></nav>
+  <a class="btn btn-ink" href="#reserva">Reservar</a>
+</div></header>
+
+<main>
+<section class="hero" id="inicio">
+  <img class="poster" src="img/hero-poster.webp" alt="" aria-hidden="true">
+  <video class="lv" src="vid/hero.mp4" poster="img/hero-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video>
+  <div class="wrap">
+    <p class="kick">Nail atelier · Alta manicura</p>
+    <h1><span class="w" style="animation-delay:.1s">Uñas</span> <span class="w" style="animation-delay:.22s">que</span> <span class="w" style="animation-delay:.34s">se</span> <em><span class="w pearl" style="animation-delay:.5s">miran dos veces.</span></em></h1>
+    <p class="lead">Diseños de autora, gel de alta gama y un probador virtual para que veas tus uñas en tu mano antes de sentarte en el sillón.</p>
+    <div class="ctas"><a class="btn btn-ink" href="#probador">✦ Pruébatelas ahora</a><a class="btn btn-ghost" href="#reserva">Reservar cita</a></div>
+    <div class="chips"><span class="chip"><i></i>Probador virtual con IA</span><span class="chip"><i></i>Material esterilizado en autoclave</span><span class="chip"><i></i>Fórmulas sin HEMA</span></div>
+  </div>
+  <span class="scroll" aria-hidden="true">Desliza</span>
+</section>
+
+<div class="mq" aria-hidden="true"><div class="tr"><span>Molten chrome</span><span>Aura nails</span><span>Liquid cat eye</span><span>Syrup nails</span><span>Micro french</span><span>Tomato red</span><span>Earth tones</span><span>Polka dots</span><span>Molten chrome</span><span>Aura nails</span><span>Liquid cat eye</span><span>Syrup nails</span><span>Micro french</span><span>Tomato red</span><span>Earth tones</span><span>Polka dots</span></div></div>
+
+<!-- PROBADOR -->
+<section class="sec try" id="probador" aria-labelledby="t-try">
+  <div class="wrap">
+    <p class="kick rv">Probador virtual</p>
+    <h2 class="h2 rv" id="t-try">Pruébatelas <em>antes</em><br>de reservar.</h2>
+    <p class="lead rv">Elige forma, largo, acabado y color. Míralo en una mano de muestra, en una foto tuya o en directo con la cámara. Todo se procesa en tu móvil: tus fotos no salen de tu dispositivo.</p>
+    <div class="try-grid">
+      <div class="stage-wrap rv">
+        <div class="stage" id="stage">
+          <span class="badge"><b></b><span id="stageBadge">Mano de muestra</span></span>
+          <canvas id="cv" aria-label="Vista previa de las uñas con el diseño elegido" role="img"></canvas>
+          <video id="cam" playsinline muted></video>
+          <div class="scan" aria-hidden="true"></div>
+          <p class="msg" id="stageMsg" role="status"></p>
+        </div>
+        <div class="stage-bar">
+          <div class="seg" role="group" aria-label="Modo del probador"><button type="button" data-mode="sample" aria-pressed="true">Muestra</button><button type="button" data-mode="photo" aria-pressed="false">Mi foto</button><button type="button" data-mode="cam" aria-pressed="false">Cámara</button></div>
+          <div class="skins" id="skins" role="group" aria-label="Tono de piel de la mano de muestra"><button type="button" data-h="mano-clara" style="background:#f0cdb4" aria-label="Piel clara" aria-pressed="false"></button><button type="button" data-h="mano-media" style="background:#c99467" aria-label="Piel media" aria-pressed="true"></button><button type="button" data-h="mano-oscura" style="background:#6e452c" aria-label="Piel oscura" aria-pressed="false"></button></div>
+          <button type="button" class="ibtn" id="flip" hidden>↺ Cambiar cámara</button>
+          <button type="button" class="ibtn" id="peek">◐ Ver sin esmalte</button>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+      </div>
+      <div class="panel rv">
+        <div class="grp"><h3>Forma <span id="lbShape">Almendra</span></h3><div class="opts" id="shapes"></div></div>
+        <div class="grp"><h3>Largo <span id="lbLen">Medio</span></h3><input type="range" id="len" min="0" max="1" step="0.01" value="0.45" aria-label="Largo de la uña"><div class="lenl"><span>Natural</span><span>Corto</span><span>Medio</span><span>Largo</span><span>XL</span></div></div>
+        <div class="grp"><h3>Acabado <span id="lbFin">Cromo</span></h3><div class="opts" id="fins"></div></div>
+        <div class="grp"><h3>Color <span id="lbCol">Perla</span></h3><div class="sw" id="cols"></div></div>
+        <div class="grp" id="grp2"><h3>Segundo color <span id="lbCol2"></span></h3><div class="sw" id="cols2"></div></div>
+        <div class="grp">
+          <div class="sum" aria-live="polite"><small>Tu diseño</small><b id="dName">Pearl chrome almendra</b><small id="dSvc">Extensiones de gel + cromo</small><div class="row"><span id="dTime">⏱ 100 min</span><span id="dPrice">desde 63 €</span></div></div>
+          <div class="acts"><button type="button" class="btn btn-ink full" id="bookDesign">Reservar este diseño</button><button type="button" class="btn btn-ghost" id="dl">⤓ Descargar</button><button type="button" class="btn btn-ghost" id="share">Compartir</button></div>
+          <p class="priv">🔒 Las fotos y la cámara se procesan en tu dispositivo con IA (MediaPipe). No se envían ni se guardan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TENDENCIAS -->
+<section class="sec" id="tendencias" aria-labelledby="t-tr">
+  <div class="wrap">
+    <p class="kick rv">Tendencias 2026</p>
+    <h2 class="h2 rv" id="t-tr">Lo que se va a <em>llevar</em>.</h2>
+    <p class="lead rv">Nuestra selección de la temporada. Toca «Pruébalo» y lo verás al momento en el probador.</p>
+    <div class="trk" id="trk" role="list"></div>
+  </div>
+</section>
+
+<!-- ASESORA -->
+<section class="sec" id="asesora" style="padding-top:0" aria-labelledby="t-q">
+  <div class="wrap">
+    <p class="kick rv">Asesora de estilo</p>
+    <h2 class="h2 rv" id="t-q">Cuatro preguntas, <em>tu diseño</em>.</h2>
+    <div class="quiz">
+      <div class="qbox rv" id="qbox" aria-live="polite"></div>
+      <div class="qart rv"><video class="lv" src="vid/gold.mp4" poster="img/t-gold.webp" muted loop playsinline preload="none" aria-hidden="true"></video><p class="cap">«Cada mano cuenta algo distinto.»</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section class="sec" id="servicios" style="background:var(--bg2)" aria-labelledby="t-sv">
+  <div class="wrap">
+    <p class="kick rv">Carta de servicios</p>
+    <h2 class="h2 rv" id="t-sv">Alta manicura, <em>sin prisas</em>.</h2>
+    <p class="lead rv">Elige uno o varios servicios: calculamos el tiempo y el precio de tu cita al momento.</p>
+    <div class="svc-tabs opts" id="svTabs" role="group" aria-label="Categorías"></div>
+    <div class="svc" id="svList"></div>
+    <div class="svbar" id="svBar"><span id="svBarTxt"></span><a class="btn" href="#reserva">Reservar →</a></div>
+  </div>
+</section>
+
+<!-- ESTUDIO -->
+<section class="sec" id="estudio" aria-labelledby="t-es">
+  <div class="wrap">
+    <p class="kick rv">El atelier</p>
+    <h2 class="h2 rv" id="t-es">Un rato <em>solo para ti</em>.</h2>
+    <div class="studio">
+      <div class="b b1 rv"><video class="lv" src="vid/studio.mp4" poster="img/estudio.webp" muted loop playsinline preload="none" aria-hidden="true"></video><img src="img/estudio.webp" alt="Interior del atelier Nácar" loading="lazy" style="z-index:-1"><div class="t"><h3>El atelier</h3><p>Sillones de bouclé, mesas de mármol y luz cálida. Café, té o cava mientras te atendemos.</p></div></div>
+      <div class="b b2 rv"><video class="lv" src="vid/art.mp4" poster="img/s-art.webp" muted loop playsinline preload="none" aria-hidden="true"></video><div class="t"><h3>Nail art a mano alzada</h3><p>Líneas finas, oro y detalles únicos.</p></div></div>
+      <div class="b b3 rv"><img src="img/s-pedi.webp" alt="Pedicura spa con pétalos" loading="lazy"><div class="t"><h3>Pedicura spa</h3><p>Baño de pétalos, exfoliación y masaje.</p></div></div>
+      <div class="b b4 rv"><img src="img/s-semi.webp" alt="Aplicación de esmalte en gel" loading="lazy"><div class="t"><h3>Gel de alta gama</h3><p>Fórmulas sin HEMA, cabina con extracción y lámparas de baja temperatura.</p></div></div>
+    </div>
+    <div class="stats">
+      <div class="rv"><b data-n="3">0</b><span>semanas de duración media</span></div>
+      <div class="rv"><b data-n="120">0</b><span>colores en carta</span></div>
+      <div class="rv"><b data-n="4.9" data-d="1">0</b><span>valoración media (demo)</span></div>
+      <div class="rv"><b data-n="100" data-s=" %">0</b><span>material esterilizado</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- HIGIENE -->
+<section class="sec" id="higiene" style="padding-top:0" aria-labelledby="t-hy">
+  <div class="wrap hyg">
+    <img class="rv" src="img/higiene.webp" alt="Instrumental esterilizado en bolsa de autoclave" loading="lazy">
+    <div class="rv">
+      <p class="kick">Protocolo clínico</p>
+      <h2 class="h2" id="t-hy">Bonito <em>y seguro</em>.</h2>
+      <p class="lead">Tus uñas naturales son lo primero. Trabajamos con protocolos de clínica y te contamos cada paso.</p>
+      <div class="hl">
+        <div><i>♨</i><p><b>Autoclave clase B</b><span>Instrumental metálico esterilizado y sellado. Abrimos la bolsa delante de ti.</span></p></div>
+        <div><i>✂</i><p><b>Limas y pulidores de un solo uso</b><span>Cada clienta, material nuevo.</span></p></div>
+        <div><i>⚗</i><p><b>Fórmulas sin HEMA</b><span>Menos riesgo de alergias a los acrílicos.</span></p></div>
+        <div><i>≋</i><p><b>Retirada sin torno agresivo</b><span>Retiramos el gel con cuidado para no adelgazar tu uña.</span></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVA -->
+<section class="sec book" id="reserva" aria-labelledby="t-bk">
+  <div class="wrap">
+    <p class="kick rv">Reserva online</p>
+    <h2 class="h2 rv" id="t-bk">Tu cita, <em>a tu medida</em>.</h2>
+    <p class="lead rv">Elige servicios, artista, día y hora. Confirmas con una pequeña señal que se descuenta del total.</p>
+    <div class="bk">
+      <div class="bkbox" id="bkbox"></div>
+      <aside class="side" aria-label="Resumen de la cita"><h4>Tu cita</h4><div id="sideList"></div><div class="tot"><span>Total estimado</span><span id="sideTot">0 €</span></div><div class="dz" id="sideDz" hidden><canvas id="sideCv" width="168" height="224" aria-hidden="true"></canvas><small id="sideDzTxt"></small></div></aside>
+    </div>
+  </div>
+</section>
+
+<!-- CLUB -->
+<div id="club"></div>
+<section id="fidelidad" data-brand="Nácar" data-color="#5b1f2a" data-icon="💅" data-stamps="6" data-reward="una manicura semipermanente gratis" data-promo="💅 Esta semana: 15 % en Aura nails con tu tarjeta Nácar."></section>
+
+<!-- REGALO -->
+<section class="sec" id="regalo" aria-labelledby="t-gf">
+  <div class="wrap">
+    <p class="kick rv">Tarjeta regalo</p>
+    <h2 class="h2 rv" id="t-gf">Regala <em>un capricho</em>.</h2>
+    <div class="gift">
+      <div class="rv"><div class="gcard perla" id="gcard"><div class="lg">NÁCAR</div><div class="am" id="gAm">50 €</div><div class="to"><small>Para</small><b id="gTo">Alguien especial</b><p id="gMsg">Un rato solo para ti.</p></div></div></div>
+      <div class="gform rv">
+        <p style="font-weight:700">Importe</p>
+        <div class="amts opts" id="gAmts"></div>
+        <p style="font-weight:700">Diseño</p>
+        <div class="opts" id="gStyles" style="margin:10px 0 16px"></div>
+        <input id="gName" maxlength="30" placeholder="Para (nombre)" aria-label="Nombre de quien la recibe">
+        <textarea id="gText" maxlength="80" rows="2" placeholder="Dedicatoria (opcional)" aria-label="Dedicatoria"></textarea>
+        <button type="button" class="btn btn-ink" id="gBuy" style="width:100%">Regalar tarjeta</button>
+        <p class="note">Demo: no se realiza ningún cobro. Se envía por WhatsApp o correo y se canjea en cualquier servicio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OPINIONES -->
+<section class="sec" id="opiniones" style="background:var(--bg2)" aria-labelledby="t-op">
+  <div class="wrap">
+    <p class="kick rv">Opiniones</p>
+    <h2 class="h2 rv" id="t-op">Lo que <em>dicen</em>.</h2>
+    <div class="revs">
+      <div class="rc rv"><div class="st">★★★★★</div><p>«Me probé el cromo en la web, lo reservé y salió idéntico. Tres semanas perfectas.»</p><small>Marta · Extensiones con cromo</small></div>
+      <div class="rc rv"><div class="st">★★★★★</div><p>«El sitio más limpio en el que he estado. Abren el instrumental delante de ti.»</p><small>Laura · Semipermanente</small></div>
+      <div class="rc rv"><div class="st">★★★★★</div><p>«La pedicura spa es un regalo. Salí flotando.»</p><small>Inés · Pedicura spa</small></div>
+    </div>
+    <p class="note">Opiniones de ejemplo para esta maqueta. En la web real se muestran las reseñas de Google del negocio.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec" id="faq" aria-labelledby="t-fq">
+  <div class="wrap" style="max-width:860px">
+    <p class="kick rv">Dudas</p>
+    <h2 class="h2 rv" id="t-fq">Preguntas <em>frecuentes</em>.</h2>
+    <div style="margin-top:30px">
+      <details class="rv"><summary>¿Cuánto dura el esmalte semipermanente?</summary><p>Entre 2 y 3 semanas, según tu uña y tu ritmo de vida. Las extensiones de gel, de 3 a 4 semanas con relleno.</p></details>
+      <details class="rv"><summary>¿Qué es eso de «sin HEMA»?</summary><p>El HEMA es un componente de muchos geles que puede causar alergias. Trabajamos con fórmulas sin HEMA para reducir ese riesgo.</p></details>
+      <details class="rv"><summary>¿El probador virtual es exacto?</summary><p>Es una simulación orientativa para ayudarte a elegir. Antes de empezar, tu artista revisa el diseño contigo y lo adapta a tu uña real.</p></details>
+      <details class="rv"><summary>¿Puedo traer mi propio diseño?</summary><p>Claro. Guárdalo en el probador o tráenos una foto: lo adaptamos a tu forma de uña.</p></details>
+      <details class="rv"><summary>¿Cómo funciona la señal de la reserva?</summary><p>Se paga una señal de 10 € que se descuenta del total. Si cancelas con más de 24 h, te la devolvemos.</p></details>
+      <details class="rv"><summary>¿Puedo hacerme las uñas embarazada?</summary><p>Sí. Trabajamos con buena ventilación y productos sin HEMA. Si tienes dudas, consúltalo con tu médico.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section class="sec" id="contacto" style="padding-top:0" aria-labelledby="t-ct">
+  <div class="wrap">
+    <p class="kick rv">Visítanos</p>
+    <h2 class="h2 rv" id="t-ct">Te <em>esperamos</em>.</h2>
+    <div class="ct">
+      <div class="ctc rv">
+        <p style="font-weight:800">Nácar Nail Atelier</p>
+        <p style="color:var(--mute)">Calle del Nácar, 8 · Tu ciudad (dirección de ejemplo)</p>
+        <div class="hrs" id="hrs" style="margin-top:14px"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><a class="btn btn-ink" href="https://wa.me/34688933308?text=Hola%2C%20he%20visto%20la%20demo%20de%20N%C3%A1car%20en%20agencia-js.com" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn-ghost" href="tel:+34688933308">Llamar</a></div>
+      </div>
+      <div class="map rv" role="img" aria-label="Mapa esquemático de la ubicación">
+        <svg viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="400" height="320" fill="#e7ddd2"/><path d="M-20 210 L420 150" stroke="#fffdfb" stroke-width="22"/><path d="M150 -20 L230 340" stroke="#fffdfb" stroke-width="16"/><path d="M-20 70 L420 110" stroke="#fffdfb" stroke-width="10"/><path d="M300 -20 L330 340" stroke="#fffdfb" stroke-width="9"/><rect x="30" y="230" width="90" height="60" rx="8" fill="#d8ccbf"/><rect x="250" y="190" width="70" height="80" rx="8" fill="#d8ccbf"/><circle cx="90" cy="120" r="34" fill="#cfdcc7"/></svg>
+        <span class="pin">Nácar ✦</span>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">
+  <div class="big pearl">NÁCAR</div>
+  <div class="row"><span>© <span id="yr">2026</span> Nácar Nail Atelier · Datos de ejemplo</span><span><a href="#" id="ckOpen">Configurar cookies</a> · Aviso legal y privacidad (demo)</span><span>Web de demostración diseñada por <a href="/">Agencia JS</a></span></div>
+</div></footer>
+
+<button type="button" class="cfab" id="cfab" aria-label="Abrir la concierge de Nácar">✦</button>
+<div class="chat" id="chat" role="dialog" aria-label="Concierge de Nácar">
+  <header><div><b>Concierge Nácar</b><small>● Asistente con IA · 24 h</small></div><button type="button" id="cx" aria-label="Cerrar">×</button></header>
+  <div class="clog" id="clog" aria-live="polite"></div>
+  <div class="cq" id="cq"></div>
+  <form class="cin" id="cform"><input id="cin" maxlength="300" placeholder="Pregunta lo que quieras…" aria-label="Tu pregunta" autocomplete="off"><button aria-label="Enviar">➤</button></form>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<div class="ckb" id="ckb" role="dialog" aria-label="Cookies"><b>Cookies</b><p style="color:var(--mute);margin-top:4px">Usamos cookies técnicas para que la web funcione y, solo si aceptas, de analítica para mejorarla.</p><div class="r"><button type="button" class="btn btn-ink" data-ck="all">Aceptar</button><button type="button" class="btn btn-ghost" data-ck="min">Solo necesarias</button></div></div>
+
+<script type="module" src="app.js"></script>
+<script src="fidelidad.js" defer></script>
+<div id="ajs-demo" style="position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:10px;padding:8px 10px 8px 16px;border-radius:999px;background:rgba(10,10,12,.92);color:#fff;font:600 13px/1.2 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35);border:1px solid rgba(232,199,102,.45);backdrop-filter:blur(8px);white-space:nowrap;max-width:calc(100vw - 24px)">
+<span style="color:#E8C766">Demo</span><span style="opacity:.85;overflow:hidden;text-overflow:ellipsis">Web premium · Agencia JS</span>
+<a href="/#planes" style="display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;background:#E8C766;color:#111;text-decoration:none;font-weight:700">Volver</a>
+<button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
+</div>
+</body>
+</html>
