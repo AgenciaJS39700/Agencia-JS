@@ -404,6 +404,7 @@ footer a{color:inherit}
 @media(max-width:560px){.shop-g{grid-template-columns:1fr 1fr;gap:10px}.shop-c .cat-b{padding:12px}.shop-c h3{font-size:16px}.shop-c p{font-size:12.5px}.shop-p{flex-direction:column;align-items:stretch;gap:6px}.shop-p .btn{width:100%}.gc-i b{font-size:20px}}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TattooParlor","name":"Tinta Negra (demo)","description":"Estudio de tatuaje privado: realismo, fine line, blackwork y cover up.","address":{"@type":"PostalAddress","streetAddress":"Calle Ejemplo, 12","addressCountry":"ES"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"230"},"openingHours":"Tu-Sa 10:00-20:00"}</script>
+<style>#regalo{background:var(--bk2)}#amigos{background:var(--bk)}#fidelidad{background:var(--bk2)}#regalo h2,#amigos h2,#fidelidad h2{font-family:var(--disp);text-transform:uppercase;letter-spacing:.01em}</style>
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
@@ -411,7 +412,7 @@ footer a{color:inherit}
 <header class="hdr"><div class="wrap">
   <a class="logo" href="#top">Tinta Negra</a>
   <button type="button" class="cart-b" id="cartB" aria-label="Abrir carrito"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><span id="cartN">0</span></button>
-  <nav class="nav" aria-label="Principal"><a href="#estilos">Estilos</a><a href="#trabajos">Trabajos</a><a href="#catalogo">Catálogo</a><a href="#simulador">Simulador</a><a href="#ia">Idea IA</a><a href="#tienda">Tienda</a><a href="#reserva">Reservar</a></nav>
+  <nav class="nav" aria-label="Principal"><a href="#estilos">Estilos</a><a href="#trabajos">Trabajos</a><a href="#catalogo">Catálogo</a><a href="#simulador">Simulador</a><a href="#ia">Idea IA</a><a href="#amigos">Amigos -15 %</a><a href="#tienda">Tienda</a><a href="#reserva">Reservar</a></nav>
 </div></header>
 
 <main id="top">
@@ -604,19 +605,9 @@ footer a{color:inherit}
   </div>
 </section>
 
-<section class="gift" id="regalo" aria-labelledby="t-gift">
-  <div class="wrap gift-w">
-    <div class="gift-card" aria-hidden="true"><span>TINTA NEGRA</span><b id="gfA">100 €</b><small>Tarjeta regalo · <i id="gfN">para alguien especial</i></small><em>Válida 12 meses en cualquier artista</em></div>
-    <div>
-      <p class="kick">13 · Tarjeta regalo</p>
-      <h2 id="t-gift" class="rv">Regala <span class="out">tinta</span></h2>
-      <p class="sim-lead">El regalo perfecto para quien lleva tiempo pensando en su próximo tatuaje. La recibe al momento por WhatsApp o correo.</p>
-      <div class="cat-f" id="gfAm" role="group" aria-label="Importe"><button type="button" class="chip-t" data-v="50">50 €</button><button type="button" class="chip-t on" data-v="100">100 €</button><button type="button" class="chip-t" data-v="150">150 €</button><button type="button" class="chip-t" data-v="200">200 €</button></div>
-      <label class="gift-l" for="gfI">¿Para quién es?</label><input id="gfI" class="gift-i" maxlength="30" placeholder="Por ejemplo: Laura">
-      <button type="button" class="btn btn-red" id="gfB" style="margin-top:16px">Pedir tarjeta regalo</button>
-    </div>
-  </div>
-</section>
+<section id="regalo" data-brand="Tinta Negra" data-color="#e1251b" data-icon="🖤" data-amounts="50,100,200" data-what="para su próximo tatuaje, con cualquier artista del estudio" data-theme="dark"></section>
+<section id="amigos" data-brand="Tinta Negra" data-color="#e1251b" data-pct="15" data-min-sessions="2" data-cap="80" data-goal="3" data-goal-reward="una sesión de retoque y un kit de cuidados" data-wa="34688933308" data-theme="dark"></section>
+<section id="fidelidad" data-brand="Tinta Negra" data-color="#e1251b" data-icon="🖤" data-stamps="6" data-each="sesión" data-reward="una hora de tatuaje gratis" data-promo="🖤 Flash day este sábado: diseños del flash desde 60 €." data-theme="dark"></section>
 
 <section class="shop" id="tienda" aria-labelledby="t-shop">
   <div class="wrap">
@@ -792,9 +783,6 @@ function painShow(i){var p=PAIN[i];$$(".pain-b").forEach(function(b,j){b.classLi
 PAIN.forEach(function(p,i){var b=document.createElement("button");b.type="button";b.className="pain-b";b.innerHTML=p[0]+'<span class="d'+p[1]+'"></span>';b.addEventListener("click",function(){painShow(i)});pz.appendChild(b)});painShow(0);
 
 /* ===== tarjeta regalo ===== */
-var gA=100;$$("#gfAm .chip-t").forEach(function(b){b.addEventListener("click",function(){gA=+b.dataset.v;$("#gfA").textContent=gA+" €";$$("#gfAm .chip-t").forEach(function(x){x.classList.toggle("on",x===b)})})});
-$("#gfI").addEventListener("input",function(e){$("#gfN").textContent=e.target.value.trim()?"para "+e.target.value.trim():"para alguien especial"});
-$("#gfB").addEventListener("click",function(){window.open("https://wa.me/"+WA+"?text="+encodeURIComponent("Hola, he visto la demo de Tinta Negra en agencia-js.com y quiero una web así para mi estudio. (Tarjeta regalo de ejemplo: "+gA+" €)"),"_blank","noopener")});
 
 /* ===== asesor ===== */
 var ch=$("#ch"),log=$("#chLog"),hi=0;
@@ -943,5 +931,6 @@ go(1);
 <a href="/#planes" style="display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;background:#E8C766;color:#111;text-decoration:none;font-weight:700">Volver</a>
 <button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
 </div>
+<script src="amigos.js" defer></script><script src="regalo.js" defer></script><script src="fidelidad.js" defer></script>
 </body>
 </html>

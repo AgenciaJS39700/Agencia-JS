@@ -337,11 +337,12 @@ body.lock .ups{display:none}
 @keyframes bob{50%{transform:translate(-50%,-8px)}}
 @media(prefers-reduced-motion:reduce){.rs .ov>*{opacity:1!important;transform:none!important}.donut{opacity:1!important;transform:none!important}}
 </style>
+<style>#fidelidad{background:var(--cream)}#regalo{background:var(--paper)}#fidelidad h2,#regalo h2{font-family:var(--serif)}</style>
 </head>
 <body>
 <header class="hdr" id="hdr"><div class="wrap">
   <a class="logo" href="#inicio" aria-label="Bar Marea, inicio"><svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 40c6-6 12-6 18 0s12 6 18 0 10-5 10-5" stroke="#d9a441" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M8 27c6-6 12-6 18 0s12 6 18 0 10-5 10-5" stroke="#f6efe3" stroke-width="5" fill="none" stroke-linecap="round"/></svg>Bar Marea</a>
-  <nav class="nav" aria-label="Principal"><a href="#carta">Carta</a><a href="#especialidades">Especialidades</a><a href="#visitanos">Horario</a><a class="btn btn-gold" href="#reserva">Reservar</a></nav>
+  <nav class="nav" aria-label="Principal"><a href="#carta">Carta</a><a href="#especialidades">Especialidades</a><a href="#regalo">Regalo</a><a href="#visitanos">Horario</a><a class="btn btn-gold" href="#reserva">Reservar</a></nav>
 </div></header>
 
 <main id="inicio">
@@ -392,6 +393,8 @@ body.lock .ups{display:none}
 
 <section class="terr" aria-label="Nuestra terraza"><video class="lv" src="vid/terraza.mp4" poster="img/terraza.webp" muted loop playsinline preload="none" aria-label="Terraza de Bar Marea al atardecer"></video><div class="wrap"><p class="kick" style="color:var(--gold)">Terraza todo el año</p><h2>El mejor sitio para ver caer el sol</h2></div></section>
 
+<section id="fidelidad" data-brand="Bar Marea" data-color="#c8653a" data-icon="🍷" data-stamps="8" data-each="visita" data-reward="una ración de la casa gratis" data-promo="🦐 Hoy en Marea: gamba roja a la plancha fuera de carta. ¡Te guardamos mesa!"></section>
+<section id="regalo" data-brand="Bar Marea" data-color="#0f2a24" data-icon="🍽️" data-amounts="30,60,100" data-what="para una comida o cena en Marea" data-validity="12"></section>
 <section class="info" id="visitanos" aria-labelledby="t-info">
   <div class="wrap">
     <p class="kick reveal">Visítanos</p>
@@ -753,5 +756,6 @@ if(matchMedia("(hover:hover) and (pointer:fine)").matches){[].slice.call(documen
 <a href="/#planes" style="display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;background:#E8C766;color:#111;text-decoration:none;font-weight:700">Volver</a>
 <button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
 </div>
+<script src="fidelidad.js" defer></script><script src="regalo.js" defer></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 /* fidelidad.js — Tarjeta de fidelización digital (demo) · Agencia JS
    Uso: <section id="fidelidad" data-brand="Nombre" data-color="#cf3f78" data-icon="🧁"
-        data-stamps="8" data-reward="un cupcake de regalo" data-promo="Hoy 2x1 en macarons de 17 a 19 h"></section>
+        data-stamps="8" data-reward="un cupcake de regalo" data-promo="Hoy 2x1 en macarons de 17 a 19 h"
+        data-each="compra" data-theme="light|dark"></section>
    Demo sin servidor: los datos se guardan solo en este navegador (localStorage). */
 (function () {
   "use strict";
@@ -10,6 +11,7 @@
   var BRAND = D.brand || "Tu negocio", COLOR = D.color || "#c8653a", ICON = D.icon || "☕";
   var TOTAL = Math.max(4, Math.min(12, parseInt(D.stamps, 10) || 8)), REWARD = D.reward || "un regalo";
   var PROMO = D.promo || "Hoy tienes una sorpresa esperándote";
+  var EACH = D.each || "compra", DARK = D.theme === "dark";
   var KEY = "fid_" + BRAND.toLowerCase().replace(/[^a-z0-9]+/g, "");
   var RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -58,11 +60,17 @@
     ".fid .fx-lk{background:none;border:0;color:inherit;opacity:.6;text-decoration:underline;font:inherit;font-size:.8rem;cursor:pointer;margin-top:.9rem}" +
     ".fid .fx-dm{font-size:.78rem;opacity:.6;margin-top:.8rem}" +
     ".fid .fx-cf{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}.fid .fx-cf i{position:absolute;top:-10px;width:8px;height:12px;border-radius:2px;animation:ffall 1.6s ease-in forwards}@keyframes ffall{to{transform:translateY(620px) rotate(540deg);opacity:0}}" +
+    ".fid.fx-dark .fx-pn{background:#151515;border-color:rgba(255,255,255,.1);box-shadow:0 30px 60px -40px #000}" +
+    ".fid.fx-dark input[type=text],.fid.fx-dark input[type=email]{background:#0d0d0d;color:#f4f4f4;border-color:rgba(255,255,255,.2)}" +
+    ".fid.fx-dark .fx-bs{background:#1d1d1d;color:#f4f4f4;border-color:rgba(255,255,255,.2)}.fid.fx-dark .fx-bs.fx-pr{background:#f4f4f4;color:#111;border-color:#f4f4f4}" +
+    ".fid.fx-dark .fx-wa{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}.fid.fx-dark .fx-dp{border-color:rgba(255,255,255,.18)}" +
+    ".fid.fx-dark .fx-rw{background:color-mix(in srgb,var(--fc) 22%,#151515)}" +
     "@media(prefers-reduced-motion:reduce){.fid *{animation:none!important;transition:none!important}}";
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
   /* ---------- estructura ---------- */
   sec.classList.add("fid");
+  if (DARK) sec.classList.add("fx-dark");
   sec.setAttribute("aria-labelledby", "fid-t");
   sec.innerHTML =
     '<div class="fx-fw">' +
@@ -72,7 +80,7 @@
       '<div>' +
         '<span class="fx-fk">Tarjeta de fidelización</span>' +
         '<h2 id="fid-t">Tu tarjeta ' + esc(BRAND) + ', en el móvil</h2>' +
-        '<p class="fx-fl">Sin descargar apps ni llevar cartones: guárdala en Apple Wallet o Google Wallet, suma un sello con cada compra y llévate ' + esc(REWARD) + '.</p>' +
+        '<p class="fx-fl">Sin descargar apps ni llevar cartones: guárdala en Apple Wallet o Google Wallet, suma un sello con cada ' + esc(EACH) + ' y llévate ' + esc(REWARD) + '.</p>' +
         '<ul class="fx-fb"><li><i>📲</i>Se guarda en la cartera del móvil, junto a tus tarjetas.</li><li><i>' + ICON + '</i>' + TOTAL + ' sellos = ' + esc(REWARD) + '.</li><li><i>🔔</i>Avisos de ofertas solo si tú quieres, y te das de baja cuando quieras.</li></ul>' +
         '<div class="fx-pn" id="fid-pn"></div>' +
       '</div>' +
