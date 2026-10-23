@@ -1,0 +1,2 @@
+hombre.bin y mujer.bin: malla base de MakeHuman (hm08) con los targets de género, publicados como CC0 por Data Collection AB, Joel Palmius y Jonas Hauquier (2020).
+Subdivididos una vez (Catmull-Clark) y con la ropa interior marcada por zonas.
