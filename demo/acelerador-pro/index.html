@@ -6,7 +6,7 @@
 <title>Bar Marea · Tapas, vermut y cocina de mercado (demo)</title>
 <meta name="description" content="Demo de web para bar de tapas con carta animada en varios idiomas, alérgenos y reservas por WhatsApp. Diseño de Agencia JS.">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#0f2a24">
+<meta name="theme-color" content="#0f2a24"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Bar Marea"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230f2a24'/%3E%3Cpath d='M10 40c6-6 12-6 18 0s12 6 18 0 8-4 8-4' stroke='%23d9a441' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M10 28c6-6 12-6 18 0s12 6 18 0 8-4 8-4' stroke='%23f6efe3' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
 :root{--g:#0f2a24;--g2:#163a32;--cream:#f6efe3;--paper:#fbf7f0;--ink:#1d1a16;--terra:#c8653a;--gold:#d9a441;--mute:#6f6a60;--serif:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
@@ -338,6 +338,7 @@ body.lock .ups{display:none}
 @media(prefers-reduced-motion:reduce){.rs .ov>*{opacity:1!important;transform:none!important}.donut{opacity:1!important;transform:none!important}}
 </style>
 <style>#fidelidad{background:var(--cream)}#regalo{background:var(--paper)}#fidelidad h2,#regalo h2{font-family:var(--serif)}</style>
+<style>.rescal{margin-top:16px;padding:16px;border-radius:16px;background:var(--cream);border:1px solid rgba(15,42,36,.15)}.rescal p{margin:0 0 10px}.rescal .btn{width:100%}.rescal-n{font-size:13px;color:var(--mute);margin:10px 0 0!important}</style>
 </head>
 <body>
 <header class="hdr" id="hdr"><div class="wrap">
@@ -742,7 +743,11 @@ var H=[["Lunes","Cerrado"],["Martes","12:30 – 16:00 · 19:30 – 00:00"],["Mi�
 var d=(new Date().getDay()+6)%7;$("#hrs").innerHTML=H.map(function(h,i){return '<li class="'+(i===d?"today":"")+'"><span>'+h[0]+'</span><span>'+h[1]+'</span></li>'}).join("");
 if(d===0){$("#openNow").innerHTML='<i style="background:#c8653a;box-shadow:0 0 0 4px rgba(200,101,58,.18)"></i><span>Hoy cerrado</span>'}
 var rd=$("#rd");rd.min=new Date().toISOString().slice(0,10);rd.value=rd.min;
-$("#fres").addEventListener("submit",function(e){e.preventDefault();var f=e.target;var msg="Hola, he visto la demo de Bar Marea en agencia-js.com y me gustaría una web así para mi negocio.\n(Reserva de ejemplo: "+f.n.value+", "+f.d.value+" a las "+f.h.value+", "+f.p.value+" personas, "+f.z.value+")";window.open("https://wa.me/34688933308?text="+encodeURIComponent(msg),"_blank","noopener")});
+$("#fres").addEventListener("submit",function(e){e.preventDefault();var f=e.target;var msg="Hola, he visto la demo de Bar Marea en agencia-js.com y me gustaría una web así para mi negocio.\n(Reserva de ejemplo: "+f.n.value+", "+f.d.value+" a las "+f.h.value+", "+f.p.value+" personas, "+f.z.value+")";window.open("https://wa.me/34688933308?text="+encodeURIComponent(msg),"_blank","noopener");resCal(f)});
+function resCal(f){var b=document.getElementById("resCal");if(!b){b=document.createElement("div");b.id="resCal";b.className="rescal";b.setAttribute("role","status");f.after(b)}
+var d=f.d.value,ds=new Date(d+"T12:00:00").toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"});
+b.innerHTML='<p><b>¡Mesa solicitada!</b> '+ds+' a las '+f.h.value+' · '+f.p.value+' personas · '+f.z.value+'.</p><button type="button" class="btn btn-dark">📅 Añadir a mi calendario</button><p class="rescal-n">Con aviso 2 horas antes. Demo: en la web real la reserva entra en la agenda del bar y se confirma sola.</p>';
+b.querySelector("button").addEventListener("click",function(){if(!window.AJSCal)return;AJSCal.descargar({titulo:"Mesa en Bar Marea",inicio:AJSCal.fecha(d,f.h.value),minutos:120,lugar:"Bar Marea",nota:f.p.value+" personas · "+f.z.value+". Si no puedes venir, avísanos por WhatsApp.",avisos:[120]},"reserva-bar-marea.ics")})}
 [].slice.call(document.querySelectorAll("video.lv")).forEach(watch);
 /* header + reveal + tilt */
 var hdr=$("#hdr");addEventListener("scroll",function(){hdr.classList.toggle("on",scrollY>40)},{passive:true});
@@ -756,6 +761,6 @@ if(matchMedia("(hover:hover) and (pointer:fine)").matches){[].slice.call(documen
 <a href="/#planes" style="display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;background:#E8C766;color:#111;text-decoration:none;font-weight:700">Volver</a>
 <button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
 </div>
-<script src="fidelidad.js" defer></script><script src="regalo.js" defer></script>
+<script src="fidelidad.js" defer></script><script src="regalo.js" defer></script><script src="appkit.js" defer data-color="#c8653a" data-theme="light" data-items='[{"i":"book","l":"Carta","h":"#carta"},{"i":"card","l":"Club","h":"#fidelidad"},{"i":"gift","l":"Regalo","h":"#regalo"},{"i":"cal","l":"Reservar","h":"#reserva"}]' data-lift=".dock,.ups"></script>
 </body>
 </html>

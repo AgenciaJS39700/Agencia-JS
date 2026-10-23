@@ -280,6 +280,14 @@ upd();
 wa.addEventListener("click", function () {
 if (!form.reportValidity()) { return; }
 openWA("Hola, soy " + nm.value.trim() + ". Quiero encargar una tarta en " + S.name + ":\n\n• Raciones: " + st.size.l + "\n• Sabor: " + st.fl.l + "\n• Relleno: " + st.fill.l + (txt.value.trim() ? "\n• Mensaje: " + txt.value.trim() : "") + "\n• Recogida: " + dt.value + "\n• Precio orientativo: " + eur(price()) + "\n\n(Pendiente de confirmación.)");
+if (window.AJSCal && !left.querySelector(".cal-btn")) {
+var cb = h("button", { type: "button", class: "btn btn-ghost cal-btn", text: "📅 Recordarme la recogida" });
+cb.style.marginTop = ".6rem"; cb.style.width = "100%";
+cb.addEventListener("click", function () {
+AJSCal.descargar({ titulo: "Recoger tarta · " + S.name, inicio: AJSCal.fecha(dt.value, "11:00"), minutos: 30, lugar: S.name, nota: st.size.l + " · " + st.fl.l + " · " + st.fill.l + (txt.value.trim() ? " · Mensaje: " + txt.value.trim() : ""), avisos: [1440, 60] }, "recogida-tarta.ics");
+});
+left.appendChild(cb);
+}
 });
 out.appendChild(pre); out.appendChild(left); return out;
 };
