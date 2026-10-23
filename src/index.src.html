@@ -386,6 +386,55 @@ footer nav[aria-label="Legal"]{row-gap:0}
 /* Móvil más compacto: sin maqueta de teléfono en servicios ni escena con parallax */
 @media(max-width:767px){.sv-stage{display:none}.sv-grid{margin-top:1.75rem}.esc{display:none}}
 </style>
+<style>/* === Asistentes 24/7: mercado de asistentes de citas por sector === */
+.mk{position:relative;overflow:hidden;background:#0a0a0a;padding:3.5rem 0}
+@media (min-width:640px){.mk{padding:4.5rem 0}}
+.mk:before{content:"";position:absolute;inset:-20% -10% auto auto;width:60vw;height:60vw;max-width:720px;max-height:720px;background:radial-gradient(circle,rgba(42,140,245,.16),transparent 62%);pointer-events:none}
+.mk-in{position:relative;max-width:72rem;margin:0 auto;padding:0 1rem}
+@media (min-width:640px){.mk-in{padding:0 1.5rem}}
+.mk-k{display:inline-flex;align-items:center;gap:.5rem;font-size:.75rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:#d4d4d8}
+.mk-k b{padding:.15rem .5rem;border-radius:999px;background:linear-gradient(180deg,#e8c766,#d4af37);color:#0a0a0a;letter-spacing:.08em;font-size:.66rem}
+.mk-h{margin-top:.8rem;font-size:clamp(1.9rem,5.5vw,2.6rem);font-weight:800;line-height:1.1;max-width:22ch}
+.mk-h span{background:linear-gradient(100deg,#fff,#e8c766 60%,#d4af37);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mk-p{margin-top:1rem;max-width:40rem;color:#a3a3a3;line-height:1.65}
+.mk-ben{display:grid;gap:.75rem;margin-top:1.6rem}
+@media (min-width:640px){.mk-ben{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1024px){.mk-ben{grid-template-columns:repeat(4,1fr)}}
+.mk-ben li{display:flex;gap:.75rem;align-items:flex-start;padding:1rem;border-radius:1rem;background:#111;border:1px solid rgba(255,255,255,.08);font-size:.9rem;line-height:1.45}
+.mk-ben li strong{display:block;color:#fafafa}.mk-ben li span{color:#a3a3a3}
+.mk-ben i{display:flex;flex:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.08);color:#e8c766;font-style:normal}
+.mk-sub{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:.5rem 1rem;margin-top:2.8rem}
+.mk-sub h3{font-size:1.35rem;font-weight:800}.mk-sub p{color:#a3a3a3;font-size:.9rem}
+.mk-grid{display:grid;gap:.9rem;margin-top:1.1rem;list-style:none;padding:0}
+@media (min-width:640px){.mk-grid{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1024px){.mk-grid{grid-template-columns:repeat(3,1fr)}}
+.mk-card{position:relative;display:flex;flex-direction:column;gap:.7rem;height:100%;padding:1.2rem;border-radius:1.1rem;background:linear-gradient(180deg,#151515,#0f0f0f);border:1px solid rgba(255,255,255,.09);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.mk-card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 70%,transparent);box-shadow:0 18px 40px rgba(0,0,0,.45),0 0 0 1px color-mix(in srgb,var(--c) 25%,transparent)}
+.mk-top{display:flex;align-items:center;gap:.75rem}
+.mk-ic{display:flex;flex:none;align-items:center;justify-content:center;width:46px;height:46px;border-radius:13px;background:color-mix(in srgb,var(--c) 16%,#111);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 40%,transparent)}
+.mk-card h4{font-size:1.05rem;font-weight:700;line-height:1.25}
+.mk-card p{color:#a3a3a3;font-size:.9rem;line-height:1.5}
+.mk-tags{display:flex;flex-wrap:wrap;gap:.35rem;list-style:none;padding:0;margin:0}
+.mk-tags li{padding:.2rem .6rem;border-radius:999px;font-size:.74rem;color:#d4d4d8;background:rgba(255,255,255,.06)}
+.mk-try{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:46px;padding:.65rem 1rem;border-radius:999px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);background:transparent;color:#fafafa;font-weight:600;font-size:.92rem;cursor:pointer;transition:background .2s,color .2s}
+.mk-try:hover{background:var(--c);color:#0a0a0a}
+.mk-try:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.mk-card:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(260px circle at 85% 0%,color-mix(in srgb,var(--c) 14%,transparent),transparent 70%)}
+.mk-lv{display:grid;gap:.9rem;margin-top:2.4rem}
+@media (min-width:768px){.mk-lv{grid-template-columns:1fr 1fr}}
+.mk-lv>div{padding:1.3rem;border-radius:1.1rem;background:#111;border:1px solid rgba(255,255,255,.09)}
+.mk-lv>div.pro{border-color:rgba(212,175,55,.6);background:linear-gradient(180deg,rgba(212,175,55,.08),#111 55%)}
+.mk-lv h4{display:flex;align-items:center;gap:.5rem;font-size:1.1rem;font-weight:800}
+.mk-lv h4 small{font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .5rem;border-radius:999px;background:rgba(255,255,255,.1);color:#e4e4e7}
+.mk-lv .pro h4 small{background:linear-gradient(180deg,#e8c766,#d4af37);color:#0a0a0a}
+.mk-lv p{margin-top:.4rem;color:#a3a3a3;font-size:.9rem}
+.mk-lv ul{display:grid;gap:.45rem;margin-top:.9rem;font-size:.9rem;color:#d4d4d8;list-style:none;padding:0}
+.mk-lv li{display:flex;gap:.55rem;align-items:flex-start}.mk-lv li:before{content:"";flex:none;width:16px;height:16px;margin-top:.2rem;border-radius:50%;background:radial-gradient(circle,#e8c766 35%,transparent 40%),rgba(232,199,102,.15)}
+.mk-cta{display:flex;flex-direction:column;gap:.8rem;align-items:stretch;margin-top:1.6rem}
+@media (min-width:640px){.mk-cta{flex-direction:row;align-items:center}}
+.mk-cta p{font-size:.8rem;color:#a3a3a3;max-width:34rem}
+@media (prefers-reduced-motion:reduce){.mk-card{transition:none}.mk-card:hover{transform:none}}
+</style>
 </head>
 <body class="bg-ink pb-20 font-sans text-bone antialiased md:pb-0">
 <div id="intro" aria-hidden="true"><div class="it-cloud"></div><div class="it-sky"></div><canvas id="it-cv"></canvas><p class="it-name">Agencia <b>JS</b></p></div>
@@ -430,6 +479,7 @@ requestAnimationFrame(fr)})(t0);
 <a href="#servicios" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Servicios</a>
 <a href="#nfc" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Tarjetas NFC</a>
 <a href="#video" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Vídeo Ads</a>
+<a href="#asistentes" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Asistentes</a>
 <a href="#faq" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Preguntas Frecuentes</a>
 <a href="#planes" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Planes</a>
 </nav>
@@ -449,6 +499,7 @@ class="flex h-11 w-11 items-center justify-center rounded-full border border-bla
 <li><a href="#servicios" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Servicios</a></li>
 <li><a href="#nfc" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Tarjetas NFC</a></li>
 <li><a href="#video" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Vídeo Ads</a></li>
+<li><a href="#asistentes" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Asistentes 24/7</a></li>
 <li><a href="#faq" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Preguntas Frecuentes</a></li>
 <li><a href="#planes" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Planes</a></li>
 <li><a href="#contacto" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Contacto</a></li>
@@ -660,6 +711,87 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 </div>
 </div>
 </section>
+<!-- 6b. ASISTENTES 24/7 (mercado por sector) -->
+<section id="asistentes" class="mk" aria-labelledby="mk-title">
+<div class="mk-in">
+<div class="reveal">
+<p class="mk-k"><b>Nuevo</b> Asistentes 24/7</p>
+<h2 id="mk-title" class="mk-h">Tu recepcionista que <span>nunca duerme</span></h2>
+<p class="mk-p">Un asistente en tu web que contesta a tus clientes y les da cita a cualquier hora: mientras atiendes, por la noche o con el local cerrado. Sin llamadas perdidas y sin mensajes sin responder.</p>
+<ul class="mk-ben">
+<li><i aria-hidden="true">📅</i><span><strong>Agenda citas solo</strong>El cliente elige servicio, día y hora en unos pocos toques.</span></li>
+<li><i aria-hidden="true">💬</i><span><strong>Responde con tus datos</strong>Horarios, servicios, precios y dudas frecuentes de tu negocio.</span></li>
+<li><i aria-hidden="true">🔔</i><span><strong>Te avisa de cada reserva</strong>Por WhatsApp o correo, y la cita entra en tu agenda.</span></li>
+<li><i aria-hidden="true">🛡️</i><span><strong>Claro y seguro</strong>Avisa de que es un asistente automático y no pide datos sensibles.</span></li>
+</ul>
+</div>
+<div class="mk-sub reveal">
+<h3>Elige tu sector y pruébalo</h3>
+<p>Demos con negocios ficticios. Pulsa en una y hazle preguntas o pide una cita.</p>
+</div>
+<ul class="mk-grid">
+<li class="reveal"><article class="mk-card" style="--c:#38bdf8"><div class="mk-top"><span class="mk-ic" data-ic="tooth"></span><h4>Clínicas dentales</h4></div><p>Primeras visitas, limpiezas y urgencias sin colgarse del teléfono.</p><ul class="mk-tags"><li>Primera visita</li><li>Limpieza</li><li>Ortodoncia</li></ul><button type="button" class="mk-try" data-asistente="dental">Probar asistente <span aria-hidden="true">→</span></button></article></li>
+<li class="reveal"><article class="mk-card" style="--c:#e8c766"><div class="mk-top"><span class="mk-ic" data-ic="scissors"></span><h4>Peluquerías y barberías</h4></div><p>Cortes, color y peinados reservados mientras tienes las manos ocupadas.</p><ul class="mk-tags"><li>Corte</li><li>Color</li><li>Barba</li></ul><button type="button" class="mk-try" data-asistente="peluqueria">Probar asistente <span aria-hidden="true">→</span></button></article></li>
+<li class="reveal"><article class="mk-card" style="--c:#f0abfc"><div class="mk-top"><span class="mk-ic" data-ic="sparkles"></span><h4>Estética y uñas</h4></div><p>Faciales, uñas y tratamientos con la agenda siempre llena.</p><ul class="mk-tags"><li>Facial</li><li>Manicura</li><li>Láser</li></ul><button type="button" class="mk-try" data-asistente="estetica">Probar asistente <span aria-hidden="true">→</span></button></article></li>
+<li class="reveal"><article class="mk-card" style="--c:#4ade80"><div class="mk-top"><span class="mk-ic" data-ic="activity"></span><h4>Fisioterapia</h4></div><p>Valoraciones y sesiones agendadas sin interrumpir el tratamiento.</p><ul class="mk-tags"><li>Valoración</li><li>Deportiva</li><li>Bonos</li></ul><button type="button" class="mk-try" data-asistente="fisio">Probar asistente <span aria-hidden="true">→</span></button></article></li>
+<li class="reveal"><article class="mk-card" style="--c:#fb923c"><div class="mk-top"><span class="mk-ic" data-ic="paw"></span><h4>Clínicas veterinarias</h4></div><p>Vacunas, revisiones y peluquería canina sin esperas al teléfono.</p><ul class="mk-tags"><li>Vacunas</li><li>Revisión</li><li>Peluquería</li></ul><button type="button" class="mk-try" data-asistente="veterinaria">Probar asistente <span aria-hidden="true">→</span></button></article></li>
+<li class="reveal"><article class="mk-card" style="--c:#a3a3a3"><div class="mk-top"><span class="mk-ic" data-ic="car"></span><h4>Talleres mecánicos</h4></div><p>Revisiones, pre-ITV y neumáticos con cita, sin colas.</p><ul class="mk-tags"><li>Aceite</li><li>Pre-ITV</li><li>Diagnosis</li></ul><button type="button" class="mk-try" data-asistente="taller">Probar asistente <span aria-hidden="true">→</span></button></article></li>
+</ul>
+<div class="mk-lv reveal">
+<div>
+<h4>Básico <small>Para empezar</small></h4>
+<p>Todo lo necesario para no perder ni una cita.</p>
+<ul>
+<li>Responde dudas con los datos de tu negocio</li>
+<li>Reserva guiada: servicio, día y hora</li>
+<li>Aviso de cada reserva por WhatsApp o correo</li>
+<li>Adaptado a tu sector y a tu imagen</li>
+</ul>
+</div>
+<div class="pro">
+<h4>Avanzado <small>Más conversación</small></h4>
+<p>Para negocios con muchas consultas o varios profesionales.</p>
+<ul>
+<li>Conversación más natural y precisa</li>
+<li>Conectado a tu agenda real, con huecos al momento</li>
+<li>Recordatorios automáticos antes de la cita</li>
+<li>Opcional: también en tu WhatsApp Business</li>
+</ul>
+</div>
+</div>
+<div class="mk-cta reveal">
+<a href="https://wa.me/34688933308" data-wa="Hola, quiero un asistente de citas para mi negocio" target="_blank" rel="noopener" data-cta="whatsapp_asistentes"
+class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full btn-silver px-7 py-3.5 font-semibold text-ink transition focus:outline-none focus-visible:ring-4 focus-visible:ring-white/40 motion-reduce:transition-none sm:w-auto">
+<svg class="ic h-5 w-5" aria-hidden="true" focusable="false"><use href="#i-message-circle"/></svg> Quiero un asistente para mi negocio
+</a>
+<p>Presupuesto según tu sector y el volumen de consultas. Puedes empezar con el Básico y pasar al Avanzado cuando quieras, sin cambiar nada en tu web.</p>
+</div>
+</div>
+</section>
+<script>
+(function () {
+  var ICONOS = { tooth: 1, scissors: 1, sparkles: 1, activity: 1, paw: 1, car: 1 };
+  var mod = null;
+  function cargar() { return mod || (mod = import("/asistentes/asistente.js")); }
+  var sec = document.getElementById("asistentes");
+  if (!sec) return;
+  // Iconos de las tarjetas y precarga del módulo cuando la sección se acerca a la pantalla
+  var io = "IntersectionObserver" in window ? new IntersectionObserver(function (es) {
+    if (!es.some(function (e) { return e.isIntersecting; })) return;
+    io.disconnect();
+    cargar().then(function (m) { sec.querySelectorAll("[data-ic]").forEach(function (s) { if (ICONOS[s.dataset.ic]) s.innerHTML = m.svg(s.dataset.ic, 24); }); }).catch(function () {});
+  }, { rootMargin: "400px" }) : null;
+  if (io) io.observe(sec);
+  sec.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-asistente]");
+    if (!b) return;
+    b.disabled = true;
+    cargar().then(function (m) { m.abrirAsistente(b.dataset.asistente, { demo: true, alCerrar: function () { b.focus(); } }); })
+      .catch(function () { window.open("https://wa.me/34688933308?text=" + encodeURIComponent("Hola, quiero ver la demo del asistente de citas"), "_blank", "noopener"); })
+      .then(function () { b.disabled = false; });
+  });
+})();
+</script>
 <!-- 8. INFRAESTRUCTURA (franja mínima) -->
 <section id="tecnologia" class="silver-surface border-y-2 border-gold/70 py-4">
 <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">

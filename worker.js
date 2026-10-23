@@ -1,5 +1,8 @@
 // /worker.js — Asistente virtual de Agencia JS (Cloudflare Workers + Workers AI)
-// Solo atiende POST /api/chat. El resto de la web se sirve como archivos estáticos.
+// Atiende POST /api/chat (asistente de la agencia) y POST /api/asistente (demos del mercado de asistentes).
+// El resto de la web se sirve como archivos estáticos.
+
+import { responderAsistente } from "./asistentes/motor.js";
 
 const MODELO = "@cf/meta/llama-3.1-8b-instruct";
 const MODELO_RESPALDO = "@cf/meta/llama-3.2-3b-instruct";
@@ -7,7 +10,7 @@ const MODELO_RESPALDO = "@cf/meta/llama-3.2-3b-instruct";
 const MAX_MENSAJES = 6; // turnos de historial que se envían al modelo
 const MAX_CARACTERES = 400; // por mensaje
 const MAX_SALIDA = 900; // caracteres de la respuesta
-const LIMITE_VENTANA = 20; // peticiones por IP...
+const LIMITE_VENTANA = 30; // peticiones por IP...
 const VENTANA_MS = 10 * 60 * 1000; // ...cada 10 minutos (por instancia del Worker)
 
 const SISTEMA = `Eres el asistente virtual de Agencia JS, una agencia de marketing digital para negocios locales. Respondes en español, con un tono cercano, profesional y breve (máximo 4 frases o una lista corta).
@@ -24,6 +27,7 @@ DATOS (no inventes nada fuera de esto):
 - Tienda online, reservas con agenda e integraciones con TPV o ERP se presupuestan a medida, fuera de los planes.
 - Vídeo publicitario: servicio aparte: vídeos mensuales personalizados para las redes del cliente, en formato vertical para Reels y TikTok, a la carta y con presupuesto personalizado.
 - Tarjetas NFC: chip NTAG215/216, sin batería ni app, compatibles con Android y iPhone XS o posteriores. Abren directamente la ficha de Google para dejar una opinión. Precio en oferta: 1 tarjeta 25 € (antes 30 €), 2 tarjetas 45 € (antes 50 €), IVA no incluido. Se piden aparte con cualquier plan; Presencia 360° incluye 2 tarjetas. Producto estándar con logo de Google, sin personalización. La valoración la decide siempre el cliente: NUNCA prometas reseñas ni puntuaciones concretas.
+- Asistentes 24/7 (servicio nuevo, aparte de los planes): un asistente automático en la web del negocio que responde dudas con sus datos (horarios, servicios, precios) y da citas a cualquier hora; avisa al negocio de cada reserva. Pensado sobre todo para negocios con cita: clínicas dentales, peluquerías y barberías, estética y uñas, fisioterapia, veterinarias y talleres. Hay demos para probar en la sección "Asistentes 24/7" de la web. Dos niveles: Básico y Avanzado (conversación más natural, agenda real, recordatorios y opcionalmente WhatsApp Business). Presupuesto a medida según sector y volumen.
 - Un "cambio de contenido" es modificar textos, precios, horarios, fotos, ofertas o enlaces. Rediseños o secciones nuevas se presupuestan aparte.
 - Promoción: "Webs de 349 €" (oferta de lanzamiento). No prometas plazos ni número de días: el plazo exacto se indica en el presupuesto. Plazos: dependen del contenido que facilite el cliente (logo, textos, fotos, horarios, servicios); se indica en el presupuesto antes de empezar.
 - Auditoría gratuita: revisamos la ficha de Google, la web y las redes y explicamos qué mejorar. Sin coste ni compromiso. Se pide con el botón "Pedir auditoría gratis" de la web.
@@ -103,7 +107,8 @@ export default {
     if (url.pathname === "/A" || url.pathname === "/a") {
       return Response.redirect("https://agencia-js.com/?utm_source=tarjeta&utm_medium=qr#auditoria", 302);
     }
-    if (url.pathname !== "/api/chat") {
+    const esAsistente = url.pathname === "/api/asistente";
+    if (url.pathname !== "/api/chat" && !esAsistente) {
       return env.ASSETS ? env.ASSETS.fetch(request) : new Response("No encontrado", { status: 404 });
     }
     if (request.method !== "POST") return json({ error: "Método no permitido" }, 405);
@@ -128,6 +133,11 @@ export default {
       cuerpo = JSON.parse(texto);
     } catch (e) {
       return json({ error: "JSON no válido" }, 400);
+    }
+
+    if (esAsistente) {
+      const r = await responderAsistente(env, cuerpo);
+      return json(r.datos, r.estado);
     }
 
     const mensajes = limpiarMensajes(cuerpo && cuerpo.messages);
