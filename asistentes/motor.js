@@ -20,6 +20,7 @@ const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "
 /** Construye las instrucciones del asistente a partir de los datos del negocio. */
 export function instrucciones(cfg, hoy = new Date()) {
   const n = cfg.negocio;
+  const extra = n.extra || [];
   const servicios = cfg.servicios.map((s) => `  · ${s.nombre}: ${s.precio} (unos ${s.min} min)`).join("\n");
   const fecha = `${DIAS[hoy.getUTCDay()]} ${hoy.getUTCDate()}/${hoy.getUTCMonth() + 1}/${hoy.getUTCFullYear()}`;
   const salud = cfg.salud
@@ -39,7 +40,7 @@ DATOS DEL NEGOCIO (no inventes nada fuera de esto):
 - Horario: ${n.horarioTexto}
 - Servicios y precios orientativos:
 ${servicios}
-${n.extra.map((e) => "- " + e).join("\n")}
+${extra.map((e) => "- " + e).join("\n")}
 ${salud}
 
 CITAS:
@@ -112,8 +113,8 @@ export function acciones(texto) {
 }
 
 /** Atiende la petición ya validada (método, origen, límite y JSON los comprueba worker.js). */
-export async function responderAsistente(env, cuerpo) {
-  const cfg = SECTORES[cuerpo && cuerpo.sector];
+export async function responderAsistente(env, cuerpo, cfgCliente) {
+  const cfg = cfgCliente || SECTORES[cuerpo && cuerpo.sector];
   if (!cfg) return { estado: 404, datos: { error: "Asistente no encontrado" } };
   const mensajes = limpiarMensajes(cuerpo.messages);
   if (!mensajes) return { estado: 400, datos: { error: "Mensajes no válidos" } };

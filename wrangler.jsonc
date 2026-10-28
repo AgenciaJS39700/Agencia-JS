@@ -9,5 +9,12 @@
     "run_worker_first": true
   },
   "ai": { "binding": "AI" },
+  // Agenda de los asistentes de citas (todos los clientes; esquema en asistentes/schema.sql)
+  "d1_databases": [{ "binding": "CITAS", "database_name": "agencia-citas", "database_id": "742096ec-15ce-442d-947d-ab7f67f19947" }],
+  // Recordatorios de citas: todos los días a las 17:00 UTC (18:00/19:00 en España)
+  "triggers": { "crons": ["0 17 * * *"] },
+  // Remitente de los correos (Brevo). El secreto BREVO_API_KEY se añade aparte.
+  "vars": { "MAIL_FROM": "agencia39700@gmail.com" },
+  "keep_vars": true,
   "observability": { "enabled": false }
 }

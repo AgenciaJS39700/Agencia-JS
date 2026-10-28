@@ -9,3 +9,7 @@ src
 tools
 asistentes/motor.js
 voz
+asistentes/agenda.js
+asistentes/clientes
+asistentes/schema.sql
+asistentes/README.md

@@ -4,6 +4,7 @@
 
 import { responderAsistente } from "./asistentes/motor.js";
 import { atenderVoz } from "./voz/agenda.js";
+import { atenderAgenda, enviarRecordatorios } from "./asistentes/agenda.js";
 
 const MODELO = "@cf/meta/llama-3.1-8b-instruct";
 const MODELO_RESPALDO = "@cf/meta/llama-3.2-3b-instruct";
@@ -98,7 +99,7 @@ async function consultar(env, mensajes) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     // www → dominio sin www (evita contenido duplicado para Google)
     if (url.hostname === "www.agencia-js.com") {
@@ -113,6 +114,14 @@ export default {
     if (url.pathname === "/api/voz/huecos" || url.pathname === "/api/voz/cita") {
       // Sin límite por IP: las llamadas llegan desde los servidores de ElevenLabs (IPs compartidas) y no se guardan datos.
       return atenderVoz(request, url.pathname.endsWith("huecos") ? "huecos" : "cita");
+    }
+    // Asistentes de citas de clientes reales (agenda en D1, panel, página de citas y widget)
+    if (url.pathname.startsWith("/api/as/")) return atenderAgenda(request, env, ctx, limitar);
+    const pag = url.pathname.match(/^\/(c|panel)\/([a-z0-9-]{2,40})\/?$/);
+    if (pag && env.ASSETS) {
+      const archivo = pag[1] === "c" ? "/asistentes/pagina" : "/asistentes/panel";
+      const r = await env.ASSETS.fetch(new Request(new URL(archivo, url), request));
+      return new Response(r.body, { status: r.status, headers: r.headers });
     }
     const esAsistente = url.pathname === "/api/asistente";
     if (url.pathname !== "/api/chat" && !esAsistente) {
@@ -157,5 +166,9 @@ export default {
     } catch (e) {
       return json({ error: "No se pudo generar la respuesta" }, 502);
     }
+  },
+  // Cron diario: recordatorio por correo de las citas de mañana
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(enviarRecordatorios(env).catch((e) => console.error("recordatorios", e && e.message)));
   },
 };

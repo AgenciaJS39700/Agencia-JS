@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Panel de citas</title>
+<meta name="theme-color" content="#0f0f10">
+<link rel="icon" href="/favicon.ico">
+<!-- /asistentes/panel.html — Panel del negocio (se sirve en /panel/SLUG). Acceso con la clave que le damos al cliente. -->
+<style>
+:root{--c:#e8c766;--bg:#0f0f10;--tx:#fafafa;--mu:#a1a1aa;--ln:rgba(255,255,255,.1);--card:#17171a;--ok:#22c55e;--no:#ef4444}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) 16px 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+h1{font-size:1.25rem;margin:0}h1 small{display:block;font-size:.78rem;color:var(--mu);font-weight:500}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:44px;padding:.5rem 1rem;border-radius:12px;border:1px solid var(--ln);background:transparent;color:var(--tx);font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:var(--c)}.btn.main{background:var(--c);color:#0a0a0a;border-color:transparent}.btn.sm{min-height:36px;padding:.3rem .7rem;font-size:.85rem}
+.btn.del{color:#fca5a5}.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.st{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:12px}.st b{display:block;font-size:1.5rem}.st span{color:var(--mu);font-size:.8rem}
+.dia{margin-top:18px}.dia h2{font-size:.95rem;margin:0 0 8px;color:var(--c);display:flex;justify-content:space-between}
+.dia h2 span{color:var(--mu);font-weight:500}
+.cita,.blq{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:start;padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--ln);margin-bottom:8px}
+.cita.cx{opacity:.45}.cita.cx .n{text-decoration:line-through}
+.h{font-weight:800;font-size:1.05rem}.h small{display:block;color:var(--mu);font-weight:500;font-size:.75rem}
+.n{font-weight:700}.d{color:#d4d4d8;font-size:.88rem}.d a{color:#d4d4d8}
+.tag{display:inline-block;font-size:.7rem;padding:.05rem .45rem;border-radius:999px;background:rgba(255,255,255,.08);color:#d4d4d8;margin-left:.3rem;vertical-align:middle}
+.blq{background:repeating-linear-gradient(135deg,#17171a,#17171a 8px,#1c1c20 8px,#1c1c20 16px)}
+.vacio{color:var(--mu);font-size:.88rem;padding:4px 2px}
+.box{background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:18px;margin:12px 0}
+.box h2{margin:0 0 10px;font-size:1rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid .full{grid-column:1/-1}
+label{display:block;font-size:.8rem;color:var(--mu);margin-bottom:4px}
+input,select{width:100%;min-height:46px;padding:.5rem .8rem;border-radius:12px;border:1px solid var(--ln);background:#0f0f10;color:var(--tx);font:inherit;font-size:16px}
+.login{max-width:380px;margin:12vh auto 0;text-align:center}
+.login p{color:var(--mu)}
+.msg{min-height:1.4em;font-size:.9rem;margin:8px 0 0}
+.ics{word-break:break-all;font-size:.8rem;background:#0f0f10;border:1px solid var(--ln);border-radius:10px;padding:10px;margin:8px 0}
+dialog{border:1px solid var(--ln);border-radius:18px;background:var(--card);color:var(--tx);width:min(520px,calc(100vw - 24px));padding:18px}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+[hidden]{display:none!important}
+@media (max-width:520px){.stats{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}.cita,.blq{grid-template-columns:54px 1fr}.cita .acc,.blq .acc{grid-column:1/-1;justify-self:end}}
+@media print{.bar,.acc,header .btn{display:none}body{background:#fff;color:#000}.cita,.blq{background:#fff;border-color:#ccc}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="login" id="login">
+    <h1>Panel de citas</h1>
+    <p>Escribe la clave que te dio Agencia JS.</p>
+    <form id="fl" class="box" style="text-align:left">
+      <label for="clave">Clave</label>
+      <input id="clave" type="password" autocomplete="current-password" required>
+      <label style="display:flex;gap:.5rem;align-items:center;margin:10px 0 12px;color:var(--tx)"><input type="checkbox" id="rec" style="width:auto;min-height:0" checked> Recordar en este dispositivo</label>
+      <button class="btn main" style="width:100%" type="submit">Entrar</button>
+      <p class="msg" role="alert" id="ml"></p>
+    </form>
+  </section>
+
+  <section id="app" hidden>
+    <header>
+      <h1 id="tit">Citas<small id="sub"></small></h1>
+      <button class="btn sm" id="salir" type="button">Salir</button>
+    </header>
+    <div class="stats" aria-live="polite">
+      <div class="st"><b id="s-hoy">0</b><span>hoy</span></div>
+      <div class="st"><b id="s-sem">0</b><span>próx. 7 días</span></div>
+      <div class="st"><b id="s-onl">0</b><span>reservadas solas</span></div>
+    </div>
+    <div class="bar">
+      <button class="btn main" id="b-nueva" type="button">+ Apuntar cita</button>
+      <button class="btn" id="b-cerrar" type="button">Cerrar horas o días</button>
+      <button class="btn" id="b-cal" type="button">Ver en mi calendario</button>
+      <button class="btn" id="b-ant" type="button" aria-label="Semanas anteriores">‹</button>
+      <button class="btn" id="b-sig" type="button" aria-label="Semanas siguientes">›</button>
+    </div>
+    <div id="lista" aria-live="polite"></div>
+  </section>
+</main>
+
+<dialog id="d-nueva" aria-labelledby="dn-t"><form id="fn" method="dialog">
+  <h2 id="dn-t">Apuntar cita</h2>
+  <div class="grid">
+    <div class="full"><label for="n-serv">Servicio</label><select id="n-serv" required></select></div>
+    <div><label for="n-fecha">Día</label><input id="n-fecha" type="date" required></div>
+    <div><label for="n-hora">Hora libre</label><select id="n-hora" required></select></div>
+    <div><label for="n-nom">Nombre</label><input id="n-nom" maxlength="60" required></div>
+    <div><label for="n-tel">Teléfono</label><input id="n-tel" type="tel" maxlength="16" required></div>
+    <div class="full"><label for="n-nota">Nota (opcional)</label><input id="n-nota" maxlength="200"></div>
+  </div>
+  <p class="msg" role="alert" id="mn"></p>
+  <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn main" id="ok-n" value="ok">Guardar</button></div>
+</form></dialog>
+
+<dialog id="d-cerrar" aria-labelledby="dc-t"><form id="fc" method="dialog">
+  <h2 id="dc-t">Cerrar horas o días</h2>
+  <p class="d">Nadie podrá reservar en ese tiempo. Deja las horas vacías para cerrar el día entero.</p>
+  <div class="grid">
+    <div><label for="c-f1">Desde el día</label><input id="c-f1" type="date" required></div>
+    <div><label for="c-f2">Hasta el día (opcional)</label><input id="c-f2" type="date"></div>
+    <div><label for="c-h1">Desde la hora</label><input id="c-h1" type="time" step="900"></div>
+    <div><label for="c-h2">Hasta la hora</label><input id="c-h2" type="time" step="900"></div>
+    <div class="full"><label for="c-mot">Motivo (opcional)</label><input id="c-mot" maxlength="80" placeholder="Vacaciones, formación…"></div>
+  </div>
+  <p class="msg" role="alert" id="mc"></p>
+  <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn main" value="ok">Cerrar</button></div>
+</form></dialog>
+
+<dialog id="d-cal" aria-labelledby="dk-t">
+  <h2 id="dk-t">Tus citas en el calendario del móvil</h2>
+  <p class="d">Copia este enlace y añádelo como calendario. Se actualiza solo con cada cita nueva o cancelada.</p>
+  <div class="ics" id="ics"></div>
+  <ul class="d" style="padding-left:1.1rem">
+    <li><b>Google Calendar</b> (desde el ordenador): Otros calendarios → + → Desde URL → pega el enlace.</li>
+    <li><b>iPhone</b>: Ajustes → Calendario → Cuentas → Añadir cuenta → Otra → Añadir calendario suscrito.</li>
+    <li>Es privado: no lo compartas.</li>
+  </ul>
+  <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" id="copiar" type="button">Copiar enlace</button><button class="btn main" type="button" onclick="this.closest('dialog').close()">Listo</button></div>
+</dialog>
+
+<script type="module">
+const slug = (location.pathname.match(/^\/panel\/([a-z0-9-]{2,40})/) || [])[1];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const hhmm = (m) => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+const hoyISO = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" }).format(new Date());
+const sumar = (f, n) => new Date(Date.parse(f + "T12:00:00Z") + n * 864e5).toISOString().slice(0, 10);
+const largo = (f) => { const t = new Date(f + "T12:00:00Z").toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }); return t.charAt(0).toUpperCase() + t.slice(1); };
+const KEY = "ajs-panel-" + slug;
+let clave = "", desde = hoyISO(), negocio = null;
+try { clave = localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || ""; } catch (e) { /* sin almacenamiento */ }
+
+async function api(ruta, cuerpo) {
+  const r = await fetch(`/api/as/${slug}/${ruta}`, { method: cuerpo ? "POST" : "GET", headers: { Authorization: "Bearer " + clave, ...(cuerpo ? { "Content-Type": "application/json" } : {}) }, body: cuerpo ? JSON.stringify(cuerpo) : undefined });
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401) { salir(); throw new Error(d.error || "Clave incorrecta"); }
+  if (!r.ok) throw new Error(d.mensaje || d.error || "Error");
+  return d;
+}
+function salir() { clave = ""; try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch (e) {} $("app").hidden = true; $("login").hidden = false; }
+$("salir").onclick = salir;
+
+$("fl").addEventListener("submit", async (e) => {
+  e.preventDefault(); clave = $("clave").value.trim(); $("ml").textContent = "Comprobando…";
+  try { await cargar(); try { ($("rec").checked ? localStorage : sessionStorage).setItem(KEY, clave); } catch (er) {} $("ml").textContent = ""; }
+  catch (er) { $("ml").textContent = er.message; }
+});
+
+async function cargar() {
+  const d = await api(`panel/citas?desde=${desde}&dias=14`);
+  negocio = d.negocio;
+  document.documentElement.style.setProperty("--c", negocio.color);
+  document.title = "Citas · " + negocio.nombre;
+  $("tit").firstChild.textContent = negocio.negocio.nombre;
+  $("sub").textContent = desde === hoyISO() ? "Próximas 2 semanas" : `Del ${largo(d.desde)} al ${largo(d.hasta)}`;
+  $("login").hidden = true; $("app").hidden = false;
+  const ok = d.citas.filter((c) => c.estado === "ok"), hoy = hoyISO(), sem = sumar(hoy, 6);
+  $("s-hoy").textContent = ok.filter((c) => c.fecha === hoy).length;
+  $("s-sem").textContent = ok.filter((c) => c.fecha >= hoy && c.fecha <= sem).length;
+  $("s-onl").textContent = ok.filter((c) => c.origen !== "panel").length;
+  let html = "";
+  for (let f = d.desde; f <= d.hasta; f = sumar(f, 1)) {
+    const cs = d.citas.filter((c) => c.fecha === f), bs = d.bloqueos.filter((b) => b.fecha === f);
+    const items = [...cs.map((c) => ({ t: c.inicio, h: citaHTML(c) })), ...bs.map((b) => ({ t: b.inicio, h: blqHTML(b) }))].sort((a, b) => a.t - b.t);
+    html += `<section class="dia"><h2>${esc(largo(f))}${f === hoy ? " · hoy" : ""}<span>${((n) => n === 1 ? "1 cita" : n + " citas")(cs.filter((c) => c.estado === "ok").length)}</span></h2>${items.map((x) => x.h).join("") || '<p class="vacio">Sin citas.</p>'}</section>`;
+  }
+  $("lista").innerHTML = html;
+}
+function citaHTML(c) {
+  const tel = esc(c.telefono), wa = c.telefono.replace(/\D/g, "").replace(/^(\d{9})$/, "34$1");
+  return `<article class="cita${c.estado !== "ok" ? " cx" : ""}"><div class="h">${hhmm(c.inicio)}<small>${hhmm(c.fin)}</small></div>
+  <div><div class="n">${esc(c.nombre)}${c.estado !== "ok" ? '<span class="tag">cancelada</span>' : ""}<span class="tag">${esc({ chat: "online", voz: "teléfono IA", panel: "apuntada" }[c.origen] || c.origen)}</span></div>
+  <div class="d">${esc(c.servicio_n)} · <a href="tel:${tel}">${tel}</a> · <a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>${c.email ? " · " + esc(c.email) : ""}</div>
+  ${c.nota ? `<div class="d">Nota: ${esc(c.nota)}</div>` : ""}<div class="d" style="color:var(--mu);font-size:.78rem">Código ${esc(c.codigo)}</div></div>
+  <div class="acc">${c.estado === "ok" ? `<button class="btn sm del" data-cancelar="${c.id}" type="button" aria-label="Cancelar la cita de ${esc(c.nombre)}">Cancelar</button>` : ""}</div></article>`;
+}
+function blqHTML(b) {
+  const todo = b.inicio === 0 && b.fin >= 1440;
+  return `<article class="blq"><div class="h">${todo ? "Día" : hhmm(b.inicio)}<small>${todo ? "entero" : hhmm(Math.min(b.fin, 1439))}</small></div><div><div class="n">Cerrado</div><div class="d">${esc(b.motivo || "Sin reservas online")}</div></div>
+  <div class="acc"><button class="btn sm" data-abrir="${b.id}" type="button">Volver a abrir</button></div></article>`;
+}
+$("lista").addEventListener("click", async (e) => {
+  const c = e.target.closest("[data-cancelar]"), a = e.target.closest("[data-abrir]");
+  try {
+    if (c && confirm("¿Cancelar esta cita? Si dejó email, se le avisará.")) { await api("panel/cancelar", { id: +c.dataset.cancelar }); await cargar(); }
+    if (a) { await api("panel/desbloquear", { id: +a.dataset.abrir }); await cargar(); }
+  } catch (er) { alert(er.message); }
+});
+$("b-ant").onclick = () => { desde = sumar(desde, -14); cargar(); };
+$("b-sig").onclick = () => { desde = sumar(desde, 14); cargar(); };
+
+/* apuntar cita (llamadas, mostrador) */
+async function horas() {
+  const s = $("n-serv").value, f = $("n-fecha").value, sel = $("n-hora");
+  sel.innerHTML = "<option value=''>…</option>";
+  if (!s || !f) return;
+  const r = await fetch(`/api/as/${slug}/huecos?servicio=${encodeURIComponent(s)}&fecha=${f}`).then((x) => x.json()).catch(() => ({}));
+  sel.innerHTML = (r.huecos || []).map((h) => `<option>${h}</option>`).join("") || "<option value=''>Sin huecos ese día</option>";
+}
+$("b-nueva").onclick = () => {
+  $("n-serv").innerHTML = negocio.servicios.map((s) => `<option value="${esc(s.id)}">${esc(s.nombre)} (${s.min} min)</option>`).join("");
+  $("n-fecha").value = $("n-fecha").min = hoyISO(); $("mn").textContent = ""; horas(); $("d-nueva").showModal();
+};
+$("n-serv").onchange = horas; $("n-fecha").onchange = horas;
+$("fn").addEventListener("submit", async (e) => {
+  if (e.submitter && e.submitter.value === "x") return;
+  e.preventDefault();
+  if (!$("fn").reportValidity()) return;
+  $("mn").textContent = "Guardando…";
+  try {
+    const r = await api("panel/cita", { servicio: $("n-serv").value, fecha: $("n-fecha").value, hora: $("n-hora").value, nombre: $("n-nom").value, telefono: $("n-tel").value, nota: $("n-nota").value });
+    $("d-nueva").close(); $("fn").reset(); await cargar();
+  } catch (er) { $("mn").textContent = er.message; }
+});
+
+/* cerrar horas o días */
+$("b-cerrar").onclick = () => { $("c-f1").value = $("c-f1").min = hoyISO(); $("mc").textContent = ""; $("d-cerrar").showModal(); };
+$("fc").addEventListener("submit", async (e) => {
+  if (e.submitter && e.submitter.value === "x") return;
+  e.preventDefault();
+  if (!$("fc").reportValidity()) return;
+  try { await api("panel/bloquear", { fecha: $("c-f1").value, fechaFin: $("c-f2").value || undefined, desde: $("c-h1").value || undefined, hasta: $("c-h2").value || undefined, motivo: $("c-mot").value }); $("d-cerrar").close(); $("fc").reset(); await cargar(); }
+  catch (er) { $("mc").textContent = er.message; }
+});
+
+/* calendario */
+$("b-cal").onclick = () => { $("ics").textContent = `${location.origin}/api/as/${slug}/agenda.ics?k=${encodeURIComponent(clave)}`; $("d-cal").showModal(); };
+$("copiar").onclick = async () => { try { await navigator.clipboard.writeText($("ics").textContent); $("copiar").textContent = "Copiado ✓"; } catch (e) { $("copiar").textContent = "Cópialo a mano"; } };
+
+if (clave) cargar().catch(() => salir()); else $("clave").focus();
+setInterval(() => { if (clave && !document.hidden && !document.querySelector("dialog[open]")) cargar().catch(() => {}); }, 60000);
+</script>
+</body>
+</html>

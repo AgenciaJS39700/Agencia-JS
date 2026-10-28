@@ -1,5 +1,6 @@
 // /asistentes/asistente.js — Ventana de chat de los asistentes de citas (navegador, módulo ES).
 // Uso: import { abrirAsistente } from "/asistentes/asistente.js";  abrirAsistente("dental", { demo: true });
+//      Cliente real (agenda en D1): import { abrirNegocio } from "https://agencia-js.com/asistentes/asistente.js";  abrirNegocio("slug");
 // Las dudas las responde /api/asistente; la reserva es un flujo guiado (servicio → día → hora → nombre → confirmar)
 // que no depende de la respuesta del modelo. En la demo la agenda es simulada; en un cliente real se conecta
 // a su agenda (D1 / Google Calendar) y a su WhatsApp.
@@ -7,6 +8,21 @@
 import { SECTORES } from "./sectores.js";
 
 const WA_AGENCIA = "34688933308";
+const BASE = new URL(import.meta.url).origin; // las API viven en agencia-js.com aunque el widget esté en otra web
+const deFecha = (f) => { const [y, m, d] = f.split("-").map(Number); return new Date(y, m - 1, d, 12); };
+const aFecha = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+async function api(slug, ruta, cuerpo) {
+  const r = await fetch(`${BASE}/api/as/${slug}/${ruta}`, cuerpo ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) } : undefined);
+  const d = await r.json().catch(() => ({}));
+  return { ok: r.ok, estado: r.status, d };
+}
+const configs = {};
+/** Abre el asistente de un cliente real (config y agenda desde el servidor). */
+export async function abrirNegocio(slug, op = {}) {
+  if (!configs[slug]) { const r = await api(slug, "config"); if (!r.ok) throw new Error(r.d.error || "Negocio no encontrado"); configs[slug] = r.d; }
+  const cfg = configs[slug];
+  return abrirAsistente(cfg, { waNumero: cfg.negocio.wa, ...op, demo: cfg.demo, remoto: true });
+}
 const MAX_PREGUNTAS = 15;
 const DIAS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
 const DIAS_L = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
@@ -107,7 +123,8 @@ const CSS = `
 .as-grid .as-b{padding:.5rem .4rem}
 .as-sum{align-self:stretch;padding:.9rem;border-radius:1rem;border:1px solid var(--as-c);background:#141416}
 .as-sum dl{display:grid;grid-template-columns:auto 1fr;gap:.25rem .8rem;margin:.5rem 0 .8rem}.as-sum dt{color:#a1a1aa;font-size:.82rem}.as-sum dd{margin:0;font-weight:600}
-.as-form{display:flex;gap:.45rem;align-self:stretch}
+.as-form{display:flex;gap:.45rem;align-self:stretch}.as-col{flex-direction:column}
+.as-cod{color:#fafafa;font-weight:600;font-size:.82rem}
 .as-chips{display:flex;gap:.45rem;overflow-x:auto;padding:.1rem .9rem .6rem;scrollbar-width:none}.as-chips::-webkit-scrollbar{display:none}
 .as-chip{flex:none;min-height:38px;padding:.4rem .8rem;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#e4e4e7;font:inherit;font-size:.82rem;cursor:pointer;white-space:nowrap}
 .as-chip:hover{border-color:var(--as-c)}
@@ -129,7 +146,8 @@ function ponerEstilos() { if (estilos) return; estilos = true; const s = h("styl
  * @param {{demo?: boolean, waNumero?: string, alCerrar?: () => void}} op
  */
 export function abrirAsistente(id, op = {}) {
-  const cfg = SECTORES[id];
+  const cfg = typeof id === "object" ? id : SECTORES[id];
+  const remoto = !!op.remoto;
   if (!cfg) return;
   const demo = op.demo !== false;
   ponerEstilos();
@@ -147,7 +165,7 @@ export function abrirAsistente(id, op = {}) {
   const x = h("button", "as-x"); x.type = "button"; x.setAttribute("aria-label", "Cerrar asistente"); x.innerHTML = svg("x", 20);
   head.append(av, ht, x);
   box.appendChild(head);
-  if (demo) box.appendChild(h("p", "as-demo", "Demo con un negocio ficticio: los datos, precios y la agenda son de ejemplo."));
+  if (demo) box.appendChild(h("p", "as-demo", remoto ? "Demo con un negocio ficticio, pero con agenda real: las citas que hagas se guardan de verdad." : "Demo con un negocio ficticio: los datos, precios y la agenda son de ejemplo."));
 
   const log = h("div", "as-log"); log.setAttribute("role", "log"); log.setAttribute("aria-live", "polite");
   const chips = h("div", "as-chips");
@@ -173,7 +191,7 @@ export function abrirAsistente(id, op = {}) {
   function contacto(cont) {
     if (demo) {
       const a = h("a", "as-b", "Quiero un asistente así para mi negocio");
-      a.href = waUrl(op.waNumero || WA_AGENCIA, `Hola, he probado el asistente de citas de ${cfg.sector.toLowerCase()} y quiero uno para mi negocio`);
+      a.href = waUrl(op.waNumero || WA_AGENCIA, `Hola, he probado el asistente de citas de ${String(cfg.sector || "").toLowerCase()} y quiero uno para mi negocio`);
       a.target = "_blank"; a.rel = "noopener"; cont.appendChild(a);
     } else if (op.waNumero) {
       const a = h("a", "as-b", "Hablar por WhatsApp"); a.href = waUrl(op.waNumero, "Hola, tengo una consulta"); a.target = "_blank"; a.rel = "noopener"; cont.appendChild(a);
@@ -186,15 +204,25 @@ export function abrirAsistente(id, op = {}) {
     const o = opciones("as-svc");
     cfg.servicios.forEach((s) => boton(o, `<span>${s.nombre}</span><small>${s.precio} · ${s.min} min</small>`, () => { bloquear(o); cita.servicio = s; msg("yo", s.nombre); elegirDia(); }));
   }
-  function elegirDia() {
-    const dias = proximosDias(cfg, cita.servicio.min);
+  async function elegirDia() {
+    let dias;
+    if (remoto) {
+      const t = escribiendo(); const r = await api(cfg.slug, "dias?servicio=" + encodeURIComponent(cita.servicio.id)); t.remove();
+      if (!r.ok) { msg("bot", "No he podido consultar la agenda ahora mismo. Prueba en un momento o contacta con el negocio."); contacto(opciones()); return; }
+      dias = r.d.dias.map((x) => deFecha(x.fecha));
+    } else dias = proximosDias(cfg, cita.servicio.min);
     if (!dias.length) { msg("bot", "Ahora mismo no veo huecos libres en las próximas semanas. Te recomiendo contactar con el equipo."); contacto(opciones()); return; }
     msg("bot", "¿Qué día te viene bien?");
     const o = opciones("as-grid");
     dias.forEach((d) => boton(o, etiquetaDia(d), () => { bloquear(o); cita.dia = d; msg("yo", fechaLarga(d)); elegirHora(); }));
   }
-  function elegirHora() {
-    const hs = huecos(cfg, cita.dia, cita.servicio.min);
+  async function elegirHora() {
+    let hs;
+    if (remoto) {
+      const t = escribiendo(); const r = await api(cfg.slug, `huecos?servicio=${encodeURIComponent(cita.servicio.id)}&fecha=${aFecha(cita.dia)}`); t.remove();
+      hs = r.ok ? r.d.huecos.map(min2) : [];
+      if (!hs.length) { msg("bot", "Ese día se acaba de llenar. Elige otro:"); elegirDia(); return; }
+    } else hs = huecos(cfg, cita.dia, cita.servicio.min);
     msg("bot", `Estos son los huecos libres del ${fechaLarga(cita.dia)}:`);
     const o = opciones("as-grid");
     hs.forEach((t) => boton(o, hhmm(t), () => { bloquear(o); cita.hora = t; msg("yo", hhmm(t)); pedirNombre(); }));
@@ -211,26 +239,53 @@ export function abrirAsistente(id, op = {}) {
       e.preventDefault();
       const v = i.value.replace(/[<>{}\[\]]/g, "").replace(/\s+/g, " ").trim();
       if (v.length < 2) { i.setCustomValidity("Escribe un nombre"); i.reportValidity(); return; }
-      bloquear(f); cita.nombre = v; msg("yo", v); resumen();
+      bloquear(f); cita.nombre = v; msg("yo", v); if (remoto) pedirContacto(); else resumen();
     });
     i.addEventListener("input", () => i.setCustomValidity(""));
+  }
+  function pedirContacto() {
+    msg("bot", cfg.pedirEmail ? "¿Un teléfono y un email? Al email te mando la confirmación y un recordatorio el día antes." : "¿Un teléfono de contacto? Solo lo usará el negocio para tu cita.");
+    const f = h("form", "as-form as-col");
+    const tel = h("input", "as-in"); tel.type = "tel"; tel.required = true; tel.maxLength = 16; tel.autocomplete = "tel"; tel.inputMode = "tel"; tel.placeholder = "Teléfono"; tel.setAttribute("aria-label", "Teléfono");
+    f.appendChild(tel);
+    let em = null;
+    if (cfg.pedirEmail) { em = h("input", "as-in"); em.type = "email"; em.maxLength = 120; em.autocomplete = "email"; em.placeholder = "Email (opcional)"; em.setAttribute("aria-label", "Email (opcional)"); f.appendChild(em); }
+    const b = h("button", "as-b as-main", "Seguir"); b.type = "submit"; f.appendChild(b);
+    log.appendChild(f); bajar(); setTimeout(() => tel.focus(), 50);
+    f.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const t = tel.value.replace(/[^\d+]/g, "");
+      if (t.replace(/\D/g, "").length < 9) { tel.setCustomValidity("Escribe un teléfono completo"); tel.reportValidity(); return; }
+      if (em && em.value && !em.checkValidity()) { em.reportValidity(); return; }
+      bloquear(f); cita.telefono = t; cita.email = em ? em.value.trim() : ""; msg("yo", t + (cita.email ? " · " + cita.email : "")); resumen();
+    });
+    tel.addEventListener("input", () => tel.setCustomValidity(""));
   }
   function resumen() {
     const s = h("div", "as-sum");
     s.appendChild(h("strong", null, "Revisa tu cita"));
     const dl = h("dl");
-    [["Servicio", cita.servicio.nombre], ["Día", fechaLarga(cita.dia)], ["Hora", `${hhmm(cita.hora)} (${cita.servicio.min} min)`], ["Precio", cita.servicio.precio], ["Nombre", cita.nombre]].forEach(([a, b]) => dl.append(h("dt", null, a), h("dd", null, b)));
+    [["Servicio", cita.servicio.nombre], ["Día", fechaLarga(cita.dia)], ["Hora", `${hhmm(cita.hora)} (${cita.servicio.min} min)`], ["Precio", cita.servicio.precio], ["Nombre", cita.nombre]].concat(cita.telefono ? [["Teléfono", cita.telefono]] : []).forEach(([a, b]) => dl.append(h("dt", null, a), h("dd", null, b)));
     s.appendChild(dl);
     const o = h("div", "as-opts"); s.appendChild(o);
     log.appendChild(s); bajar();
-    boton(o, svg("cal", 18) + " Confirmar cita", () => { bloquear(o); confirmada(); }, true);
+    boton(o, svg("cal", 18) + " Confirmar cita", () => { bloquear(o); remoto ? guardar() : confirmada(); }, true);
     boton(o, "Cambiar", () => { bloquear(o); elegirDia(); });
+  }
+  async function guardar() {
+    const t = escribiendo();
+    const r = await api(cfg.slug, "cita", { servicio: cita.servicio.id, fecha: aFecha(cita.dia), hora: hhmm(cita.hora), nombre: cita.nombre, telefono: cita.telefono, email: cita.email || undefined });
+    t.remove();
+    if (r.ok && r.d.ok) { cita.codigo = r.d.codigo; confirmada(); return; }
+    msg("bot", (r.d && (r.d.mensaje || r.d.error)) || "No se pudo guardar la cita. Inténtalo de nuevo.");
+    if (r.estado === 409) elegirHora(); else contacto(opciones());
   }
   function confirmada() {
     msg("bot", `¡Listo, ${cita.nombre.split(" ")[0]}! Tu cita de ${cita.servicio.nombre.toLowerCase()} queda reservada para el ${fechaLarga(cita.dia)} a las ${hhmm(cita.hora)}.`);
     const o = opciones();
+    if (cita.codigo) log.appendChild(h("p", "as-note as-cod", `Código de tu cita: ${cita.codigo} · guárdalo para anularla o cambiarla`));
     const a = h("a", "as-b"); a.innerHTML = svg("cal", 18) + " Añadir a mi calendario"; a.href = ics(cfg, cita); a.download = "cita.ics"; o.appendChild(a);
-    if (demo) {
+    if (demo && !remoto) {
       log.appendChild(h("p", "as-note", "En la versión real la cita entra directamente en la agenda del negocio y el cliente recibe la confirmación y un recordatorio."));
       contacto(opciones());
     }
@@ -248,7 +303,9 @@ export function abrirAsistente(id, op = {}) {
     historial.push({ role: "user", content: texto });
     const t = escribiendo();
     try {
-      const r = await fetch("/api/asistente", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sector: cfg.id, messages: historial.slice(-8) }) });
+      const r = remoto
+        ? await fetch(`${BASE}/api/as/${cfg.slug}/chat`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: historial.slice(-8) }) })
+        : await fetch("/api/asistente", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sector: cfg.id, messages: historial.slice(-8) }) });
       const d = await r.json().catch(() => ({}));
       t.remove();
       if (!r.ok || !d.reply) throw new Error(d.error || "error");
@@ -273,7 +330,7 @@ export function abrirAsistente(id, op = {}) {
 
   bar.addEventListener("submit", (e) => { e.preventDefault(); const v = input.value; input.value = ""; preguntar(v); });
   const pedir = h("button", "as-chip", "📅 Pedir cita"); pedir.type = "button"; pedir.addEventListener("click", () => empezarCita()); chips.appendChild(pedir);
-  cfg.chips.forEach((c) => { const b = h("button", "as-chip", c); b.type = "button"; b.addEventListener("click", () => preguntar(c)); chips.appendChild(b); });
+  (cfg.chips || []).forEach((c) => { const b = h("button", "as-chip", c); b.type = "button"; b.addEventListener("click", () => preguntar(c)); chips.appendChild(b); });
 
   function cerrar() { dlg.close(); }
   x.addEventListener("click", cerrar);
@@ -286,6 +343,6 @@ export function abrirAsistente(id, op = {}) {
   boton(o, "Tengo una duda", () => { bloquear(o); input.focus(); });
   dlg.showModal();
   if (window.matchMedia("(min-width:640px)").matches) input.focus(); else x.focus();
-  if (typeof window.gtag === "function") window.gtag("event", "asistente_demo", { sector: cfg.id });
+  if (typeof window.gtag === "function") window.gtag("event", remoto ? "asistente_abierto" : "asistente_demo", { sector: cfg.slug || cfg.id });
   return dlg;
 }
