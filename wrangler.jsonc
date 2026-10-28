@@ -14,7 +14,7 @@
   // Recordatorios de citas: todos los días a las 17:00 UTC (18:00/19:00 en España)
   "triggers": { "crons": ["0 17 * * *"] },
   // Remitente de los correos (Brevo). El secreto BREVO_API_KEY se añade aparte.
-  "vars": { "MAIL_FROM": "agencia39700@gmail.com" },
+  "vars": { "MAIL_FROM": "info@agencia-js.com" },
   "keep_vars": true,
   "observability": { "enabled": false }
 }
