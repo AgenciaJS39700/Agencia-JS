@@ -13,3 +13,5 @@ asistentes/agenda.js
 asistentes/clientes
 asistentes/schema.sql
 asistentes/README.md
+asistentes/push.js
+asistentes/whatsapp.js
