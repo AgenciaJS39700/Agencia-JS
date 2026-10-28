@@ -7,6 +7,10 @@
 <title>Panel de citas</title>
 <meta name="theme-color" content="#0f0f10">
 <link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" id="mf">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <!-- /asistentes/panel.html — Panel del negocio (se sirve en /panel/SLUG). Acceso con la clave que le damos al cliente. -->
 <style>
 :root{--c:#e8c766;--bg:#0f0f10;--tx:#fafafa;--mu:#a1a1aa;--ln:rgba(255,255,255,.1);--card:#17171a;--ok:#22c55e;--no:#ef4444}
@@ -41,6 +45,23 @@ input,select{width:100%;min-height:46px;padding:.5rem .8rem;border-radius:12px;b
 dialog{border:1px solid var(--ln);border-radius:18px;background:var(--card);color:var(--tx);width:min(520px,calc(100vw - 24px));padding:18px}
 dialog::backdrop{background:rgba(0,0,0,.6)}
 [hidden]{display:none!important}
+.vista{display:inline-flex;border:1px solid var(--ln);border-radius:12px;overflow:hidden}.vista button{min-height:42px;padding:.4rem .9rem;border:0;background:transparent;color:var(--mu);font:inherit;font-weight:600;cursor:pointer}
+.vista button[aria-pressed=true]{background:var(--c);color:#0a0a0a}
+.pro{font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;background:var(--c);color:#0a0a0a;border-radius:6px;padding:.05rem .35rem;font-weight:800}
+.sem{overflow-x:auto;border:1px solid var(--ln);border-radius:16px;background:var(--card);-webkit-overflow-scrolling:touch}
+.sg{display:grid;grid-template-columns:46px repeat(7,minmax(104px,1fr));min-width:780px}
+.sh{position:sticky;top:0;z-index:2;background:var(--card);padding:8px 6px;text-align:center;font-size:.78rem;color:var(--mu);border-bottom:1px solid var(--ln);border-left:1px solid var(--ln)}
+.sh b{display:block;color:var(--tx);font-size:1.05rem}.sh.hoy b{color:var(--c)}
+.sh:first-child{border-left:0}
+.shoras{position:relative}.shoras span{position:absolute;right:6px;transform:translateY(-50%);font-size:.7rem;color:var(--mu)}.shoras span:first-child{transform:translateY(2px)}
+.scol{position:relative;border-left:1px solid var(--ln);background-image:linear-gradient(var(--ln) 1px,transparent 1px);background-size:100% var(--hh)}
+.scol .abierto{position:absolute;left:0;right:0;background:rgba(255,255,255,.035)}
+.ev{position:absolute;left:3px;right:3px;border-radius:8px;padding:3px 6px;font-size:.72rem;line-height:1.25;overflow:hidden;background:color-mix(in srgb,var(--c) 85%,#000);color:#0a0a0a;border:0;text-align:left;cursor:pointer;font-family:inherit}
+.ev b{display:block;font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ev:focus-visible{outline:2px solid #fff}
+.ev.voz{background:#a78bfa}.ev.panel{background:#d4d4d8}
+.ev.blk{background:repeating-linear-gradient(135deg,#2a2a2f,#2a2a2f 6px,#1f1f23 6px,#1f1f23 12px);color:#d4d4d8;cursor:default}
+.ahora{position:absolute;left:0;right:0;height:2px;background:#ef4444;z-index:1}.ahora:before{content:"";position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:#ef4444}
+.ley{display:flex;gap:12px;flex-wrap:wrap;font-size:.75rem;color:var(--mu);margin:8px 2px 0}.ley i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
 @media (max-width:520px){.stats{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}.cita,.blq{grid-template-columns:54px 1fr}.cita .acc,.blq .acc{grid-column:1/-1;justify-self:end}}
 @media print{.bar,.acc,header .btn{display:none}body{background:#fff;color:#000}.cita,.blq{background:#fff;border-color:#ccc}}
 </style>
@@ -73,6 +94,8 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <button class="btn main" id="b-nueva" type="button">+ Apuntar cita</button>
       <button class="btn" id="b-cerrar" type="button">Cerrar horas o días</button>
       <button class="btn" id="b-cal" type="button">Ver en mi calendario</button>
+      <button class="btn" id="b-push" type="button" hidden>🔔 Avisos al móvil <span class="pro">Pro</span></button>
+      <div class="vista" id="vista" role="group" aria-label="Vista" hidden><button type="button" data-v="lista" aria-pressed="true">Lista</button><button type="button" data-v="semana" aria-pressed="false">Semana</button></div>
       <button class="btn" id="b-ant" type="button" aria-label="Semanas anteriores">‹</button>
       <button class="btn" id="b-sig" type="button" aria-label="Semanas siguientes">›</button>
     </div>
@@ -108,6 +131,22 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
   <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn main" value="ok">Cerrar</button></div>
 </form></dialog>
 
+<dialog id="d-push" aria-labelledby="dp-t">
+  <h2 id="dp-t">🔔 Avisos de citas en este móvil</h2>
+  <p class="d">Cada vez que alguien reserve o anule una cita, te sonará un aviso en este móvil, aunque tengas el panel cerrado.</p>
+  <p class="d" id="p-est" role="status" style="font-weight:700;color:var(--tx)"></p>
+  <div class="box" id="p-ios" hidden style="margin:10px 0"><b>En iPhone, primero instala el panel:</b>
+    <ol class="d" style="padding-left:1.1rem;margin:.4rem 0 0"><li>Abre esta página en <b>Safari</b>.</li><li>Pulsa <b>Compartir</b> (el cuadrado con la flecha).</li><li><b>Añadir a pantalla de inicio</b>.</li><li>Abre el panel desde ese icono y vuelve aquí.</li></ol></div>
+  <div class="bar" style="justify-content:flex-end;margin:12px 0 0">
+    <button class="btn" type="button" id="p-prueba" hidden>Enviar prueba</button>
+    <button class="btn main" type="button" id="p-act">Activar avisos</button>
+    <button class="btn" type="button" onclick="this.closest('dialog').close()">Cerrar</button>
+  </div>
+</dialog>
+
+<dialog id="d-ver" aria-labelledby="dv-t"><h2 id="dv-t">Cita</h2><div id="ver"></div>
+  <div class="bar" style="justify-content:flex-end;margin:8px 0 0"><button class="btn" type="button" onclick="this.closest('dialog').close()">Cerrar</button></div></dialog>
+
 <dialog id="d-cal" aria-labelledby="dk-t">
   <h2 id="dk-t">Tus citas en el calendario del móvil</h2>
   <p class="d">Copia este enlace y añádelo como calendario. Se actualiza solo con cada cita nueva o cancelada.</p>
@@ -129,7 +168,10 @@ const hoyISO = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid
 const sumar = (f, n) => new Date(Date.parse(f + "T12:00:00Z") + n * 864e5).toISOString().slice(0, 10);
 const largo = (f) => { const t = new Date(f + "T12:00:00Z").toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }); return t.charAt(0).toUpperCase() + t.slice(1); };
 const KEY = "ajs-panel-" + slug;
-let clave = "", desde = hoyISO(), negocio = null;
+let clave = "", desde = hoyISO(), negocio = null, vista = "lista", ultimo = null;
+const lunes = (f) => sumar(f, -((new Date(f + "T12:00:00Z").getUTCDay() + 6) % 7));
+try { vista = localStorage.getItem("ajs-vista") === "semana" ? "semana" : "lista"; } catch (e) { /* sin almacenamiento */ }
+$("mf").href = `/panel/${slug}/app.webmanifest`;
 try { clave = localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || ""; } catch (e) { /* sin almacenamiento */ }
 
 async function api(ruta, cuerpo) {
@@ -149,17 +191,28 @@ $("fl").addEventListener("submit", async (e) => {
 });
 
 async function cargar() {
-  const d = await api(`panel/citas?desde=${desde}&dias=14`);
-  negocio = d.negocio;
+  const sem = vista === "semana" && negocio && negocio.avanzado;
+  if (sem) desde = lunes(desde);
+  const d = await api(`panel/citas?desde=${desde}&dias=${sem ? 7 : 14}`);
+  negocio = d.negocio; ultimo = d;
+  $("b-push").hidden = $("vista").hidden = !negocio.avanzado;
+  if (!negocio.avanzado && vista === "semana") vista = "lista";
+  $("vista").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === vista)));
   document.documentElement.style.setProperty("--c", negocio.color);
   document.title = "Citas · " + negocio.nombre;
   $("tit").firstChild.textContent = negocio.negocio.nombre;
-  $("sub").textContent = desde === hoyISO() ? "Próximas 2 semanas" : `Del ${largo(d.desde)} al ${largo(d.hasta)}`;
+  $("sub").textContent = sem ? `Semana del ${largo(d.desde)}` : desde === hoyISO() ? "Próximas 2 semanas" : `Del ${largo(d.desde)} al ${largo(d.hasta)}`;
   $("login").hidden = true; $("app").hidden = false;
-  const ok = d.citas.filter((c) => c.estado === "ok"), hoy = hoyISO(), sem = sumar(hoy, 6);
+  const ok = d.citas.filter((c) => c.estado === "ok"), hoy = hoyISO(), fin7 = sumar(hoy, 6);
   $("s-hoy").textContent = ok.filter((c) => c.fecha === hoy).length;
-  $("s-sem").textContent = ok.filter((c) => c.fecha >= hoy && c.fecha <= sem).length;
+  $("s-sem").textContent = ok.filter((c) => c.fecha >= hoy && c.fecha <= fin7).length;
   $("s-onl").textContent = ok.filter((c) => c.origen !== "panel").length;
+  if (sem || (vista === "semana" && negocio.avanzado && !sem)) { if (!sem) { desde = lunes(desde); return cargar(); }
+    const sc = document.querySelector(".sem"), x = sc ? sc.scrollLeft : null;
+    $("lista").innerHTML = semanaHTML(d);
+    const n = document.querySelector(".sem"), h = n.querySelector(".sh.hoy");
+    if (x !== null) n.scrollLeft = x; else if (h) n.scrollLeft = Math.max(0, h.offsetLeft - 50);
+    return; }
   let html = "";
   for (let f = d.desde; f <= d.hasta; f = sumar(f, 1)) {
     const cs = d.citas.filter((c) => c.fecha === f), bs = d.bloqueos.filter((b) => b.fecha === f);
@@ -167,6 +220,30 @@ async function cargar() {
     html += `<section class="dia"><h2>${esc(largo(f))}${f === hoy ? " · hoy" : ""}<span>${((n) => n === 1 ? "1 cita" : n + " citas")(cs.filter((c) => c.estado === "ok").length)}</span></h2>${items.map((x) => x.h).join("") || '<p class="vacio">Sin citas.</p>'}</section>`;
   }
   $("lista").innerHTML = html;
+}
+/* ---- vista semanal (plan Avanzado) ---- */
+function semanaHTML(d) {
+  const hor = negocio.negocio.horario || {}, m2 = (t) => { const [a, b] = t.split(":").map(Number); return a * 60 + b; };
+  let ini = 24 * 60, fin = 0;
+  Object.values(hor).flat().forEach(([a, b]) => { ini = Math.min(ini, m2(a)); fin = Math.max(fin, m2(b)); });
+  d.citas.forEach((c) => { if (c.estado === "ok") { ini = Math.min(ini, c.inicio); fin = Math.max(fin, c.fin); } });
+  if (fin <= ini) { ini = 8 * 60; fin = 21 * 60; }
+  ini = Math.floor(ini / 60) * 60; fin = Math.ceil(fin / 60) * 60;
+  const HH = 56, k = HH / 60, alto = (fin - ini) * k, hoy = hoyISO();
+  const ahora = (() => { const p = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date()).split(":"); return +p[0] * 60 + +p[1]; })();
+  const dias = Array.from({ length: 7 }, (_, i) => sumar(d.desde, i));
+  const cab = dias.map((f) => { const x = new Date(f + "T12:00:00Z"); return `<div class="sh${f === hoy ? " hoy" : ""}">${x.toLocaleDateString("es-ES", { weekday: "short", timeZone: "UTC" })}<b>${x.getUTCDate()}</b></div>`; }).join("");
+  let horas = ""; for (let t = ini; t < fin; t += 60) horas += `<span style="top:${(t - ini) * k}px">${hhmm(t)}</span>`;
+  const cols = dias.map((f) => {
+    const dw = new Date(f + "T12:00:00Z").getUTCDay();
+    const abiertos = (hor[dw] || []).map(([a, b]) => `<div class="abierto" style="top:${(m2(a) - ini) * k}px;height:${(m2(b) - m2(a)) * k}px"></div>`).join("");
+    const blq = d.bloqueos.filter((b) => b.fecha === f).map((b) => { const a = Math.max(b.inicio, ini), z = Math.min(b.fin, fin); return z > a ? `<div class="ev blk" style="top:${(a - ini) * k}px;height:${(z - a) * k}px"><b>Cerrado</b>${esc(b.motivo || "")}</div>` : ""; }).join("");
+    const evs = d.citas.filter((c) => c.fecha === f && c.estado === "ok").map((c) => `<button type="button" class="ev ${esc(c.origen)}" data-ver="${c.id}" style="top:${(c.inicio - ini) * k}px;height:${Math.max((c.fin - c.inicio) * k - 2, 20)}px" aria-label="${esc(`${hhmm(c.inicio)} ${c.nombre}, ${c.servicio_n}`)}"><b>${hhmm(c.inicio)} ${esc(c.nombre)}</b>${esc(c.servicio_n)}</button>`).join("");
+    const linea = f === hoy && ahora >= ini && ahora <= fin ? `<div class="ahora" style="top:${(ahora - ini) * k}px"></div>` : "";
+    return `<div class="scol" style="height:${alto}px;--hh:${HH}px">${abiertos}${blq}${evs}${linea}</div>`;
+  }).join("");
+  return `<div class="sem"><div class="sg"><div class="sh"></div>${cab}<div class="shoras" style="height:${alto}px">${horas}</div>${cols}</div></div>
+  <p class="ley"><span><i style="background:var(--c)"></i>Online</span><span><i style="background:#a78bfa"></i>Por teléfono (IA)</span><span><i style="background:#d4d4d8"></i>Apuntada por ti</span><span><i style="background:#2a2a2f"></i>Cerrado</span></p>`;
 }
 function citaHTML(c) {
   const tel = esc(c.telefono), wa = c.telefono.replace(/\D/g, "").replace(/^(\d{9})$/, "34$1");
@@ -182,14 +259,56 @@ function blqHTML(b) {
   <div class="acc"><button class="btn sm" data-abrir="${b.id}" type="button">Volver a abrir</button></div></article>`;
 }
 $("lista").addEventListener("click", async (e) => {
-  const c = e.target.closest("[data-cancelar]"), a = e.target.closest("[data-abrir]");
+  const c = e.target.closest("[data-cancelar]"), a = e.target.closest("[data-abrir]"), v = e.target.closest("[data-ver]");
+  if (v && ultimo) { const x = ultimo.citas.find((y) => y.id === +v.dataset.ver); if (x) { $("ver").innerHTML = citaHTML(x); $("d-ver").showModal(); } return; }
   try {
     if (c && confirm("¿Cancelar esta cita? Si dejó email, se le avisará.")) { await api("panel/cancelar", { id: +c.dataset.cancelar }); await cargar(); }
     if (a) { await api("panel/desbloquear", { id: +a.dataset.abrir }); await cargar(); }
   } catch (er) { alert(er.message); }
 });
-$("b-ant").onclick = () => { desde = sumar(desde, -14); cargar(); };
-$("b-sig").onclick = () => { desde = sumar(desde, 14); cargar(); };
+$("ver").addEventListener("click", async (e) => {
+  const c = e.target.closest("[data-cancelar]");
+  if (c && confirm("¿Cancelar esta cita? Si dejó email, se le avisará.")) { try { await api("panel/cancelar", { id: +c.dataset.cancelar }); $("d-ver").close(); await cargar(); } catch (er) { alert(er.message); } }
+});
+const paso = () => (vista === "semana" && negocio && negocio.avanzado ? 7 : 14);
+$("b-ant").onclick = () => { desde = sumar(desde, -paso()); cargar(); };
+$("b-sig").onclick = () => { desde = sumar(desde, paso()); cargar(); };
+$("vista").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-v]"); if (!b || b.dataset.v === vista) return;
+  vista = b.dataset.v; try { localStorage.setItem("ajs-vista", vista); } catch (er) {}
+  desde = vista === "semana" ? lunes(hoyISO()) : hoyISO(); cargar();
+});
+
+/* ---- avisos push al móvil (plan Avanzado) ---- */
+const ios = /iP(hone|ad|od)/.test(navigator.userAgent), instalada = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+const b64 = (s) => { const t = s.replace(/-/g, "+").replace(/_/g, "/"); const r = atob(t + "=".repeat((4 - (t.length % 4)) % 4)); return Uint8Array.from(r, (c) => c.charCodeAt(0)); };
+async function registro() { return navigator.serviceWorker.register("/panel/sw.js", { scope: "/panel/" }).then(() => navigator.serviceWorker.ready); }
+async function estadoPush() {
+  const est = $("p-est"), act = $("p-act"), pr = $("p-prueba");
+  $("p-ios").hidden = !(ios && !instalada);
+  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) { est.textContent = ios && !instalada ? "Primero instala el panel (pasos de abajo)." : "Este navegador no admite avisos. Prueba con Chrome o Safari actualizados."; act.hidden = true; pr.hidden = true; return; }
+  if (Notification.permission === "denied") { est.textContent = "Los avisos están bloqueados para esta web. Actívalos en los ajustes del navegador."; act.hidden = true; pr.hidden = true; return; }
+  const reg = await registro(), sub = await reg.pushManager.getSubscription();
+  act.hidden = false; act.textContent = sub ? "Desactivar en este móvil" : "Activar avisos"; act.className = sub ? "btn del" : "btn main";
+  pr.hidden = !sub; est.textContent = sub ? "✅ Activados en este móvil." : "Desactivados en este móvil.";
+}
+$("b-push").onclick = () => { $("d-push").showModal(); estadoPush().catch((e) => { $("p-est").textContent = "No se pudo comprobar: " + e.message; }); };
+$("p-act").onclick = async () => {
+  const b = $("p-act"); b.disabled = true;
+  try {
+    const reg = await registro(), sub = await reg.pushManager.getSubscription();
+    if (sub) { await api("panel/push/baja", { endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); }
+    else {
+      if ((await Notification.requestPermission()) !== "granted") throw new Error("No has dado permiso para los avisos.");
+      const { clave: pub } = await api("panel/push/clave");
+      const nueva = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(pub) });
+      await api("panel/push/alta", { sub: nueva.toJSON() });
+    }
+    await estadoPush();
+  } catch (e) { $("p-est").textContent = e.message; } finally { b.disabled = false; }
+};
+$("p-prueba").onclick = async () => { try { await api("panel/push/prueba", {}); $("p-est").textContent = "Enviado: en unos segundos debería sonar el aviso."; } catch (e) { $("p-est").textContent = e.message; } };
+if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", (e) => { if (e.data === "recargar" && clave) cargar().catch(() => {}); });
 
 /* apuntar cita (llamadas, mostrador) */
 async function horas() {

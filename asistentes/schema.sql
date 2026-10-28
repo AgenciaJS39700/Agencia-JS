@@ -32,3 +32,16 @@ CREATE TABLE IF NOT EXISTS bloqueos (
   motivo TEXT
 );
 CREATE INDEX IF NOT EXISTS bloqueos_dia ON bloqueos (slug, fecha);
+
+-- Avisos push al móvil del negocio (plan Avanzado)
+CREATE TABLE IF NOT EXISTS push_subs (
+  endpoint TEXT PRIMARY KEY,
+  slug     TEXT NOT NULL,
+  p256dh   TEXT NOT NULL,
+  auth     TEXT NOT NULL,
+  creada   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS push_slug ON push_subs (slug);
+
+-- Ajustes internos (claves VAPID de los avisos push)
+CREATE TABLE IF NOT EXISTS ajustes (k TEXT PRIMARY KEY, v TEXT NOT NULL);

@@ -14,10 +14,15 @@
 // Panel del negocio (Authorization: Bearer <clave>; solo desde agencia-js.com):
 //   GET  /api/as/:slug/panel/citas?desde=F&dias=N   ·  POST /panel/cita · /panel/cancelar · /panel/bloquear · /panel/desbloquear
 //   GET  /api/as/:slug/agenda.ics?k=<clave>         calendario para suscribirse (Google, Apple, Outlook)
+//   Plan Avanzado: GET panel/push/clave · POST panel/push/alta | baja | prueba (avisos al móvil del negocio)
 
 import { CLIENTES } from "./clientes/index.js";
 import { responderAsistente } from "./motor.js";
 import { resolverDia } from "../voz/agenda.js";
+import { avisarMoviles, altaMovil, bajaMovil, clavesVapid } from "./push.js";
+import { plantillaWhatsApp } from "./whatsapp.js";
+
+const conPrefijo = (t) => { const d = String(t || "").replace(/\D/g, ""); return d.length === 9 ? "34" + d : d; };
 
 const TZ = "Europe/Madrid";
 const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
@@ -61,6 +66,9 @@ async function cuerpo(request, max = 4000) {
   if (t.length > max) throw new Error("grande");
   return t ? JSON.parse(t) : {};
 }
+
+/** Plan Avanzado: avisos push al móvil y vista semanal en el panel. */
+export const avanzado = (cfg) => cfg.plan === "avanzado" || cfg.motor === "pro";
 
 /* ---------------------------------------------------------------- disponibilidad */
 const ag = (cfg) => ({ paso: 30, capacidad: 1, antelacionMin: 60, diasMax: 60, festivos: [], maxPorTelefono: 3, ...(cfg.agenda || {}) });
@@ -141,6 +149,9 @@ export async function reservar(env, cfg, datos, origen = "chat", ctx) {
       const cita = { id: r.meta.last_row_id, codigo: cod, servicio_n: serv.nombre, precio: serv.precio, fecha, inicio, fin, nombre, telefono: tel, email, nota, origen };
       const avisos = Promise.all([
         avisarNegocio(env, cfg, cita, "nueva"),
+        origen !== "panel" && cfg.avisos && cfg.avisos.whatsapp ? plantillaWhatsApp(env, cfg.avisos.whatsapp, "cita_nueva", [cfg.negocio.nombre, nombre + (origen === "voz" ? " (por teléfono)" : ""), serv.nombre, `${legible(fecha)} a las ${hhmm(inicio)}`, tel]) : null,
+        cfg.avisos && cfg.avisos.whatsappCliente ? plantillaWhatsApp(env, conPrefijo(tel), "cita_cliente", [nombre.split(" ")[0], cfg.negocio.nombre, serv.nombre, `${legible(fecha)} a las ${hhmm(inicio)}`, cod, cfg.slug]) : null,
+        avanzado(cfg) && origen !== "panel" ? avisarMoviles(env, cfg.slug, `📅 Nueva cita · ${nombre}`, `${serv.nombre} · ${legible(fecha)} a las ${hhmm(inicio)}${origen === "voz" ? " (por teléfono)" : ""}`) : null,
         email ? correo(env, cfg, email, nombre, `Cita confirmada · ${cfg.negocio.nombre}`, plantillaCliente(cfg, cita, "Tu cita está confirmada")) : null,
       ]).catch((e) => console.error("avisos", e && e.message));
       if (ctx) ctx.waitUntil(avisos); else await avisos;
@@ -159,6 +170,8 @@ async function cancelar(env, cfg, where, binds, ctx, quien) {
   await env.CITAS.prepare("UPDATE citas SET estado = 'cancelada' WHERE id = ?").bind(c.id).run();
   const p = Promise.all([
     avisarNegocio(env, cfg, c, quien === "cliente" ? "anulada por el cliente" : "cancelada"),
+    quien === "cliente" && cfg.avisos && cfg.avisos.whatsapp ? plantillaWhatsApp(env, cfg.avisos.whatsapp, "cita_anulada", [cfg.negocio.nombre, c.nombre, c.servicio_n, `${legible(c.fecha)} a las ${hhmm(c.inicio)}`]) : null,
+    quien === "cliente" && avanzado(cfg) ? avisarMoviles(env, cfg.slug, `❌ Cita anulada · ${c.nombre}`, `${c.servicio_n} · ${legible(c.fecha)} a las ${hhmm(c.inicio)}. El hueco vuelve a estar libre.`) : null,
     c.email && quien !== "cliente" ? correo(env, cfg, c.email, c.nombre, `Cita cancelada · ${cfg.negocio.nombre}`, plantillaCliente(cfg, c, "Tu cita se ha cancelado", "Si quieres otra fecha, puedes pedirla de nuevo cuando quieras.")) : null,
   ]).catch((e) => console.error("avisos", e && e.message));
   if (ctx) ctx.waitUntil(p); else await p;
@@ -224,7 +237,7 @@ export function configPublica(cfg) {
     slug: cfg.slug, demo: !!cfg.demo, activo: cfg.activo !== false, icono: cfg.icono, color: cfg.color, sector: cfg.sector,
     negocio: { nombre: cfg.negocio.nombre, direccion: cfg.negocio.direccion, telefono: cfg.negocio.telefono, horarioTexto: cfg.negocio.horarioTexto, horario: cfg.negocio.horario, wa: cfg.negocio.wa, web: cfg.negocio.web, mapa: cfg.negocio.mapa, logo: cfg.negocio.logo },
     servicios: cfg.servicios.map(({ id, nombre, min, precio }) => ({ id, nombre, min, precio })),
-    chips: cfg.chips, saludo: cfg.saludo, pedirEmail: !!a.pedirEmail, diasMax: a.diasMax,
+    chips: cfg.chips, saludo: cfg.saludo, pedirEmail: !!a.pedirEmail, diasMax: a.diasMax, avanzado: avanzado(cfg),
   };
 }
 
@@ -269,6 +282,10 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       const { results } = await env.CITAS.prepare("SELECT * FROM citas WHERE slug = ? AND estado = 'ok' AND fecha >= ? ORDER BY fecha, inicio LIMIT 2000").bind(cfg.slug, desde).all();
       return new Response(ics(cfg, results || []), { headers: { "Content-Type": "text/calendar; charset=utf-8", "Cache-Control": "no-store" } });
     }
+    if (ruta === "panel/push/clave" && request.method === "GET") {
+      if (!avanzado(cfg)) return res({ error: "Los avisos al móvil son del plan Avanzado." }, 403);
+      return res({ clave: (await clavesVapid(env)).pub });
+    }
     if (ruta === "panel/citas" && request.method === "GET") {
       const desde = RE_FECHA.test(url.searchParams.get("desde") || "") ? url.searchParams.get("desde") : ahora().fecha;
       const dias = Math.min(Math.max(+url.searchParams.get("dias") || 14, 1), 92);
@@ -281,6 +298,12 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     }
     if (request.method !== "POST") return res({ error: "Método no permitido" }, 405);
     let b; try { b = await cuerpo(request); } catch (e) { return res({ error: "JSON no válido" }, 400); }
+    if (ruta.startsWith("panel/push/")) {
+      if (!avanzado(cfg)) return res({ error: "Los avisos al móvil son del plan Avanzado." }, 403);
+      if (ruta === "panel/push/alta") return (await altaMovil(env, cfg.slug, b.sub)) ? res({ ok: true }) : res({ error: "Suscripción no válida" }, 400);
+      if (ruta === "panel/push/baja") { await bajaMovil(env, cfg.slug, b.endpoint); return res({ ok: true }); }
+      if (ruta === "panel/push/prueba") { const n = await avisarMoviles(env, cfg.slug, "🔔 Aviso de prueba", "Así te llegarán las citas nuevas en este móvil."); return res({ ok: true, moviles: n }); }
+    }
     if (ruta === "panel/cita") { const r = await reservar(env, cfg, b, "panel", ctx); return res(r, r.estado); }
     if (ruta === "panel/cancelar") { const c = await cancelar(env, cfg, "id = ?", [+b.id || 0], ctx, "negocio"); return c ? res({ ok: true }) : res({ error: "Cita no encontrada" }, 404); }
     if (ruta === "panel/bloquear") {
@@ -352,4 +375,14 @@ export async function atenderAgenda(request, env, ctx, limitar) {
   }
   if (ruta === "chat") { const x = await responderAsistente(env, b, cfg); return r(x.datos, x.estado); }
   return r({ error: "No encontrado" }, 404);
+}
+
+/** Manifiesto de la app del panel (para instalarlo en el móvil; en iPhone es necesario para los avisos). */
+export function manifiesto(slug) {
+  const cfg = CLIENTES[slug];
+  if (!cfg) return null;
+  return new Response(JSON.stringify({
+    name: `Citas · ${cfg.negocio.nombre}`, short_name: "Citas", lang: "es", start_url: `/panel/${slug}`, scope: "/panel/", display: "standalone",
+    background_color: "#0f0f10", theme_color: "#0f0f10", icons: [{ src: "/apple-touch-icon.png", sizes: "180x180", type: "image/png", purpose: "any" }],
+  }), { headers: { "Content-Type": "application/manifest+json; charset=utf-8", "Cache-Control": "no-store" } });
 }

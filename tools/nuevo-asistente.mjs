@@ -51,6 +51,7 @@ import plantilla from "./_plantilla.js";
 export default {
   ...plantilla,
   slug: ${v(slug)},
+  plan: ${v(motor === "pro" ? "avanzado" : "basico")},
   motor: ${v(motor)},
   icono: ${v(base ? base.icono : "cal")},
   color: ${v(base ? base.color : "#e8c766")},        // TODO color de su marca
@@ -77,7 +78,7 @@ ${(base ? base.negocio.extra : []).map((e) => "      // " + v(e) + ",").join("\n
   chips: ${v(base ? base.chips : plantillaChips())},
   saludo: ${v(`¡Hola! Soy el asistente de ${nombre}. Te ayudo a pedir cita o a resolver tus dudas.`)},
   agenda: { ...plantilla.agenda, capacidad: 1, pedirEmail: ${motor === "pro"} }, // TODO capacidad = profesionales a la vez
-  avisos: { email: "TODO@correo-del-negocio.com" },
+  avisos: { email: "TODO@correo-del-negocio.com", whatsapp: "", whatsappCliente: false }, // TODO whatsapp = "34…" para avisos por WhatsApp
   panel: { hash: "${hash(clave)}" },
   dominios: [],                 // TODO si tiene web: ["https://su-dominio.com"]
 };

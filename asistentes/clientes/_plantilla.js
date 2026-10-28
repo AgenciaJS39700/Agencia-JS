@@ -6,7 +6,8 @@ export default {
   slug: "SLUG",                  // en la URL: agencia-js.com/c/SLUG · solo minúsculas, números y guiones
   activo: true,                  // false = el asistente deja de dar citas (impago, baja…)
   demo: false,                   // true = muestra el aviso de «negocio ficticio»
-  motor: "basico",               // "basico" (Workers AI) · "pro" (Claude, plan Avanzado)
+  plan: "basico",                // "basico" · "avanzado" (avisos push al móvil, vista semanal, email y recordatorios)
+  motor: "basico",               // "basico" (Workers AI) · "pro" (Claude). El Avanzado puede seguir con "basico" si va bien
   icono: "cal",                  // tooth · scissors · sparkles · activity · paw · car · cal
   color: "#e8c766",              // color principal (botones, cabecera)
   sector: "SECTOR",
@@ -43,6 +44,8 @@ export default {
   },
   avisos: {
     email: "TODO@correo-del-negocio.com", // recibe cada cita nueva y cada cancelación
+    whatsapp: "",                // WhatsApp del negocio para avisos (p. ej. "34600111222"); vacío = sin avisos por WhatsApp
+    whatsappCliente: false,      // true = el cliente recibe la confirmación por WhatsApp (desde el número de Agencia JS)
   },
   panel: { hash: "HASH" },       // SHA-256 de la clave del panel (la clave NO se guarda aquí)
   dominios: [],                  // webs donde se instala el widget, p. ej. ["https://clinica.com"] (vacío = cualquiera)

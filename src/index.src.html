@@ -727,7 +727,12 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
     var b = e.target.closest("[data-asistente]");
     if (!b) return;
     b.disabled = true;
-    cargar().then(function (m) { m.abrirAsistente(b.dataset.asistente, { demo: true, alCerrar: function () { b.focus(); } }); })
+    cargar().then(function (m) {
+      var op = { demo: true, alCerrar: function () { b.focus(); } };
+      // La clínica dental usa la agenda real (demo-clinica): las citas se guardan y se ven en su panel
+      if (b.dataset.asistente === "dental") return m.abrirNegocio("demo-clinica", op).catch(function () { m.abrirAsistente("dental", op); });
+      m.abrirAsistente(b.dataset.asistente, op);
+    })
       .catch(function () { window.open("https://wa.me/34688933308?text=" + encodeURIComponent("Hola, quiero ver la demo del asistente de citas"), "_blank", "noopener"); })
       .then(function () { b.disabled = false; });
   });

@@ -8,6 +8,7 @@ export default {
   ...plantilla,
   slug: "demo-clinica",
   demo: true,
+  plan: "avanzado",             // la demo enseña todo lo del plan Avanzado
   icono: "tooth",
   color: "#38bdf8",
   sector: "Clínica dental",

@@ -4,7 +4,7 @@
 
 import { responderAsistente } from "./asistentes/motor.js";
 import { atenderVoz } from "./voz/agenda.js";
-import { atenderAgenda, enviarRecordatorios } from "./asistentes/agenda.js";
+import { atenderAgenda, enviarRecordatorios, manifiesto } from "./asistentes/agenda.js";
 
 const MODELO = "@cf/meta/llama-3.1-8b-instruct";
 const MODELO_RESPALDO = "@cf/meta/llama-3.2-3b-instruct";
@@ -117,6 +117,13 @@ export default {
     }
     // Asistentes de citas de clientes reales (agenda en D1, panel, página de citas y widget)
     if (url.pathname.startsWith("/api/as/")) return atenderAgenda(request, env, ctx, limitar);
+    if (url.pathname === "/panel/sw.js" && env.ASSETS) {
+      // Service worker del panel (avisos push); se sirve en /panel/ para que su alcance cubra todos los paneles
+      const r = await env.ASSETS.fetch(new Request(new URL("/asistentes/panel-sw.js", url), request));
+      return new Response(r.body, { status: r.status, headers: { "Content-Type": "text/javascript; charset=utf-8", "Cache-Control": "no-cache" } });
+    }
+    const man = url.pathname.match(/^\/panel\/([a-z0-9-]{2,40})\/app\.webmanifest$/);
+    if (man) return manifiesto(man[1]) || new Response("No encontrado", { status: 404 });
     const pag = url.pathname.match(/^\/(c|panel)\/([a-z0-9-]{2,40})\/?$/);
     if (pag && env.ASSETS) {
       const archivo = pag[1] === "c" ? "/asistentes/pagina" : "/asistentes/panel";
