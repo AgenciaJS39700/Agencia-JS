@@ -37,6 +37,16 @@ Sin esto todo funciona, pero no salen correos.
 - Al negocio: cada cita nueva, cancelada o anulada.
 - Al cliente (si deja email): confirmación al reservar y recordatorio la víspera (cron diario a las 17:00 UTC).
 
+## Plan Avanzado (`plan: "avanzado"`)
+- **Avisos push al móvil del negocio** en cada cita nueva o anulada (gratis). En el panel: «🔔 Avisos al móvil» → Activar. En iPhone hay que instalar antes el panel (Safari → Compartir → Añadir a pantalla de inicio).
+- **Vista semanal** en el panel.
+- Pide email al cliente (confirmación y recordatorio).
+
+## Avisos por WhatsApp (todos los planes, cuando esté montada la API de Meta)
+- Un único número de WhatsApp de Agencia JS envía los avisos a cada negocio (`avisos.whatsapp: "34…"`) y, si se quiere, la confirmación al cliente (`avisos.whatsappCliente: true`).
+- Necesita: Meta Business de Agencia JS verificado, un número dedicado para la API, tarjeta en Meta y 3 plantillas de «Utilidad» aprobadas (texto exacto en `asistentes/whatsapp.js`).
+- Secretos del Worker: `WA_TOKEN` y `WA_PHONE_ID`. Coste orientativo: ~0,017 € por aviso en España (tarifa de utilidad de Meta, octubre de 2026).
+
 ## Agente de voz de un cliente real
 En su agente de ElevenLabs, las herramientas apuntan a `https://agencia-js.com/api/as/<slug>/voz/huecos` y `/voz/cita` (mismos parámetros que la demo). Opcional: secreto `VOZ_WEBHOOK_SECRET` en el Worker y la cabecera `x-voz-clave` en las herramientas.
 
