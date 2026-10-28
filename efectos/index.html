@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laboratorio de efectos · Agencia JS</title>
+<meta name="description" content="Catálogo interno de efectos web de Agencia JS para que cada página destaque.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#09090b;--pan:#121216;--line:#26262d;--tx:#f4f4f5;--mu:#a1a1aa;--gold:#e8c766;--blue:#3a9bff}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+a{color:inherit}
+.wrap{width:min(1120px,100% - 32px);margin-inline:auto}
+header.top{padding:72px 0 40px;text-align:center}
+.k{font:800 .72rem/1 system-ui;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+h1{font-size:clamp(2.2rem,6vw,4rem);line-height:1.04;font-weight:900;margin:.6rem 0 .8rem;letter-spacing:-.02em}
+h1 span{background:linear-gradient(100deg,#fff,#e8c766 60%,#3a9bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--mu);max-width:44rem;margin-inline:auto}
+.idx{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:1.6rem}
+.idx a{font-size:.85rem;text-decoration:none;padding:.45rem .9rem;border:1px solid var(--line);border-radius:999px;color:var(--mu)}
+.idx a:hover{color:#fff;border-color:var(--gold)}
+.fx{padding:84px 0;border-top:1px solid var(--line)}
+.fx-h{display:grid;gap:.4rem;margin-bottom:2.2rem;max-width:48rem}
+.fx-h .n{font:800 .78rem/1 system-ui;color:var(--gold);letter-spacing:.2em}
+.fx-h h2{font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.1;font-weight:850}
+.fx-h p{color:var(--mu)}
+.use{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.4rem}
+.use span{font-size:.75rem;padding:.25rem .65rem;border-radius:999px;background:#1b1b22;color:#d4d4d8;border:1px solid var(--line)}
+.stage{border:1px solid var(--line);border-radius:28px;background:var(--pan);padding:clamp(20px,4vw,48px);position:relative;overflow:hidden}
+.light{background:#fbf6ef;color:#1d1410}
+
+/* 1 · Órbita */
+.orb-grid{display:grid;gap:40px;align-items:center}
+@media(min-width:900px){.orb-grid{grid-template-columns:1fr 1.1fr}}
+.orb-grid h3{font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.02;font-weight:900;font-family:Georgia,serif}
+.orb-grid p{opacity:.75;margin-top:.8rem}
+.orbita{margin-bottom:70px}
+
+/* 2 · Frase que se ilumina */
+.lit{font-size:clamp(1.7rem,4.6vw,3.3rem);line-height:1.18;font-weight:850;letter-spacing:-.01em}
+.lit .w{opacity:.14;transition:opacity .25s}
+.lit .w.g{color:var(--gold)}
+
+/* 3 · Marquee inclinado */
+.mq{transform:rotate(-4deg);margin:30px -40px;background:var(--gold);color:#111;padding:14px 0;overflow:hidden;white-space:nowrap}
+.mq.b{transform:rotate(3deg);background:var(--blue);color:#fff;margin-top:-6px}
+.mq-t{display:inline-flex;gap:2.4rem;font:900 clamp(1.4rem,3.5vw,2.4rem)/1 system-ui;text-transform:uppercase;will-change:transform}
+.mq-t span::after{content:"✦";margin-left:2.4rem;opacity:.6}
+
+/* 4 · Tarjetas holográficas */
+.holo-g{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));perspective:900px}
+.holo{position:relative;aspect-ratio:3/4;border-radius:22px;background:linear-gradient(160deg,#1e1e26,#0e0e12);border:1px solid #2f2f3a;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.8,.2,1);overflow:hidden;display:grid;place-items:end start;padding:22px}
+.holo img{position:absolute;inset:8% 8% 26%;width:84%;height:66%;object-fit:contain;transform:translateZ(40px);filter:drop-shadow(0 24px 20px rgba(0,0,0,.6))}
+.holo::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.28),transparent 40%),linear-gradient(115deg,transparent 30%,rgba(255,0,170,.16) 42%,rgba(0,220,255,.18) 50%,rgba(255,230,0,.14) 58%,transparent 70%);background-size:100% 100%,250% 250%;background-position:0 0,var(--bx,50%) var(--by,50%);mix-blend-mode:screen;opacity:0;transition:opacity .4s;pointer-events:none}
+.holo:hover::after{opacity:1}
+.holo b{position:relative;transform:translateZ(60px);font-size:1.15rem}
+.holo small{display:block;color:var(--mu);font-weight:500}
+
+/* 5 · Linterna */
+.torch{position:relative;aspect-ratio:16/8;border-radius:22px;overflow:hidden;cursor:none}
+.torch img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.torch .a{filter:grayscale(1) brightness(.35)}
+.torch .b{-webkit-mask:radial-gradient(circle at var(--x,50%) var(--y,50%),#000 0 var(--r,130px),transparent calc(var(--r,130px) + 60px));mask:radial-gradient(circle at var(--x,50%) var(--y,50%),#000 0 var(--r,130px),transparent calc(var(--r,130px) + 60px))}
+.torch p{position:absolute;left:24px;bottom:20px;font-weight:800;font-size:clamp(1.1rem,2.6vw,1.6rem);text-shadow:0 2px 14px #000}
+
+/* 6 · Titular descifrado */
+.dec{font:900 clamp(2rem,6vw,4.4rem)/1.05 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.02em}
+.dec em{font-style:normal;color:var(--blue)}
+
+/* 7 · Abanico */
+.fan{position:relative;height:clamp(300px,42vw,420px);display:grid;place-items:center}
+.fan .c{position:absolute;width:clamp(150px,22vw,220px);aspect-ratio:3/4;border-radius:20px;background:#fff;box-shadow:0 30px 60px -20px rgba(0,0,0,.6);display:grid;place-items:center;padding:16px;transition:transform .8s cubic-bezier(.2,.9,.25,1.15),z-index 0s .2s;transform:rotate(calc(var(--i) * 2deg)) translateY(calc(var(--i) * -3px));cursor:pointer;border:6px solid var(--cc)}
+.fan .c img{width:100%;height:70%;object-fit:contain}
+.fan .c b{color:#1d1410;font-size:.95rem}
+.fan.open .c{transform:rotate(calc((var(--i) - 2) * 14deg)) translateX(calc((var(--i) - 2) * 62%)) translateY(calc(var(--d) * 8%))}
+.fan.open .c.top{transform:translateY(-8%) scale(1.12);z-index:9}
+@media(max-width:700px){.fan .c{width:118px}.fan.open .c{transform:rotate(calc((var(--i) - 2) * 9deg)) translateX(calc((var(--i) - 2) * 38%)) translateY(calc(var(--d) * 6%))}}
+
+/* 8 · Botón magnético */
+.mag-w{display:flex;justify-content:center;padding:50px 0}
+.mag{position:relative;display:inline-flex;align-items:center;gap:.6rem;padding:1.15rem 2.2rem;border-radius:999px;border:0;background:linear-gradient(135deg,#f5e3a6,#e8c766 45%,#c99a2e);color:#111;font:800 1.1rem/1 system-ui;cursor:pointer;box-shadow:0 20px 50px -14px rgba(232,199,102,.6);transition:transform .25s cubic-bezier(.2,.8,.2,1);overflow:hidden}
+.mag::before{content:"";position:absolute;inset:-50%;background:conic-gradient(from 0deg,transparent 0 70%,rgba(255,255,255,.75) 80%,transparent 90%);animation:magspin 3s linear infinite;mix-blend-mode:overlay}
+.mag span{position:relative;transition:transform .25s}
+@keyframes magspin{to{transform:rotate(360deg)}}
+
+/* 9 · Explorador */
+.exp{display:flex;gap:12px;height:clamp(320px,40vw,420px)}
+.exp .p{flex:1;position:relative;border-radius:22px;overflow:hidden;background:#1b1b22;border:1px solid var(--line);transition:flex .7s cubic-bezier(.2,.8,.2,1),background-color .5s;cursor:pointer;min-width:52px}
+.exp .p.act{flex:4.2;background:var(--pc)}
+.exp .p img{position:absolute;right:-6%;bottom:-6%;width:70%;height:70%;object-fit:contain;opacity:0;transform:translateY(20%) rotate(12deg);transition:.7s cubic-bezier(.2,.8,.2,1)}
+.exp .p.act img{opacity:1;transform:none}
+.exp .p h4{position:absolute;left:18px;top:18px;font-size:1.15rem;white-space:nowrap;transform-origin:left top;transition:transform .6s}
+.exp .p:not(.act) h4{transform:rotate(90deg) translate(4px,-26px)}
+.exp .p p{position:absolute;left:18px;top:52px;max-width:48%;font-size:.9rem;opacity:0;transition:opacity .4s}
+.exp .p.act p{opacity:.85;transition-delay:.3s}
+.exp .p.act h4,.exp .p.act p{color:#1d1410}
+@media(max-width:700px){.exp{flex-direction:column;height:auto}.exp .p{height:64px;flex:none;transition:height .6s cubic-bezier(.2,.8,.2,1),background-color .5s}.exp .p.act{height:300px}.exp .p:not(.act) h4{transform:none}}
+
+/* 10 · Ventana que se abre */
+.win{height:min(70vh,560px);border-radius:28px;overflow:hidden;position:relative;clip-path:inset(var(--v,18%) calc(var(--v,18%) * 1.4) var(--v,18%) calc(var(--v,18%) * 1.4) round 28px)}
+.win img{width:100%;height:100%;object-fit:cover;transform:scale(calc(1.35 - var(--q,0) * .35))}
+.win div{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55));font:900 clamp(1.8rem,5vw,3.6rem)/1.05 system-ui;padding:20px;opacity:var(--q,0)}
+
+/* 11 · Cifras rodantes */
+.odo-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;text-align:center}
+.odo{font:900 clamp(2.6rem,6vw,4rem)/1 system-ui;display:inline-flex;overflow:hidden;height:1em}
+.odo i{display:inline-block;font-style:normal;transition:transform 1.8s cubic-bezier(.2,.9,.2,1)}
+.odo i span{display:block;height:1em}
+.odo-g p{color:var(--mu);margin-top:.4rem}
+
+.tip{margin-top:18px;color:var(--mu);font-size:.85rem}
+footer{padding:60px 0 90px;text-align:center;color:var(--mu);font-size:.9rem}
+@media (prefers-reduced-motion:reduce){.mq-t{transform:none!important}.mag::before{animation:none}}
+</style>
+</head>
+<body>
+<header class="top wrap">
+<p class="k">Agencia JS · uso interno</p>
+<h1>Laboratorio de <span>efectos</span></h1>
+<p class="lead">Efectos llamativos y ligeros (sin librerías, accesibles y con versión tranquila para quien prefiere menos movimiento) para que cada web que hacemos destaque. Cada bloque dice en qué tipo de negocio encaja.</p>
+<nav class="idx" aria-label="Efectos">
+<a href="#f1">Órbita de producto</a><a href="#f2">Frase que se ilumina</a><a href="#f3">Cinta inclinada</a><a href="#f4">Tarjetas holográficas</a><a href="#f5">Linterna</a><a href="#f6">Titular descifrado</a><a href="#f7">Abanico</a><a href="#f8">Botón magnético</a><a href="#f9">Explorador</a><a href="#f10">Ventana que se abre</a><a href="#f11">Cifras rodantes</a>
+</nav>
+</header>
+
+<main>
+<section class="fx" id="f1"><div class="wrap">
+<div class="fx-h"><span class="n">01</span><h2>Órbita de producto</h2><p>Disco de color, texto circular que gira (y acelera al hacer scroll) y productos recortados que entran y salen en órbita. El color de todo cambia con cada producto. Se puede deslizar con el dedo y con las flechas del teclado.</p><div class="use"><span>Panaderías y pastelerías</span><span>Tiendas online</span><span>Cosmética</span><span>Bebidas</span><span>Heladerías</span><span>Productos estrella</span></div></div>
+<div class="stage light"><div class="orb-grid">
+<div><p class="k" style="color:#b86e1a">Del obrador, hoy</p><h3>Recién salido del horno</h3><p>Ejemplo con los productos de la demo de panadería. Necesita fotos de producto recortadas (sin fondo); las recortamos nosotros.</p></div>
+<div class="orbita" data-ring="HECHO CADA MAÑANA ✦ MASA MADRE ✦ MANTEQUILLA DE VERDAD ✦ " data-auto="4200">
+<figure data-color="#f0a14a" data-name="Croissant de mantequilla" data-desc="Hojaldre de 27 capas"><img src="img/croissant.webp" alt="Croissants de mantequilla" width="720" height="510"></figure>
+<figure data-color="#8a5a3c" data-name="Napolitana de chocolate" data-desc="Chocolate belga fundente"><img src="img/napolitana.webp" alt="Napolitanas de chocolate" width="720" height="359"></figure>
+<figure data-color="#c9a36b" data-name="Hogaza de masa madre" data-desc="48 horas de fermentación"><img src="img/hogaza.webp" alt="Hogaza de masa madre" width="720" height="472"><img src="img/magdalena.webp" alt="" data-sat></figure>
+<figure data-color="#e2603c" data-name="Rosco de naranja" data-desc="Para compartir el domingo"><img src="img/rosco.webp" alt="Rosco de naranja" width="720" height="494"></figure>
+<figure data-color="#d9a441" data-name="Empanada gallega" data-desc="Masa fina y relleno casero"><img src="img/empanada.webp" alt="Empanada" width="720" height="455"></figure>
+</div></div></div>
+<p class="tip">Archivo reutilizable: <code>/efectos/orbita.js</code> · ya aplicado en la demo de panadería y, en versión anterior, en la portada de la pastelería Dulce Nube.</p>
+</div></section>
+
+<section class="fx" id="f2"><div class="wrap">
+<div class="fx-h"><span class="n">02</span><h2>Frase que se ilumina con el scroll</h2><p>Las palabras se van encendiendo una a una según bajas. Obliga a leer el mensaje clave de la marca.</p><div class="use"><span>Cualquier negocio</span><span>Manifiesto o «quiénes somos»</span><span>Antes de los precios</span></div></div>
+<p class="lit" data-lit>Cada cliente que no te encuentra en Google es un cliente que entra por la puerta de tu *competencia.* Nosotros hacemos que te *encuentre* a *ti.*</p>
+</div></section>
+
+<section class="fx" id="f3" style="overflow:hidden"><div class="wrap">
+<div class="fx-h"><span class="n">03</span><h2>Cinta inclinada que reacciona al scroll</h2><p>Dos cintas cruzadas que avanzan solas, aceleran al hacer scroll y cambian de dirección al subir. Da energía entre secciones.</p><div class="use"><span>Gimnasios</span><span>Bares y ocio</span><span>Moda</span><span>Eventos</span><span>Separador entre secciones</span></div></div></div>
+<div class="mq" aria-hidden="true"><div class="mq-t" data-mq="1"><span>Webs que venden</span><span>Reseñas en Google</span><span>Vídeos que paran el scroll</span><span>Asistentes 24/7</span><span>Webs que venden</span><span>Reseñas en Google</span><span>Vídeos que paran el scroll</span><span>Asistentes 24/7</span></div></div>
+<div class="mq b" aria-hidden="true"><div class="mq-t" data-mq="-1"><span>Más llamadas</span><span>Más reservas</span><span>Más clientes</span><span>Más llamadas</span><span>Más reservas</span><span>Más clientes</span><span>Más llamadas</span><span>Más reservas</span></div></div>
+</section>
+
+<section class="fx" id="f4"><div class="wrap">
+<div class="fx-h"><span class="n">04</span><h2>Tarjetas holográficas 3D</h2><p>Se inclinan siguiendo el ratón con un reflejo tornasolado, como una carta coleccionable. El producto «sale» de la tarjeta.</p><div class="use"><span>Catálogos</span><span>Planes y precios</span><span>Equipo</span><span>Tatuajes y diseños</span><span>Productos premium</span></div></div>
+<div class="holo-g">
+<div class="holo" data-tilt><img src="img/fresa.webp" alt="" loading="lazy"><b>Fresa y nata<small>Tarta del mes</small></b></div>
+<div class="holo" data-tilt><img src="img/choco.webp" alt="" loading="lazy"><b>Chocolate intenso<small>La más pedida</small></b></div>
+<div class="holo" data-tilt><img src="img/pistacho.webp" alt="" loading="lazy"><b>Pistacho<small>Edición limitada</small></b></div>
+</div>
+</div></section>
+
+<section class="fx" id="f5"><div class="wrap">
+<div class="fx-h"><span class="n">05</span><h2>Linterna: el cursor revela</h2><p>La foto está a oscuras y el puntero (o el dedo) la ilumina, descubriendo la imagen real. En móvil la luz se mueve sola. Perfecto para antes/después.</p><div class="use"><span>Reformas</span><span>Estética y peluquerías (antes/después)</span><span>Restaurantes de noche</span><span>Clínicas dentales</span></div></div>
+<div class="torch" data-torch><img class="a" src="/demo/impulso/img/obrador.webp" alt="" loading="lazy"><img class="b" src="/demo/impulso/img/obrador.webp" alt="Obrador de la panadería" loading="lazy"><p>Pasa el ratón para encender la luz</p></div>
+</div></section>
+
+<section class="fx" id="f6"><div class="wrap">
+<div class="fx-h"><span class="n">06</span><h2>Titular que se descifra</h2><p>Las letras aparecen como un código que se resuelve al entrar en pantalla. Muy tecnológico.</p><div class="use"><span>Tecnología e informática</span><span>Asistentes con IA</span><span>Ciberseguridad</span><span>Gaming</span><span>Nuestra propia web</span></div></div>
+<p class="dec"><span data-dec>Tu recepcionista que</span><br><em data-dec>nunca duerme</em></p>
+</div></section>
+
+<section class="fx" id="f7"><div class="wrap">
+<div class="fx-h"><span class="n">07</span><h2>Abanico de cartas</h2><p>Un mazo que se abre en abanico al aparecer. Al pulsar una carta, salta al frente.</p><div class="use"><span>Cartas de restaurante</span><span>Sabores o colecciones</span><span>Servicios</span><span>Tarjetas regalo</span></div></div>
+<div class="stage light"><div class="fan" data-fan>
+<div class="c" style="--i:0;--d:1;--cc:#f28aa5"><img src="img/fresa.webp" alt="" loading="lazy"><b>Fresa</b></div>
+<div class="c" style="--i:1;--d:.3;--cc:#8a5a3c"><img src="img/choco.webp" alt="" loading="lazy"><b>Chocolate</b></div>
+<div class="c" style="--i:2;--d:0;--cc:#97bf5e"><img src="img/pistacho.webp" alt="" loading="lazy"><b>Pistacho</b></div>
+<div class="c" style="--i:3;--d:.3;--cc:#f0c93f"><img src="img/limon.webp" alt="" loading="lazy"><b>Limón</b></div>
+<div class="c" style="--i:4;--d:1;--cc:#c03a6b"><img src="img/frutos.webp" alt="" loading="lazy"><b>Frutos rojos</b></div>
+</div></div>
+</div></section>
+
+<section class="fx" id="f8"><div class="wrap">
+<div class="fx-h"><span class="n">08</span><h2>Botón magnético con destello</h2><p>El botón principal «atrae» al cursor cuando se acerca y tiene un brillo que recorre el borde. Sube los clics en la llamada a la acción.</p><div class="use"><span>Botón de reservar</span><span>Botón de WhatsApp</span><span>Cualquier web</span></div></div>
+<div class="stage mag-w"><button class="mag" type="button" data-mag><span>Reservar mi cita →</span></button></div>
+</div></section>
+
+<section class="fx" id="f9"><div class="wrap">
+<div class="fx-h"><span class="n">09</span><h2>Explorador de ingredientes</h2><p>Paneles que se despliegan y toman el color del ingrediente (inspirado en el vídeo de la tienda de productos). En móvil se convierte en acordeón.</p><div class="use"><span>Cosmética natural</span><span>Comida y bebida</span><span>Servicios por pasos</span><span>Menús</span></div></div>
+<div class="exp" data-exp>
+<div class="p act" style="--pc:#f2c95b" tabindex="0" role="button" aria-expanded="true"><h4>Mantequilla</h4><p>De vaca asturiana, la que da el hojaldre crujiente.</p><img src="img/croissant.webp" alt="" loading="lazy"></div>
+<div class="p" style="--pc:#9ad18b" tabindex="0" role="button" aria-expanded="false"><h4>Pistacho</h4><p>Tostado en el obrador y molido cada semana.</p><img src="img/pistacho.webp" alt="" loading="lazy"></div>
+<div class="p" style="--pc:#f5a3b5" tabindex="0" role="button" aria-expanded="false"><h4>Fresa</h4><p>De temporada, de productores de la zona.</p><img src="img/fresa.webp" alt="" loading="lazy"></div>
+<div class="p" style="--pc:#c79a6b" tabindex="0" role="button" aria-expanded="false"><h4>Masa madre</h4><p>Con 10 años de vida y 48 horas de fermentación.</p><img src="img/hogaza.webp" alt="" loading="lazy"></div>
+</div>
+</div></section>
+
+<section class="fx" id="f10"><div class="wrap">
+<div class="fx-h"><span class="n">10</span><h2>Ventana que se abre</h2><p>La imagen empieza recortada y se abre a pantalla completa mientras bajas, sin bloquear el scroll (versión ligera del efecto que quitamos de la web de la agencia).</p><div class="use"><span>Hoteles y casas rurales</span><span>Restaurantes</span><span>Inmobiliarias</span><span>Fotos del local</span></div></div>
+<div class="win" data-win><img src="/demo/impulso/img/hero.webp" alt="Mostrador de la panadería" loading="lazy"><div>Ven a conocernos</div></div>
+</div></section>
+
+<section class="fx" id="f11"><div class="wrap">
+<div class="fx-h"><span class="n">11</span><h2>Cifras rodantes</h2><p>Los números giran como un cuentakilómetros hasta su valor al aparecer.</p><div class="use"><span>Años de experiencia</span><span>Clientes</span><span>Reseñas</span><span>Resultados</span></div></div>
+<div class="stage odo-g">
+<div><span class="odo" data-odo="2400"></span><p>tartas entregadas</p></div>
+<div><span class="odo" data-odo="4.9"></span><p>valoración en Google</p></div>
+<div><span class="odo" data-odo="15"></span><p>años horneando</p></div>
+</div>
+</div></section>
+</main>
+<footer class="wrap">Agencia JS · laboratorio interno de efectos · no indexado</footer>
+
+<script src="orbita.js" defer></script>
+<script>
+(function () {
+"use strict";
+var RM = matchMedia("(prefers-reduced-motion: reduce)").matches, FINE = matchMedia("(hover:hover) and (pointer:fine)").matches;
+var $$ = function (s) { return [].slice.call(document.querySelectorAll(s)); };
+function enVista(el, fn, m) { if (!("IntersectionObserver" in window)) { fn(); return; } var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); fn(); } }, { rootMargin: m || "0px 0px -15% 0px" }); io.observe(el); }
+
+/* 02 · Frase que se ilumina */
+$$("[data-lit]").forEach(function (p) {
+p.innerHTML = p.textContent.trim().split(/\s+/).map(function (w) { var g = /^\*.*\*$/.test(w) || /^\*/.test(w); w = w.replace(/\*/g, ""); return '<span class="w' + (g ? " g" : "") + '">' + w + "</span>"; }).join(" ");
+var ws = p.querySelectorAll(".w");
+function upd() { var r = p.getBoundingClientRect(), vh = innerHeight, t = (vh * 0.85 - r.top) / (r.height + vh * 0.4); var k = Math.round(Math.max(0, Math.min(1, t)) * ws.length); ws.forEach(function (w, i) { w.style.opacity = RM || i < k ? 1 : ""; }); }
+addEventListener("scroll", upd, { passive: true }); upd();
+});
+
+/* 03 · Cintas */
+var mqs = $$("[data-mq]").map(function (t) { return { t: t, x: 0, d: +t.dataset.mq }; });
+if (mqs.length && !RM) {
+var vel = 0, ly = scrollY, dir = 1;
+addEventListener("scroll", function () { var dy = scrollY - ly; ly = scrollY; vel = Math.min(40, Math.abs(dy)); dir = dy >= 0 ? 1 : -1; }, { passive: true });
+(function loop() { vel *= 0.92; mqs.forEach(function (m) { var w = m.t.scrollWidth / 2; m.x -= (1 + vel * 0.6) * m.d * dir; if (m.x < -w) { m.x += w; } if (m.x > 0) { m.x -= w; } m.t.style.transform = "translateX(" + m.x + "px)"; }); requestAnimationFrame(loop); })();
+}
+
+/* 04 · Holográficas */
+if (FINE && !RM) $$("[data-tilt]").forEach(function (c) {
+c.addEventListener("pointermove", function (e) { var r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height; c.style.transform = "rotateY(" + ((x - .5) * 22) + "deg) rotateX(" + ((.5 - y) * 22) + "deg)"; c.style.setProperty("--mx", x * 100 + "%"); c.style.setProperty("--my", y * 100 + "%"); c.style.setProperty("--bx", x * 100 + "%"); c.style.setProperty("--by", y * 100 + "%"); });
+c.addEventListener("pointerleave", function () { c.style.transform = ""; });
+});
+
+/* 05 · Linterna */
+$$("[data-torch]").forEach(function (t) {
+var tx = 50, ty = 50, cx = 50, cy = 50, auto = true, a = 0;
+t.addEventListener("pointermove", function (e) { var r = t.getBoundingClientRect(); tx = (e.clientX - r.left) / r.width * 100; ty = (e.clientY - r.top) / r.height * 100; auto = false; });
+t.addEventListener("pointerleave", function () { auto = true; });
+(function loop() { if (auto && !RM) { a += 0.012; tx = 50 + Math.cos(a) * 32; ty = 50 + Math.sin(a * 1.6) * 22; } cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12; t.style.setProperty("--x", cx + "%"); t.style.setProperty("--y", cy + "%"); requestAnimationFrame(loop); })();
+});
+
+/* 06 · Descifrar */
+var CH = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ0123456789#%&$@";
+$$("[data-dec]").forEach(function (el, n) {
+var fin = el.textContent; if (RM) { return; }
+el.textContent = fin.replace(/\S/g, "·");
+enVista(el, function () {
+var f = 0, tot = fin.length * 3 + 10;
+setTimeout(function step() { f++; el.textContent = fin.split("").map(function (c, i) { if (c === " ") { return " "; } return f > i * 3 + 8 ? c : CH[Math.random() * CH.length | 0]; }).join(""); if (f < tot) { setTimeout(step, 32); } else { el.textContent = fin; } }, n * 350);
+});
+});
+
+/* 07 · Abanico */
+$$("[data-fan]").forEach(function (f) {
+enVista(f, function () { f.classList.add("open"); });
+f.addEventListener("click", function (e) { var c = e.target.closest(".c"); if (!c) { return; } f.querySelectorAll(".c").forEach(function (x) { x.classList.toggle("top", x === c && !x.classList.contains("top")); }); });
+});
+
+/* 08 · Botón magnético */
+if (FINE && !RM) $$("[data-mag]").forEach(function (b) {
+var w = b.parentNode, s = b.querySelector("span");
+w.addEventListener("pointermove", function (e) { var r = b.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2), d = Math.hypot(dx, dy); if (d < 180) { b.style.transform = "translate(" + dx * 0.35 + "px," + dy * 0.45 + "px)"; s.style.transform = "translate(" + dx * 0.12 + "px," + dy * 0.15 + "px)"; } else { b.style.transform = s.style.transform = ""; } });
+w.addEventListener("pointerleave", function () { b.style.transform = s.style.transform = ""; });
+});
+
+/* 09 · Explorador */
+$$("[data-exp]").forEach(function (x) {
+var ps = [].slice.call(x.querySelectorAll(".p"));
+function act(p) { ps.forEach(function (q) { q.classList.toggle("act", q === p); q.setAttribute("aria-expanded", q === p ? "true" : "false"); }); }
+ps.forEach(function (p) { p.addEventListener("click", function () { act(p); }); if (FINE) { p.addEventListener("pointerenter", function () { act(p); }); } p.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(p); } }); });
+});
+
+/* 10 · Ventana */
+$$("[data-win]").forEach(function (w) {
+function upd() { var r = w.getBoundingClientRect(), vh = innerHeight, q = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.9))); if (RM) { q = 1; } w.style.setProperty("--v", (18 * (1 - q)).toFixed(2) + "%"); w.style.setProperty("--q", q.toFixed(3)); }
+addEventListener("scroll", upd, { passive: true }); upd();
+});
+
+/* 11 · Cifras rodantes */
+$$("[data-odo]").forEach(function (o) {
+var v = o.dataset.odo;
+o.setAttribute("aria-label", v); o.innerHTML = v.split("").map(function (c) { if (!/\d/.test(c)) { return "<i><span>" + c + "</span></i>"; } var col = ""; for (var k = 0; k <= 19; k++) { col += "<span>" + (k % 10) + "</span>"; } return '<i data-d="' + c + '">' + col + "</i>"; }).join("");
+enVista(o, function () { o.querySelectorAll("i[data-d]").forEach(function (i, n) { i.style.transitionDelay = n * 0.12 + "s"; i.style.transform = "translateY(-" + (10 + +i.dataset.d) + "em)"; }); });
+});
+})();
+</script>
+</body>
+</html>
