@@ -73,7 +73,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
     <p>Escribe la clave que te dio Agencia JS.</p>
     <form id="fl" class="box" style="text-align:left">
       <label for="clave">Clave</label>
-      <input id="clave" type="password" autocomplete="current-password" required>
+      <div style="display:flex;gap:8px"><input id="clave" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" required><button class="btn" type="button" id="ver-clave" aria-label="Mostrar la clave" aria-pressed="false">👁</button></div>
       <label style="display:flex;gap:.5rem;align-items:center;margin:10px 0 12px;color:var(--tx)"><input type="checkbox" id="rec" style="width:auto;min-height:0" checked> Recordar en este dispositivo</label>
       <button class="btn main" style="width:100%" type="submit">Entrar</button>
       <p class="msg" role="alert" id="ml"></p>
@@ -183,9 +183,10 @@ async function api(ruta, cuerpo) {
 }
 function salir() { clave = ""; try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch (e) {} $("app").hidden = true; $("login").hidden = false; }
 $("salir").onclick = salir;
+$("ver-clave").onclick = () => { const i = $("clave"), v = i.type === "password"; i.type = v ? "text" : "password"; $("ver-clave").setAttribute("aria-pressed", String(v)); };
 
 $("fl").addEventListener("submit", async (e) => {
-  e.preventDefault(); clave = $("clave").value.trim(); $("ml").textContent = "Comprobando…";
+  e.preventDefault(); clave = $("clave").value.replace(/[\u2010-\u2015\u2212]/g, "-").replace(/\s+/g, ""); $("ml").textContent = "Comprobando…";
   try { await cargar(); try { ($("rec").checked ? localStorage : sessionStorage).setItem(KEY, clave); } catch (er) {} $("ml").textContent = ""; }
   catch (er) { $("ml").textContent = er.message; }
 });
