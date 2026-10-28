@@ -421,6 +421,20 @@ footer nav[aria-label="Legal"]{row-gap:0}
 .mk-lv>div.pro{background:linear-gradient(160deg,rgba(232,199,102,.14),rgba(244,114,182,.08) 45%,#111 75%)}
 @media (prefers-reduced-motion:reduce){.mk:before,.mk:after,.mk-h span,.mk-ben i,.mk-orb,.mk-card:hover:before{animation:none}}
 @media (max-width:640px){.mk-ph{height:470px}.mk-notif{left:-2%;right:-2%}}
+
+/* Recepcionista de voz */
+.mk-voz{position:relative;display:grid;gap:1rem 1.5rem;align-items:center;margin-top:2.4rem;padding:1.4rem;border-radius:1.4rem;background:linear-gradient(135deg,rgba(96,165,250,.14),rgba(168,85,247,.12) 50%,rgba(244,114,182,.12));border:1px solid rgba(255,255,255,.14);overflow:hidden}
+@media (min-width:768px){.mk-voz{grid-template-columns:auto 1fr auto}}
+.mk-voz h3{font-size:1.4rem;font-weight:800;margin-top:.4rem}.mk-voz-t>p:last-child{color:#c4c4cc;font-size:.92rem;margin-top:.3rem;max-width:40rem}
+.mk-voz-orb{position:relative;width:88px;height:88px}
+.mk-voz-orb i{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#60a5fa,#a855f7,#f472b6,#e8c766,#60a5fa);filter:blur(.5px);animation:vozSpin 6s linear infinite}
+.mk-voz-orb i:nth-child(2){inset:12%;background:#0b0b12;animation:vozPulse 1.8s ease-in-out infinite}
+.mk-voz-orb i:nth-child(3){inset:30%;background:radial-gradient(circle,#fff,#93c5fd 60%,transparent 70%);animation:vozPulse 1.8s ease-in-out infinite reverse}
+@keyframes vozSpin{to{transform:rotate(360deg)}}@keyframes vozPulse{50%{transform:scale(.88)}}
+.mk-voz-b{min-height:52px;padding:.8rem 1.5rem;border-radius:999px;border:0;font-weight:800;font-size:1rem;color:#0a0a0a;background:linear-gradient(135deg,#f5e3a6,#e8c766 45%,#c99a2e);box-shadow:0 12px 34px -10px rgba(232,199,102,.7);cursor:pointer}
+.mk-voz-b:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.mk-voz-n{grid-column:1/-1;font-size:.75rem;color:#a1a1aa}
+@media (prefers-reduced-motion:reduce){.mk-voz-orb i{animation:none}}
 /* Planes: pago único / suscripción */
 .pay-tg{position:relative;display:grid;grid-template-columns:1fr 1fr;width:min(100%,30rem);margin:2rem auto 0;padding:.35rem;border-radius:999px;background:#0a0a0a;border:1px solid rgba(232,199,102,.45)}
 .pay-tg button{position:relative;z-index:1;min-height:52px;padding:.5rem .8rem;border:0;background:none;color:#d4d4d8;font-weight:700;font-size:.95rem;line-height:1.15;border-radius:999px;cursor:pointer;transition:color .3s}
@@ -680,6 +694,12 @@ class="inline-flex min-h-[48px] w-full flex-none items-center justify-center gap
 </ul>
 </div>
 </div>
+<div class="mk-voz reveal" id="mk-voz" data-agent="" hidden>
+<div class="mk-voz-orb" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="mk-voz-t"><p class="mk-k"><b>Nuevo</b> Recepcionista de voz</p><h3>Y si te llaman, también contesta</h3><p>Coge el teléfono cuando tú no puedes, habla como una persona, resuelve dudas y da la cita. Pruébala: es una clínica dental de ejemplo.</p></div>
+<button type="button" class="mk-voz-b" id="mk-voz-b"><span aria-hidden="true">🎙️</span> Hablar con Carla</button>
+<p class="mk-voz-n">Usa el micrófono de tu dispositivo. Demo con datos ficticios.</p>
+</div>
 <div class="mk-cta reveal">
 <a href="https://wa.me/34688933308" data-wa="Hola, quiero un asistente de citas para mi negocio" target="_blank" rel="noopener" data-cta="whatsapp_asistentes"
 class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full btn-silver px-7 py-3.5 font-semibold text-ink transition focus:outline-none focus-visible:ring-4 focus-visible:ring-white/40 motion-reduce:transition-none sm:w-auto">
@@ -741,6 +761,23 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
     new IntersectionObserver(function (es) { vis = es[0].isIntersecting; if (vis && !running) ciclo(); }, { threshold: .25 }).observe(chat.parentNode);
   } else { vis = true; ciclo(); }
   document.addEventListener("visibilitychange", function () { if (!document.hidden && vis && !running) ciclo(); });
+})();
+</script>
+<script>
+(function () {
+  var box = document.getElementById("mk-voz"); if (!box) return;
+  var id = (box.dataset.agent || "").trim(); if (!id) return; // se activa al poner el agent_id de ElevenLabs
+  box.hidden = false;
+  document.getElementById("mk-voz-b").addEventListener("click", function () {
+    if (!document.querySelector("elevenlabs-convai")) {
+      var w = document.createElement("elevenlabs-convai");
+      w.setAttribute("agent-id", id); w.setAttribute("variant", "expanded"); w.setAttribute("dismissible", "true");
+      w.setAttribute("avatar-orb-color-1", "#60a5fa"); w.setAttribute("avatar-orb-color-2", "#f472b6");
+      w.setAttribute("start-call-text", "Llamar a Carla"); w.setAttribute("end-call-text", "Colgar"); w.setAttribute("listening-text", "Te escucho…"); w.setAttribute("speaking-text", "Carla está hablando"); w.setAttribute("action-text", "Habla con Carla");
+      document.body.appendChild(w);
+      var sc = document.createElement("script"); sc.src = "https://unpkg.com/@elevenlabs/convai-widget-embed"; sc.async = true; document.head.appendChild(sc);
+    }
+  });
 })();
 </script>
 <!-- 4. PLANES -->

@@ -1,0 +1,19 @@
+name: Agente de voz
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["voz/agente-clinica.json"]
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Crear o actualizar el agente en ElevenLabs
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          VOZ_AGENT_ID: ${{ vars.VOZ_AGENT_ID }}
+        run: node voz/publicar.mjs

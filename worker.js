@@ -3,6 +3,7 @@
 // El resto de la web se sirve como archivos estáticos.
 
 import { responderAsistente } from "./asistentes/motor.js";
+import { atenderVoz } from "./voz/agenda.js";
 
 const MODELO = "@cf/meta/llama-3.1-8b-instruct";
 const MODELO_RESPALDO = "@cf/meta/llama-3.2-3b-instruct";
@@ -107,6 +108,11 @@ export default {
     // Enlace corto del QR de las tarjetas de visita → sección de auditoría (con origen medible)
     if (url.pathname === "/A" || url.pathname === "/a") {
       return Response.redirect("https://agencia-js.com/?utm_source=tarjeta&utm_medium=qr#auditoria", 302);
+    }
+    // Agente de voz (ElevenLabs): herramientas de agenda de la demo
+    if (url.pathname === "/api/voz/huecos" || url.pathname === "/api/voz/cita") {
+      // Sin límite por IP: las llamadas llegan desde los servidores de ElevenLabs (IPs compartidas) y no se guardan datos.
+      return atenderVoz(request, url.pathname.endsWith("huecos") ? "huecos" : "cita");
     }
     const esAsistente = url.pathname === "/api/asistente";
     if (url.pathname !== "/api/chat" && !esAsistente) {
