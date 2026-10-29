@@ -178,7 +178,10 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
 .track .now i{animation:bump 1.2s infinite}
 .pm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
 .pm button{min-height:52px;border-radius:14px;border:1.5px solid #e2d6c1;background:#fff;font:inherit;font-weight:800;cursor:pointer;color:var(--ink)}
-.pm .wide{grid-column:1/-1}.pm button:disabled,.chip:disabled{opacity:.45;cursor:not-allowed}
+.pm .wide{grid-column:1/-1}
+.qrbox{display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px;border-radius:22px;background:#fff;border:1.5px solid #e2d6c1;text-align:center}.qrbox svg{width:min(190px,52vw);height:auto;border-radius:10px}.qrbox b{display:block;font-family:var(--serif);font-size:22px}.qrbox span{display:block;font-weight:800;font-size:18px;color:var(--g)}.qrbox small{color:#2fa35a;font-weight:700}
+.qrlink{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:12px 0 4px;padding:12px 14px;border-radius:14px;border:1.5px dashed var(--g);background:#fff;font:inherit;font-weight:800;color:var(--g);cursor:pointer;text-align:left}.qrlink i{font-style:normal;font-size:12px;padding:4px 8px;border-radius:8px;background:var(--g);color:var(--cream)}
+.lnk{display:block;width:100%;margin-top:10px;padding:10px;border:0;background:none;font:inherit;font-weight:700;color:var(--mute);text-decoration:underline;cursor:pointer}.pm button:disabled,.chip:disabled{opacity:.45;cursor:not-allowed}
 .ppl{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:10px 12px;border:1.5px solid #e2d6c1;border-radius:14px;background:#fff;font-weight:700}
 .stp{display:flex;align-items:center;gap:10px}.stp button{width:44px;height:44px;border-radius:50%;border:1.5px solid #e2d6c1;background:var(--paper);font:inherit;font-size:20px;font-weight:800;cursor:pointer;color:var(--ink)}.stp button:disabled{opacity:.4}.stp b{min-width:2ch;text-align:center;font-size:20px}
 .parts{list-style:none;padding:0;margin:10px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}.parts li{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:12px;border:1.5px solid #e2d6c1;background:#fff;font-size:13px}.parts li span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#efe6d6;font-weight:800;font-size:12px;flex:none}.parts li.ok{background:#eaf6ee;border-color:#9fd3b0}.parts li.ok span{background:#2fa35a;color:#fff}.parts li.now{border-color:var(--g);box-shadow:0 0 0 2px var(--g) inset}
@@ -598,9 +601,14 @@ T.es.fallback="Mmm, no estoy seguro de haberte entendido 🤔 Puedo ayudarte con
 T.en.fallback="Hmm, I'm not sure I understood 🤔 I can help with the set menu, allergens (gluten, dairy, nuts, seafood), «what do you recommend», «what should I drink», opening hours, bookings, terrace, paying cash or splitting the bill.";
 T.fr.fallback="Hmm, je ne suis pas sûr d'avoir compris 🤔 Je peux vous aider avec le menu du jour, les allergènes, « que me conseillez-vous », « que boire », les horaires, les réservations, la terrasse, le paiement en espèces ou le partage de l'addition.";
 })();
+(function(){var X={
+es:{qr_t:"Pagad cada uno desde vuestro móvil",qr_p:"Que cada persona de la mesa escanee este código con la cámara del móvil: se abre la cuenta de la mesa {m} y cada uno paga su parte. Lo pagado se ve al momento en todos los móviles.",qr_wa:"Enviar el enlace por WhatsApp",qr_me:"Pagar desde este móvil",qr_waiter:"Prefiero pagar con el camarero",qr_link:"📲 Que cada uno pague desde su móvil",live:"En directo en todos los móviles",someone:"Alguien de la mesa ha pagado {x}",wa_txt:"Cuenta de la mesa {m} en Bar Marea. Paga tu parte aquí 👉 {u}",gone:"Esta cuenta ya no existe o ha caducado.",net:"Sin conexión: se pagará solo desde este móvil.",join:"Cuenta de la mesa {m}: elige cómo pagar."},
+en:{qr_t:"Everyone pays from their own phone",qr_p:"Each person at the table scans this code with their phone camera: the bill for table {m} opens and everyone pays their share. Payments show up instantly on every phone.",qr_wa:"Send the link on WhatsApp",qr_me:"Pay from this phone",qr_waiter:"I'd rather pay the waiter",qr_link:"📲 Let everyone pay from their phone",live:"Live on every phone",someone:"Someone at the table paid {x}",wa_txt:"Bill for table {m} at Bar Marea. Pay your share here 👉 {u}",gone:"This bill no longer exists or has expired.",net:"No connection: payment will only work from this phone.",join:"Bill for table {m}: choose how to pay."},
+fr:{qr_t:"Chacun paie depuis son téléphone",qr_p:"Chaque personne de la table scanne ce code avec l'appareil photo : l'addition de la table {m} s'ouvre et chacun paie sa part. Les paiements s'affichent aussitôt sur tous les téléphones.",qr_wa:"Envoyer le lien par WhatsApp",qr_me:"Payer depuis ce téléphone",qr_waiter:"Je préfère payer au serveur",qr_link:"📲 Que chacun paie depuis son téléphone",live:"En direct sur tous les téléphones",someone:"Quelqu'un de la table a payé {x}",wa_txt:"Addition de la table {m} au Bar Marea. Payez votre part ici 👉 {u}",gone:"Cette addition n'existe plus ou a expiré.",net:"Pas de connexion : paiement uniquement depuis ce téléphone.",join:"Addition de la table {m} : choisissez comment payer."}
+};for(var l in X)for(var k in X[l])T[l][k]=X[l][k]})();
 var MESA=((new URLSearchParams(location.search).get("mesa")||"7").replace(/\D/g,"").slice(0,3))||"7";
 var cat="picar",fV=0,fG=0,fL=0,fK=0,fD=0,VIEW="cards",upShown={},upNo=0,upT;
-var cart={},ordered={},stage=0,tip=0,split=1,pm="apple",note="",view="cart",greeted=0,spm="all",parts=0,paidC=0,itemPaid={},sel={},cashW=0;
+var cart={},ordered={},stage=0,tip=0,split=1,pm="apple",note="",view="cart",greeted=0,spm="all",parts=0,paidC=0,itemPaid={},sel={},cashW=0,room=null,roomV=0,roomIt=[],pollT=0;
 var $=function(s){return document.querySelector(s)};
 var tabs=$("#tabs"),ind=$("#ind"),grid=$("#grid"),filters=$("#filters");
 function t(k){return T[L][k]}
@@ -684,6 +692,23 @@ function lines(o,edit){var h="";for(var k in o){var m=M[k];h+='<div class="line"
 function upCart(){var isD=function(x){return x.c==="bebidas"},isF=function(x){return x.c!=="bebidas"&&x.c!=="postres"},L2=[],k="";
   if(inAll(isF)&&!inAll(isD)){k="up_d";L2=[M[13],M[14]]}else if(inAll(isF)&&!inAll(function(x){return x.c==="postres"})){k="up_s";L2=[M[11],M[12]]}else if(inAll(isD)&&!inAll(isF)){k="up_f";L2=[M[0],M[2]]}
   if(!k)return "";return '<div class="upc"><p>🤵 '+t(k)+'</p>'+L2.map(function(m){return '<div class="sug"><span class="e" aria-hidden="true">'+thumb(m,"mini")+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € · '+m.n[0]+' kcal</small></span><button type="button" data-act="addc" data-i="'+m.id+'" aria-label="'+esc(t("addto")+": "+nm(m))+'">+</button></div>'}).join("")+'</div>'}
+/* ---------- cuenta compartida: un QR y cada uno paga desde su móvil ---------- */
+var API="/api/cuenta/";
+function api(path,body){return fetch(API+path,body?{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}:{cache:"no-store"}).then(function(r){return r.json().then(function(j){if(!j.codigo)throw j;return j})})}
+function cents(m){return Math.round(pr(m)*100)}
+function resetBill(){ordered={};stage=0;tip=0;split=1;spm="all";parts=0;paidC=0;itemPaid={};sel={};cashW=0;room=null;roomIt=[];stopPoll()}
+function applyRoom(d){room=d.codigo;roomV=d.v;roomIt=d.items.map(function(it){return it.i});ordered={};itemPaid={};
+  d.items.forEach(function(it){ordered[it.i]=(ordered[it.i]||0)+it.q;itemPaid[it.i]=(itemPaid[it.i]||0)+it.paid});
+  tip=d.tip;spm=d.spm;split=d.n;parts=d.parts;paidC=d.paidC;if(d.cerrada){resetBill();view="done"}}
+function openRoom(cb){if(room||!cnt(ordered)){cb&&cb();return}var it=[];for(var k in ordered)it.push({i:+k,p:cents(M[k]),q:ordered[k]});
+  api("nueva",{mesa:MESA,items:it,tip:tip}).then(function(d){applyRoom(d);startPoll();cb&&cb()}).catch(function(){toast(t("net"));cb&&cb()})}
+function roomUrl(){return location.origin+location.pathname+"?mesa="+MESA+"&cuenta="+room}
+function stopPoll(){clearInterval(pollT);pollT=0}
+function startPoll(){stopPoll();pollT=setInterval(function(){if(!room||document.hidden||!$("#cart").classList.contains("open"))return;
+  var code=room;api(code).then(function(d){if(d.v===roomV||code!==room)return;var was=paidC;if(d.paidC>was)toast("✓ "+f(t("someone"),{x:eur((d.paidC-was)/100)}));
+    if(d.cerrada&&view!=="done"){resetBill();view="done";drawCart();bar();return}applyRoom(d);if(view==="pay"||view==="qr")drawCart();bar()}).catch(function(){})},3000)}
+function roomDo(body,done){var code=room;api(code,body).then(function(d){if(d.aviso)toast(d.aviso);applyRoom(d);done&&done(d);drawCart();bar()}).catch(function(e){toast((e&&e.error)||t("net"))})}
+function showQR(){openRoom(function(){view=room?"qr":"pay";drawCart()})}
 function drawCart(){
   var b=$("#ct-b"),h="";
   if(view==="cart"){
@@ -694,10 +719,17 @@ function drawCart(){
       h+='<p class="lbl" style="margin-top:22px">'+t("ordered")+'</p><div class="track">'+[["📝","st1"],["🔥","st2"],["🍽️","st3"]].map(function(s,i){return '<div class="'+(stage>i?"on":"")+(stage===i+1&&i<2?" now":"")+'"><i>'+s[0]+'</i>'+t(s[1])+'</div>'}).join("")+'</div>'+lines(ordered,0)+'<div class="sum t"><span>'+t("account")+'</span><span>'+eur(sum(ordered))+cv(sum(ordered))+'</span></div><button class="btn btn-dark" type="button" data-act="pay" style="width:100%;margin-top:14px">💳 '+t("pay")+'</button>';
     }
     h+='<div class="acts" style="padding:14px 0 0"><button type="button" data-act="call">'+t("call")+'</button><button type="button" data-act="bill">'+t("bill")+'</button></div>';
+  }else if(view==="qr"){
+    var u=roomUrl(),tq=Math.round(Math.round(sum(ordered)*100)*(1+tip/100));
+    h='<h3 id="ct-t">'+t("qr_t")+'</h3><p style="color:var(--mute);margin:8px 0 14px">'+f(t("qr_p"),{m:MESA})+'</p>'+
+      '<div class="qrbox">'+(window.qrSVG?qrSVG(u,232):'')+'<div><b>'+t("table")+' '+MESA+'</b><span>'+eur(tq/100)+'</span><small>'+(paidC?t("left")+': '+eur((tq-paidC)/100):'● '+t("live"))+'</small></div></div>'+
+      '<a class="btn btn-dark" style="width:100%;margin-top:12px" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(f(t("wa_txt"),{m:MESA,u:u}))+'">💬 '+t("qr_wa")+'</a>'+
+      '<button class="btn btn-gold" type="button" data-act="pay" style="width:100%;margin-top:10px">💳 '+t("qr_me")+'</button>'+
+      '<button class="lnk" type="button" data-act="waiter">🙋 '+t("qr_waiter")+'</button>';
   }else if(view==="pay"){
-    var s=sum(ordered),rate=1+tip/100,totC=Math.round(s*rate*100),lock=paidC>0,amt=0,btn="";
+    var s=sum(ordered),rate=1+tip/100,totC=Math.round(Math.round(s*100)*rate),lock=paidC>0,amt=0,btn="";
     var segB=function(v,lab){return '<button type="button" class="chip" data-act="spm" data-v="'+v+'" aria-pressed="'+(spm===v)+'"'+(lock&&spm!==v?" disabled":"")+'>'+lab+'</button>'};
-    h='<h3 id="ct-t">'+t("pay")+' · '+t("table")+' '+MESA+'</h3><div class="sum"><span>'+t("subtotal")+'</span><span>'+eur(s)+'</span></div>';
+    h='<h3 id="ct-t">'+t("pay")+' · '+t("table")+' '+MESA+'</h3>'+(room?'<button type="button" class="qrlink" data-act="qr">'+t("qr_link")+'<i>QR</i></button>':'')+'<div class="sum"><span>'+t("subtotal")+'</span><span>'+eur(s)+'</span></div>';
     h+='<p class="lbl">'+t("tip")+'</p><div class="seg">'+[0,5,10].map(function(x){return '<button type="button" class="chip" data-act="tip" data-v="'+x+'" aria-pressed="'+(tip===x)+'"'+(lock?" disabled":"")+'>'+(x?x+" %":"—")+'</button>'}).join("")+'</div>';
     h+='<p class="lbl">'+t("split")+'</p><div class="seg">'+segB("all",t("sp_all"))+segB("eq",t("sp_eq"))+segB("it",t("sp_it"))+'</div>';
     if(spm==="eq"){
@@ -711,7 +743,7 @@ function drawCart(){
       h+='<p class="small" style="margin-top:10px">'+t("pick")+'</p><div class="its">';var any=0;
       for(var key in ordered){var m=M[key],rem=ordered[key]-(itemPaid[key]||0),sv=sel[key]||0;
         h+='<div class="it'+(rem<1?" done":"")+'"><span class="e" aria-hidden="true">'+thumb(m,"mini")+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € · '+(rem<1?"✓":(rem+' / '+ordered[key]))+'</small></span>'+(rem<1?'<span class="okb">✓</span>':'<span class="qty"><button type="button" data-act="sdec" data-i="'+key+'" aria-label="−"'+(sv<1?" disabled":"")+'>−</button><b>'+sv+'</b><button type="button" data-act="sinc" data-i="'+key+'" aria-label="+"'+(sv>=rem?" disabled":"")+'>+</button></span>')+'</div>';
-        amt+=Math.round(pr(m)*sv*rate*100);if(sv)any=1}
+        amt+=Math.round(cents(m)*sv*rate);if(sv)any=1}
       h+='</div><div class="prog"><i style="width:'+(totC?paidC/totC*100:0)+'%"></i></div><div class="sum"><span>'+t("left")+'</span><span>'+eur((totC-paidC)/100)+'</span></div>';
       btn=any?t("pay_sel"):t("nosel");
     }else{amt=totC-paidC;btn=t("paynow")}
@@ -732,16 +764,21 @@ $("#ct-b").addEventListener("click",function(e){
   if(a==="inc"){cart[i]++}
   else if(a==="addc"){cart[i]=(cart[i]||0)+1;toast("✓ "+t("added")+": "+nm(M[i]))}
   else if(a==="dec"){cart[i]--;if(cart[i]<1)delete cart[i]}
-  else if(a==="send"){for(var k in cart)ordered[k]=(ordered[k]||0)+cart[k];cart={};note="";stage=1;toast("🍳 "+t("sent"));run()}
-  else if(a==="pay"){view="pay"}
-  else if(a==="tip"){if(paidC)return;tip=+x.dataset.v}
-  else if(a==="spm"){if(paidC)return;spm=x.dataset.v;if(spm==="eq"&&split<2)split=2;sel={}}
-  else if(a==="ppl"){if(paidC)return;split=Math.max(2,Math.min(30,split+(+x.dataset.v)))}
+  else if(a==="send"){if(room&&!paidC){room=null;roomIt=[];stopPoll()}for(var k in cart)ordered[k]=(ordered[k]||0)+cart[k];cart={};note="";stage=1;toast("🍳 "+t("sent"));run()}
+  else if(a==="pay"){openRoom(function(){view="pay";drawCart();bar()});return}
+  else if(a==="qr"){showQR();return}
+  else if(a==="waiter"){toast("🧾 "+f(t("billed"),{m:MESA}));return}
+  else if(a==="tip"){if(paidC)return;tip=+x.dataset.v;if(room){roomDo({op:"cfg",tip:tip})}}
+  else if(a==="spm"){if(paidC)return;spm=x.dataset.v;if(spm==="eq"&&split<2)split=2;sel={};if(room){roomDo({op:"cfg",spm:spm,n:split})}}
+  else if(a==="ppl"){if(paidC)return;split=Math.max(2,Math.min(30,split+(+x.dataset.v)));if(room){roomDo({op:"cfg",n:split})}}
   else if(a==="sinc"){sel[i]=(sel[i]||0)+1}
   else if(a==="sdec"){sel[i]=Math.max(0,(sel[i]||0)-1)}
   else if(a==="cashw"){cashW=+x.dataset.v}
   else if(a==="pm"){pm=x.dataset.v}
-  else if(a==="dopay"){var am=+x.dataset.a;if(!(am>0))return;x.disabled=true;x.textContent="…";var wasCash=pm==="cash";setTimeout(function(){
+  else if(a==="dopay"){var am=+x.dataset.a;if(!(am>0))return;x.disabled=true;x.textContent="…";var wasCash=pm==="cash";
+    if(room){var sa=roomIt.map(function(i){return sel[i]||0});setTimeout(function(){roomDo({op:"pagar",sel:sa,pm:pm},function(d){sel={};cashW=0;
+      if(wasCash)toast("💶 "+f(t("cash_ok"),{m:MESA,x:eur((d.ultimo||am)/100)}));else if(view!=="done")toast(t("part_ok"))})},900);return}
+    setTimeout(function(){
       paidC+=am;if(spm==="eq")parts++;if(spm==="it"){for(var k in sel)itemPaid[k]=(itemPaid[k]||0)+sel[k];sel={}}
       if(wasCash)toast("💶 "+f(t("cash_ok"),{m:MESA,x:eur(am/100)}));
       var totC=Math.round(sum(ordered)*(1+tip/100)*100),done=paidC>=totC-1||(spm==="eq"&&parts>=split);
@@ -750,7 +787,7 @@ $("#ct-b").addEventListener("click",function(e){
       drawCart();bar()},1100);return}
   else if(a==="review"){toast(t("review_demo"));return}
   else if(a==="call"){toast("🙋 "+f(t("called"),{m:MESA}));return}
-  else if(a==="bill"){toast("🧾 "+f(t("billed"),{m:MESA}));return}
+  else if(a==="bill"){if(cnt(ordered)){showQR();return}toast("🧾 "+f(t("billed"),{m:MESA}));return}
   drawCart();bar();
 });
 var runT=[];function run(){runT.forEach(clearTimeout);runT=[setTimeout(function(){stage=2;if($("#cart").classList.contains("open")&&view==="cart")drawCart()},3500),setTimeout(function(){stage=3;if($("#cart").classList.contains("open")&&view==="cart")drawCart()},9000)]}
@@ -821,8 +858,9 @@ function answer(q){
 function ask(q){q=q.trim().slice(0,200);if(!q)return;msg(q,"u");typing(function(){answer(q)})}
 $("#ask").addEventListener("submit",function(e){e.preventDefault();var i=$("#askin");ask(i.value);i.value=""});
 $("#quick").addEventListener("click",function(e){var b=e.target.closest("[data-q]");if(b)ask(b.dataset.q)});
-$("#acts").addEventListener("click",function(e){var b=e.target.closest("[data-act]");if(!b)return;var k=b.dataset.act==="call"?"called":"billed";msg(b.textContent,"u");typing(function(){msg(f(t(k),{m:MESA}),"b");toast(f(t(k),{m:MESA}))})});
-log.addEventListener("click",function(e){var g=e.target.closest("[data-go]");if(g){closeS($("#chat"));setTimeout(function(){var el=document.getElementById(g.dataset.go);el&&el.scrollIntoView({behavior:"smooth"})},380);return}var b=e.target.closest("[data-add]");if(b){add(+b.dataset.add);b.textContent="✓";b.disabled=true;return}var p=e.target.closest("[data-pay]");if(p&&cnt(ordered)){closeS($("#chat"));view="pay";setTimeout(function(){drawCart();openS($("#cart"))},380)}else if(p){toast(f(t("billed"),{m:MESA}))}});
+$("#acts").addEventListener("click",function(e){var b=e.target.closest("[data-act]");if(!b)return;var k=b.dataset.act==="call"?"called":"billed";
+  if(k==="billed"&&cnt(ordered)){closeS($("#chat"));setTimeout(function(){showQR();openS($("#cart"))},380);return}msg(b.textContent,"u");typing(function(){msg(f(t(k),{m:MESA}),"b");toast(f(t(k),{m:MESA}))})});
+log.addEventListener("click",function(e){var g=e.target.closest("[data-go]");if(g){closeS($("#chat"));setTimeout(function(){var el=document.getElementById(g.dataset.go);el&&el.scrollIntoView({behavior:"smooth"})},380);return}var b=e.target.closest("[data-add]");if(b){add(+b.dataset.add);b.textContent="✓";b.disabled=true;return}var p=e.target.closest("[data-pay]");if(p&&cnt(ordered)){closeS($("#chat"));setTimeout(function(){showQR();openS($("#cart"))},380)}else if(p){toast(f(t("billed"),{m:MESA}))}});
 $("#fab").addEventListener("click",openChat);
 /* ---------- idioma ---------- */
 function setLang(l){L=l;document.documentElement.lang=L;[].slice.call(document.querySelectorAll(".lang button")).forEach(function(x){x.setAttribute("aria-pressed",x.dataset.l===L)});[].slice.call(document.querySelectorAll("[data-t]")).forEach(function(n){n.textContent=t(n.dataset.t)});$("#mesa").textContent=f(t("here"),{m:MESA});drawTabs();drawFilters();drawGrid();drawChatUI();drawCurSel();drawCurNote();$("#ups").classList.remove("on");$("#explore-t").textContent=t("explore");$("#vt-c").textContent="▦ "+t("vcards");$("#vt-l").textContent="☰ "+t("vlist");bar();if($("#cart").classList.contains("open"))drawCart()}
@@ -856,6 +894,8 @@ rtrack.addEventListener("click",function(e){var a=e.target.closest("[data-radd]"
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&reel.classList.contains("open"))closeReel()});
 loadRates();
 setLang(L);
+(function(){var c=(new URLSearchParams(location.search).get("cuenta")||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,8);if(c.length!==8)return;
+  api(c).then(function(d){if(d.cerrada){view="done"}else{applyRoom(d);view="pay";startPoll();toast(f(t("join"),{m:MESA}))}drawCart();bar();openS($("#cart"))}).catch(function(e){toast((e&&e.error)||t("gone"))})})();
 /* horario */
 var H=window.__H=[["Lunes","Cerrado"],["Martes","12:30 – 16:00 · 19:30 – 00:00"],["Miércoles","12:30 – 16:00 · 19:30 – 00:00"],["Jueves","12:30 – 16:00 · 19:30 – 00:00"],["Viernes","12:30 – 16:30 · 19:30 – 01:00"],["Sábado","12:00 – 01:00"],["Domingo","12:00 – 17:00"]];
 var d=(new Date().getDay()+6)%7;$("#hrs").innerHTML=H.map(function(h,i){return '<li class="'+(i===d?"today":"")+'"><span>'+h[0]+'</span><span>'+h[1]+'</span></li>'}).join("");
@@ -879,6 +919,6 @@ if(matchMedia("(hover:hover) and (pointer:fine)").matches){[].slice.call(documen
 <a href="/#planes" style="display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;background:#E8C766;color:#111;text-decoration:none;font-weight:700">Volver</a>
 <button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
 </div>
-<script src="fidelidad.js" defer></script><script src="regalo.js" defer></script><script src="appkit.js" defer data-color="#c8653a" data-theme="light" data-items='[{"i":"book","l":"Carta","h":"#carta"},{"i":"card","l":"Club","h":"#fidelidad"},{"i":"gift","l":"Regalo","h":"#regalo"},{"i":"cal","l":"Reservar","h":"#reserva"}]' data-lift=".dock,.ups"></script>
+<script src="qr.js" defer></script><script src="fidelidad.js" defer></script><script src="regalo.js" defer></script><script src="appkit.js" defer data-color="#c8653a" data-theme="light" data-items='[{"i":"book","l":"Carta","h":"#carta"},{"i":"card","l":"Club","h":"#fidelidad"},{"i":"gift","l":"Regalo","h":"#regalo"},{"i":"cal","l":"Reservar","h":"#reserva"}]' data-lift=".dock,.ups"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@
 import { responderAsistente } from "./asistentes/motor.js";
 import { atenderVoz } from "./voz/agenda.js";
 import { atenderAgenda, enviarRecordatorios, manifiesto } from "./asistentes/agenda.js";
+import { atenderCuenta } from "./mesas/cuenta.js";
 
 const MODELO = "@cf/meta/llama-3.1-8b-instruct";
 const MODELO_RESPALDO = "@cf/meta/llama-3.2-3b-instruct";
@@ -117,6 +118,8 @@ export default {
     }
     // Asistentes de citas de clientes reales (agenda en D1, panel, página de citas y widget)
     if (url.pathname.startsWith("/api/as/")) return atenderAgenda(request, env, ctx, limitar);
+    // Cuenta compartida de una mesa (demo del bar: pagar entre varios móviles con un QR)
+    if (url.pathname.startsWith("/api/cuenta/")) return atenderCuenta(request, env);
     if (url.pathname === "/panel/sw.js" && env.ASSETS) {
       // Service worker del panel (avisos push); se sirve en /panel/ para que su alcance cubra todos los paneles
       const r = await env.ASSETS.fetch(new Request(new URL("/asistentes/panel-sw.js", url), request));
