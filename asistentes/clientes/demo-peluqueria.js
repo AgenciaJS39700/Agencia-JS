@@ -1,0 +1,60 @@
+// /asistentes/clientes/demo-peluqueria.js — Cliente de DEMOSTRACIÓN (ficticio): Salón Marta Vega, con agenda real en D1.
+// Lo usa la web demo de la peluquería (widget con data-negocio="demo-peluqueria"). Clave del panel: demo-martavega.
+import plantilla from "./_plantilla.js";
+
+const PARTIDO = [["10:00", "14:00"], ["16:00", "20:30"]];
+
+export default {
+  ...plantilla,
+  slug: "demo-peluqueria",
+  demo: true,
+  plan: "avanzado",
+  motor: "pro",
+  icono: "scissors",
+  color: "#d9b77e",
+  sector: "Peluquería y estética",
+  negocio: {
+    nombre: "Salón Marta Vega",
+    tipo: "peluquería y estética",
+    direccion: "C/ de la Luna, 9 · Villanueva del Mar (dirección de ejemplo)",
+    telefono: "628 22 47 19",
+    horarioTexto: "Martes a viernes de 10:00 a 14:00 y de 16:00 a 20:30. Sábados de 9:00 a 15:00. Domingos y lunes cerrado.",
+    horario: { 2: PARTIDO, 3: PARTIDO, 4: PARTIDO, 5: PARTIDO, 6: [["09:00", "15:00"]] },
+    extra: [
+      "Club de clientas gratis: 50 puntos de bienvenida al registrarte en la web y 1 punto por cada euro. Con 100 puntos tienes 5 € de descuento; con 250, un ritual spa capilar gratis; con 400, un 15 % en color; con 600, un corte y peinado gratis.",
+      "Niveles del club: Rosa (desde 0), Champán (desde 400 puntos, +10 % de puntos y regalo de cumpleaños) y Oro (desde 1000, +25 % de puntos y cita prioritaria).",
+      "Si invitas a una amiga con tu código del club, las dos ganáis 75 puntos.",
+      "Tarjetas regalo de 25, 50, 75, 100 o 150 € (o el importe que quieras entre 10 y 300 €) en la sección «Regalar» de la web. Se pueden usar en cualquier servicio o producto y no caducan en un año.",
+      "Tienda en la web: productos profesionales (pack Ritual de brillo 49 €, aceite sérum 24 €, kit de peinado 39 €) y merchandising (tote bag 18 €, vela y toalla 32 €). Se reservan en la web y se pagan y recogen en el salón.",
+      "Campaña Navidad Glam hasta el 31 de diciembre: 15 % en color, balayage y peinados de fiesta con el código GLAM15.",
+      "Probador de color en la web: sube una foto o usa la cámara y prueba tonos de pelo antes de venir.",
+      "Novias: prueba de peinado y maquillaje previa con coste; se descuenta si se contrata el día de la boda.",
+      "Productos profesionales, con opciones sin amoníaco y veganas. Se paga con tarjeta, efectivo o Bizum.",
+      "Cancelar o cambiar cita: con 24 h de antelación, con el código de la cita o por WhatsApp.",
+      "Aparcamiento público a 2 minutos en la Plaza del Mar.",
+    ],
+    wa: "34628224719",
+    web: "",
+    mapa: "",
+    logo: "",
+  },
+  servicios: [
+    { id: "corte-mujer", nombre: "Corte mujer (lavado, corte y peinado)", min: 45, precio: "desde 35 €" },
+    { id: "corte-caballero", nombre: "Corte caballero", min: 30, precio: "desde 16 €" },
+    { id: "barba", nombre: "Arreglo de barba", min: 20, precio: "desde 12 €" },
+    { id: "color", nombre: "Color completo", min: 90, precio: "desde 55 €" },
+    { id: "balayage", nombre: "Balayage / mechas", min: 150, precio: "desde 95 €" },
+    { id: "keratina", nombre: "Tratamiento de keratina", min: 120, precio: "desde 70 €" },
+    { id: "ritual", nombre: "Ritual spa capilar", min: 30, precio: "28 €" },
+    { id: "evento", nombre: "Peinado de evento", min: 60, precio: "desde 40 €" },
+    { id: "manicura", nombre: "Manicura semipermanente", min: 45, precio: "desde 22 €" },
+  ],
+  salud: false,
+  urgencia: "",
+  chips: ["¿Cómo funciona el club de puntos?", "¿Tenéis tarjeta regalo?", "¿Qué promociones hay?"],
+  saludo: "¡Hola! Soy el asistente del Salón Marta Vega ✂️ Te ayudo a pedir cita o con dudas sobre servicios, precios, el club de puntos o las tarjetas regalo.",
+  agenda: { ...plantilla.agenda, capacidad: 3, pedirEmail: true },
+  avisos: { email: "agencia39700@gmail.com", whatsapp: "", whatsappCliente: false },
+  panel: { hash: "f4a9356e9d01acef4818b195a858d7f6f1249019f26c77e28489576557b100f3" },
+  dominios: [],
+};
