@@ -22,6 +22,17 @@ EXTRA = """<style>
 .gcard .st{font-size:34px;color:#5f6368}.gcard .st b{color:#d93025}
 .gcard .stars{color:#fbbc04;font-size:34px;margin:8px 0}
 .small{font-size:26px;color:#8a8a93;margin-top:24px}
+.flag{display:flex;gap:24px;align-items:flex-start;border-radius:28px;padding:34px 38px;margin-top:30px;background:rgba(239,68,68,.08);border:2px solid rgba(239,68,68,.4)}
+.flag.ok{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.4)}
+.flag i{font-style:normal;font-size:52px;line-height:1;flex:none}
+.flag span{font-size:38px;line-height:1.35;color:#fafafa}
+.flag b{display:block;font-size:24px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;color:#fca5a5}
+.flag.ok b{color:#86efac}
+.pair{display:flex;align-items:center;gap:18px;margin-top:26px;font-size:32px;color:#fafafa}
+.pair div{flex:1;background:rgba(255,255,255,.04);border:2px solid rgba(255,255,255,.12);border-radius:24px;padding:24px 26px;line-height:1.3}
+.pair div b{color:#3a9bff;margin-right:8px}.pair div.b b{color:#e8c766}
+.pair em{font-style:normal;color:#8a8a93;font-size:26px;font-weight:700}
+.step{font-family:"Inter Display";font-size:34px;font-weight:800;color:#3a9bff;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px}
 </style>"""
 
 def slide(i, n, inner, foot='→', glow2=False):

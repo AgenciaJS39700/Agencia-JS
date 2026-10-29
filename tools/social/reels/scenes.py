@@ -53,35 +53,32 @@ def S(inner, extra=''):
 def NOTE(t):
     return S(f'<div class="note"><div class="h"><b>?</b>Mensaje anónimo · ahora</div><div class="t">{t}</div><div class="sig">—A</div></div>')
 
+SEARCH = ('<div style="background:#fff;border-radius:60px;padding:34px 46px;font-size:46px;color:#202124;display:flex;gap:24px;align-items:center;box-shadow:0 30px 70px rgba(0,0,0,.6)">🔍 <span>[tu servicio] cerca de mí</span></div>'
+  '<div style="background:#fff;border-radius:40px;padding:50px;margin-top:40px;color:#202124;box-shadow:0 30px 70px rgba(0,0,0,.6)">'
+  '<div style="font-size:62px;font-weight:800">Tu Negocio</div><div style="color:#fbbc04;font-size:50px;margin:12px 0">★★★★★ <span style="color:#5f6368;font-size:36px">Reseñas</span></div>'
+  '<div style="font-size:40px;color:#5f6368"><b style="color:#188038">Abre mañana</b> · 9:00</div>'
+  '<div style="display:flex;gap:20px;margin-top:36px"><div style="flex:1;text-align:center;background:#1a73e8;color:#fff;border-radius:40px;padding:24px;font-size:38px;font-weight:700">Sitio web</div><div style="flex:1;text-align:center;border:3px solid #1a73e8;color:#1a73e8;border-radius:40px;padding:24px;font-size:38px;font-weight:700">Cómo llegar</div></div></div>')
+CHAT = ('<div style="background:#0b141a;border-radius:44px;padding:50px;box-shadow:0 30px 80px rgba(0,0,0,.6);border:2px solid rgba(255,255,255,.1)">'
+  '<div style="color:#8a8a93;font-size:34px;margin-bottom:30px">WhatsApp · Tu Negocio</div>'
+  '<div style="background:#005c4b;color:#fff;border-radius:34px 34px 8px 34px;padding:34px 40px;font-size:52px;line-height:1.3;margin-left:80px">¡Hola! ¿Tenéis hueco mañana por la mañana? 🙏<div style="text-align:right;font-size:30px;color:#a7d7c5;margin-top:10px">23:04 ✓✓</div></div></div>'
+  '<p>Mensaje recibido mientras tú descansas.</p>')
+CHECKS = lambda items: ''.join(f'<div style="display:flex;gap:30px;align-items:flex-start;font-size:54px;line-height:1.3;color:#fafafa;margin-top:44px"><span style="flex:none;width:84px;height:84px;border-radius:22px;border:4px solid #e8c766;color:#e8c766;display:flex;align-items:center;justify-content:center;font-weight:800">{i}</span><span>{t}</span></div>' for i,t in enumerate(items,1))
+
 REELS = {
- 'reel-2026-10-20-mensaje-a': [
-   S('<div class="tag">Tienes un mensaje 📩</div><h1>Alguien sabe lo que pasa con <span class="g">tu negocio</span>…</h1>'),
-   NOTE('Sé que tu web sigue sin verse bien en el móvil.'),
-   NOTE('Sé que tu ficha de Google tiene el horario de hace dos años.'),
-   NOTE('Y sé que tus clientes se van a la competencia sin decirte nada.'),
-   END('Nosotros te ayudamos a <span class="g">arreglarlo</span>', 'Te revisamos gratis tu web y tu ficha de Google.'),
+ 'reel-2026-11-04-pov-23h': [
+   S('<div class="tag">POV 🌙</div><h1>Son las 23:00 y alguien busca <span class="g">tu negocio</span> en el móvil…</h1>'),
+   S('<div class="lab">1. Te encuentra en Google</div>' + SEARCH),
+   S('<div class="new"><div class="hero"><b>Tu Negocio</b><span>Precios, fotos reales y horario</span></div><div class="row"><div class="btn b1">WhatsApp</div><div class="btn b2">Llamar</div></div><div class="info">⭐ Reseñas · 📍 Cómo llegar</div></div><p>2. Tu web abre rápido y lo tiene todo.</p>'),
+   S('<div class="lab">3. Te escribe</div>' + CHAT),
+   S('<div class="react" style="margin:0 0 40px">😴</div><h1>Tú, durmiendo.<br>Tu web, <span class="g">trabajando</span>.</h1>'),
+   END('Que tu negocio <span class="g">atienda 24/7</span>', 'Web rápida, ficha de Google al día y WhatsApp a un toque.'),
  ],
- 'reel-2026-10-24-mi-reaccion': [
-   S('<div class="tag">Mi reacción a…</div><h1>Las reseñas de Google de mi negocio cuando empiezo a <span class="g">pedirlas</span></h1><div class="small">Ejemplo ilustrativo</div>'),
-   S('<div class="lab">Reseñas en Google</div><div class="counter">3</div><div class="react">😐</div>'),
-   S('<div class="lab">Reseñas en Google</div><div class="counter">12</div><div class="react">🙂</div>'),
-   S('<div class="lab">Reseñas en Google</div><div class="counter">35</div><div class="react">😃</div>'),
-   S('<div class="lab">Reseñas en Google</div><div class="counter">70</div><div class="react">🤩</div><div class="small">Ejemplo ilustrativo. Las opiniones las deciden siempre tus clientes.</div>'),
-   END('Pide reseñas sin esfuerzo con <span class="g">tarjetas NFC</span>', 'El cliente acerca el móvil y se abre tu ficha para opinar.'),
- ],
- 'reel-2026-10-29-datos-miedo': [
-   S('<div class="pill">Datos que dan miedo 🎃</div><h1>4 cosas de tu web que <span class="g" style="color:#fb923c">asustan</span> a tus clientes</h1>', 'or'),
-   S('<div class="pill">Dato 1</div><div class="fact">Si tu web no tiene HTTPS, Chrome avisa a tus clientes: <span class="g">«No seguro»</span>.</div>', 'or'),
-   S('<div class="pill">Dato 2</div><div class="fact">Si tu ficha dice <span class="g">«Cerrado»</span> por error, Google se lo enseña a todo el que te busca.</div>', 'or'),
-   S('<div class="pill">Dato 3</div><div class="fact">Una reseña sin responder <span class="g">sigue ahí</span>, visible para cada cliente nuevo.</div>', 'or'),
-   S('<div class="pill">Dato 4</div><div class="fact">Si tu teléfono está dentro de una imagen, en el móvil <span class="g">no se puede pulsar</span> para llamar.</div>', 'or'),
-   END('¿Tu web <span class="g">da miedo</span>? 🎃', 'Te la revisamos gratis y te decimos qué arreglar.'),
- ],
- 'reel-2026-10-31-disfraz': [
-   S('<div class="pill">Halloween 🎃</div><h1>Mi web disfrazada para <span class="g">Halloween</span>…</h1>', 'or'),
-   S('<div class="old"><div class="mar">*** BIENVENIDOS A MI PAGINA WEB ***</div><h2>¡¡MI NEGOCIO!!</h2><div class="uc">🚧 EN CONSTRUCCION 🚧</div><p>Para ver la carta descarga el PDF (12 MB)</p><p>Telefono: ver imagen</p><div class="cnt">VISITAS: 000047</div></div><p style="color:#fdba74">Disfraz: web de 2005 🧟</p>', 'or'),
-   S('<div class="new"><div class="hero"><b>Tu Negocio</b><span>Abierto hoy · 10:00 – 21:00</span></div><div class="row"><div class="btn b1">WhatsApp</div><div class="btn b2">Llamar</div></div><div class="info">⭐ Reseñas reales · 📍 Cómo llegar<br>Carta y precios al momento</div></div><p>Sin disfraz: web de 2026 ✨</p>'),
-   END('¿Truco… o <span class="g">web nueva</span>? 🎃', 'Rápida, clara y lista para que te escriban.'),
+ 'reel-2026-11-06-black-friday': [
+   S('<div class="tag">Faltan 3 semanas ⏳</div><h1>Black Friday en mi negocio: <span class="g">expectativa</span> vs <span class="g">realidad</span></h1>'),
+   S('<div class="tag">Expectativa 🤩</div><div class="react" style="margin:0;font-size:200px;white-space:nowrap">🛍️🛍️🛍️</div><div class="fact" style="margin-top:50px">Cola en la puerta y el WhatsApp <span class="g" style="color:#e8c766">echando humo</span>.</div>'),
+   S('<div class="pill">Realidad 😶</div><div class="react" style="margin:0">🦗</div><div class="fact" style="margin-top:50px">Tu oferta solo estaba en una historia de 24 horas… <span class="g">y casi nadie la vio</span>.</div>', 'or'),
+   S('<h1 style="font-size:96px">Cómo cambiar <span class="g">el final</span> 👇</h1>' + CHECKS(['Una página de ofertas en tu web','Tu oferta publicada en tu ficha de Google','Botón de WhatsApp para pedir o reservar','Avisa a tus clientes con tiempo'])),
+   END('Prepara tu <span class="g">Black Friday</span> ahora', 'Te ayudamos con la web, la ficha de Google y los vídeos.'),
  ],
 }
 
