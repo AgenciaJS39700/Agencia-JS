@@ -40,6 +40,6 @@ export default {
   chips: ["¿Cuánto cuesta una limpieza?", "¿Tenéis financiación?", "¿Atendéis a niños?"],
   saludo: "¡Hola! Soy el asistente de Clínica Dental Sonríe. Te ayudo a pedir cita o a resolver dudas sobre tratamientos, precios y horarios.",
   agenda: { ...plantilla.agenda, capacidad: 1, pedirEmail: true },
-  avisos: { email: "" },         // demo: sin correos
+  avisos: { email: "agencia39700@gmail.com" }, // demo: los avisos llegan a la agencia (sirve para probar y para ver quién prueba la demo)
   panel: { hash: "f5af7b545f9540d4aeaa8ca9d8b9a064aeb3852f15adc6bfc65c9fb266529f1b" },
 };
