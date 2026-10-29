@@ -45,8 +45,8 @@ if (hero) {
 var himg = hero.querySelector("img");
 var grid = hero.querySelector(".grid-bg");
 var base = { trigger: hero, start: "top top", end: "bottom top", scrub: true };
-if (himg) { gsap.fromTo(himg, { yPercent: 0, scale: 1.12 }, { yPercent: desk ? 8 : 5, scale: 1.22, ease: "none", scrollTrigger: base }); }
-if (grid) { gsap.to(grid, { yPercent: 25, ease: "none", scrollTrigger: base }); }
+/* (oct 2026) sin parallax: la imagen y la rejilla quedan fijas */
+void himg; void grid; void base;
 /* El texto del hero ya no se desvanece: con el scroll rápido arriba/abajo podía quedarse semitransparente */
 }
 
@@ -90,14 +90,7 @@ n.parentNode.insertBefore(w, n);
 w.appendChild(n);
 return w;
 }
-var nfc = document.getElementById("nfc-stage");
-if (nfc) {
-gsap.fromTo(envolver(nfc), { yPercent: desk ? 9 : 4 }, { yPercent: desk ? -9 : -4, ease: "none", scrollTrigger: { trigger: "#nfc", start: "top bottom", end: "bottom top", scrub: true } });
-}
-var tel = document.querySelector("#video .phone-float");
-if (tel) {
-gsap.fromTo(envolver(tel), { yPercent: desk ? 8 : 3, rotation: desk ? -5 : -2 }, { yPercent: desk ? -8 : -3, rotation: desk ? 5 : 2, ease: "none", scrollTrigger: { trigger: "#video", start: "top bottom", end: "bottom top", scrub: true } });
-}
+/* (oct 2026) sin parallax en la tarjeta NFC ni en el móvil del vídeo */
 });
 
 ST.refresh();

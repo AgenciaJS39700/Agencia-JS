@@ -27,34 +27,7 @@ var mm = gsap.matchMedia();
 mm.add({ desk: "(min-width: 960px)", mob: "(max-width: 959px)" }, function (ctx) {
 var desk = ctx.conditions.desk;
 
-/* 1) HERO: capas con profundidad al hacer scroll + ratón */
-var hero = $(".hero");
-if (hero) {
-var items = $$(".hero-a .it", hero);
-items.forEach(function (n, i) {
-var d = parseFloat(n.dataset.d || (0.5 + i * 0.35));
-gsap.to(n, { yPercent: -18 * d, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true } });
-});
-var blob = $(".hero-a .blob", hero);
-if (blob) { gsap.to(blob, { yPercent: 10, scale: 1.08, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true } }); }
-var ht = $(".hero-t", hero);
-if (ht) { gsap.to(ht, { y: desk ? -60 : -30, opacity: 0.1, ease: "none", scrollTrigger: { trigger: hero, start: "20% top", end: "bottom top", scrub: true } }); }
-if (desk && fine) {
-var ha = $(".hero-a", hero);
-var xs = items.map(function (n) { return gsap.quickTo(n, "x", { duration: 0.8, ease: "power3.out" }); });
-var ys = items.map(function (n) { return gsap.quickTo(n, "y", { duration: 0.8, ease: "power3.out" }); });
-hero.addEventListener("pointermove", function (e) {
-var r = hero.getBoundingClientRect(), px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
-items.forEach(function (n, i) { var d = parseFloat(n.dataset.d || (0.5 + i * 0.35)); xs[i](px * 38 * d); ys[i](py * 28 * d); });
-});
-}
-}
-
-/* 2) FRASE: las palabras se iluminan según el scroll */
-$$(".st p").forEach(function (p) {
-var w = $$(".w", p); if (!w.length) { return; }
-gsap.to(w, { opacity: 1, ease: "none", stagger: 0.5, scrollTrigger: { trigger: p, start: "top 82%", end: "bottom 45%", scrub: 0.4 } });
-});
+/* 1-2) Sin parallax en el hero ni frase que se ilumina (oct 2026: no se ven bien en móvil) */
 
 /* 3) PASOS: scroll horizontal anclado (escritorio) */
 $$(".hz").forEach(function (hz) {
@@ -69,17 +42,6 @@ batch($$(".hz-c", hz));
 }
 });
 
-/* 4) ESCENA QUE SE EXPANDE (Apple-style) */
-$$(".xp").forEach(function (xp) {
-var frame = $(".xp-f", xp), txt = $$(".xp-t > *", xp), art = $(".xp-p", xp);
-xp.classList.add("on");
-var ini = desk ? "inset(12% 14% 12% 14% round 36px)" : "inset(9% 5% 13% 5% round 26px)";
-var tl = gsap.timeline({ defaults: { ease: "none" }, scrollTrigger: { trigger: xp, start: "top top", end: "+=140%", pin: true, scrub: 0.7, anticipatePin: 1 } });
-tl.fromTo(frame, { clipPath: ini }, { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: 1 }, 0);
-if (art) { tl.fromTo(art, { scale: 1.25, yPercent: 6, opacity: 0.25 }, { scale: 1, yPercent: -4, opacity: 0.6, duration: 1 }, 0); }
-tl.fromTo(txt, { y: 50, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.14, duration: 0.45, ease: "power2.out" }, 0.45);
-});
-
 /* 5) Entrada escalonada de tarjetas */
 batch($$(".bc"));
 batch($$(".dt"));
@@ -92,12 +54,6 @@ $$("[data-count]").forEach(function (n) {
 var fin = parseFloat(n.dataset.count), dec = (n.dataset.dec | 0), suf = n.dataset.suf || "", o = { v: 0 };
 n.textContent = (0).toFixed(dec).replace(".", ",") + suf;
 gsap.to(o, { v: fin, duration: 1.8, ease: "power2.out", onUpdate: function () { n.textContent = o.v.toFixed(dec).replace(".", ",") + suf; }, onComplete: function () { n.textContent = fin.toFixed(dec).replace(".", ",") + suf; }, scrollTrigger: { trigger: n, start: "top 92%", once: true } });
-});
-
-/* 7) Parallax suave en bloques marcados */
-$$("[data-par]").forEach(function (n) {
-var v = parseFloat(n.dataset.par) || 8;
-gsap.fromTo(n, { yPercent: v }, { yPercent: -v, ease: "none", scrollTrigger: { trigger: n.parentNode, start: "top bottom", end: "bottom top", scrub: true } });
 });
 
 /* 8) Botones magnéticos + inclinación 3D (solo con ratón) */

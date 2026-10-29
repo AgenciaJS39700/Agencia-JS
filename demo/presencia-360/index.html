@@ -971,8 +971,7 @@ function hz(){if(innerWidth<861||RM){pro.style.height="";pin.style.position="";t
  var dist=track.scrollWidth-innerWidth+64;pro.style.height=(innerHeight+dist)+"px";pin.style.position="sticky";pin.style.top="0";
  var r=pro.getBoundingClientRect();var p=Math.min(1,Math.max(0,-r.top/(pro.offsetHeight-innerHeight)));track.style.transform="translateX("+(-dist*p)+"px)"}
 addEventListener("scroll",hz,{passive:true});addEventListener("resize",hz);hz();
-/* hero parallax */
-if(!RM){addEventListener("scroll",function(){var y=scrollY;if(y<innerHeight*1.2){ha.style.transform="translateY("+(y*.25)+"px) rotate("+(y*.02)+"deg)";$(".hero h1").style.transform="translateY("+(y*-.12)+"px)"}},{passive:true})}
+/* (oct 2026) sin parallax en el hero */
 /* reserva por pasos */
 var S=1,N=8,data={};
 $$(".opts").forEach(function(g){$$(".opt",g).forEach(function(o){o.setAttribute("aria-pressed","false");o.addEventListener("click",function(){$$(".opt",g).forEach(function(x){x.setAttribute("aria-pressed",x===o)});data[g.dataset.k]=o.textContent;setTimeout(function(){if(S<N)go(S+1)},250)})})});
