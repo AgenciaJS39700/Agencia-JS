@@ -135,7 +135,14 @@ export default {
     }
     const esAsistente = url.pathname === "/api/asistente";
     if (url.pathname !== "/api/chat" && !esAsistente) {
-      return env.ASSETS ? env.ASSETS.fetch(request) : new Response("No encontrado", { status: 404 });
+      if (!env.ASSETS) return new Response("No encontrado", { status: 404 });
+      const r = await env.ASSETS.fetch(request);
+      // El widget de citas se carga desde webs de clientes: sus módulos necesitan CORS para el import()
+      if (/^\/asistentes\/[a-z0-9-]+\.js$/.test(url.pathname) && r.ok) {
+        const h = new Headers(r.headers); h.set("Access-Control-Allow-Origin", "*");
+        return new Response(r.body, { status: r.status, headers: h });
+      }
+      return r;
     }
     if (request.method !== "POST") return json({ error: "Método no permitido" }, 405);
 
