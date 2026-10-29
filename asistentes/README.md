@@ -20,7 +20,7 @@ Todo vive en el Worker `agencia-js`: no hay que crear nada nuevo en Cloudflare p
 3. `git add -A && git commit -m "feat(asistentes): alta <slug>" && git push` → se publica solo.
 4. Prueba en `agencia-js.com/c/<slug>`: haz una cita, mírala en el panel y anúlala.
 5. Entrega al cliente:
-   - Enlace de su página de citas (para Google Business → «Reservas», Instagram, WhatsApp y un QR del mostrador).
+   - Enlace de su página de citas (para Google Business → «Reservas», Instagram y WhatsApp). Las citas del local o del teléfono se apuntan en el panel, en la misma agenda).
    - Si tiene web: la línea del widget antes de `</body>`. Cualquier botón con `data-pedir-cita` lo abre también.
    - Su panel y su clave. Enséñale «Apuntar cita», «Cerrar horas o días» y «Ver en mi calendario».
 

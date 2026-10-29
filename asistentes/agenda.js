@@ -81,7 +81,8 @@ function calcular(cfg, fecha, dur, citas, bloqueos, ya, forzar) {
   const out = [];
   for (const [ini, fin] of tramos) {
     for (let t = min2(ini); t + dur <= min2(fin); t += a.paso) {
-      if (fecha === ya.fecha && t < ya.min + (forzar ? 0 : a.antelacionMin)) continue;
+      // Online: con antelación mínima. Panel (en el local): vale el hueco en curso si aún no ha terminado su primer tramo
+      if (fecha === ya.fecha && (forzar ? t + a.paso <= ya.min : t < ya.min + a.antelacionMin)) continue;
       const solapes = citas.filter((c) => c.inicio < t + dur && c.fin > t).length;
       if (solapes >= a.capacidad) continue;
       if (bloqueos.some((b) => b.inicio < t + dur && b.fin > t)) continue;
@@ -124,7 +125,8 @@ export async function reservar(env, cfg, datos, origen = "chat", ctx) {
   if (!serv) return { ok: false, estado: 400, mensaje: "Elige un servicio." };
   if (!RE_FECHA.test(fecha) || !/^\d{1,2}:\d{2}$/.test(hora)) return { ok: false, estado: 400, mensaje: "Falta el día o la hora." };
   if (nombre.length < 2) return { ok: false, estado: 400, mensaje: "Escribe tu nombre." };
-  if (tel.replace(/\D/g, "").length < 9) return { ok: false, estado: 400, mensaje: "El teléfono no parece completo." };
+  // En el panel (cliente que pasa por el local) el teléfono es opcional
+  if (tel.replace(/\D/g, "").length < 9 && !(origen === "panel" && !tel)) return { ok: false, estado: 400, mensaje: "El teléfono no parece completo." };
   if (email && !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) return { ok: false, estado: 400, mensaje: "El email no parece correcto." };
   const inicio = min2(hora), fin = inicio + serv.min;
   const libres = await huecosDia(env, cfg, fecha, serv.min, origen === "panel");
@@ -285,6 +287,11 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     if (ruta === "panel/push/clave" && request.method === "GET") {
       if (!avanzado(cfg)) return res({ error: "Los avisos al móvil son del plan Avanzado." }, 403);
       return res({ clave: (await clavesVapid(env)).pub });
+    }
+    if (ruta === "panel/huecos" && request.method === "GET") {
+      const serv = cfg.servicios.find((s) => s.id === url.searchParams.get("servicio")), fecha = url.searchParams.get("fecha") || "";
+      if (!serv || !RE_FECHA.test(fecha)) return res({ error: "Servicio o fecha no válidos" }, 400);
+      return res({ fecha, huecos: (await huecosDia(env, cfg, fecha, serv.min, true)).map(hhmm) });
     }
     if (ruta === "panel/citas" && request.method === "GET") {
       const desde = RE_FECHA.test(url.searchParams.get("desde") || "") ? url.searchParams.get("desde") : ahora().fecha;

@@ -55,7 +55,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .sh:first-child{border-left:0}
 .shoras{position:relative}.shoras span{position:absolute;right:6px;transform:translateY(-50%);font-size:.7rem;color:var(--mu)}.shoras span:first-child{transform:translateY(2px)}
 .scol{position:relative;border-left:1px solid var(--ln);background-image:linear-gradient(var(--ln) 1px,transparent 1px);background-size:100% var(--hh)}
-.scol .abierto{position:absolute;left:0;right:0;background:rgba(255,255,255,.035)}
+.scol{cursor:copy}.scol .abierto{position:absolute;left:0;right:0;background:rgba(255,255,255,.035)}
 .ev{position:absolute;left:3px;right:3px;border-radius:8px;padding:3px 6px;font-size:.72rem;line-height:1.25;overflow:hidden;background:color-mix(in srgb,var(--c) 85%,#000);color:#0a0a0a;border:0;text-align:left;cursor:pointer;font-family:inherit}
 .ev b{display:block;font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ev:focus-visible{outline:2px solid #fff}
 .ev.voz{background:#a78bfa}.ev.panel{background:#d4d4d8}
@@ -110,7 +110,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
     <div><label for="n-fecha">Día</label><input id="n-fecha" type="date" required></div>
     <div><label for="n-hora">Hora libre</label><select id="n-hora" required></select></div>
     <div><label for="n-nom">Nombre</label><input id="n-nom" maxlength="60" required></div>
-    <div><label for="n-tel">Teléfono</label><input id="n-tel" type="tel" maxlength="16" required></div>
+    <div><label for="n-tel">Teléfono (opcional)</label><input id="n-tel" type="tel" maxlength="16"></div>
     <div class="full"><label for="n-nota">Nota (opcional)</label><input id="n-nota" maxlength="200"></div>
   </div>
   <p class="msg" role="alert" id="mn"></p>
@@ -241,16 +241,16 @@ function semanaHTML(d) {
     const blq = d.bloqueos.filter((b) => b.fecha === f).map((b) => { const a = Math.max(b.inicio, ini), z = Math.min(b.fin, fin); return z > a ? `<div class="ev blk" style="top:${(a - ini) * k}px;height:${(z - a) * k}px"><b>Cerrado</b>${esc(b.motivo || "")}</div>` : ""; }).join("");
     const evs = d.citas.filter((c) => c.fecha === f && c.estado === "ok").map((c) => `<button type="button" class="ev ${esc(c.origen)}" data-ver="${c.id}" style="top:${(c.inicio - ini) * k}px;height:${Math.max((c.fin - c.inicio) * k - 2, 20)}px" aria-label="${esc(`${hhmm(c.inicio)} ${c.nombre}, ${c.servicio_n}`)}"><b>${hhmm(c.inicio)} ${esc(c.nombre)}</b>${esc(c.servicio_n)}</button>`).join("");
     const linea = f === hoy && ahora >= ini && ahora <= fin ? `<div class="ahora" style="top:${(ahora - ini) * k}px"></div>` : "";
-    return `<div class="scol" style="height:${alto}px;--hh:${HH}px">${abiertos}${blq}${evs}${linea}</div>`;
+    return `<div class="scol" data-dia="${f}" data-ini="${ini}" data-k="${k}" title="Toca un hueco libre para apuntar una cita" style="height:${alto}px;--hh:${HH}px">${abiertos}${blq}${evs}${linea}</div>`;
   }).join("");
   return `<div class="sem"><div class="sg"><div class="sh"></div>${cab}<div class="shoras" style="height:${alto}px">${horas}</div>${cols}</div></div>
-  <p class="ley"><span><i style="background:var(--c)"></i>Online</span><span><i style="background:#a78bfa"></i>Por teléfono (IA)</span><span><i style="background:#d4d4d8"></i>Apuntada por ti</span><span><i style="background:#2a2a2f"></i>Cerrado</span></p>`;
+  <p class="ley"><span><i style="background:var(--c)"></i>Online</span><span><i style="background:#a78bfa"></i>Por teléfono (IA)</span><span><i style="background:#d4d4d8"></i>En el local / apuntada</span><span><i style="background:#2a2a2f"></i>Cerrado</span></p>`;
 }
 function citaHTML(c) {
-  const tel = esc(c.telefono), wa = c.telefono.replace(/\D/g, "").replace(/^(\d{9})$/, "34$1");
+  const tel = esc(c.telefono), wa = String(c.telefono || "").replace(/\D/g, "").replace(/^(\d{9})$/, "34$1");
   return `<article class="cita${c.estado !== "ok" ? " cx" : ""}"><div class="h">${hhmm(c.inicio)}<small>${hhmm(c.fin)}</small></div>
-  <div><div class="n">${esc(c.nombre)}${c.estado !== "ok" ? '<span class="tag">cancelada</span>' : ""}<span class="tag">${esc({ chat: "online", voz: "teléfono IA", panel: "apuntada" }[c.origen] || c.origen)}</span></div>
-  <div class="d">${esc(c.servicio_n)} · <a href="tel:${tel}">${tel}</a> · <a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>${c.email ? " · " + esc(c.email) : ""}</div>
+  <div><div class="n">${esc(c.nombre)}${c.estado !== "ok" ? '<span class="tag">cancelada</span>' : ""}<span class="tag">${esc({ chat: "online", voz: "teléfono IA", panel: "en el local" }[c.origen] || c.origen)}</span></div>
+  <div class="d">${esc(c.servicio_n)}${c.telefono ? ` · <a href="tel:${tel}">${tel}</a> · <a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : " · sin teléfono"}${c.email ? " · " + esc(c.email) : ""}</div>
   ${c.nota ? `<div class="d">Nota: ${esc(c.nota)}</div>` : ""}<div class="d" style="color:var(--mu);font-size:.78rem">Código ${esc(c.codigo)}</div></div>
   <div class="acc">${c.estado === "ok" ? `<button class="btn sm del" data-cancelar="${c.id}" type="button" aria-label="Cancelar la cita de ${esc(c.nombre)}">Cancelar</button>` : ""}</div></article>`;
 }
@@ -261,6 +261,11 @@ function blqHTML(b) {
 }
 $("lista").addEventListener("click", async (e) => {
   const c = e.target.closest("[data-cancelar]"), a = e.target.closest("[data-abrir]"), v = e.target.closest("[data-ver]");
+  const col = !v && !c && !a && e.target.closest(".scol");
+  if (col && !e.target.closest(".ev")) {
+    const y = e.clientY - col.getBoundingClientRect().top, m = Math.floor((+col.dataset.ini + y / +col.dataset.k) / 30) * 30;
+    nuevaCita(col.dataset.dia, hhmm(m)); return;
+  }
   if (v && ultimo) { const x = ultimo.citas.find((y) => y.id === +v.dataset.ver); if (x) { $("ver").innerHTML = citaHTML(x); $("d-ver").showModal(); } return; }
   try {
     if (c && confirm("¿Cancelar esta cita? Si dejó email, se le avisará.")) { await api("panel/cancelar", { id: +c.dataset.cancelar }); await cargar(); }
@@ -316,13 +321,18 @@ async function horas() {
   const s = $("n-serv").value, f = $("n-fecha").value, sel = $("n-hora");
   sel.innerHTML = "<option value=''>…</option>";
   if (!s || !f) return;
-  const r = await fetch(`/api/as/${slug}/huecos?servicio=${encodeURIComponent(s)}&fecha=${f}`).then((x) => x.json()).catch(() => ({}));
+  const r = await api(`panel/huecos?servicio=${encodeURIComponent(s)}&fecha=${f}`).catch(() => ({}));
   sel.innerHTML = (r.huecos || []).map((h) => `<option>${h}</option>`).join("") || "<option value=''>Sin huecos ese día</option>";
+  if (horaPedida && (r.huecos || []).includes(horaPedida)) sel.value = horaPedida;
+  horaPedida = "";
 }
-$("b-nueva").onclick = () => {
+let horaPedida = "";
+function nuevaCita(fecha, hora) {
   $("n-serv").innerHTML = negocio.servicios.map((s) => `<option value="${esc(s.id)}">${esc(s.nombre)} (${s.min} min)</option>`).join("");
-  $("n-fecha").value = $("n-fecha").min = hoyISO(); $("mn").textContent = ""; horas(); $("d-nueva").showModal();
-};
+  $("n-fecha").min = hoyISO(); $("n-fecha").value = fecha && fecha >= hoyISO() ? fecha : hoyISO();
+  horaPedida = hora || ""; $("mn").textContent = ""; horas(); $("d-nueva").showModal();
+}
+$("b-nueva").onclick = () => nuevaCita();
 $("n-serv").onchange = horas; $("n-fecha").onchange = horas;
 $("fn").addEventListener("submit", async (e) => {
   if (e.submitter && e.submitter.value === "x") return;
