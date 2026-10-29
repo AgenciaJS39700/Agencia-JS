@@ -130,10 +130,31 @@ for (; t <= b && out.length < 14; t += 20) { out.push((d === 0 ? "Hoy " : d === 
 }
 return out;
 }
+function decCart(id) { var it = byId[id], s = it.s || 1; cart[id] = Math.round((cart[id] - s) * 100) / 100; if (cart[id] < (it.m || s)) { delete cart[id]; } renderCart(); }
+/* Añadir y quitar desde la propia tarjeta: el botón «Añadir» se convierte en − cantidad + */
+function syncCards() {
+$$("[data-add]").forEach(function (b) {
+var id = b.dataset.add, it = byId[id]; if (!it) { return; }
+var cq = b.nextElementSibling && b.nextElementSibling.classList.contains("cq") ? b.nextElementSibling : null;
+if (!cq) {
+cq = h("div", { class: "cq", role: "group", "aria-label": "Cantidad de " + it.n });
+var m = h("button", { type: "button", "aria-label": "Quitar " + it.n, text: "−" });
+var p = h("button", { type: "button", "aria-label": "Añadir otro " + it.n, text: "+" });
+m.addEventListener("click", function () { decCart(id); });
+p.addEventListener("click", function () { addToCart(id); });
+cq.appendChild(m); cq.appendChild(h("span", { class: "cq-v", "aria-live": "polite" })); cq.appendChild(p);
+b.parentNode.insertBefore(cq, b.nextSibling);
+}
+var q = cart[id];
+b.hidden = !!q; cq.hidden = !q;
+if (q) { $(".cq-v", cq).textContent = qtyLabel(it, q); }
+});
+}
 function renderCart() {
 if (!dr) { return; }
 var n = cartCount();
 cn.forEach(function (b) { b.textContent = n; b.classList.toggle("on", n > 0); });
+syncCards();
 cb.textContent = "";
 if (!n) {
 cb.appendChild(h("div", { class: "empty" }, [h("div", { html: S.art && S.art.empty || "" }), h("p", { text: "Tu pedido está vacío. Añade productos desde el catálogo." })]));
@@ -146,7 +167,7 @@ var src = $('.pc[data-id="' + id + '"] .im img') || $('.pc[data-id="' + id + '"]
 var ti = h("div", { class: "ti" }); if (src) { ti.appendChild(src.cloneNode(true)); }
 var minus = h("button", { type: "button", "aria-label": "Quitar " + (it.u === "kg" ? "medio kilo" : "uno"), text: "−" });
 var plus = h("button", { type: "button", "aria-label": "Añadir " + (it.u === "kg" ? "medio kilo" : "uno"), text: "+" });
-minus.addEventListener("click", function () { var s = it.s || 1; cart[id] = Math.round((cart[id] - s) * 100) / 100; if (cart[id] < (it.m || s)) { delete cart[id]; } renderCart(); });
+minus.addEventListener("click", function () { decCart(id); });
 plus.addEventListener("click", function () { cart[id] = Math.round((cart[id] + (it.s || 1)) * 100) / 100; renderCart(); });
 cb.appendChild(h("div", { class: "ci" }, [ti, h("div", {}, [h("b", { text: it.n }), h("small", { text: eur(it.p) + (it.u === "kg" ? "/kg" : "") + " · " + eur(it.p * q) })]), h("div", { class: "qt" }, [minus, h("span", { text: qtyLabel(it, q) }), plus])]));
 });
