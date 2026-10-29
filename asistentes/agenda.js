@@ -212,13 +212,33 @@ async function avisarNegocio(env, cfg, c, tipo) {
 /** Recordatorio por correo el día anterior (lo lanza el cron diario de worker.js). */
 export async function enviarRecordatorios(env) {
   if (!env.CITAS) return;
-  const manana = sumar(ahora().fecha, 1);
-  const { results } = await env.CITAS.prepare("SELECT * FROM citas WHERE fecha = ? AND estado = 'ok' AND recordada = 0 AND email IS NOT NULL LIMIT 200").bind(manana).all();
+  const hoy = ahora().fecha, manana = sumar(hoy, 1);
+  // 1) Víspera: correo (si dejó email) y WhatsApp (si el negocio lo tiene activado y está montada la API de Meta)
+  const { results } = await env.CITAS.prepare("SELECT * FROM citas WHERE fecha = ? AND estado = 'ok' AND recordada = 0 LIMIT 300").bind(manana).all();
   for (const c of results || []) {
     const cfg = CLIENTES[c.slug];
     if (!cfg || cfg.activo === false) continue;
-    const ok = await correo(env, cfg, c.email, c.nombre, `Recordatorio: mañana a las ${hhmm(c.inicio)} · ${cfg.negocio.nombre}`, plantillaCliente(cfg, c, "Te esperamos mañana"));
-    if (ok) await env.CITAS.prepare("UPDATE citas SET recordada = 1 WHERE id = ?").bind(c.id).run();
+    const [m, w] = await Promise.all([
+      c.email ? correo(env, cfg, c.email, c.nombre, `Recordatorio: mañana a las ${hhmm(c.inicio)} · ${cfg.negocio.nombre}`, plantillaCliente(cfg, c, "Te esperamos mañana")) : false,
+      cfg.avisos && cfg.avisos.whatsappCliente && c.telefono ? plantillaWhatsApp(env, conPrefijo(c.telefono), "cita_recordatorio", [c.nombre.split(" ")[0], cfg.negocio.nombre, c.servicio_n, `mañana a las ${hhmm(c.inicio)}`, c.codigo, cfg.slug]) : false,
+    ]);
+    if (m || w) await env.CITAS.prepare("UPDATE citas SET recordada = 1 WHERE id = ?").bind(c.id).run();
+  }
+  // 2) «Te toca volver»: cfg.vuelta = { idServicio: días }. Una sola vez (el día exacto) y solo si no tiene ya otra cita.
+  for (const slug of Object.keys(CLIENTES)) {
+    const cfg = CLIENTES[slug];
+    if (!cfg || cfg.activo === false || !cfg.vuelta) continue;
+    for (const [sid, dias] of Object.entries(cfg.vuelta)) {
+      const f = sumar(hoy, -Number(dias));
+      const r = await env.CITAS.prepare("SELECT * FROM citas WHERE slug = ? AND servicio = ? AND fecha = ? AND estado = 'ok' AND email IS NOT NULL LIMIT 100").bind(slug, sid, f).all();
+      for (const c of r.results || []) {
+        const otra = await env.CITAS.prepare("SELECT 1 FROM citas WHERE slug = ? AND email = ? AND fecha >= ? AND estado = 'ok' LIMIT 1").bind(slug, c.email, hoy).first();
+        if (otra) continue;
+        const sem = Math.round(Number(dias) / 7), url = cfg.negocio.web || `https://agencia-js.com/c/${slug}`;
+        await correo(env, cfg, c.email, c.nombre, `${c.nombre.split(" ")[0]}, ¿repetimos? · ${cfg.negocio.nombre}`,
+          marco(cfg, `Hace ${sem} semanas de tu ${c.servicio_n.toLowerCase()}`, `<p style="font-size:15px;line-height:1.6">Es el momento ideal para el retoque y que tu pelo siga perfecto. Reserva en un minuto, cuando quieras:</p><p style="margin:20px 0"><a href="${esc(url)}" style="display:inline-block;background:${esc(cfg.color)};color:#111;padding:12px 20px;border-radius:999px;font-weight:700;text-decoration:none">Pedir cita</a></p>`));
+      }
+    }
   }
 }
 

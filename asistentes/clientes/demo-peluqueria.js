@@ -34,7 +34,7 @@ export default {
       "Aparcamiento público a 2 minutos en la Plaza del Mar.",
     ],
     wa: "34628224719",
-    web: "",
+    web: "https://peluquer-a-marta-vega.agencia39700.workers.dev/",
     mapa: "",
     logo: "",
   },
@@ -54,7 +54,9 @@ export default {
   chips: ["¿Cómo funciona el club de puntos?", "¿Tenéis tarjeta regalo?", "¿Qué promociones hay?"],
   saludo: "¡Hola! Soy el asistente del Salón Marta Vega ✂️ Te ayudo a pedir cita o con dudas sobre servicios, precios, el club de puntos o las tarjetas regalo.",
   agenda: { ...plantilla.agenda, capacidad: 3, pedirEmail: true },
-  avisos: { email: "agencia39700@gmail.com", whatsapp: "", whatsappCliente: false },
+  avisos: { email: "agencia39700@gmail.com", whatsapp: "", whatsappCliente: true }, // WhatsApp al cliente: sale cuando esté montada la API de Meta
+  // «Te toca volver»: correo X días después de la cita si no ha vuelto a reservar
+  vuelta: { color: 42, babylights: 42, balayage: 70, "corte-mujer": 50, keratina: 90, manicura: 21 },
   panel: { hash: "f4a9356e9d01acef4818b195a858d7f6f1249019f26c77e28489576557b100f3" },
   dominios: [],
 };

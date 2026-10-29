@@ -8,6 +8,7 @@
 //   cita_nueva     «📅 Nueva cita en {{1}}: {{2}}, {{3}}, {{4}}. Teléfono del cliente: {{5}}.»
 //   cita_anulada   «❌ Cita anulada en {{1}}: {{2}}, {{3}}, {{4}}. El hueco vuelve a estar libre.»
 //   cita_cliente   «Hola {{1}}, tu cita en {{2}} está confirmada: {{3}}, {{4}}. Tu código es {{5}}. Si no puedes venir, anúlala en agencia-js.com/c/{{6}}»
+//   cita_recordatorio «Hola {{1}}, te recordamos tu cita en {{2}}: {{3}}, {{4}}. Código {{5}}. ¿No puedes venir? Anúlala en agencia-js.com/c/{{6}}»
 
 const limpio = (t) => String(t == null ? "" : t).replace(/[\r\n\t]+/g, " ").replace(/ {2,}/g, " ").trim().slice(0, 200) || "-";
 

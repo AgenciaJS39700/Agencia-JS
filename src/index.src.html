@@ -435,6 +435,27 @@ footer nav[aria-label="Legal"]{row-gap:0}
 .mk-voz-b:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .mk-voz-n{grid-column:1/-1;font-size:.75rem;color:#a1a1aa}
 @media (prefers-reduced-motion:reduce){.mk-voz-orb i{animation:none}}
+/* Demos por sector */
+.dm{padding:4.5rem 0 3.5rem;background:#050505}
+.dm-g{display:grid;gap:1rem;margin-top:2.2rem}
+@media(min-width:640px){.dm-g{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.dm-g{grid-template-columns:repeat(3,1fr);gap:1.3rem}}
+.dm-c{position:relative;display:flex;flex-direction:column;border-radius:1.5rem;overflow:hidden;background:#0d0d0f;border:1px solid rgba(255,255,255,.09);transition:transform .35s,border-color .35s,box-shadow .35s;text-decoration:none;color:#fff}
+.dm-c:hover{transform:translateY(-4px);border-color:rgba(232,199,102,.55);box-shadow:0 30px 60px -30px rgba(232,199,102,.35)}
+.dm-c:focus-visible{outline:3px solid #e8c766;outline-offset:3px}
+.dm-im{position:relative;aspect-ratio:16/10;overflow:hidden}
+.dm-im img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.dm-c:hover .dm-im img{transform:scale(1.06)}
+.dm-im:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(13,13,15,.95))}
+.dm-s{position:absolute;left:1rem;top:1rem;z-index:1;padding:.3rem .7rem;border-radius:999px;background:rgba(10,10,10,.65);backdrop-filter:blur(8px);font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.dm-new{position:absolute;right:1rem;top:1rem;z-index:1;padding:.3rem .7rem;border-radius:999px;background:linear-gradient(135deg,#f5e3a6,#e8c766 45%,#c99a2e);color:#0a0a0a;font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.dm-b{padding:0 1.2rem 1.3rem;margin-top:-1.6rem;position:relative;z-index:1;display:flex;flex-direction:column;gap:.6rem;flex:1}
+.dm-b h3{font-size:1.25rem;font-weight:800}
+.dm-b p{font-size:.88rem;color:#a3a3a3;line-height:1.5}
+.dm-f{display:flex;flex-wrap:wrap;gap:.35rem}
+.dm-f span{font-size:.72rem;font-weight:700;padding:.25rem .6rem;border-radius:999px;background:rgba(255,255,255,.07);color:#e4e4e7}
+.dm-ft{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-top:auto;padding-top:.6rem;font-size:.8rem;color:#a3a3a3}
+.dm-ft b{display:inline-flex;align-items:center;gap:.4rem;color:#f5e3a6;font-size:.9rem}
 /* Planes: pago único / suscripción */
 .pay-tg{position:relative;display:grid;grid-template-columns:1fr 1fr;width:min(100%,30rem);margin:2rem auto 0;padding:.35rem;border-radius:999px;background:#0a0a0a;border:1px solid rgba(232,199,102,.45)}
 .pay-tg button{position:relative;z-index:1;min-height:52px;padding:.5rem .8rem;border:0;background:none;color:#d4d4d8;font-weight:700;font-size:.95rem;line-height:1.15;border-radius:999px;cursor:pointer;transition:color .3s}
@@ -562,6 +583,7 @@ requestAnimationFrame(fr)})(t0);
 </a>
 <nav aria-label="Principal" class="hidden items-center gap-1 xl:flex">
 <a href="#asistentes" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Asistentes</a>
+<a href="#demos" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Demos</a>
 <a href="#planes" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Planes</a>
 <a href="#video" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Vídeo Ads</a>
 <a href="#nfc" class="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-black/5 hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black">Tarjetas NFC</a>
@@ -582,6 +604,7 @@ class="flex h-11 w-11 items-center justify-center rounded-full border border-bla
 <nav id="menu-movil" aria-label="Menú móvil" class="hidden border-t border-black/10 bg-zinc-200 xl:hidden">
 <ul class="mx-auto max-w-6xl space-y-1 px-4 py-3">
 <li><a href="#asistentes" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Asistentes 24/7</a></li>
+<li><a href="#demos" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Demos por sector</a></li>
 <li><a href="#planes" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Planes</a></li>
 <li><a href="#video" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Vídeo Ads</a></li>
 <li><a href="#nfc" class="block rounded-xl px-4 py-3 font-semibold text-ink hover:bg-black/10">Tarjetas NFC</a></li>
@@ -802,6 +825,42 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 })();
 </script>
 <!-- 4. PLANES -->
+<section id="demos" class="dm" aria-labelledby="dm-t">
+<div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+<div class="reveal mx-auto max-w-2xl text-center">
+<p class="text-xs font-semibold uppercase tracking-[0.25em] text-silver">Demos por sector</p>
+<h2 id="dm-t" class="mt-3 text-3xl font-extrabold sm:text-4xl">Mira cómo quedaría tu negocio</h2>
+<p class="mt-3 text-sm text-mute">Webs de ejemplo funcionando de verdad. Ábrelas en el móvil y pruébalas: reserva, paga, pide… Todas son datos de demostración.</p>
+</div>
+<div class="dm-g">
+<a class="dm-c reveal" href="https://peluquer-a-marta-vega.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_sector_salón" aria-label="Ver la demo de Salón Marta Vega (Peluquería y estética)">
+<div class="dm-im"><img src="/img/demos/peluqueria.webp" alt="" loading="lazy" decoding="async" width="640" height="400"><span class="dm-s">Peluquería y estética</span><span class="dm-new">Nueva</span></div>
+<div class="dm-b"><h3>Salón Marta Vega</h3><p>La más completa: reservas reales, probador de color con la cámara, club de puntos con cuenta, tarjeta regalo con pago, tienda y panel del salón.</p><div class="dm-f"><span>Probador de color</span><span>Club de puntos</span><span>Pago con tarjeta</span><span>App instalable</span></div><div class="dm-ft"><span>Plan: Presencia 360°</span><b>Ver demo <svg class="ic h-4 w-4" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></b></div></div>
+</a>
+<a class="dm-c reveal" href="/demo/acelerador-pro/" data-cta="demo_sector_bar" aria-label="Ver la demo de Bar Marea (Bar y restaurante)">
+<div class="dm-im"><img src="/demo/acelerador-pro/img/terraza.webp" alt="" loading="lazy" decoding="async" width="640" height="400"><span class="dm-s">Bar y restaurante</span></div>
+<div class="dm-b"><h3>Bar Marea</h3><p>Carta digital con alérgenos, pedido desde la mesa, cuenta dividida entre varios móviles con QR y camarero virtual.</p><div class="dm-f"><span>Pedir desde la mesa</span><span>Pagar entre todos</span><span>Carta en 3 idiomas</span></div><div class="dm-ft"><span>Plan: Acelerador Pro</span><b>Ver demo <svg class="ic h-4 w-4" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></b></div></div>
+</a>
+<a class="dm-c reveal" href="https://nacar-demo.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_sector_nácar" aria-label="Ver la demo de Nácar Nail Atelier (Uñas y belleza)">
+<div class="dm-im"><img src="/img/demos/unas.webp" alt="" loading="lazy" decoding="async" width="640" height="400"><span class="dm-s">Uñas y belleza</span></div>
+<div class="dm-b"><h3>Nácar Nail Atelier</h3><p>Web premium con probador de uñas en tu propia mano, colores de temporada y reservas.</p><div class="dm-f"><span>Probador de uñas</span><span>Reservas</span><span>Diseño premium</span></div><div class="dm-ft"><span>Plan: Presencia 360°</span><b>Ver demo <svg class="ic h-4 w-4" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></b></div></div>
+</a>
+<a class="dm-c reveal" href="/demo/presencia-360/" data-cta="demo_sector_tinta" aria-label="Ver la demo de Tinta Negra (Tatuajes)">
+<div class="dm-im"><img src="/demo/presencia-360/img/estudio.webp" alt="" loading="lazy" decoding="async" width="640" height="400"><span class="dm-s">Tatuajes</span></div>
+<div class="dm-b"><h3>Tinta Negra</h3><p>Simulador para ver el tatuaje en tu piel en 3D, catálogo de diseños y citas con el artista.</p><div class="dm-f"><span>Simulador 3D</span><span>Catálogo</span><span>Citas</span></div><div class="dm-ft"><span>Plan: Presencia 360°</span><b>Ver demo <svg class="ic h-4 w-4" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></b></div></div>
+</a>
+<a class="dm-c reveal" href="/demo/impulso/" data-cta="demo_sector_el" aria-label="Ver la demo de El Horno de Lola (Panadería y comercio)">
+<div class="dm-im"><img src="/demo/impulso/img/hero.webp" alt="" loading="lazy" decoding="async" width="640" height="400"><span class="dm-s">Panadería y comercio</span></div>
+<div class="dm-b"><h3>El Horno de Lola</h3><p>Pedidos para recoger por WhatsApp, horas de las hornadas en directo y tarjeta de fidelización.</p><div class="dm-f"><span>Pedido por WhatsApp</span><span>Hornadas en directo</span><span>Fidelización</span></div><div class="dm-ft"><span>Plan: Impulso Digital</span><b>Ver demo <svg class="ic h-4 w-4" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></b></div></div>
+</a>
+<a class="dm-c reveal" href="/c/demo-clinica" data-cta="demo_sector_clínica" aria-label="Ver la demo de Clínica Dental Sonríe (Clínicas y citas)">
+<div class="dm-im"><img src="/img/demos/clinica.webp" alt="" loading="lazy" decoding="async" width="640" height="400"><span class="dm-s">Clínicas y citas</span></div>
+<div class="dm-b"><h3>Clínica Dental Sonríe</h3><p>Asistente de citas 24/7 con agenda real: el paciente reserva o anula solo y la clínica lo ve todo en su panel.</p><div class="dm-f"><span>Citas 24 h</span><span>Agenda real</span><span>Panel del negocio</span></div><div class="dm-ft"><span>Plan: Asistente 24/7</span><b>Ver demo <svg class="ic h-4 w-4" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></b></div></div>
+</a>
+</div>
+<p class="reveal mt-8 text-center text-sm text-mute">¿Tu sector no está? Lo hacemos a medida. <a href="https://wa.me/34688933308" data-wa="Hola, quiero ver cómo quedaría la web de mi negocio" target="_blank" rel="noopener" data-cta="demo_sector_otro" class="font-semibold text-white underline underline-offset-2">Cuéntanos tu negocio</a> y te enseñamos un ejemplo.</p>
+</div>
+</section>
 <section id="planes" class="bg-navy py-14 sm:py-16 lg:py-20">
 <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 <div class="reveal mx-auto max-w-2xl text-center">
@@ -885,7 +944,7 @@ class="mt-3 inline-flex min-h-[46px] items-center justify-center gap-2 rounded-f
 class="mt-8 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-white/60 px-6 py-3 font-semibold transition hover:bg-white hover:text-ink focus:outline-none focus-visible:ring-4 focus-visible:ring-white/40 motion-reduce:transition-none">
 <svg class="ic h-5 w-5" aria-hidden="true" focusable="false"><use href="#i-message-circle"/></svg> Quiero este plan
 </a>
-<a href="/demo/presencia-360/" data-cta="demo_presencia-360" aria-label="Ver demo del plan Presencia 360°"
+<a href="https://peluquer-a-marta-vega.agencia39700.workers.dev/" data-cta="demo_presencia-360" aria-label="Ver demo del plan Presencia 360°: Salón Marta Vega"
 class="mt-3 inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border border-white/25 px-6 py-2.5 text-sm font-semibold text-white/90 transition hover:border-gold hover:text-gold-light focus:outline-none focus-visible:ring-4 focus-visible:ring-white/40 motion-reduce:transition-none">
 <svg class="ic h-4 w-4" aria-hidden="true" focusable="false"><use href="#i-play"/></svg> Ver demo
 </a>
