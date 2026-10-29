@@ -178,6 +178,12 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
 .track .now i{animation:bump 1.2s infinite}
 .pm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
 .pm button{min-height:52px;border-radius:14px;border:1.5px solid #e2d6c1;background:#fff;font:inherit;font-weight:800;cursor:pointer;color:var(--ink)}
+.pm .wide{grid-column:1/-1}.pm button:disabled,.chip:disabled{opacity:.45;cursor:not-allowed}
+.ppl{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:10px 12px;border:1.5px solid #e2d6c1;border-radius:14px;background:#fff;font-weight:700}
+.stp{display:flex;align-items:center;gap:10px}.stp button{width:44px;height:44px;border-radius:50%;border:1.5px solid #e2d6c1;background:var(--paper);font:inherit;font-size:20px;font-weight:800;cursor:pointer;color:var(--ink)}.stp button:disabled{opacity:.4}.stp b{min-width:2ch;text-align:center;font-size:20px}
+.parts{list-style:none;padding:0;margin:10px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}.parts li{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:12px;border:1.5px solid #e2d6c1;background:#fff;font-size:13px}.parts li span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#efe6d6;font-weight:800;font-size:12px;flex:none}.parts li.ok{background:#eaf6ee;border-color:#9fd3b0}.parts li.ok span{background:#2fa35a;color:#fff}.parts li.now{border-color:var(--g);box-shadow:0 0 0 2px var(--g) inset}
+.prog{height:8px;border-radius:99px;background:#efe6d6;overflow:hidden;margin-top:12px}.prog i{display:block;height:100%;background:#2fa35a;transition:width .5s}
+.its{display:grid;gap:8px;margin-top:8px}.it{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:10px;padding:8px;border:1.5px solid #e2d6c1;border-radius:14px;background:#fff}.it.done{opacity:.55}.it b{display:block;font-size:14px;line-height:1.2}.it small{color:var(--mute);font-size:12.5px}.it .qty{display:flex;align-items:center;gap:6px}.it .qty button{width:36px;height:36px;border-radius:50%;border:1.5px solid #e2d6c1;background:var(--paper);font:inherit;font-weight:800;cursor:pointer;color:var(--ink)}.it .qty button:disabled{opacity:.35}.it .okb{color:#2fa35a;font-weight:800;padding-right:8px}
 .pm button[aria-pressed=true]{border-color:var(--g);box-shadow:0 0 0 2px var(--g) inset}
 .okk{text-align:center;padding:10px 0}
 .okk svg{margin:0 auto 10px}
@@ -185,12 +191,13 @@ textarea.nt{width:100%;min-height:64px;border:1.5px solid #e2d6c1;border-radius:
 .okk path{stroke-dasharray:60;stroke-dashoffset:60;animation:draw .45s .6s forwards}
 @keyframes draw{to{stroke-dashoffset:0}}
 .chat .in{display:flex;flex-direction:column;height:min(700px,88svh);padding:0;overflow:hidden}
+@media(max-width:600px){.chat{align-items:flex-end}.chat .in{height:92dvh;max-height:none;border-radius:24px 24px 0 0}.chat .quick{padding-bottom:2px}.ask{padding-bottom:calc(12px + env(safe-area-inset-bottom))}}
 .chat .top{display:flex;align-items:center;gap:12px;padding:16px 64px 14px 18px;border-bottom:1px solid #efe5d4}
 .av{width:46px;height:46px;border-radius:50%;background:var(--g);display:grid;place-items:center;font-size:23px;flex:none}
 .top b{display:block;font-family:var(--serif);font-size:20px}.top small{color:#2fa35a;font-weight:700;font-size:12.5px}
 .log{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
 .msg{max-width:88%;padding:11px 14px;border-radius:18px;font-size:15px;line-height:1.45;animation:pop .35s}
-.msg.b{background:#fff;border:1px solid #efe5d4;border-bottom-left-radius:6px}
+.msg.bot{background:#fff;color:var(--ink);border:1px solid #efe5d4;border-bottom-left-radius:6px}
 .msg.u{align-self:flex-end;background:var(--g);color:var(--cream);border-bottom-right-radius:6px}
 .msg .small{display:block;margin-top:6px}
 .dots span{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--mute);margin:0 2px;animation:dot 1s infinite}
@@ -339,7 +346,7 @@ body.lock .ups{display:none}
 </style>
 <style>#fidelidad{background:var(--cream)}#regalo{background:var(--paper)}#fidelidad h2,#regalo h2{font-family:var(--serif)}</style>
 <style>.rescal{margin-top:16px;padding:16px;border-radius:16px;background:var(--cream);border:1px solid rgba(15,42,36,.15)}.rescal p{margin:0 0 10px}.rescal .btn{width:100%}.rescal-n{font-size:13px;color:var(--mute);margin:10px 0 0!important}</style>
-</head>
+<style id="movil-pill">@media(max-width:600px){#ajs-demo{left:auto!important;right:10px;transform:none!important;gap:6px!important;padding:5px 5px 5px 12px!important;font-size:12px!important}#ajs-demo>span+span{display:none}}html:has(.sheet.open,.reel.open) #ajs-demo{display:none!important}</style></head>
 <body>
 <header class="hdr" id="hdr"><div class="wrap">
   <a class="logo" href="#inicio" aria-label="Bar Marea, inicio"><svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 40c6-6 12-6 18 0s12 6 18 0 10-5 10-5" stroke="#d9a441" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M8 27c6-6 12-6 18 0s12 6 18 0 10-5 10-5" stroke="#f6efe3" stroke-width="5" fill="none" stroke-linecap="round"/></svg>Bar Marea</a>
@@ -537,9 +544,63 @@ function vthumb(m){return '<video class="thumb lv" src="vid/'+VID[m.id]+'.mp4" p
 function im(i){return "img/"+IMG[i]+".webp"}
 function thumb(m,c){return '<img class="'+(c||"thumb")+'" src="'+im(m.id)+'" alt="" loading="lazy" width="720" height="720">'}
 var L=(function(){var n=(navigator.language||"es").slice(0,2).toLowerCase();return T[n]?n:"es"})();
+(function(){var X={
+es:{sp_all:"Todo junto",sp_eq:"A partes iguales",sp_it:"Por platos",people:"¿Entre cuántos?",pay_part:"Pagar parte",of:"de",prog:"Pagado {a} de {b}",left:"Queda por pagar",pick:"Marca lo que pagas tú:",nosel:"Marca al menos un plato",pay_sel:"Pagar lo marcado",part_ok:"Parte pagada ✓ Siguiente persona.",cash:"Efectivo",cash_w:"¿Con cuánto pagas?",exact:"Justo",change:"Cambio",cash_btn:"Pagar en efectivo",cash_ok:"Un camarero viene a la mesa {m} a cobrar {x} en efectivo.",lock:"Ya hay pagos hechos: el reparto queda fijado.",
+f_menu:"🍽️ <b>Menú del día</b> (martes a viernes, mediodía): <b>14,90 €</b> con primero, segundo, postre o café, pan y bebida.<br>• Primeros: salmorejo o ensalada de la casa<br>• Segundos: merluza a la plancha o carrillera al vino tinto<br>• Postre casero o café<br><span class=\"small\">El fin de semana no hay menú: carta completa.</span>",
+f_hours:"🕒 Horario:<br>{h}",f_res:"📅 Puedes reservar en la sección «Visítanos»: eliges día, hora, personas y zona (terraza, interior o barra) y te confirmamos por WhatsApp en minutos.",f_go_res:"Reservar mesa",
+f_bread:"🥖 Sí: pan de masa madre de obrador del barrio (1,50 € la cesta; va incluido en el menú del día). Si eres celíaco, pide el pan sin gluten.",
+f_pay:"💳 Aceptamos tarjeta, Apple Pay, Google Pay, Bizum y efectivo. Puedes pagar desde aquí y dividir la cuenta a partes iguales o por platos, entre las personas que seáis.",
+f_split:"➗ Sí: en «Pagar la cuenta» eliges <b>a partes iguales</b> (entre las personas que seáis) o <b>por platos</b> (cada uno marca lo suyo). Verás en todo momento lo pagado y lo que falta.",
+f_terr:"☀️ Sí, tenemos terraza (abierta todo el año, con estufas en invierno). Al reservar puedes elegir terraza, interior o barra.",
+f_pets:"🐶 Las mascotas son bienvenidas en la terraza. Te ponemos un cuenco de agua.",
+f_kids:"🧒 Sí: tenemos tronas y medias raciones para peques. Pregunta al camarero por las opciones del día.",
+f_wifi:"📶 Wifi gratis: red <b>Marea-Clientes</b>, contraseña <b>vermut2026</b> (dato de demostración).",
+f_take:"🥡 Sí, casi toda la carta se puede pedir para llevar. Llama o escríbenos por WhatsApp y te lo tenemos listo.",
+f_where:"📍 Calle del Puerto, 12. Hay aparcamiento público a 3 minutos andando.",
+f_group:"🎉 Hacemos grupos y celebraciones (cumpleaños, comidas de empresa) con menús cerrados. Escríbenos por WhatsApp con fecha y número de personas.",
+f_acc:"♿ El local es accesible: entrada sin escalones y baño adaptado.",
+f_veg:"",f_hi:"¡Hola! 👋 ¿En qué te ayudo? Puedo contarte el menú del día, alérgenos, qué pedir, horario o ayudarte a pagar.",f_thx:"¡A ti! Si necesitas algo más, aquí estoy 😊"},
+en:{sp_all:"Together",sp_eq:"Split equally",sp_it:"By dish",people:"How many people?",pay_part:"Pay share",of:"of",prog:"Paid {a} of {b}",left:"Left to pay",pick:"Tick what you're paying for:",nosel:"Tick at least one dish",pay_sel:"Pay selected",part_ok:"Share paid ✓ Next person.",cash:"Cash",cash_w:"Paying with?",exact:"Exact",change:"Change",cash_btn:"Pay in cash",cash_ok:"A waiter is coming to table {m} to collect {x} in cash.",lock:"Payments already made: the split is now fixed.",
+f_menu:"🍽️ <b>Set lunch menu</b> (Tuesday to Friday, lunchtime): <b>€14.90</b> with starter, main, dessert or coffee, bread and a drink.<br>• Starters: salmorejo or house salad<br>• Mains: grilled hake or pork cheeks in red wine<br>• Homemade dessert or coffee<br><span class=\"small\">No set menu at weekends: full menu.</span>",
+f_hours:"🕒 Opening hours:<br>{h}",f_res:"📅 You can book in the «Visit us» section: choose day, time, party size and area (terrace, inside or bar) and we confirm on WhatsApp within minutes.",f_go_res:"Book a table",
+f_bread:"🥖 Yes: sourdough from a local bakery (€1.50 per basket; included in the set menu). If you're coeliac, ask for gluten-free bread.",
+f_pay:"💳 We take card, Apple Pay, Google Pay, Bizum and cash. You can pay from here and split the bill equally or by dish, between as many people as you are.",
+f_split:"➗ Yes: in «Pay the bill» choose <b>split equally</b> (between any number of people) or <b>by dish</b> (everyone ticks their own). You'll always see what's paid and what's left.",
+f_terr:"☀️ Yes, we have a terrace (open all year, heaters in winter). When booking you can choose terrace, inside or bar.",
+f_pets:"🐶 Pets are welcome on the terrace. We'll bring a bowl of water.",
+f_kids:"🧒 Yes: high chairs and half portions for kids. Ask the waiter for today's options.",
+f_wifi:"📶 Free wifi: network <b>Marea-Clientes</b>, password <b>vermut2026</b> (demo data).",
+f_take:"🥡 Yes, most of the menu is available to take away. Call or WhatsApp us and we'll have it ready.",
+f_where:"📍 Calle del Puerto, 12. Public parking 3 minutes' walk away.",
+f_group:"🎉 We host groups and celebrations (birthdays, work lunches) with set menus. WhatsApp us with the date and number of people.",
+f_acc:"♿ The venue is accessible: step-free entrance and adapted toilet.",
+f_veg:"",f_hi:"Hi! 👋 How can I help? I can tell you the set menu, allergens, what to order, opening hours or help you pay.",f_thx:"You're welcome! I'm here if you need anything else 😊"},
+fr:{sp_all:"Ensemble",sp_eq:"À parts égales",sp_it:"Par plat",people:"Combien de personnes ?",pay_part:"Payer la part",of:"sur",prog:"Payé {a} sur {b}",left:"Reste à payer",pick:"Cochez ce que vous payez :",nosel:"Cochez au moins un plat",pay_sel:"Payer la sélection",part_ok:"Part payée ✓ Personne suivante.",cash:"Espèces",cash_w:"Vous payez avec ?",exact:"Juste",change:"Monnaie",cash_btn:"Payer en espèces",cash_ok:"Un serveur arrive à la table {m} pour encaisser {x} en espèces.",lock:"Des paiements ont été faits : le partage est fixé.",
+f_menu:"🍽️ <b>Menu du jour</b> (du mardi au vendredi, le midi) : <b>14,90 €</b> avec entrée, plat, dessert ou café, pain et boisson.<br>• Entrées : salmorejo ou salade maison<br>• Plats : merlu à la plancha ou joues de porc au vin rouge<br>• Dessert maison ou café<br><span class=\"small\">Pas de menu le week-end : carte complète.</span>",
+f_hours:"🕒 Horaires :<br>{h}",f_res:"📅 Réservez dans la section « Venez nous voir » : jour, heure, nombre de personnes et zone (terrasse, salle ou bar), confirmation par WhatsApp en quelques minutes.",f_go_res:"Réserver une table",
+f_bread:"🥖 Oui : pain au levain d'une boulangerie du quartier (1,50 € la corbeille ; inclus dans le menu du jour). Si vous êtes cœliaque, demandez le pain sans gluten.",
+f_pay:"💳 Nous acceptons carte, Apple Pay, Google Pay, Bizum et espèces. Vous pouvez payer d'ici et partager l'addition à parts égales ou par plat.",
+f_split:"➗ Oui : dans « Payer l'addition », choisissez <b>à parts égales</b> ou <b>par plat</b>. Vous voyez toujours ce qui est payé et ce qui reste.",
+f_terr:"☀️ Oui, nous avons une terrasse (ouverte toute l'année, chauffée en hiver).",
+f_pets:"🐶 Les animaux sont les bienvenus en terrasse. On vous apporte un bol d'eau.",
+f_kids:"🧒 Oui : chaises hautes et demi-portions pour les enfants.",
+f_wifi:"📶 Wifi gratuit : réseau <b>Marea-Clientes</b>, mot de passe <b>vermut2026</b> (donnée de démo).",
+f_take:"🥡 Oui, presque toute la carte est disponible à emporter. Appelez-nous ou écrivez sur WhatsApp.",
+f_where:"📍 Calle del Puerto, 12. Parking public à 3 minutes à pied.",
+f_group:"🎉 Groupes et célébrations (anniversaires, repas d'entreprise) avec menus fermés. Écrivez-nous sur WhatsApp.",
+f_acc:"♿ Le local est accessible : entrée de plain-pied et toilettes adaptées.",
+f_veg:"",f_hi:"Bonjour ! 👋 Je peux vous parler du menu du jour, des allergènes, de quoi commander, des horaires ou vous aider à payer.",f_thx:"Avec plaisir ! Je suis là si besoin 😊"}
+};for(var l in X)for(var k in X[l])T[l][k]=X[l][k];
+T.es.q=["Menú del día","Soy celíaco","¿Qué me recomiendas?","Algo ligero","¿Qué bebo?","Horario","¿Puedo pagar en efectivo?","Sin lácteos"];
+T.en.q=["Set menu","I'm coeliac","What do you recommend?","Something light","What should I drink?","Opening hours","Can I pay cash?","Dairy free"];
+T.fr.q=["Menu du jour","Je suis cœliaque","Que me conseillez-vous ?","Quelque chose de léger","Que boire ?","Horaires","Je peux payer en espèces ?","Sans lactose"];
+T.es.fallback="Mmm, no estoy seguro de haberte entendido 🤔 Puedo ayudarte con el menú del día, alérgenos (gluten, lácteos, frutos secos, marisco), «qué me recomiendas», «qué bebo», horario, reservas, terraza, pago en efectivo o dividir la cuenta.";
+T.en.fallback="Hmm, I'm not sure I understood 🤔 I can help with the set menu, allergens (gluten, dairy, nuts, seafood), «what do you recommend», «what should I drink», opening hours, bookings, terrace, paying cash or splitting the bill.";
+T.fr.fallback="Hmm, je ne suis pas sûr d'avoir compris 🤔 Je peux vous aider avec le menu du jour, les allergènes, « que me conseillez-vous », « que boire », les horaires, les réservations, la terrasse, le paiement en espèces ou le partage de l'addition.";
+})();
 var MESA=((new URLSearchParams(location.search).get("mesa")||"7").replace(/\D/g,"").slice(0,3))||"7";
 var cat="picar",fV=0,fG=0,fL=0,fK=0,fD=0,VIEW="cards",upShown={},upNo=0,upT;
-var cart={},ordered={},stage=0,tip=0,split=1,pm="apple",note="",view="cart",greeted=0;
+var cart={},ordered={},stage=0,tip=0,split=1,pm="apple",note="",view="cart",greeted=0,spm="all",parts=0,paidC=0,itemPaid={},sel={},cashW=0;
 var $=function(s){return document.querySelector(s)};
 var tabs=$("#tabs"),ind=$("#ind"),grid=$("#grid"),filters=$("#filters");
 function t(k){return T[L][k]}
@@ -634,8 +695,32 @@ function drawCart(){
     }
     h+='<div class="acts" style="padding:14px 0 0"><button type="button" data-act="call">'+t("call")+'</button><button type="button" data-act="bill">'+t("bill")+'</button></div>';
   }else if(view==="pay"){
-    var s=sum(ordered),tt=s*(1+tip/100);
-    h='<h3 id="ct-t">'+t("pay")+'</h3><div class="sum"><span>'+t("subtotal")+'</span><span>'+eur(s)+'</span></div><p class="lbl">'+t("tip")+'</p><div class="seg">'+[0,5,10].map(function(x){return '<button type="button" class="chip" data-act="tip" data-v="'+x+'" aria-pressed="'+(tip===x)+'">'+(x?x+" %":"—")+'</button>'}).join("")+'</div><p class="lbl">'+t("split")+'</p><div class="seg">'+[1,2,3,4].map(function(x){return '<button type="button" class="chip" data-act="split" data-v="'+x+'" aria-pressed="'+(split===x)+'">'+(x===1?"1":"÷ "+x)+'</button>'}).join("")+'</div><div class="pm">'+[["apple","Apple Pay"],["google","G Pay"],["card","💳 "+t("card")],["bizum","Bizum"]].map(function(x){return '<button type="button" data-act="pm" data-v="'+x[0]+'" aria-pressed="'+(pm===x[0])+'">'+x[1]+'</button>'}).join("")+'</div><div class="sum t"><span>'+t("total")+'</span><span>'+eur(tt)+cv(tt)+'</span></div>'+(split>1?'<div class="sum"><span>'+t("each")+' ('+split+')</span><span>'+eur(tt/split)+'</span></div>':'')+'<button class="btn btn-gold" type="button" data-act="dopay" style="width:100%;margin-top:14px">🔒 '+t("paynow")+' '+eur(split>1?tt/split:tt)+'</button><p class="small" style="text-align:center;margin-top:10px">'+t("demo_pay")+'</p>';
+    var s=sum(ordered),rate=1+tip/100,totC=Math.round(s*rate*100),lock=paidC>0,amt=0,btn="";
+    var segB=function(v,lab){return '<button type="button" class="chip" data-act="spm" data-v="'+v+'" aria-pressed="'+(spm===v)+'"'+(lock&&spm!==v?" disabled":"")+'>'+lab+'</button>'};
+    h='<h3 id="ct-t">'+t("pay")+' · '+t("table")+' '+MESA+'</h3><div class="sum"><span>'+t("subtotal")+'</span><span>'+eur(s)+'</span></div>';
+    h+='<p class="lbl">'+t("tip")+'</p><div class="seg">'+[0,5,10].map(function(x){return '<button type="button" class="chip" data-act="tip" data-v="'+x+'" aria-pressed="'+(tip===x)+'"'+(lock?" disabled":"")+'>'+(x?x+" %":"—")+'</button>'}).join("")+'</div>';
+    h+='<p class="lbl">'+t("split")+'</p><div class="seg">'+segB("all",t("sp_all"))+segB("eq",t("sp_eq"))+segB("it",t("sp_it"))+'</div>';
+    if(spm==="eq"){
+      var base=Math.floor(totC/split),extra=totC-base*split,share=function(k){return base+(k<extra?1:0)};
+      h+='<div class="ppl"><span>'+t("people")+'</span><div class="stp"><button type="button" data-act="ppl" data-v="-1" aria-label="−"'+(lock||split<=2?" disabled":"")+'>−</button><b aria-live="polite">'+split+'</b><button type="button" data-act="ppl" data-v="1" aria-label="+"'+(lock||split>=30?" disabled":"")+'>+</button></div></div>';
+      h+='<ol class="parts">';for(var k=0;k<split;k++)h+='<li class="'+(k<parts?"ok":k===parts?"now":"")+'"><span>'+(k<parts?"✓":k+1)+'</span><b>'+eur(share(k)/100)+'</b></li>';h+='</ol>';
+      amt=parts<split?share(parts):0;
+      h+='<div class="prog"><i style="width:'+(parts/split*100)+'%"></i></div><div class="sum"><span>'+f(t("prog"),{a:parts,b:split})+'</span><span>'+t("left")+': '+eur((totC-paidC)/100)+'</span></div>';
+      btn=t("pay_part")+' '+(parts+1)+' '+t("of")+' '+split;
+    }else if(spm==="it"){
+      h+='<p class="small" style="margin-top:10px">'+t("pick")+'</p><div class="its">';var any=0;
+      for(var key in ordered){var m=M[key],rem=ordered[key]-(itemPaid[key]||0),sv=sel[key]||0;
+        h+='<div class="it'+(rem<1?" done":"")+'"><span class="e" aria-hidden="true">'+thumb(m,"mini")+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € · '+(rem<1?"✓":(rem+' / '+ordered[key]))+'</small></span>'+(rem<1?'<span class="okb">✓</span>':'<span class="qty"><button type="button" data-act="sdec" data-i="'+key+'" aria-label="−"'+(sv<1?" disabled":"")+'>−</button><b>'+sv+'</b><button type="button" data-act="sinc" data-i="'+key+'" aria-label="+"'+(sv>=rem?" disabled":"")+'>+</button></span>')+'</div>';
+        amt+=Math.round(pr(m)*sv*rate*100);if(sv)any=1}
+      h+='</div><div class="prog"><i style="width:'+(totC?paidC/totC*100:0)+'%"></i></div><div class="sum"><span>'+t("left")+'</span><span>'+eur((totC-paidC)/100)+'</span></div>';
+      btn=any?t("pay_sel"):t("nosel");
+    }else{amt=totC-paidC;btn=t("paynow")}
+    if(lock)h+='<p class="small" style="margin-top:6px">🔒 '+t("lock")+'</p>';
+    h+='<div class="pm">'+[["apple","Apple Pay"],["google","G Pay"],["card","💳 "+t("card")],["bizum","Bizum"],["cash","💶 "+t("cash")]].map(function(x){return '<button type="button" data-act="pm" data-v="'+x[0]+'" aria-pressed="'+(pm===x[0])+'"'+(x[0]==="cash"?' class="wide"':'')+'>'+x[1]+'</button>'}).join("")+'</div>';
+    if(pm==="cash"&&amt>0){var opts=[0,5,10,20,50,100].filter(function(v){return !v||v*100>=amt}).slice(0,5);if(cashW&&cashW*100<amt)cashW=0;
+      h+='<p class="lbl">'+t("cash_w")+'</p><div class="seg">'+opts.map(function(v){return '<button type="button" class="chip" data-act="cashw" data-v="'+v+'" aria-pressed="'+(cashW===v)+'">'+(v?v+" €":t("exact"))+'</button>'}).join("")+'</div>'+(cashW?'<div class="sum"><span>'+t("change")+'</span><span>'+eur((cashW*100-amt)/100)+'</span></div>':'')}
+    h+='<div class="sum t"><span>'+(spm==="all"?t("total"):t("paynow"))+'</span><span>'+eur(amt/100)+cv(amt/100)+'</span></div>';
+    h+='<button class="btn btn-gold" type="button" data-act="dopay" data-a="'+amt+'" style="width:100%;margin-top:14px"'+(amt>0?"":" disabled")+'>'+(pm==="cash"?"💶 "+t("cash_btn"):"🔒 "+btn)+(amt>0?' · '+eur(amt/100):'')+'</button><p class="small" style="text-align:center;margin-top:10px">'+t("demo_pay")+'</p>';
   }else{
     h='<div class="okk"><svg width="96" height="96" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="none" stroke="#2fa35a" stroke-width="4"/><path d="M19 33l9 9 17-19" fill="none" stroke="#2fa35a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><h3 id="ct-t">'+t("paid")+'</h3><p style="color:var(--mute);margin:8px 0 16px">'+t("thanks")+'</p><p style="font-size:26px;letter-spacing:4px;color:var(--gold)" aria-hidden="true">★★★★★</p><button class="btn btn-dark" type="button" data-act="review" style="width:100%;margin-top:12px">'+t("review")+'</button><p class="small" style="margin-top:10px">'+t("demo_pay")+'</p></div>';
   }
@@ -649,10 +734,20 @@ $("#ct-b").addEventListener("click",function(e){
   else if(a==="dec"){cart[i]--;if(cart[i]<1)delete cart[i]}
   else if(a==="send"){for(var k in cart)ordered[k]=(ordered[k]||0)+cart[k];cart={};note="";stage=1;toast("🍳 "+t("sent"));run()}
   else if(a==="pay"){view="pay"}
-  else if(a==="tip"){tip=+x.dataset.v}
-  else if(a==="split"){split=+x.dataset.v}
+  else if(a==="tip"){if(paidC)return;tip=+x.dataset.v}
+  else if(a==="spm"){if(paidC)return;spm=x.dataset.v;if(spm==="eq"&&split<2)split=2;sel={}}
+  else if(a==="ppl"){if(paidC)return;split=Math.max(2,Math.min(30,split+(+x.dataset.v)))}
+  else if(a==="sinc"){sel[i]=(sel[i]||0)+1}
+  else if(a==="sdec"){sel[i]=Math.max(0,(sel[i]||0)-1)}
+  else if(a==="cashw"){cashW=+x.dataset.v}
   else if(a==="pm"){pm=x.dataset.v}
-  else if(a==="dopay"){x.disabled=true;x.textContent="…";setTimeout(function(){ordered={};stage=0;tip=0;split=1;view="done";drawCart();bar()},1300);return}
+  else if(a==="dopay"){var am=+x.dataset.a;if(!(am>0))return;x.disabled=true;x.textContent="…";var wasCash=pm==="cash";setTimeout(function(){
+      paidC+=am;if(spm==="eq")parts++;if(spm==="it"){for(var k in sel)itemPaid[k]=(itemPaid[k]||0)+sel[k];sel={}}
+      if(wasCash)toast("💶 "+f(t("cash_ok"),{m:MESA,x:eur(am/100)}));
+      var totC=Math.round(sum(ordered)*(1+tip/100)*100),done=paidC>=totC-1||(spm==="eq"&&parts>=split);
+      if(spm==="it"){done=true;for(var k2 in ordered)if((itemPaid[k2]||0)<ordered[k2])done=false}
+      if(done){ordered={};stage=0;tip=0;split=1;spm="all";parts=0;paidC=0;itemPaid={};sel={};cashW=0;view="done"}else if(!wasCash)toast(t("part_ok"));
+      drawCart();bar()},1100);return}
   else if(a==="review"){toast(t("review_demo"));return}
   else if(a==="call"){toast("🙋 "+f(t("called"),{m:MESA}));return}
   else if(a==="bill"){toast("🧾 "+f(t("billed"),{m:MESA}));return}
@@ -663,7 +758,7 @@ $("#cartbar").addEventListener("click",function(){if(view==="done")view="cart";i
 /* ---------- camarero virtual ---------- */
 var log=$("#log");
 function norm(s){return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/œ/g,"oe")}
-function msg(html,who){var d=document.createElement("div");d.className="msg "+who;if(who==="u")d.textContent=html;else d.innerHTML=html;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+function msg(html,who){var d=document.createElement("div");d.className="msg "+(who==="u"?"u":"bot");if(who==="u")d.textContent=html;else d.innerHTML=html;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
 function cards(list,dia){return list.map(function(m){return '<div class="sug"><span class="e" aria-hidden="true">'+thumb(m,"mini")+'</span><span><b>'+nm(m)+'</b><small>'+m.p+' € · '+(dia?'🍬 '+m.sg+' g · '+m.n[0]+' kcal':m.n[0]+' kcal')+'</small></span><button type="button" data-add="'+m.id+'" aria-label="'+esc(t("addto")+": "+nm(m))+'">+</button></div>'}).join("")}
 function drawChatUI(){
   $("#ch-t").textContent=t("waiter");$("#ch-s").textContent=t("online");$("#askin").placeholder=t("ask_ph");$("#fab-s").textContent=t("fab");$("#fab").setAttribute("aria-label",t("waiter"));
@@ -674,10 +769,33 @@ function openChat(){openS($("#chat"));if(!greeted){greeted=1;typing(function(){m
 function typing(cb){var d=msg('<span class="dots" aria-label="…"><span></span><span></span><span></span></span>',"b");setTimeout(function(){d.remove();cb()},650+Math.random()*400)}
 var STOP={hausgemachte:1,hausgemachter:1,klassische:1,classica:1,caseiros:1,caseiro:1,classica:1,della:1,clasica:1,classic:1,classique:1,casera:1,caseras:1,homemade:1,maison:1,house:1,temporada:1,seasonal:1,saison:1,classique:1};
 function findDish(n){var best=null,bs=0;M.forEach(function(m){var sc=0;LANGS.forEach(function(l){norm(m[l][0]).split(/[^a-z]+/).forEach(function(w){if(w.length>=5&&!STOP[w]&&n.indexOf(w)>-1)sc++})});if(sc>bs){bs=sc;best=m}});return best}
+function faq(n){
+  var hrs=function(){var H=(window.__H||[]);return H.map(function(h){return h[0]+": "+h[1]}).join("<br>")};
+  var go=function(){return '<div class="sug"><span class="e">📅</span><span><b>'+t("f_go_res")+'</b></span><button type="button" data-go="visitanos" aria-label="'+esc(t("f_go_res"))+'">→</button></div>'};
+  var payb=function(){return '<div class="sug"><span class="e">💳</span><span><b>'+t("pay")+'</b></span><button type="button" data-pay="1" aria-label="'+esc(t("pay"))+'">→</button></div>'};
+  if(/^(hola|buenas|hey|hi|hello|bonjour|salut)\b/.test(n)&&n.length<16)return t("f_hi");
+  if(/^(gracias|thanks|thank you|merci|genial|perfecto)\b/.test(n))return t("f_thx");
+  if(/menu del dia|menu diario|del dia|menu de hoy|que hay hoy|set menu|lunch menu|daily menu|menu of the day|menu du jour|formule|plat du jour/.test(n))return t("f_menu");
+  if(/dividir|divid|a medias|a partes|por separado|separad|cada uno|split|share the bill|partager|diviser|chacun/.test(n))return t("f_split")+payb();
+  if(/efectivo|metalico|tarjeta|bizum|apple pay|google pay|datafono|cash|\bcard\b|especes|carte bancaire|\bcb\b/.test(n))return t("f_pay")+payb();
+  if(/horario|\bhoras?\b|abr[ie]s|abiert|cierr|cerrad|open|close|hours|horaire|ouvert|ferm/.test(n)&&!/reserv/.test(n))return f(t("f_hours"),{h:hrs()});
+  if(/reserv|\bbook|booking|table for|mesa para/.test(n))return t("f_res")+go();
+  if(/\bpan\b|panes|bread|\bpain\b|baguette/.test(n)&&!/gluten|celia/.test(n))return t("f_bread");
+  if(/terraz|terrace|outside|fuera|exterior|al aire libre|terrasse/.test(n))return t("f_terr");
+  if(/perr|mascot|\bdog|\bpet|chien|animal/.test(n))return t("f_pets");
+  if(/nin[oa]s?|crio|peque|trona|bebe|kids?|child|enfant|bebe|chaise haute/.test(n))return t("f_kids");
+  if(/wifi|wi-fi|internet|contrasena|password/.test(n))return t("f_wifi");
+  if(/llevar|take ?away|takeout|to go|emporter|domicilio|delivery|livraison/.test(n))return t("f_take");
+  if(/donde|direcci|ubicac|aparca|parking|where|address|adresse|garer|como llego|como llegar/.test(n))return t("f_where");
+  if(/grupo|cumple|evento|celebra|empresa|despedida|group|birthday|party|event|anniversaire|groupe/.test(n))return t("f_group");
+  if(/silla de ruedas|accesib|minusv|wheelchair|accessib|fauteuil/.test(n))return t("f_acc");
+  return null;
+}
 function answer(q){
   var n=norm(q),cons=[],lab=[],allergy=0;
   var neg=/\b(sin|no|without|sans|ohne|kein|senza|sem|alerg|allerg|intoler)/.test(n);var dia=0;
   if(/camarer|waiter|serveur|kellner|empregad|garcom/.test(n)&&!/virtu/.test(n)){toast("🙋 "+f(t("called"),{m:MESA}));return msg(f(t("called"),{m:MESA}),"b")}
+  var fq=faq(n);if(fq)return msg(fq,"b");
   if(/cuenta|\bbill\b|check|addition|cobr|pagar|\bpay\b|payer|rechnung|zahlen|\bconto\b|\bconta\b/.test(n)){toast("🧾 "+f(t("billed"),{m:MESA}));return msg(f(t("billed"),{m:MESA})+'<div class="sug"><span class="e">💳</span><span><b>'+t("pay")+'</b></span><button type="button" data-pay="1" aria-label="'+esc(t("pay"))+'">→</button></div>',"b")}
   if(/diabet|azuc|sugar|zucker|zuccher|acucar|sucre|glucem|glukos|carbohid|\bcarbs?\b|hidrat/.test(n)){cons.push(lowS);lab.push(t("diab"));dia=1}
   if(/celia|coelia|celiac|coeliac|gluten|zoliak/.test(n)){cons.push(function(m){return m.gf});lab.push(t("gf"));allergy=1}
@@ -704,7 +822,7 @@ function ask(q){q=q.trim().slice(0,200);if(!q)return;msg(q,"u");typing(function(
 $("#ask").addEventListener("submit",function(e){e.preventDefault();var i=$("#askin");ask(i.value);i.value=""});
 $("#quick").addEventListener("click",function(e){var b=e.target.closest("[data-q]");if(b)ask(b.dataset.q)});
 $("#acts").addEventListener("click",function(e){var b=e.target.closest("[data-act]");if(!b)return;var k=b.dataset.act==="call"?"called":"billed";msg(b.textContent,"u");typing(function(){msg(f(t(k),{m:MESA}),"b");toast(f(t(k),{m:MESA}))})});
-log.addEventListener("click",function(e){var b=e.target.closest("[data-add]");if(b){add(+b.dataset.add);b.textContent="✓";b.disabled=true;return}var p=e.target.closest("[data-pay]");if(p&&cnt(ordered)){closeS($("#chat"));view="pay";setTimeout(function(){drawCart();openS($("#cart"))},380)}else if(p){toast(f(t("billed"),{m:MESA}))}});
+log.addEventListener("click",function(e){var g=e.target.closest("[data-go]");if(g){closeS($("#chat"));setTimeout(function(){var el=document.getElementById(g.dataset.go);el&&el.scrollIntoView({behavior:"smooth"})},380);return}var b=e.target.closest("[data-add]");if(b){add(+b.dataset.add);b.textContent="✓";b.disabled=true;return}var p=e.target.closest("[data-pay]");if(p&&cnt(ordered)){closeS($("#chat"));view="pay";setTimeout(function(){drawCart();openS($("#cart"))},380)}else if(p){toast(f(t("billed"),{m:MESA}))}});
 $("#fab").addEventListener("click",openChat);
 /* ---------- idioma ---------- */
 function setLang(l){L=l;document.documentElement.lang=L;[].slice.call(document.querySelectorAll(".lang button")).forEach(function(x){x.setAttribute("aria-pressed",x.dataset.l===L)});[].slice.call(document.querySelectorAll("[data-t]")).forEach(function(n){n.textContent=t(n.dataset.t)});$("#mesa").textContent=f(t("here"),{m:MESA});drawTabs();drawFilters();drawGrid();drawChatUI();drawCurSel();drawCurNote();$("#ups").classList.remove("on");$("#explore-t").textContent=t("explore");$("#vt-c").textContent="▦ "+t("vcards");$("#vt-l").textContent="☰ "+t("vlist");bar();if($("#cart").classList.contains("open"))drawCart()}
@@ -739,7 +857,7 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&reel.classL
 loadRates();
 setLang(L);
 /* horario */
-var H=[["Lunes","Cerrado"],["Martes","12:30 – 16:00 · 19:30 – 00:00"],["Miércoles","12:30 – 16:00 · 19:30 – 00:00"],["Jueves","12:30 – 16:00 · 19:30 – 00:00"],["Viernes","12:30 – 16:30 · 19:30 – 01:00"],["Sábado","12:00 – 01:00"],["Domingo","12:00 – 17:00"]];
+var H=window.__H=[["Lunes","Cerrado"],["Martes","12:30 – 16:00 · 19:30 – 00:00"],["Miércoles","12:30 – 16:00 · 19:30 – 00:00"],["Jueves","12:30 – 16:00 · 19:30 – 00:00"],["Viernes","12:30 – 16:30 · 19:30 – 01:00"],["Sábado","12:00 – 01:00"],["Domingo","12:00 – 17:00"]];
 var d=(new Date().getDay()+6)%7;$("#hrs").innerHTML=H.map(function(h,i){return '<li class="'+(i===d?"today":"")+'"><span>'+h[0]+'</span><span>'+h[1]+'</span></li>'}).join("");
 if(d===0){$("#openNow").innerHTML='<i style="background:#c8653a;box-shadow:0 0 0 4px rgba(200,101,58,.18)"></i><span>Hoy cerrado</span>'}
 var rd=$("#rd");rd.min=new Date().toISOString().slice(0,10);rd.value=rd.min;

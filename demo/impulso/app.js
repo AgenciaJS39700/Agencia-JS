@@ -142,7 +142,7 @@ $("#cart-foot").hidden = true; return;
 $("#cart-foot").hidden = false;
 Object.keys(cart).forEach(function (id) {
 var it = byId[id], q = cart[id];
-var src = $('.pc[data-id="' + id + '"] .im svg');
+var src = $('.pc[data-id="' + id + '"] .im img') || $('.pc[data-id="' + id + '"] .im svg');
 var ti = h("div", { class: "ti" }); if (src) { ti.appendChild(src.cloneNode(true)); }
 var minus = h("button", { type: "button", "aria-label": "Quitar " + (it.u === "kg" ? "medio kilo" : "uno"), text: "−" });
 var plus = h("button", { type: "button", "aria-label": "Añadir " + (it.u === "kg" ? "medio kilo" : "uno"), text: "+" });
