@@ -40,8 +40,8 @@ export default {
   },
   servicios: [
     { id: "corte-mujer", nombre: "Corte mujer (lavado, corte y peinado)", min: 45, precio: "desde 35 €" },
-    { id: "corte-caballero", nombre: "Corte caballero", min: 30, precio: "desde 16 €" },
-    { id: "barba", nombre: "Arreglo de barba", min: 20, precio: "desde 12 €" },
+    { id: "brushing", nombre: "Brushing y ondas", min: 45, precio: "desde 22 €" },
+    { id: "babylights", nombre: "Babylights / retoque de raíz", min: 90, precio: "desde 45 €" },
     { id: "color", nombre: "Color completo", min: 90, precio: "desde 55 €" },
     { id: "balayage", nombre: "Balayage / mechas", min: 150, precio: "desde 95 €" },
     { id: "keratina", nombre: "Tratamiento de keratina", min: 120, precio: "desde 70 €" },

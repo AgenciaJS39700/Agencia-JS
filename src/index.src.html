@@ -445,6 +445,22 @@ footer nav[aria-label="Legal"]{row-gap:0}
 #planes.sub-on .pay-k{transform:translateX(100%)}
 .pay-note{margin:.8rem auto 0;max-width:36rem;text-align:center;font-size:.85rem;color:#a3a3a3;min-height:2.6em}
 .pay-sub{display:none}
+.sub-info{display:none;margin:2.2rem auto 0;max-width:68rem;border:1px solid rgba(232,199,102,.35);border-radius:1.5rem;background:linear-gradient(180deg,rgba(232,199,102,.08),rgba(10,10,10,.6));padding:1.4rem}
+#planes.sub-on .sub-info{display:block;animation:payIn .45s ease}
+.sub-info h3{font-size:1.15rem;font-weight:800;text-align:center}
+.sub-rules{display:grid;gap:.8rem;margin-top:1.1rem}
+@media(min-width:768px){.sub-rules{grid-template-columns:repeat(4,1fr)}.sub-info{padding:1.8rem 2rem}}
+.sub-rules li{list-style:none;display:flex;gap:.7rem;align-items:flex-start;padding:.9rem;border-radius:1rem;background:#0a0a0a;border:1px solid rgba(255,255,255,.08);font-size:.86rem;color:#a3a3a3;line-height:1.45}
+.sub-rules b{display:block;color:#fff;font-size:.92rem;margin-bottom:.15rem}
+.sub-rules i{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#f5e3a6,#e8c766 45%,#c99a2e);color:#0a0a0a;font-style:normal;font-weight:800;font-size:.85rem}
+.sub-vs{display:grid;gap:.8rem;margin-top:1rem}
+@media(min-width:768px){.sub-vs{grid-template-columns:1fr 1fr}}
+.sub-vs p{padding:.9rem 1rem;border-radius:1rem;background:rgba(255,255,255,.04);font-size:.86rem;color:#a3a3a3}
+.sub-vs b{color:#fff}
+.combo{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 1.4rem;margin-top:1.6rem;padding:1.2rem 1.4rem;border-radius:1.5rem;border:1px solid rgba(232,199,102,.45);background:radial-gradient(120% 140% at 0% 0%,rgba(232,199,102,.16),transparent 60%),#0a0a0a}
+.combo p{flex:1 1 22rem;font-size:.92rem;color:#d4d4d8;line-height:1.5}
+.combo strong{color:#fff}
+.combo .k{display:inline-block;margin-bottom:.3rem;font-size:.7rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#e8c766}
 #planes.sub-on .pay-one,#planes.sub-on .offer-badge{display:none}
 #planes.sub-on .pay-sub{display:block;animation:payIn .45s ease}
 .sub-price{font-size:2.25rem;font-weight:800;line-height:1}
@@ -875,7 +891,24 @@ class="mt-3 inline-flex min-h-[46px] items-center justify-center gap-2 rounded-f
 </a>
 </article>
 </div>
-<p class="reveal mt-6 text-center text-sm text-mute">¿Quieres que tus clientes dejen reseñas con solo acercar el móvil? Añade <a href="#nfc" class="font-semibold text-white underline underline-offset-2">tarjetas NFC para Google</a> a cualquier plan, ahora en oferta: 25 € una, 45 € dos. En Presencia 360° vienen 2 incluidas.</p>
+<div class="sub-info" aria-live="polite">
+<h3>Cómo funciona la suscripción</h3>
+<ul class="sub-rules">
+<li><i>1</i><span><b>Permanencia de 12 meses</b>Te comprometes un año. Es lo que nos permite no cobrarte la web de golpe.</span></li>
+<li><i>2</i><span><b>Se cobra solo cada mes</b>Por domiciliación o tarjeta. No tienes que acordarte de pagar.</span></li>
+<li><i>3</i><span><b>Después del año, tú eliges</b>Sigues con la cuota o te quedas la web pagando la diferencia hasta el precio normal.</span></li>
+<li><i>4</i><span><b>Todo incluido</b>Web, mantenimiento, cambios del plan y soporte. Si dejas de pagar, la web se pausa hasta ponerte al día.</span></li>
+</ul>
+<div class="sub-vs">
+<p><b>Pago único:</b> para quien prefiere pagar menos a la larga. A partir del segundo año sale más barato.</p>
+<p><b>Suscripción:</b> para empezar ya sin un gasto grande. Impulso Digital, desde el primer día por 59 €/mes y 0 € de alta.</p>
+</div>
+</div>
+<div class="combo reveal">
+<p><span class="k">Oferta combo</span><br><strong>Web + asistente de citas 24/7:</strong> el alta del asistente va a <strong>mitad de precio</strong> (Básico 99 € en vez de 199 €; Avanzado 149 € en vez de 299 €). Si tu web es <strong>por suscripción</strong>, el asistente va <strong>sin alta</strong>: solo se suma su cuota. En Presencia 360° el Básico ya va incluido.</p>
+<a href="#asistentes" data-cta="combo_asistente" class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border border-white/25 px-6 py-2.5 text-sm font-semibold text-white/90 transition hover:border-gold hover:text-gold-light focus:outline-none focus-visible:ring-4 focus-visible:ring-white/40">Ver los asistentes</a>
+</div>
+<p class="reveal mt-6 text-center text-sm text-mute">¿Quieres que tus clientes dejen reseñas con solo acercar el móvil? Añade <a href="#nfc" class="font-semibold text-white underline underline-offset-2">tarjetas NFC para Google</a> a cualquier plan, ahora en oferta: 1 pack 25 €, 2 packs 45 €. En Presencia 360° vienen 2 packs incluidos.</p>
 <div class="reveal mt-8 flex items-start gap-4 rounded-2xl border border-white/10 bg-ink p-5 sm:items-center sm:p-6">
 <span class="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-white/10 text-white"><svg class="ic h-5 w-5" aria-hidden="true" focusable="false"><use href="#i-headset"/></svg></span>
 <p class="text-sm leading-relaxed text-mute"><strong class="text-white">Mantenimiento y soporte en cada plan:</strong> cambios de contenido cada mes, mantenimiento técnico y atención directa por WhatsApp o email. La cuota mensual (29 €, 49 € o 79 € según el plan) aparece clara en tu propuesta antes de empezar, sin sorpresas.</p>
@@ -1314,7 +1347,7 @@ var EMAIL = "info@agencia-js.com";
 document.querySelectorAll("a[data-wa]").forEach(function (a) {
 a.href = "https://wa.me/" + WA_NUM + "?text=" + encodeURIComponent(a.dataset.wa);
 });
-/* FAQ (14 preguntas; se muestran 6 y el resto con «Ver más») */
+/* FAQ (16 preguntas; se muestran 6 y el resto con «Ver más») */
 var FAQ = [
 ["¿Qué incluye la oferta de 349 €?", "El plan Impulso Digital completo (web profesional adaptada a móvil, SEO local básico, diseño moderno con animaciones, enlaces a tus redes, certificado SSL y hosting rápido) por 349 € en lugar de 399 €, mientras la oferta esté publicada. Después, mantenimiento de 29 € al mes."],
 ["¿Qué diferencia hay entre los tres planes?", "Impulso Digital es la web profesional de entrada con SEO local básico. Acelerador Pro suma más secciones, multi-idioma, ficha de Google optimizada y medición de visitas. Presencia 360° añade textos profesionales, auditoría SEO local, informe mensual, 2 packs de tarjetas NFC, 3 cambios al mes y soporte prioritario."],
@@ -1322,6 +1355,8 @@ var FAQ = [
 ["¿Cuánto cuesta el mantenimiento y cuándo empieza a cobrarse?", "La cuota es de 29 € al mes en Impulso Digital, 49 € en Acelerador Pro y 79 € en Presencia 360°, IVA no incluido, y siempre aparece en tu propuesta antes de empezar. En Impulso Digital se paga desde el mes 1; en Acelerador Pro el primer mes es gratis y en Presencia 360° lo son los dos primeros."],
 ["¿Cómo funcionan las tarjetas NFC para Google Reviews?", "Tu cliente acerca el móvil a la tarjeta y se abre directamente tu ficha de Google para que deje su opinión. No tiene que buscar tu negocio ni escribir nada."],
 ["¿Cuánto cuestan las tarjetas NFC y vienen incluidas en algún plan?", "Ahora están en oferta: un pack cuesta 25 € (antes 30 €) y dos packs 45 € (antes 50 €), IVA no incluido. Cada pack lleva una tarjeta grande y una pequeña, ya configuradas; si necesitas más, te hacemos presupuesto. Se piden aparte con cualquier plan, salvo en Presencia 360°, que ya incluye 2 packs."],
+["¿Puedo pagar la web al mes en lugar de una vez?", "Sí, con la suscripción: Impulso Digital 0 € de alta + 59 €/mes, Acelerador Pro 99 € de alta + 99 €/mes y Presencia 360° 149 € de alta + 169 €/mes, IVA no incluido, con la web y el mantenimiento incluidos. La permanencia mínima es de 12 meses y se cobra sola cada mes. Después del año puedes seguir con la cuota o quedarte la web pagando la diferencia hasta el precio normal. Si dejas de pagar, la web se pausa hasta que te pongas al día."],
+["¿Hay descuento si contrato web y asistente juntos?", "Sí. Con la web en pago único, el alta del asistente va a mitad de precio: Básico 99 € (en vez de 199 €) y Avanzado 149 € (en vez de 299 €), con su cuota normal. Con la web por suscripción, el asistente va sin alta y solo se suma su cuota mensual. En Presencia 360° el asistente Básico ya viene incluido."],
 ["¿Cuánto tarda en estar lista mi web?", "Depende del contenido que nos facilites (logo, textos, fotos, horarios y servicios). Te indicamos el plazo estimado en el presupuesto, antes de empezar."],
 ["¿En qué consiste la auditoría gratuita?", "Revisamos tu ficha de Google Business Profile, tu web y tus redes y te explicamos qué mejorar para que más clientes te encuentren y te contacten. Es gratuita y no te compromete a nada. Pídela con el botón «Pedir auditoría gratis»: respondes unas preguntas rápidas, nos dejas tu correo, tu web y tus redes, y te la enviamos."],
 ["¿Qué se considera un «cambio de contenido»?", "Modificar textos, precios, horarios, fotos, ofertas o enlaces de tu web. Los rediseños completos o las secciones nuevas se presupuestan aparte."],
