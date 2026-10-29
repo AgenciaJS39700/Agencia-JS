@@ -327,10 +327,35 @@ export async function atenderAgenda(request, env, ctx, limitar) {
   }
 
   /* ---- agente de voz ---- */
-  if (ruta === "voz/huecos" || ruta === "voz/cita") {
+  if (ruta === "voz/huecos" || ruta === "voz/cita" || ruta === "voz/recado" || ruta === "voz/anular") {
     if (env.VOZ_WEBHOOK_SECRET && !igual(request.headers.get("x-voz-clave") || "", env.VOZ_WEBHOOK_SECRET)) return res({ error: "No autorizado" }, 401);
-    if (!env.CITAS) return res({ ok: false, mensaje: "La agenda no está disponible. Ofrece tomar nota y que el negocio llame." });
     let b; try { b = await cuerpo(request, 2000); } catch (e) { return res({ error: "JSON no válido" }, 400); }
+    // Recado: el cliente quiere hablar con una persona o el agente no puede resolverlo → aviso al negocio para devolver la llamada
+    if (ruta === "voz/recado") {
+      const nom = limpiar(b.nombre, 60), tel = soloTel(b.telefono), mot = limpiar(b.motivo, 400);
+      if (!tel || tel.replace(/\D/g, "").length < 9) return res({ ok: false, mensaje: "Pide un teléfono de contacto para que el negocio pueda devolver la llamada." });
+      const env1 = await correo(env, cfg, cfg.avisos && cfg.avisos.email, cfg.negocio.nombre, `📞 Devolver llamada · ${nom || tel}`,
+        marco(cfg, "Llamada pendiente de devolver", `<p style="font-size:15px;line-height:1.7;background:#f6f6f8;padding:14px 16px;border-radius:10px;margin:14px 0"><b>${esc(nom || "Sin nombre")}</b> · <a href="tel:${esc(tel)}">${esc(tel)}</a><br>${esc(mot || "Quiere hablar con una persona.")}</p><p style="color:#555;font-size:14px">Lo ha anotado el asistente de voz.</p>`)).catch(() => false);
+      const env2 = avanzado(cfg) ? await avisarMoviles(env, cfg.slug, `📞 Devolver llamada · ${nom || tel}`, mot || "Quiere hablar con una persona.").catch(() => 0) : 0;
+      return res({ ok: true, mensaje: env1 || env2 ? "Recado entregado: el negocio devolverá la llamada lo antes posible." : "Recado anotado. Di que el negocio le llamará lo antes posible." });
+    }
+    if (!env.CITAS) return res({ ok: false, mensaje: "La agenda no está disponible. Ofrece tomar nota y que el negocio llame." });
+    // Anular por teléfono: con el código de la cita, o con el teléfono y el día si solo hay una cita ese día
+    if (ruta === "voz/anular") {
+      const tel = soloTel(b.telefono).replace(/\D/g, "").slice(-9), cod = limpiar(b.codigo, 8).toUpperCase();
+      if (tel.length < 9) return res({ ok: false, mensaje: "Pide el teléfono con el que se hizo la cita." });
+      let c = null;
+      if (cod.length >= 6) c = await cancelar(env, cfg, "codigo = ? AND substr(replace(telefono, '+', ''), -9) = ? AND fecha >= ?", [cod, tel, ahora().fecha], ctx, "cliente");
+      else {
+        const d = resolverDia(b.dia);
+        if (!d) return res({ ok: false, mensaje: "Pregunta el día de la cita (o el código que se le dio al reservar)." });
+        const f = d.toISOString().slice(0, 10);
+        const n = await env.CITAS.prepare("SELECT COUNT(*) AS n FROM citas WHERE slug = ? AND estado = 'ok' AND fecha = ? AND substr(replace(telefono, '+', ''), -9) = ?").bind(cfg.slug, f, tel).first();
+        if (n && n.n > 1) return res({ ok: false, mensaje: "Hay varias citas ese día con ese teléfono: pide la hora o el código, o toma recado." });
+        if (f >= ahora().fecha) c = await cancelar(env, cfg, "fecha = ? AND substr(replace(telefono, '+', ''), -9) = ?", [f, tel], ctx, "cliente");
+      }
+      return res(c ? { ok: true, mensaje: `Cita del ${legible(c.fecha)} a las ${hhmm(c.inicio)} anulada. El negocio ya está avisado.` } : { ok: false, mensaje: "No encuentro una cita pendiente con esos datos. Ofrece tomar recado para el negocio." });
+    }
     const d = resolverDia(b.dia); // Date (12:00 UTC) o null
     if (!d) return res({ ok: false, mensaje: "No he entendido el día. Pide un día concreto, por ejemplo «el martes» o «el 5 de noviembre»." });
     const fecha = d.toISOString().slice(0, 10);

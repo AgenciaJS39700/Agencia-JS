@@ -10,7 +10,7 @@ Todo vive en el Worker `agencia-js`: no hay que crear nada nuevo en Cloudflare p
 | Panel del negocio | `agencia-js.com/panel/<slug>` (clave propia) |
 | Widget para su web | `<script src="https://agencia-js.com/asistentes/widget.js" data-negocio="<slug>" async></script>` |
 | Calendario del móvil | Panel → «Ver en mi calendario» (enlace .ics privado, se actualiza solo) |
-| Recepcionista de voz | Webhooks `POST /api/as/<slug>/voz/huecos` y `/voz/cita` (misma agenda) |
+| Recepcionista de voz | Webhooks `POST /api/as/<slug>/voz/huecos`, `/voz/cita`, `/voz/anular` y `/voz/recado` (misma agenda) |
 
 ## Alta (unos 15 minutos)
 1. `node tools/nuevo-asistente.mjs <slug> "<Nombre>" <sector> [basico|pro]`
@@ -49,6 +49,11 @@ Sin esto todo funciona, pero no salen correos.
 
 ## Agente de voz de un cliente real
 En su agente de ElevenLabs, las herramientas apuntan a `https://agencia-js.com/api/as/<slug>/voz/huecos` y `/voz/cita` (mismos parámetros que la demo). Opcional: secreto `VOZ_WEBHOOK_SECRET` en el Worker y la cabecera `x-voz-clave` en las herramientas.
+- `voz/anular` `{telefono, codigo?, dia?}`: anula con el código, o con teléfono + día si solo hay una cita ese día.
+- `voz/recado` `{nombre, telefono, motivo}`: «quiero hablar con una persona» → correo al negocio (y push en Avanzado) para devolver la llamada.
+- Conexión: desvío de la línea del local si no contesta/comunica (recomendado), fuera de horario, siempre, o número propio.
+- Voz Pro: herramienta de transferencia de ElevenLabs a un número **distinto** del desviado (si no, bucle).
+- Pendiente: SMS de confirmación al cliente (Voz Pro) y aviso legal de grabación en el saludo.
 
 ## Seguridad
 - La reserva es atómica: nunca entran dos citas en el mismo hueco por encima de `capacidad`.
