@@ -55,6 +55,12 @@
  .mk-ph-w{width:min(100%,290px)!important}
  .mk-ph{height:380px!important}
 }
+
+@media(max-width:767px){.d-only{display:none!important}
+ .m-fold:not(.on){display:none!important}
+ .m-fold-b{display:flex;width:100%;align-items:center;justify-content:center;min-height:52px;border-radius:999px;border:1px solid rgba(232,199,102,.5);background:transparent;color:#fff;font-weight:800}
+ .m-fold-b[hidden]{display:none}}
+@media(min-width:768px){.m-only,.m-fold-b{display:none!important}}
 </style>
 <style>/* === Agencia JS: entrada del hero, cuestionario y asistente === */
 @keyframes fx-in{from{opacity:0;transform:translateY(26px);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
@@ -899,7 +905,8 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 <div class="reveal mx-auto max-w-2xl text-center">
 <p class="text-xs font-semibold uppercase tracking-[0.25em] text-silver">Planes y precios</p>
 <h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">Elige el nivel que necesita tu negocio</h2>
-<p class="mt-3 text-sm text-mute">Precios de partida, IVA no incluido. Elige cómo pagar: la web de una vez o por suscripción mensual. El presupuesto final se ajusta a tu negocio. Oferta de lanzamiento en Impulso Digital: 349 € en lugar de 399 € mientras figure en esta web.</p>
+<p class="mt-3 text-sm text-mute md:hidden m-only">Precios de partida, IVA no incluido. Impulso Digital en oferta: 349 € en lugar de 399 €.</p>
+<p class="mt-3 text-sm text-mute d-only">Precios de partida, IVA no incluido. Elige cómo pagar: la web de una vez o por suscripción mensual. El presupuesto final se ajusta a tu negocio. Oferta de lanzamiento en Impulso Digital: 349 € en lugar de 399 € mientras figure en esta web.</p>
 </div>
 <div class="pay-tg reveal" role="radiogroup" aria-label="Forma de pago">
 <button type="button" role="radio" aria-checked="true" data-pay="one">Pago único <small>+ mantenimiento</small></button>
@@ -1201,7 +1208,8 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 </div>
 </div>
 </div>
-<form id="form-contacto" class="reveal space-y-4 rounded-card border border-gold/40 bg-ink p-6 sm:p-8" aria-label="Formulario de contacto">
+<button type="button" class="m-fold-b" id="form-contacto-b" aria-controls="form-contacto" aria-expanded="false">✉️ Déjanos tus datos y te llamamos</button>
+<form id="form-contacto" class="m-fold reveal space-y-4 rounded-card border border-gold/40 bg-ink p-6 sm:p-8" aria-label="Formulario de contacto">
 <div>
 <label for="f-nombre" class="text-sm font-medium">Nombre</label>
 <input id="f-nombre" name="nombre" type="text" autocomplete="name" required class="mt-1 w-full rounded-xl border border-white/15 bg-navy p-3 text-base text-bone focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/40">
@@ -1708,6 +1716,12 @@ document.getElementById("anio").textContent = new Date().getFullYear();
     });
   }, { rootMargin: "-40% 0px -55% 0px" });
   links.forEach(function (a) { var t = document.querySelector(a.getAttribute("href")); if (t) io.observe(t); });
+})();
+</script>
+<script>
+(function () { var b = document.getElementById("form-contacto-b"), f = document.getElementById("form-contacto"); if (!b || !f) return;
+  b.addEventListener("click", function () { f.classList.add("on"); b.hidden = true; b.setAttribute("aria-expanded", "true"); var i = f.querySelector("input"); if (i) i.focus({ preventScroll: true }); });
+  if (location.hash === "#contacto" || location.hash === "#form-contacto") { f.classList.add("on"); b.hidden = true; }
 })();
 </script>
 </body>

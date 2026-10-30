@@ -444,7 +444,8 @@ footer a{color:inherit}
 <style>#tnToast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));z-index:160;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#f3efe8;color:#0a0a0a;padding:12px 18px;border-radius:999px;font:700 14px var(--sans);box-shadow:0 18px 40px -12px rgba(0,0,0,.6);transition:.3s;max-width:calc(100vw - 32px);text-align:center}#tnToast.on{opacity:1;transform:translate(-50%,0)}
 @media(min-width:900px){#tnToast{bottom:40px}}
 .res-proof{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding:10px;border-radius:16px;border:1.5px solid var(--red);background:#fff}.res-proof img{width:64px;height:64px;border-radius:10px;object-fit:cover;flex:none}.res-proof div{flex:1;min-width:0;display:flex;flex-direction:column;color:#111}.res-proof span{font-size:13px;color:#6b655c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.res-proof button{width:40px;height:40px;border-radius:50%;border:1px solid #ddd;background:#fff;color:#111;cursor:pointer;flex:none}</style>
-<style id="movil-pill">@media(max-width:600px){#ajs-demo{left:auto!important;right:10px;transform:none!important;gap:6px!important;padding:5px 5px 5px 12px!important;font-size:12px!important}#ajs-demo>span+span{display:none}}</style></head>
+<style id="movil-pill">@media(max-width:600px){#ajs-demo{left:auto!important;right:10px;transform:none!important;gap:6px!important;padding:5px 5px 5px 12px!important;font-size:12px!important}#ajs-demo>span+span{display:none}}</style><link rel="stylesheet" href="movil.css">
+</head>
 <body>
 <div class="grain" aria-hidden="true"></div>
 <div class="cur" id="cur" aria-hidden="true"></div>
@@ -517,7 +518,7 @@ footer a{color:inherit}
     <div class="fl-head"><div><p class="kick">02 · Catálogo</p><h2 id="t-cat" class="rv">Encuentra <span class="out">tu diseño</span></h2></div><p style="max-width:380px;color:#b3ac9f">Filtra por estilo y tamaño. Cada diseño se adapta a tu cuerpo, y puedes probarlo en tu piel con el simulador antes de reservar.</p></div>
     <div class="cat-f" role="group" aria-label="Filtrar por estilo" id="catE"></div>
     <div class="cat-f" role="group" aria-label="Filtrar por tamaño" id="catT"></div>
-    <div class="cat-g" id="catG" aria-live="polite"></div>
+    <div class="cat-g m2 mmore" id="catG" aria-live="polite" data-more="Ver todos los diseños"></div>
   </div>
 </section>
 
@@ -603,7 +604,7 @@ footer a{color:inherit}
   <div class="wrap">
     <p class="kick">08 · El equipo</p>
     <h2 id="t-ar" class="rv">Artistas <span class="out">residentes</span></h2>
-    <div class="agrid">
+    <div class="agrid mcar">
       <article class="ac rv"><div class="aw"><img src="img/serpiente.webp" alt="" loading="lazy"></div><div class="mono">AL</div><h3>Alba</h3><p class="sp">Fine line · Botánico</p><p>Piezas delicadas y florales que acompañan la forma del cuerpo.</p><a class="ig" href="#reserva">Reservar con Alba →</a></article>
       <article class="ac rv"><div class="aw"><img src="img/calavera.webp" alt="" loading="lazy"></div><div class="mono">MK</div><h3>Marko</h3><p class="sp">Blackwork · Geométrico</p><p>Negro sólido, mandalas y composiciones de gran formato.</p><a class="ig" href="#reserva">Reservar con Marko →</a></article>
       <article class="ac rv"><div class="aw"><img src="img/retrato2.webp" alt="" loading="lazy"></div><div class="mono">ST</div><h3>Sara</h3><p class="sp">Realismo · Retrato</p><p>Retratos y escenas en negro y gris con mucho detalle.</p><a class="ig" href="#reserva">Reservar con Sara →</a></article>
@@ -641,7 +642,7 @@ footer a{color:inherit}
   <div class="wrap">
     <p class="kick">12 · Cuidados</p>
     <h2 id="t-cui" class="rv">Tu tatuaje, <span class="out">día a día</span></h2>
-    <ol class="cui-t">
+    <ol class="cui-t mcar">
       <li class="rv"><b>Día 0</b><h3>Film protector</h3><p>Sales con un film transpirable. Déjalo el tiempo que te indique tu artista y lávate siempre las manos antes de tocar la zona.</p></li>
       <li class="rv"><b>Días 1–3</b><h3>Limpieza suave</h3><p>Lava 2 veces al día con agua tibia y jabón neutro, seca a toquecitos y aplica una capa fina de crema.</p></li>
       <li class="rv"><b>Días 4–14</b><h3>Pica y se pela</h3><p>Es normal. No rasques ni arranques las pieles. Hidrata y usa ropa holgada.</p></li>
@@ -660,7 +661,7 @@ footer a{color:inherit}
 <section class="shop" id="tienda" aria-labelledby="t-shop">
   <div class="wrap">
     <div class="fl-head"><div><p class="kick">14 · Tienda</p><h2 id="t-shop" class="rv">Cuida <span class="out">tu tinta</span></h2></div><p style="max-width:380px;color:#b3ac9f">Lo que usamos en el estudio, para que tu tatuaje cure perfecto. Recógelo en el estudio o recíbelo en casa.</p></div>
-    <div class="shop-g" id="shopG"><article class="shop-c"><div class="shop-i"><img src="img/shop/balsamo.webp" alt="Bálsamo de cuidado" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Bálsamo de cuidado</h3><p>Vegano, sin perfume. 50 ml</p><div class="shop-p"><b>14,90 €</b><button type="button" class="btn btn-red" data-add="balsamo">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/jabon.webp" alt="Jabón neutro" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Jabón neutro</h3><p>pH suave para los primeros días. 250 ml</p><div class="shop-p"><b>9,90 €</b><button type="button" class="btn btn-red" data-add="jabon">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/film.webp" alt="Film protector" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Film protector</h3><p>Segunda piel transpirable. 2 m</p><div class="shop-p"><b>12,50 €</b><button type="button" class="btn btn-red" data-add="film">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/solar.webp" alt="Stick solar SPF 50" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Stick solar SPF 50</h3><p>Protege el color del sol</p><div class="shop-p"><b>11,90 €</b><button type="button" class="btn btn-red" data-add="solar">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/camiseta.webp" alt="Camiseta Rosa" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Camiseta Rosa</h3><p>Algodón orgánico. Unisex</p><div class="shop-p"><b>24 €</b><button type="button" class="btn btn-red" data-add="camiseta">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/gorra.webp" alt="Gorra Daga" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Gorra Daga</h3><p>Bordado rojo. Talla única</p><div class="shop-p"><b>22 €</b><button type="button" class="btn btn-red" data-add="gorra">Añadir</button></div></div></article><article class="shop-c gc"><div class="shop-i gc-i"><span>TINTA NEGRA</span><b>Tarjeta regalo</b></div><div class="cat-b"><h3>Tarjeta regalo</h3><p>De 50 a 200 €, válida 12 meses</p><div class="shop-p"><b>desde 50 €</b><a class="btn btn-ghost" href="#regalo">Elegir</a></div></div></article></div>
+    <div class="shop-g m2" id="shopG"><article class="shop-c"><div class="shop-i"><img src="img/shop/balsamo.webp" alt="Bálsamo de cuidado" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Bálsamo de cuidado</h3><p>Vegano, sin perfume. 50 ml</p><div class="shop-p"><b>14,90 €</b><button type="button" class="btn btn-red" data-add="balsamo">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/jabon.webp" alt="Jabón neutro" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Jabón neutro</h3><p>pH suave para los primeros días. 250 ml</p><div class="shop-p"><b>9,90 €</b><button type="button" class="btn btn-red" data-add="jabon">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/film.webp" alt="Film protector" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Film protector</h3><p>Segunda piel transpirable. 2 m</p><div class="shop-p"><b>12,50 €</b><button type="button" class="btn btn-red" data-add="film">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/solar.webp" alt="Stick solar SPF 50" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Stick solar SPF 50</h3><p>Protege el color del sol</p><div class="shop-p"><b>11,90 €</b><button type="button" class="btn btn-red" data-add="solar">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/camiseta.webp" alt="Camiseta Rosa" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Camiseta Rosa</h3><p>Algodón orgánico. Unisex</p><div class="shop-p"><b>24 €</b><button type="button" class="btn btn-red" data-add="camiseta">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/gorra.webp" alt="Gorra Daga" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Gorra Daga</h3><p>Bordado rojo. Talla única</p><div class="shop-p"><b>22 €</b><button type="button" class="btn btn-red" data-add="gorra">Añadir</button></div></div></article><article class="shop-c gc"><div class="shop-i gc-i"><span>TINTA NEGRA</span><b>Tarjeta regalo</b></div><div class="cat-b"><h3>Tarjeta regalo</h3><p>De 50 a 200 €, válida 12 meses</p><div class="shop-p"><b>desde 50 €</b><a class="btn btn-ghost" href="#regalo">Elegir</a></div></div></article></div>
   </div>
 </section>
 
@@ -988,5 +989,6 @@ go(1);
 <button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
 </div>
 <script src="sim.js" defer></script><script src="amigos.js" defer></script><script src="regalo.js" defer></script><script src="fidelidad.js" defer></script><script src="appkit.js" defer data-color="#e1251b" data-theme="dark" data-items='[{"i":"brush","l":"Catálogo","h":"#catalogo"},{"i":"sparkles","l":"Simulador","h":"#simulador"},{"i":"users","l":"Amigos","h":"#amigos"},{"i":"gift","l":"Regalo","h":"#regalo"},{"i":"cal","l":"Reservar","h":"#reserva"}]' data-lift=".ch-fab,.ch,.ck"></script>
+<script src="movil.js" defer></script>
 </body>
 </html>

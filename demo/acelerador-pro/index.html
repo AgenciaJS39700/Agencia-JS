@@ -349,7 +349,8 @@ body.lock .ups{display:none}
 </style>
 <style>#fidelidad{background:var(--cream)}#regalo{background:var(--paper)}#fidelidad h2,#regalo h2{font-family:var(--serif)}</style>
 <style>.rescal{margin-top:16px;padding:16px;border-radius:16px;background:var(--cream);border:1px solid rgba(15,42,36,.15)}.rescal p{margin:0 0 10px}.rescal .btn{width:100%}.rescal-n{font-size:13px;color:var(--mute);margin:10px 0 0!important}</style>
-<style id="movil-pill">@media(max-width:600px){#ajs-demo{left:auto!important;right:10px;transform:none!important;gap:6px!important;padding:5px 5px 5px 12px!important;font-size:12px!important}#ajs-demo>span+span{display:none}}html:has(.sheet.open,.reel.open) #ajs-demo{display:none!important}</style></head>
+<style id="movil-pill">@media(max-width:600px){#ajs-demo{left:auto!important;right:10px;transform:none!important;gap:6px!important;padding:5px 5px 5px 12px!important;font-size:12px!important}#ajs-demo>span+span{display:none}}html:has(.sheet.open,.reel.open) #ajs-demo{display:none!important}</style><link rel="stylesheet" href="movil.css">
+</head>
 <body>
 <header class="hdr" id="hdr"><div class="wrap">
   <a class="logo" href="#inicio" aria-label="Bar Marea, inicio"><svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 40c6-6 12-6 18 0s12 6 18 0 10-5 10-5" stroke="#d9a441" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M8 27c6-6 12-6 18 0s12 6 18 0 10-5 10-5" stroke="#f6efe3" stroke-width="5" fill="none" stroke-linecap="round"/></svg>Bar Marea</a>
@@ -920,5 +921,6 @@ if(matchMedia("(hover:hover) and (pointer:fine)").matches){[].slice.call(documen
 <button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
 </div>
 <script src="qr.js" defer></script><script src="fidelidad.js" defer></script><script src="regalo.js" defer></script><script src="appkit.js" defer data-color="#c8653a" data-theme="light" data-items='[{"i":"book","l":"Carta","h":"#carta"},{"i":"card","l":"Club","h":"#fidelidad"},{"i":"gift","l":"Regalo","h":"#regalo"},{"i":"cal","l":"Reservar","h":"#reserva"}]' data-lift=".dock,.ups"></script>
+<script src="movil.js" defer></script>
 </body>
 </html>
