@@ -1,0 +1,12 @@
+/* /bento.css — tarjetas pulsables del bloque «Por qué elegirnos» */
+.bc{position:relative}
+.bc .bc-go{position:static!important;display:inline-flex;align-items:center;gap:.4rem;margin-top:auto;padding-top:.6rem;font-weight:800;font-size:.92rem;color:inherit;text-decoration:none}
+.bc .bc-go::after{content:"";position:absolute;inset:0;z-index:3;border-radius:inherit}
+.bc .bc-go i{font-style:normal;transition:transform .25s}
+.bc:hover .bc-go i{transform:translateX(4px)}
+.bc .bc-go:focus-visible{outline:none}
+.bc:has(.bc-go:focus-visible){outline:3px solid var(--accent);outline-offset:3px}
+.bc:has(.bc-go){cursor:pointer}
+.bc:not(.hi):not(.ph) .bc-go{color:var(--brand)}
+@keyframes bcflash{0%,100%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 0 6px var(--brand)}}
+.pc.bc-flash{animation:bcflash 1.6s ease 2}
