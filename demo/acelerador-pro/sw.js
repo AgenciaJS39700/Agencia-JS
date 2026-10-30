@@ -2,7 +2,7 @@
    Páginas y código: primero la red (siempre lo último) y, sin conexión, la copia guardada.
    Imágenes: primero la copia (carga instantánea). Vídeos y /api/ no pasan por aquí.
    Al publicar cambios grandes, sube VERSION para limpiar las copias antiguas. */
-var VERSION = "v4";
+var VERSION = "v5";
 var CACHE = "ajs-" + new URL(self.registration.scope).pathname.replace(/[^a-z0-9]+/gi, "-") + VERSION;
 var CORE = ["./", "index.html", "manifest.webmanifest", "appkit.js"];
 
