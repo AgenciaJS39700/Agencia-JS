@@ -31,7 +31,7 @@
     var moneda = local;
     try { moneda = sessionStorage.getItem("ajs_moneda") || local; } catch (e) { /* sin almacenamiento */ }
     if (moneda !== local && moneda !== "USD" && moneda !== "EUR") { moneda = local; }
-    if (G.grupo === "A" && local === "EUR") { return; }        // mismo precio y misma moneda que España
+    var soloVentajas = G.grupo === "A" && local === "EUR";     // mismo precio y moneda que España: solo el bloque de ventajas
 
     var RE = /(\d{1,3}(?:\.\d{3})+|\d+)(?:,\d+)?\s?€/g;
     var fmtCache = {};
@@ -117,8 +117,47 @@
       box.parentNode.insertBefore(nota, box.nextSibling);
     }
 
+    /* Ventajas para clientes de fuera de España (31/10/2026): 3 cuotas sin intereses, +1 mes de
+       mantenimiento gratis, garantía en el diseño y 1 mes gratis por recomendación. */
+    function nombrePais() {
+      try { return new Intl.DisplayNames(["es"], { type: "region" }).of(G.pais) || NOMBRES[G.pais] || G.pais; } catch (e) { return NOMBRES[G.pais] || G.pais; }
+    }
+    function bandera() {
+      return /^[A-Z]{2}$/.test(G.pais) ? String.fromCodePoint.apply(null, G.pais.split("").map(function (c) { return 127397 + c.charCodeAt(0); })) : "🌎";
+    }
+    function cuotas() {
+      [].forEach.call(document.querySelectorAll("#planes .pay-one .text-4xl"), function (sp) {
+        var eur = parseInt(sp.dataset.precio || sp.textContent.replace(/\D/g, ""), 10);
+        var p = sp.closest("p"); if (!eur || !p || p.parentNode.querySelector(".am-cu")) { return; }
+        var c = document.createElement("p"); c.className = "am-cu";
+        c.textContent = "o 3 cuotas de " + Math.ceil(eur / 3) + " € sin intereses";   // precios.js la pasa a la moneda del país
+        p.parentNode.insertBefore(c, p.nextSibling);
+      });
+    }
+    function ventajas() {
+      var anc = document.getElementById("ajs-moneda") || (document.querySelector("#planes .pay-tg"));
+      if (!anc || document.getElementById("ajs-ventajas")) { return; }
+      var v = document.createElement("div"); v.id = "ajs-ventajas";
+      v.innerHTML = '<p class="av-t">' + bandera() + " Ventajas para clientes de <b>" + nombrePais() + "</b></p>" +
+        '<ul><li><b>3 cuotas</b> sin intereses</li><li><b>+1 mes</b> de mantenimiento gratis</li>' +
+        '<li><b>Garantía:</b> si no te gusta el diseño, no pagas la segunda mitad</li>' +
+        '<li><b>Recomienda</b> y gana 1 mes gratis por cada cliente</li></ul>';
+      anc.parentNode.insertBefore(v, anc);
+      var st = document.createElement("style");
+      st.textContent = "#ajs-ventajas{max-width:46rem;margin:1.4rem auto .2rem;padding:1rem 1.1rem;border:1px solid rgba(232,199,102,.45);border-radius:18px;background:rgba(232,199,102,.06);color:#d9d9d9;font-size:.86rem}" +
+        "#ajs-ventajas .av-t{margin:0 0 .6rem;text-align:center;font-weight:700;color:#e5e5e5}#ajs-ventajas b{color:#fff}" +
+        "#ajs-ventajas ul{display:grid;gap:.45rem;margin:0;padding:0;list-style:none}@media(min-width:640px){#ajs-ventajas ul{grid-template-columns:1fr 1fr}}" +
+        "#ajs-ventajas li{position:relative;padding-left:1.4rem;line-height:1.35}#ajs-ventajas li::before{content:'✓';position:absolute;left:0;color:#e8c766;font-weight:800}" +
+        ".am-cu{margin:.35rem 0 0;font-size:.82rem;font-weight:700;color:#e8c766}";
+      document.head.appendChild(st);
+    }
+
     function arranca() {
-      selector(); todo();
+      cuotas();
+      if (!soloVentajas) { selector(); }
+      ventajas();
+      if (soloVentajas) { return; }
+      todo();
       if ("MutationObserver" in window) {
         new MutationObserver(function (ms) {
           if (ocupado) { return; }
