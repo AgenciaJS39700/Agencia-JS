@@ -1,5 +1,5 @@
 # Descarga los vídeos de media/fuentes.txt y los deja listos para la web (MP4 H.264 ligero + póster WebP).
-# Formato de cada línea: nombre  url  tipo  [segundos]
+# Formato de cada línea: nombre  url  tipo  [segundos|-]  [url de audio que sustituye al original]
 #   tipo: fondo-h (1280x720 sin sonido) · fondo-v (720x1280 sin sonido) · anuncio (720x1280 con sonido) · carla (720x1280 con sonido y retoque natural)
 name: Vídeos
 on:
@@ -18,11 +18,16 @@ jobs:
       - name: Descargar y convertir
         run: |
           mkdir -p /tmp/raw media
-          grep -v '^#' media/fuentes.txt | while read -r n u t s; do
+          grep -v '^#' media/fuentes.txt | while read -r n u t s a; do
             [ -z "$n" ] && continue
             [ -f "media/$n.mp4" ] && continue
             curl -sSfL -o "/tmp/raw/$n.mp4" "$u"
-            T=""; [ -n "$s" ] && T="-t $s"
+            T=""; [ -n "$s" ] && [ "$s" != "-" ] && T="-t $s"
+            if [ -n "$a" ]; then
+              curl -sSfL -o "/tmp/raw/$n-a.mp3" "$a"
+              ffmpeg -nostdin -v error -y -i "/tmp/raw/$n.mp4" -i "/tmp/raw/$n-a.mp3" -map 0:v -map 1:a -c:v copy -c:a aac -shortest "/tmp/raw/$n-x.mp4"
+              mv "/tmp/raw/$n-x.mp4" "/tmp/raw/$n.mp4"
+            fi
             case "$t" in
               fondo-h) ffmpeg -nostdin -v error -y -i "/tmp/raw/$n.mp4" $T -an -vf "scale=1280:-2,fps=30" -c:v libx264 -preset slow -crf 27 -pix_fmt yuv420p -movflags +faststart "media/$n.mp4" ;;
               fondo-v) ffmpeg -nostdin -v error -y -i "/tmp/raw/$n.mp4" $T -an -vf "scale=720:-2,fps=30" -c:v libx264 -preset slow -crf 27 -pix_fmt yuv420p -movflags +faststart "media/$n.mp4" ;;
