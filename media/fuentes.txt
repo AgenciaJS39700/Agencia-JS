@@ -5,3 +5,4 @@ anuncio-bar https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3u
 anuncio-peluqueria https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3uS/hf_20261101_113632_9d5b0310-467b-4c66-953f-a30a18af65da.mp4 anuncio 9.2
 anuncio-clinica https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3uS/hf_20261101_113632_ca923082-c55d-49fe-83e4-1db6c979ae94.mp4 anuncio - https://v3b.fal.media/files/b/0ab0b73f/YytQYIKeKFmMH6EVM8LYE_sound_effect.mp3
 carla-asistentes https://v3b.fal.media/files/b/0ab0b73b/4i2KKFChvSSYd3y9IFIWc_output.mp4 carla
+anuncio-nfc https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3uS/hf_20261101_115553_0fe42b4d-6a82-443a-87fc-e555fa95bbf4.mp4 anuncio
