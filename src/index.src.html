@@ -611,6 +611,15 @@ footer nav[aria-label="Legal"]{row-gap:0}
 .mjump a[href="#contacto"],header nav a[href="#contacto"]{--z:#e8c766}
 .mjump a[href*="#"]::before{content:"";display:inline-block;width:.45rem;height:.45rem;margin-right:.4rem;border-radius:50%;background:var(--z,#9a9a9a);vertical-align:.08em}
 .mjump a.on{background:var(--z,#e8c766)!important;border-color:var(--z,#e8c766)!important;color:#111!important}
+/* Móvil (01/11/2026): letra algo más grande y cajas interiores con un tono de su zona para que no se pierdan en el fondo */
+@media(max-width:767px){
+.zona .text-sm,.zona .mk-p,.zona li{font-size:.9375rem;line-height:1.6}
+.zona .text-xs{font-size:.8125rem;line-height:1.5}
+.zona p.text-mute,.zona .text-mute{color:#d0d0d6!important}
+.zona .bg-ink,.zona .bg-navy,.zona .rounded-card,.zona .dm-c{background-color:color-mix(in srgb,var(--z) 7%,#131316)!important}
+.zona .z-h{font-size:1.85rem;line-height:1.15}
+.zona .z-k{font-size:.72rem}
+}
 .mjump a.on::before{background:#111}
 </style>
 </head>
