@@ -4,5 +4,5 @@ portada-v https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3uS/
 anuncio-bar https://v3b.fal.media/files/b/0ab0b7f9/kdWmR5JlZe-cgsvHYibgn_anuncio-bar-marea.mp4 listo
 anuncio-peluqueria https://v3b.fal.media/files/b/0ab0b7f9/S1dTY-Vo_ZdiG-LYimCFQ_anuncio-marta-vega.mp4 listo
 anuncio-clinica https://v3b.fal.media/files/b/0ab0b7fa/YtRiemL0m6anqbF4Bl9mZ_anuncio-sonrisa-sur.mp4 listo
-anuncio-nfc https://v3b.fal.media/files/b/0ab0b7fa/MTp7bFZgVG3wWvOYvaYOn_anuncio-nfc-es.mp4 listo
 carla-asistentes https://v3b.fal.media/files/b/0ab0b7fa/lgcr9lI516k9oZVbZugk4_ngZKHxaW.mp4 carla
+anuncio-nfc-v2 https://v3b.fal.media/files/b/0ab0b88f/E5pK77qxna-kM8UK8dprO_anuncio-nfc-es-v2.mp4 listo
