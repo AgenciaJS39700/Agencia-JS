@@ -1,8 +1,8 @@
 # nombre  url  tipo  [segundos]
 portada-h https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3uS/hf_20261101_113621_5035c881-c015-4c3c-8172-0a37e3f63c61.mp4 fondo-h
 portada-v https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3uS/hf_20261101_113622_35200294-d542-436e-9943-06f07da86ed4.mp4 fondo-v
-anuncio-bar https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3uS/hf_20261101_113634_ca9be4d6-f735-402f-836a-8ee0b2f7d490.mp4 anuncio
-anuncio-peluqueria https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3uS/hf_20261101_113632_9d5b0310-467b-4c66-953f-a30a18af65da.mp4 anuncio 9.2
-anuncio-clinica https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3uS/hf_20261101_113632_ca923082-c55d-49fe-83e4-1db6c979ae94.mp4 anuncio - https://v3b.fal.media/files/b/0ab0b73f/YytQYIKeKFmMH6EVM8LYE_sound_effect.mp3
 carla-asistentes https://v3b.fal.media/files/b/0ab0b73b/4i2KKFChvSSYd3y9IFIWc_output.mp4 carla
-anuncio-nfc https://d8j0ntlcm91z4.cloudfront.net/user_3KCXHxLegiA18O8VhrE2rEMT3uS/hf_20261101_115553_0fe42b4d-6a82-443a-87fc-e555fa95bbf4.mp4 anuncio
+anuncio-bar https://v3b.fal.media/files/b/0ab0b7f9/kdWmR5JlZe-cgsvHYibgn_anuncio-bar-marea.mp4 listo
+anuncio-peluqueria https://v3b.fal.media/files/b/0ab0b7f9/S1dTY-Vo_ZdiG-LYimCFQ_anuncio-marta-vega.mp4 listo
+anuncio-clinica https://v3b.fal.media/files/b/0ab0b7fa/YtRiemL0m6anqbF4Bl9mZ_anuncio-sonrisa-sur.mp4 listo
+anuncio-nfc https://v3b.fal.media/files/b/0ab0b7fa/MTp7bFZgVG3wWvOYvaYOn_anuncio-nfc-es.mp4 listo
