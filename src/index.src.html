@@ -622,6 +622,26 @@ footer nav[aria-label="Legal"]{row-gap:0}
 }
 .mjump a.on::before{background:#111}
 </style>
+<style>
+/* (01/11/2026) Vídeo de portada, galería de anuncios y visor */
+#inicio .pv{opacity:0;transition:opacity 1.2s ease}#inicio .pv.on{opacity:.75}
+.vg-h{font-size:1.15rem;font-weight:800;margin:0 0 1rem;display:flex;flex-wrap:wrap;align-items:baseline;gap:.6rem}.vg-h small{font-size:.8rem;font-weight:600;color:#c2c2c8}
+.vg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;list-style:none;margin:0;padding:0}
+.vg-c{position:relative;display:block;width:100%;aspect-ratio:9/16;border-radius:20px;overflow:hidden;border:1px solid color-mix(in srgb,var(--z,#fb7185) 40%,transparent);background:#111;padding:0;cursor:pointer}
+.vg-c img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s ease}.vg-c:hover img{transform:scale(1.04)}
+.vg-c i{position:absolute;left:50%;top:45%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:1.2rem;color:#fff;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.6);backdrop-filter:blur(6px)}
+.vg-c span{position:absolute;left:0;right:0;bottom:0;padding:2.2rem .8rem .8rem;font-weight:800;font-size:.9rem;color:#fff;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.8))}
+@media(max-width:767px){.vg{display:flex}.vg>li{flex:0 0 62%}}
+.carla-c{display:flex;align-items:center;gap:.9rem;width:100%;max-width:26rem;margin-top:1.1rem;padding:.6rem .9rem .6rem .6rem;border-radius:18px;border:1px solid color-mix(in srgb,var(--z,#a78bfa) 50%,transparent);background:color-mix(in srgb,var(--z,#a78bfa) 12%,#121216);color:#fff;text-align:left;cursor:pointer}
+.carla-c:hover{background:color-mix(in srgb,var(--z,#a78bfa) 20%,#121216)}
+.carla-t{position:relative;flex:none;width:56px;height:76px;border-radius:12px;overflow:hidden}.carla-t img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.carla-t i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;color:#fff;background:rgba(0,0,0,.3)}
+.carla-c b{display:block;font-size:1rem}.carla-c small{display:block;font-size:.8rem;color:#d0d0d6;line-height:1.35}
+.vlb{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:rgba(0,0,0,.88);padding:1rem}.vlb[hidden]{display:none!important}
+.vlb video{height:min(86svh,calc(94vw*16/9));aspect-ratio:9/16;width:auto;max-width:94vw;border-radius:18px;background:#000;object-fit:contain}
+.vlb-x{position:absolute;top:max(14px,env(safe-area-inset-top));right:14px;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;font-size:1.4rem;cursor:pointer}
+.vlb p{position:absolute;bottom:max(14px,env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:#ddd;font-size:.85rem;margin:0}
+</style>
 </head>
 <body class="bg-ink pb-20 font-sans text-bone antialiased md:pb-0">
 <div id="intro" aria-hidden="true"><div class="it-cloud"></div><div class="it-sky"></div><canvas id="it-cv"></canvas><p class="it-name">Agencia <b>JS</b></p></div>
@@ -705,6 +725,7 @@ class="flex h-11 w-11 items-center justify-center rounded-full border border-bla
 <div class="grid-bg absolute inset-0 -z-30" aria-hidden="true"></div>
 <img src="/hero-agencia.webp" alt="" aria-hidden="true" width="1280" height="720" fetchpriority="high" decoding="async"
 class="absolute inset-0 -z-20 h-full w-full object-cover opacity-70" onerror="this.style.display='none'">
+<video id="portada-v" class="pv absolute inset-0 -z-20 h-full w-full object-cover" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
 <div class="absolute inset-0 -z-10 bg-gradient-to-b from-ink/70 via-ink/50 to-ink" aria-hidden="true"></div>
 <div class="mx-auto max-w-6xl px-4 pb-24 pt-14 sm:px-6 sm:pb-28 sm:pt-20 lg:px-8 lg:pb-32 lg:pt-28">
 <div class="max-w-3xl space-y-6">
@@ -770,6 +791,10 @@ class="inline-flex min-h-[48px] w-full flex-none items-center justify-center gap
 <li><i aria-hidden="true">🔔</i><span><strong>Te avisa de cada reserva</strong>Por WhatsApp o correo, y la cita entra en tu agenda.</span></li>
 <li><i aria-hidden="true">🛡️</i><span><strong>Claro y seguro</strong>Avisa de que es un asistente automático y no pide datos sensibles.</span></li>
 </ul>
+<button type="button" class="vlb-c carla-c" data-video="/media/carla-asistentes.mp4" data-titulo="Carla, la recepcionista que nunca duerme" data-cta="video_carla">
+<span class="carla-t"><img src="/media/carla-asistentes.webp" alt="" width="72" height="128" loading="lazy" decoding="async"><i aria-hidden="true">▶</i></span>
+<span><b>Conoce a Carla</b><small>Así presentaría tu asistente a tus clientes · 15 s con sonido</small></span>
+</button>
 </div>
 <div class="mk-ph-w reveal" aria-hidden="true">
 <div class="mk-ph">
@@ -1111,6 +1136,15 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 </div>
 </div>
 </div>
+</div>
+<div class="mx-auto mt-12 max-w-6xl px-4 sm:px-6 lg:px-8">
+<h3 class="vg-h reveal">Ejemplos de anuncios <small>Pulsa para verlos con sonido</small></h3>
+<ul class="vg mcar" aria-label="Ejemplos de anuncios">
+<li><button type="button" class="vlb-c vg-c" data-video="/media/anuncio-bar.mp4" data-titulo="Anuncio para un bar" data-cta="video_bar"><img src="/media/anuncio-bar.webp" alt="" width="360" height="640" loading="lazy" decoding="async"><i aria-hidden="true">▶</i><span>Bar · cafetería</span></button></li>
+<li><button type="button" class="vlb-c vg-c" data-video="/media/anuncio-peluqueria.mp4" data-titulo="Anuncio para una peluquería" data-cta="video_peluqueria"><img src="/media/anuncio-peluqueria.webp" alt="" width="360" height="640" loading="lazy" decoding="async"><i aria-hidden="true">▶</i><span>Peluquería</span></button></li>
+<li><button type="button" class="vlb-c vg-c" data-video="/media/anuncio-clinica.mp4" data-titulo="Anuncio para una clínica dental" data-cta="video_clinica"><img src="/media/anuncio-clinica.webp" alt="" width="360" height="640" loading="lazy" decoding="async"><i aria-hidden="true">▶</i><span>Clínica dental</span></button></li>
+<!--NFC-->
+</ul>
 </div>
 </section>
 <!-- 5. TARJETAS NFC -->
@@ -1768,6 +1802,24 @@ document.getElementById("anio").textContent = new Date().getFullYear();
 (function () { var b = document.getElementById("form-contacto-b"), f = document.getElementById("form-contacto"); if (!b || !f) return;
   b.addEventListener("click", function () { f.classList.add("on"); b.hidden = true; b.setAttribute("aria-expanded", "true"); var i = f.querySelector("input"); if (i) i.focus({ preventScroll: true }); });
   if (location.hash === "#contacto" || location.hash === "#form-contacto") { f.classList.add("on"); b.hidden = true; }
+})();
+</script>
+<div class="vlb" id="vlb" hidden role="dialog" aria-modal="true" aria-label="Vídeo"><button type="button" class="vlb-x" aria-label="Cerrar">×</button><video controls playsinline preload="none"></video><p>Vídeo de ejemplo generado con IA</p></div>
+<script>
+(function(){
+/* Portada: vídeo en bucle (horizontal u horizontal según pantalla), solo si no se pide menos movimiento ni ahorro de datos */
+var pv=document.getElementById("portada-v");
+var c=navigator.connection||{};
+if(pv&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&!c.saveData){
+ var go=function(){var m=innerWidth<768;pv.poster=m?"/media/portada-v.webp":"/media/portada-h.webp";pv.src=m?"/media/portada-v.mp4":"/media/portada-h.mp4";pv.addEventListener("playing",function(){pv.classList.add("on")},{once:true});var p=pv.play();if(p&&p.catch)p.catch(function(){});};
+ if(document.readyState==="complete")setTimeout(go,300);else addEventListener("load",function(){setTimeout(go,300)});
+}
+/* Visor de vídeos (anuncios y Carla) */
+var box=document.getElementById("vlb");if(!box)return;var v=box.querySelector("video"),last=null;
+function cerrar(){v.pause();v.removeAttribute("src");v.load();box.hidden=true;document.documentElement.style.overflow="";if(last)last.focus();}
+document.addEventListener("click",function(e){var b=e.target.closest(".vlb-c");if(!b)return;last=b;box.setAttribute("aria-label",b.dataset.titulo||"Vídeo");v.src=b.dataset.video;box.hidden=false;document.documentElement.style.overflow="hidden";v.play().catch(function(){});box.querySelector(".vlb-x").focus();});
+box.addEventListener("click",function(e){if(e.target===box||e.target.closest(".vlb-x"))cerrar();});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!box.hidden)cerrar();});
 })();
 </script>
 </body>
