@@ -1,0 +1,43 @@
+# Descarga los vídeos de media/fuentes.txt y los deja listos para la web (MP4 H.264 ligero + póster WebP).
+# Formato de cada línea: nombre  url  tipo  [segundos]
+#   tipo: fondo-h (1280x720 sin sonido) · fondo-v (720x1280 sin sonido) · anuncio (720x1280 con sonido) · carla (720x1280 con sonido y retoque natural)
+name: Vídeos
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["media/fuentes.txt", ".github/workflows/videos.yml"]
+permissions:
+  contents: write
+jobs:
+  videos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg webp
+      - name: Descargar y convertir
+        run: |
+          mkdir -p /tmp/raw media
+          grep -v '^#' media/fuentes.txt | while read -r n u t s; do
+            [ -z "$n" ] && continue
+            [ -f "media/$n.mp4" ] && continue
+            curl -sSfL -o "/tmp/raw/$n.mp4" "$u"
+            T=""; [ -n "$s" ] && T="-t $s"
+            case "$t" in
+              fondo-h) ffmpeg -nostdin -v error -y -i "/tmp/raw/$n.mp4" $T -an -vf "scale=1280:-2,fps=30" -c:v libx264 -preset slow -crf 27 -pix_fmt yuv420p -movflags +faststart "media/$n.mp4" ;;
+              fondo-v) ffmpeg -nostdin -v error -y -i "/tmp/raw/$n.mp4" $T -an -vf "scale=720:-2,fps=30" -c:v libx264 -preset slow -crf 27 -pix_fmt yuv420p -movflags +faststart "media/$n.mp4" ;;
+              anuncio) ffmpeg -nostdin -v error -y -i "/tmp/raw/$n.mp4" $T -vf "scale=720:-2,fps=30" -c:v libx264 -preset slow -crf 25 -pix_fmt yuv420p -c:a aac -b:a 96k -af "loudnorm=I=-16:TP=-1.5" -movflags +faststart "media/$n.mp4" ;;
+              carla) ffmpeg -nostdin -v error -y -i "/tmp/raw/$n.mp4" $T -vf "scale=720:-2,fps=30,eq=saturation=0.94:contrast=1.02,colorbalance=rm=0.02:bm=-0.02,noise=alls=5:allf=t,vignette=PI/6" -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p -c:a aac -b:a 128k -af "loudnorm=I=-16:TP=-1.5" -movflags +faststart "media/$n.mp4" ;;
+            esac
+            ss=0.0; [ "$t" = "anuncio" ] || [ "$t" = "carla" ] && ss=1.0
+            ffmpeg -nostdin -v error -y -ss $ss -i "media/$n.mp4" -frames:v 1 "/tmp/raw/$n.png"
+            cwebp -quiet -q 72 -m 6 "/tmp/raw/$n.png" -o "media/$n.webp"
+          done
+          ls -la media
+      - name: Guardar en el repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898+github-actions[bot]@users.noreply.github.com"
+          git add media
+          git diff --cached --quiet || git commit -m "chore(media): vídeos para la web"
+          git pull --rebase -q && git push
