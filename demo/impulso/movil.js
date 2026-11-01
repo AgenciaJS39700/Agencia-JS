@@ -1,5 +1,5 @@
 /* /movil.js — Optimización móvil común de Agencia JS (oct 2026).
-   1) Carruseles (.mcar): puntos de posición + aviso «Desliza para ver más».
+   1) Carruseles (.mcar): puntos de posición + aviso «Desliza para ver más» + pasan solos cada 4,5 s.
    2) Barra de atajos bajo la cabecera, sacada de los enlaces del menú (#secciones). */
 (function () {
   "use strict";
@@ -24,7 +24,26 @@
     };
     c.addEventListener("scroll", function () { window.requestAnimationFrame(upd); }, { passive: true });
     upd();
+    autoCar(c);
   });
+
+  /* 1d) Carruseles que pasan solos cada pocos segundos (como en las webs profesionales).
+     Solo en móvil y cuando el carrusel se ve; se para al tocarlo y vuelve a los 9 s. Sin movimiento si el usuario lo pide. */
+  function autoCar(c) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || c.dataset.autoOk || c.dataset.auto === "0") { return; }
+    c.dataset.autoOk = "1";
+    var ms = parseInt(c.dataset.auto, 10) || 4500, vis = false, pausa = 0, mqA = window.matchMedia("(max-width: 767px)");
+    var idx = function () { var r = c.getBoundingClientRect(), m = r.left + r.width / 2, best = 0, bd = 1e9; [].forEach.call(c.children, function (x, i) { var b = x.getBoundingClientRect(), d = Math.abs(b.left + b.width / 2 - m); if (d < bd) { bd = d; best = i; } }); return best; };
+    var ir = function (i) { var x = c.children[i]; if (!x) { return; } var r = c.getBoundingClientRect(), b = x.getBoundingClientRect(); c.scrollTo({ left: c.scrollLeft + (b.left + b.width / 2) - (r.left + r.width / 2), behavior: "smooth" }); };
+    var tick = function () {
+      if (!mqA.matches || !vis || document.hidden || Date.now() < pausa || c.scrollWidth <= c.clientWidth + 8) { return; }
+      var i = idx() + 1; if (i >= c.children.length || c.scrollLeft + c.clientWidth >= c.scrollWidth - 4) { i = 0; }
+      ir(i);
+    };
+    ["touchstart", "pointerdown", "wheel", "focusin"].forEach(function (ev) { c.addEventListener(ev, function () { pausa = Date.now() + 9000; }, { passive: true }); });
+    if ("IntersectionObserver" in window) { new IntersectionObserver(function (es) { vis = es[0].isIntersecting; }, { threshold: 0.5 }).observe(c); } else { vis = true; }
+    setInterval(tick, ms);
+  }
 
 
   /* 1b) Bloques largos plegados en móvil: un botón los abre (formularios de regalo y tarjeta, horario…) */
