@@ -149,6 +149,12 @@ export default {
       url.hostname = "agencia-js.com";
       return Response.redirect(url.toString(), 301);
     }
+    // Vídeos sustituidos: los nombres antiguos (que pueda tener una página guardada en caché) llevan a la versión actual
+    const VIDEO_ACTUAL = { "anuncio-nfc": "anuncio-nfc-v3", "anuncio-nfc-v2": "anuncio-nfc-v3" };
+    const mv = url.pathname.match(/^\/media\/([a-z0-9-]+)\.(mp4|webp)$/);
+    if (mv && VIDEO_ACTUAL[mv[1]]) {
+      return Response.redirect(url.origin + "/media/" + VIDEO_ACTUAL[mv[1]] + "." + mv[2], 302);
+    }
     // Enlace corto del QR de las tarjetas de visita → sección de auditoría (con origen medible)
     if (url.pathname === "/A" || url.pathname === "/a") {
       return Response.redirect("https://agencia-js.com/?utm_source=tarjeta&utm_medium=qr#auditoria", 302);
