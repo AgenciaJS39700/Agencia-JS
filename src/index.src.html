@@ -577,6 +577,42 @@ footer nav[aria-label="Legal"]{row-gap:0}
 .mk-cta p{font-size:.8rem;color:#a3a3a3;max-width:34rem}
 @media (prefers-reduced-motion:reduce){.mk-card{transition:none}.mk-card:hover{transform:none}}
 </style>
+<style>
+/* (01/11/2026) Zonas de color: cada bloque de productos con su color para distinguirlo de un vistazo.
+   Asistentes violeta · Demos turquesa · Planes dorado · Vídeo coral · NFC azul · Servicios verde · Contacto dorado */
+#asistentes{--z:#a78bfa;--zb:#110e1c}
+#demos{--z:#2dd4bf;--zb:#081514}
+#planes{--z:#e8c766;--zb:#15120a}
+#video{--z:#fb7185;--zb:#190c11}
+#nfc{--z:#60a5fa;--zb:#0a1120}
+#servicios{--z:#34d399;--zb:#08150f}
+#contacto{--z:#e8c766;--zb:#111111}
+.zona{position:relative;isolation:isolate;border-top:3px solid var(--z);background:radial-gradient(ellipse 90% 55% at 50% 0%,color-mix(in srgb,var(--z) 17%,transparent),transparent 72%),radial-gradient(ellipse 60% 40% at 100% 100%,color-mix(in srgb,var(--z) 8%,transparent),transparent 70%),var(--zb)!important}
+.zona .z-k,.zona .mk-k{display:inline-flex;align-items:center;gap:.45rem;padding:.38rem .85rem;border-radius:999px;border:1px solid color-mix(in srgb,var(--z) 55%,transparent);background:color-mix(in srgb,var(--z) 14%,transparent);color:var(--z)!important;letter-spacing:.18em}
+.zona .z-k::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:var(--z);box-shadow:0 0 10px var(--z)}
+.zona .mk-k b{background:var(--z)!important;color:#111!important}
+.zona .z-h::after{content:"";display:block;width:64px;height:4px;margin:.9rem 0 0;border-radius:4px;background:linear-gradient(90deg,var(--z),color-mix(in srgb,var(--z) 30%,transparent))}
+.zona .text-center .z-h::after,.zona .text-center.z-h::after{margin-inline:auto}
+#asistentes .mk-h span,#servicios .sv-grad{background:linear-gradient(100deg,#fff,var(--z) 55%,color-mix(in srgb,var(--z) 70%,#fff));-webkit-background-clip:text;background-clip:text;color:transparent;animation:none}
+/* Textos secundarios con más contraste (antes se perdían sobre el negro) */
+.zona .text-mute,#asistentes .mk-p{color:#c2c2c8!important}
+.zona .text-silver{color:#e4e4e7}
+/* Tarjetas de cada zona con un borde de su color */
+#demos .dm-c,#asistentes .mk-c,#nfc .rounded-card,#video .rounded-card,#servicios .sv-card{border-color:color-mix(in srgb,var(--z) 35%,transparent)!important}
+/* Separación clara entre zonas */
+.zona+.zona,.zona+section{box-shadow:0 -1px 0 rgba(0,0,0,.6)}
+/* Barra de atajos y menú: cada enlace con el punto del color de su zona */
+.mjump a[href="#asistentes"],header nav a[href="#asistentes"]{--z:#a78bfa}
+.mjump a[href="#demos"],header nav a[href="#demos"]{--z:#2dd4bf}
+.mjump a[href="#planes"],header nav a[href="#planes"]{--z:#e8c766}
+.mjump a[href="#video"],header nav a[href="#video"]{--z:#fb7185}
+.mjump a[href="#nfc"],header nav a[href="#nfc"]{--z:#60a5fa}
+.mjump a[href="#servicios"],header nav a[href="#servicios"]{--z:#34d399}
+.mjump a[href="#contacto"],header nav a[href="#contacto"]{--z:#e8c766}
+.mjump a[href*="#"]::before{content:"";display:inline-block;width:.45rem;height:.45rem;margin-right:.4rem;border-radius:50%;background:var(--z,#9a9a9a);vertical-align:.08em}
+.mjump a.on{background:var(--z,#e8c766)!important;border-color:var(--z,#e8c766)!important;color:#111!important}
+.mjump a.on::before{background:#111}
+</style>
 </head>
 <body class="bg-ink pb-20 font-sans text-bone antialiased md:pb-0">
 <div id="intro" aria-hidden="true"><div class="it-cloud"></div><div class="it-sky"></div><canvas id="it-cv"></canvas><p class="it-name">Agencia <b>JS</b></p></div>
@@ -712,12 +748,12 @@ class="inline-flex min-h-[48px] w-full flex-none items-center justify-center gap
 </div>
 </section>
 <!-- 6b. ASISTENTES 24/7 (mercado por sector) -->
-<section id="asistentes" class="mk" aria-labelledby="mk-title">
+<section id="asistentes" class="zona mk" aria-labelledby="mk-title">
 <div class="mk-in">
 <div class="mk-hero">
 <div class="reveal">
 <p class="mk-k"><b>Nuevo</b> Asistentes 24/7</p>
-<h2 id="mk-title" class="mk-h">Tu recepcionista que <span>nunca duerme</span></h2>
+<h2 id="mk-title" class="z-h mk-h">Tu recepcionista que <span>nunca duerme</span></h2>
 <p class="mk-p">Un asistente en tu web que contesta a tus clientes y les da cita a cualquier hora: mientras atiendes, por la noche o con el local cerrado. Sin llamadas perdidas y sin mensajes sin responder.</p>
 <ul class="mk-ben">
 <li><i aria-hidden="true">📅</i><span><strong>Agenda citas solo</strong>El cliente elige servicio, día y hora en unos pocos toques.</span></li>
@@ -864,11 +900,11 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 })();
 </script>
 <!-- 4. PLANES -->
-<section id="demos" class="dm" aria-labelledby="dm-t">
+<section id="demos" class="zona dm" aria-labelledby="dm-t">
 <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 <div class="reveal mx-auto max-w-2xl text-center">
-<p class="text-xs font-semibold uppercase tracking-[0.25em] text-silver">Demos por sector</p>
-<h2 id="dm-t" class="mt-3 text-3xl font-extrabold sm:text-4xl">Mira cómo quedaría tu negocio</h2>
+<p class="z-k text-xs font-semibold uppercase tracking-[0.25em] text-silver">Demos por sector</p>
+<h2 id="dm-t" class="z-h mt-3 text-3xl font-extrabold sm:text-4xl">Mira cómo quedaría tu negocio</h2>
 <p class="mt-3 text-sm text-mute">Webs de ejemplo funcionando de verdad. Ábrelas en el móvil y pruébalas: reserva, paga, pide… Todas son datos de demostración.</p>
 </div>
 <div class="dm-g mcar">
@@ -900,11 +936,11 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 <p class="reveal mt-8 text-center text-sm text-mute">¿Tu sector no está? Lo hacemos a medida. <a href="https://wa.me/34688933308" data-wa="Hola, quiero ver cómo quedaría la web de mi negocio" target="_blank" rel="noopener" data-cta="demo_sector_otro" class="font-semibold text-white underline underline-offset-2">Cuéntanos tu negocio</a> y te enseñamos un ejemplo.</p>
 </div>
 </section>
-<section id="planes" class="bg-navy py-14 sm:py-16 lg:py-20">
+<section id="planes" class="zona bg-navy py-14 sm:py-16 lg:py-20">
 <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 <div class="reveal mx-auto max-w-2xl text-center">
-<p class="text-xs font-semibold uppercase tracking-[0.25em] text-silver">Planes y precios</p>
-<h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">Elige el nivel que necesita tu negocio</h2>
+<p class="z-k text-xs font-semibold uppercase tracking-[0.25em] text-silver">Planes y precios</p>
+<h2 class="z-h mt-3 text-3xl font-extrabold sm:text-4xl">Elige el nivel que necesita tu negocio</h2>
 <p class="mt-3 text-sm text-mute md:hidden m-only">Precios de partida, IVA no incluido. Impulso Digital en oferta: 349 € en lugar de 399 €.</p>
 <p class="mt-3 text-sm text-mute d-only">Precios de partida, IVA no incluido. Elige cómo pagar: la web de una vez o por suscripción mensual. El presupuesto final se ajusta a tu negocio. Oferta de lanzamiento en Impulso Digital: 349 € en lugar de 399 € mientras figure en esta web.</p>
 </div>
@@ -1036,11 +1072,11 @@ class="mt-3 inline-flex min-h-[46px] items-center justify-center gap-2 rounded-f
 })();
 </script>
 <!-- 6. VÍDEO ADS -->
-<section id="video" class="bg-navy py-14 sm:py-16 lg:py-20">
+<section id="video" class="zona bg-navy py-14 sm:py-16 lg:py-20">
 <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-14 lg:px-8">
 <div class="reveal space-y-5">
-<p class="text-xs font-semibold uppercase tracking-[0.25em] text-silver">Producción de vídeo</p>
-<h2 class="text-3xl font-extrabold leading-tight sm:text-4xl">Vídeo publicitario para tu negocio</h2>
+<p class="z-k text-xs font-semibold uppercase tracking-[0.25em] text-silver">Producción de vídeo</p>
+<h2 class="z-h text-3xl font-extrabold leading-tight sm:text-4xl">Vídeo publicitario para tu negocio</h2>
 <p class="leading-relaxed text-mute">Contenido publicitario dinámico diseñado para captar clientes en redes sociales. Creamos vídeos mensuales personalizados para tus redes.</p>
 <ul class="space-y-2.5 text-sm text-mute">
 <li class="flex items-start gap-3"><svg class="ic mt-0.5 h-4 w-4 flex-none text-white" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Campañas y ofertas de temporada</li>
@@ -1069,11 +1105,11 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 </div>
 </section>
 <!-- 5. TARJETAS NFC -->
-<section id="nfc" class="py-14 sm:py-16 lg:py-20">
+<section id="nfc" class="zona py-14 sm:py-16 lg:py-20">
 <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-14 lg:px-8">
 <div class="reveal order-2 space-y-5 lg:order-1">
-<p class="text-xs font-semibold uppercase tracking-[0.25em] text-silver">Complemento para cualquier plan</p>
-<h2 class="text-3xl font-extrabold leading-tight sm:text-4xl">Tarjetas NFC para Google Reviews</h2>
+<p class="z-k text-xs font-semibold uppercase tracking-[0.25em] text-silver">Complemento para cualquier plan</p>
+<h2 class="z-h text-3xl font-extrabold leading-tight sm:text-4xl">Tarjetas NFC para Google Reviews</h2>
 <p class="leading-relaxed text-mute">Facilita que tus clientes dejen su opinión en Google: acercan el móvil y llegan directamente a tu ficha, sin buscar tu negocio ni escribir nada.</p>
 <ul class="space-y-3 text-sm">
 <li class="flex items-start gap-3"><span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-white/10"><svg class="ic h-4 w-4" aria-hidden="true" focusable="false"><use href="#i-cpu"/></svg></span><span><strong>Chip NFC NTAG215/216</strong><br><span class="text-mute">Lectura instantánea en menos de 100 ms.</span></span></li>
@@ -1112,12 +1148,12 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 </div>
 </section>
 <!-- 3. SERVICIOS: escaparate interactivo -->
-<section id="servicios" class="sv">
+<section id="servicios" class="zona sv">
 <div class="sv-glow" aria-hidden="true"></div>
 <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 <div class="reveal mx-auto max-w-3xl text-center">
-<p class="text-xs font-semibold uppercase tracking-[0.25em] text-gold-light">Lo que hacemos</p>
-<h2 class="mt-3 text-4xl font-extrabold leading-tight sm:text-5xl">Qué hacemos por tu <span class="sv-grad">negocio</span></h2>
+<p class="z-k text-xs font-semibold uppercase tracking-[0.25em] text-gold-light">Lo que hacemos</p>
+<h2 class="z-h mt-3 text-4xl font-extrabold leading-tight sm:text-5xl">Qué hacemos por tu <span class="sv-grad">negocio</span></h2>
 <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-silver sm:text-lg">Cuando alguien busca lo que tú vendes, ¿te encuentra a ti o a tu competencia? Esto es lo que ponemos en marcha para que seas tú.</p>
 </div>
 <div class="sv-grid reveal">
@@ -1188,11 +1224,11 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 </div>
 </section>
 <!-- 10. CONTACTO -->
-<section id="contacto" class="border-t border-gold/40 bg-ink py-14 sm:py-16 lg:py-20">
+<section id="contacto" class="zona border-t border-gold/40 bg-ink py-14 sm:py-16 lg:py-20">
 <div class="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-14 lg:px-8">
 <div class="reveal space-y-6">
-<p class="text-xs font-semibold uppercase tracking-[0.25em] text-silver">Contacto</p>
-<h2 class="text-3xl font-extrabold leading-tight sm:text-4xl">Cuéntanos qué necesita tu negocio</h2>
+<p class="z-k text-xs font-semibold uppercase tracking-[0.25em] text-silver">Contacto</p>
+<h2 class="z-h text-3xl font-extrabold leading-tight sm:text-4xl">Cuéntanos qué necesita tu negocio</h2>
 <p class="leading-relaxed text-mute">Escríbenos por el canal que prefieras o déjanos tus datos y te respondemos lo antes posible.</p>
 <ul class="space-y-4">
 <li class="flex items-center gap-4"><span class="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-white/10"><svg class="ic h-5 w-5" aria-hidden="true" focusable="false"><use href="#i-message-circle"/></svg></span><div><p class="text-sm text-mute">WhatsApp y llamadas</p><a href="https://wa.me/34688933308" data-wa="Hola, quiero información sobre los servicios de Agencia JS" target="_blank" rel="noopener" data-cta="whatsapp_contacto" class="font-semibold hover:underline">688 93 33 08</a></div></li>
