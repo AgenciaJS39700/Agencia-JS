@@ -356,6 +356,8 @@ dirty = true;
 function resize() {
 if (!renderer || turn) { return; }
 var w = cv.parentNode.clientWidth, h = Math.round(w * (window.innerWidth < 700 ? 1.15 : 0.75));
+/* nunca más alto que la pantalla (móvil girado, portátiles bajos) */
+h = Math.max(240, Math.min(h, window.innerHeight - (window.innerHeight < 560 ? 120 : 210)));
 renderer.setSize(w, h, false); cv.style.width = w + "px"; cv.style.height = h + "px";
 camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
 }

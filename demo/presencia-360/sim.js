@@ -679,13 +679,15 @@ if (navigator.canShare && navigator.canShare({ files: [f] })) { navigator.share(
 else { save(b); TN.toast("Tu navegador no comparte imágenes: te la hemos descargado"); }
 });
 });
+/* baja hasta un apartado y, si al llegar las secciones de abajo han crecido mientras cargaban, corrige la posición */
+function irA(el) { if (!el) { return; } el.scrollIntoView({ behavior: "smooth" }); [700, 1400, 2200].forEach(function (t) { setTimeout(function () { var y = el.getBoundingClientRect().top - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0); if (Math.abs(y) > 6) { el.scrollIntoView({ behavior: t < 2200 ? "smooth" : "auto" }); } }, t); }); }
 $("#b-book").addEventListener("click", function () {
 if (!ready()) { TN.toast("Elige primero un diseño"); return; }
 exportBlob().then(function (b) {
 if (mode3d) {
 var q = TN.s3d.info(), zz = Z3[q.zone] || q.zone;
 if (TN.attach) { TN.attach({ url: URL.createObjectURL(b), file: new File([b], "tinta-negra-prueba.jpg", { type: "image/jpeg" }), zone: zz, style: q.st, cm: q.cm, summary: q.names + " en " + q.zone.toLowerCase() + ", ≈ " + q.cmText + ", vista 3D", idea: q.names + " de unos " + q.cmText + " en " + q.zone.toLowerCase() + "." }); }
-var c3 = $("#reserva"); if (c3) { c3.scrollIntoView({ behavior: "smooth" }); }
+irA($("#reserva"));
 return;
 }
 var names = layers.map(function (L) { return L.d.n; }).join(" + "), L = layers[sel] || layers[0];
@@ -694,7 +696,7 @@ var summary = names + " en " + (base.zone === "Otra" ? "la zona de la foto" : ba
 if (TN.attach) {
 TN.attach({ url: URL.createObjectURL(b), file: new File([b], "tinta-negra-prueba.jpg", { type: "image/jpeg" }), zone: base.zone, style: L.d.st, cm: cm, summary: summary, idea: names + (base.cm ? " de unos " + cmText(L) : "") + " en " + (base.zone === "Otra" ? "la zona de la foto" : base.zone.toLowerCase()) + "." });
 }
-var c = $("#reserva"); if (c) { c.scrollIntoView({ behavior: "smooth" }); }
+var c = $("#reserva"); if (c) { irA(c); }
 
 });
 });

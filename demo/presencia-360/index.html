@@ -7,7 +7,7 @@
 <meta name="text-scale" content="scale">
 <link rel="stylesheet" href="accesibilidad.css">
 <title>Tinta Negra · Estudio de tatuaje (demo)</title>
-<meta name="description" content="Demo de web premium para estudio de tatuajes: galería flash animada, artistas, proceso y reserva guiada por WhatsApp. Diseño de Agencia JS.">
+<meta name="description" content="Demo de web premium para estudio de tatuajes: galería flash, el artista, simulador y reserva guiada por WhatsApp. Diseño de Agencia JS.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0a0a0a"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Tinta Negra"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0a'/%3E%3Cpath d='M32 8v40M24 40l8 16 8-16M22 20h20' stroke='%23e1251b' stroke-width='5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
@@ -357,7 +357,7 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
 .ba-h{position:absolute;top:0;bottom:0;left:var(--p);width:3px;background:var(--bone);transform:translateX(-50%);pointer-events:none}
 .ba-h:after{content:"⟷";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:var(--bone);color:#0a0a0a;display:grid;place-items:center;font-weight:900}
 .ba input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
-.ba-l{position:absolute;top:14px;padding:6px 12px;border-radius:999px;background:rgba(10,10,10,.7);font-weight:800;font-size:0.75rem;letter-spacing:.12em;text-transform:uppercase;pointer-events:none}.ba-l.l{left:14px}.ba-l.r{right:14px;background:var(--red)}
+.ba-l{position:absolute;top:14px;padding:6px 12px;border-radius:999px;background:rgba(10,10,10,.7);font-weight:800;font-size:0.75rem;letter-spacing:.12em;text-transform:uppercase;pointer-events:none}.ba-l.l{left:14px;background:var(--red)}.ba-l{transition:opacity .25s}.ba.ba-a .ba-l.l,.ba.ba-d .ba-l.r{opacity:0}.ba-l.r{right:14px}
 .ba figcaption{position:absolute;left:0;right:0;bottom:0;padding:40px 16px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85));font-weight:700;font-size:0.875rem;pointer-events:none}
 .shop{padding:120px 0;background:var(--bk2)}
 .shop-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:40px}
@@ -450,9 +450,17 @@ footer a{color:inherit}
 <link rel="stylesheet" href="reloj.css" media="(max-width: 300px)">
 <style id="tn-experiencia">/* «La experiencia»: escena 3D guiada por el scroll (experiencia.js) */
 .xp{position:relative;height:560svh;background:var(--bk)}
-.xp-pin{position:sticky;top:0;height:100svh;overflow:hidden;background:#0a0a0a url(img/exp/xp-0.webp) 70% 50%/cover no-repeat}
-.xp-cv{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .8s}
-.xp-ok .xp-cv{opacity:1}
+.xp-pin{position:sticky;top:0;height:100svh;overflow:hidden;background:#0a0a0a}
+.xp-st{position:absolute;inset:0;overflow:hidden;opacity:0;transition:opacity .8s}
+.xp-ok .xp-st{opacity:1}
+.xp-l{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity;visibility:hidden}
+.xp-l>img,.xp-l>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.xp-aro{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen;opacity:var(--aro,0)}
+.xp-aro-l,.xp-aro-h{stroke-dasharray:1 1;stroke-dashoffset:calc(1 - var(--aro,0))}
+.xp-aro-luz{opacity:calc(var(--aro,0) * var(--pulso,1))}
+.xp-pz{position:absolute;background:#0e0e0f url(img/material.webp) no-repeat;background-size:1600px 900px;box-shadow:0 30px 60px rgba(0,0,0,.55);will-change:transform}
+.xp-junto .xp-pz{box-shadow:none}
+.xp-poster :is(.xp-txt,.xp-dots,.xp-n,.xp-vig){display:none!important}
 .xp-vig{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(10,10,10,.92) 0,rgba(10,10,10,.55) 34%,rgba(10,10,10,0) 60%),linear-gradient(0deg,#0a0a0a 0,rgba(10,10,10,0) 22%),linear-gradient(180deg,#0a0a0a 0,rgba(10,10,10,0) 18%)}
 .xp-txt{position:absolute;inset:0;left:50%;translate:-50% 0;pointer-events:none}
 .xp-ch{position:absolute;left:0;top:50%;transform:translateY(-50%);width:min(36rem,46%);opacity:0;filter:blur(12px);translate:0 3rem;pointer-events:none;transition:opacity .55s ease,filter .6s ease,translate .8s cubic-bezier(.2,.8,.2,1)}
@@ -486,8 +494,8 @@ footer a{color:inherit}
 /* móvil en vertical: la escena arriba y el texto abajo */
 @media (max-aspect-ratio:4/5){
 .xp{height:520svh}
-.xp-pin{background-position:50% 30%}
-.xp-vig{background:linear-gradient(0deg,#0a0a0a 0,rgba(10,10,10,.9) 34%,rgba(10,10,10,0) 58%),linear-gradient(180deg,#0a0a0a 0,rgba(10,10,10,0) 16%)}
+.xp-st{bottom:40%}
+.xp-vig{background:linear-gradient(0deg,#0a0a0a 0,#0a0a0a 40%,rgba(10,10,10,.6) 48%,rgba(10,10,10,0) 62%),linear-gradient(180deg,#0a0a0a 0,rgba(10,10,10,0) 16%)}
 .xp-ch{top:auto;bottom:calc(5.4rem + env(safe-area-inset-bottom));transform:none;width:calc(100% - 4.2rem)}
 .xp-ch h3{font-size:clamp(1.9rem,9.6vw,3.4rem)}
 .xp-ch p:not(.kick){font-size:.98rem;margin-top:.8rem}
@@ -510,7 +518,7 @@ footer a{color:inherit}
 /* versión fija: sin animaciones, sin WebGL o mientras no se ha cargado nada */
 :is(.xp-static,.a11y-quieto .xp){height:auto}
 :is(.xp-static,.a11y-quieto .xp) .xp-pin{position:relative;height:auto;background:none;padding:clamp(3rem,8vw,6rem) 0}
-:is(.xp-static,.a11y-quieto .xp) :is(.xp-cv,.xp-vig,.xp-dots,.xp-n){display:none}
+:is(.xp-static,.a11y-quieto .xp) :is(.xp-st,.xp-vig,.xp-dots,.xp-n){display:none}
 :is(.xp-static,.a11y-quieto .xp) .xp-txt{position:static;translate:none;display:grid;gap:clamp(2.5rem,6vw,4.5rem)}
 :is(.xp-static,.a11y-quieto .xp) .xp-ch{position:static;transform:none;width:auto;opacity:1;filter:none;translate:none;pointer-events:auto;display:grid;gap:1.2rem 3rem;align-items:center}
 :is(.xp-static,.a11y-quieto .xp) .xp-cards li{opacity:1;translate:none}
@@ -521,7 +529,114 @@ footer a{color:inherit}
 @media (forced-colors:active){.xp-vig{display:none}.xp-ch{background:Canvas}}
 .sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
+<style id="tn-sim-tabs">/* Simulador: visor y ajustes a la misma altura; ajustes en pestañas (nov 2026) */
+#simulador .panel{align-content:start;gap:.9rem}
+#simulador .sim-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem;padding:.3rem;border-radius:999px;background:var(--bg2);border:1px solid var(--line)}
+#simulador .sim-tabs button{min-height:44px;border:0;border-radius:999px;background:none;font-weight:800;font-size:.86rem;color:var(--mute)}
+#simulador .sim-tabs button[aria-selected=true]{background:var(--brand);color:#fff}
+#simulador .sim-tp{display:grid;gap:.9rem;align-content:start;grid-template-columns:minmax(0,1fr);min-width:0}
+#simulador .sim-cont,#simulador .sim-tp>*,#simulador .panel>*{min-width:0;max-width:100%}
+#simulador .sim-tp[hidden]{display:none!important}
+#simulador .sim-tp>div>h3:first-child{display:none}
+#simulador .sim-pie{display:grid;gap:.6rem;padding-top:.8rem;border-top:1px solid var(--line)}
+#simulador .sim-pie .priv{margin:0}
+#simulador .designs{max-height:none}
+@media(min-width:1000px){
+#simulador .sim{align-items:stretch}
+#simulador .panel{contain:size;display:flex;flex-direction:column;padding:1rem;min-height:0}
+#simulador .sim-cont{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-right:.25rem;scrollbar-width:thin;display:grid;align-content:start}
+#simulador .designs{grid-template-columns:repeat(4,1fr)}
+}
+#simulador .acts{grid-template-columns:1fr 1fr}#simulador .acts .btn-main{grid-column:1/-1}
+@media(max-width:999px){
+#simulador .designs{display:grid!important;grid-auto-flow:column;grid-template-rows:repeat(2,4.75rem);grid-auto-columns:4.75rem;grid-template-columns:none;gap:.45rem;overflow-x:auto;overflow-y:hidden;padding-bottom:.4rem;scroll-snap-type:x proximity}
+#simulador .designs .ds{width:4.75rem;height:4.75rem;flex:none;scroll-snap-align:start}
+#simulador .bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.4rem}
+#simulador .bar .tb{justify-content:center;font-size:.78rem;padding:.4rem .45rem;min-height:44px}
+#simulador .bar .tb[hidden]{display:none}
+#simulador .acts .btn{min-height:48px;font-size:.92rem}
+}
+@media(min-width:600px) and (max-width:999px){#simulador .bar{grid-template-columns:repeat(6,minmax(0,1fr))}}
+/* móvil girado: visor y ajustes uno al lado del otro, a la misma altura */
+@media (max-height:560px) and (min-aspect-ratio:4/3) and (max-width:999px){
+#simulador .sim{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:stretch;gap:.8rem}
+#simulador .panel{contain:size;display:flex;flex-direction:column;padding:.7rem;min-height:0}
+#simulador .sim-cont{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;display:grid;align-content:start}
+#simulador .designs{display:grid!important;grid-auto-flow:row;grid-template-rows:none;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible}
+#simulador .designs .ds{width:auto;height:auto}
+#simulador .bar{grid-template-columns:repeat(3,minmax(0,1fr))}
+#simulador .acts .btn{min-height:44px;font-size:.82rem;padding:.4rem .6rem}
+}
+</style>
 <style id="tn-ajustes">/* Ajustes de dispositivos y accesibilidad (nov 2026) */
+.cui-ac{display:grid;gap:.5rem;margin-top:clamp(1.2rem,3vw,2rem);max-width:58rem}
+.cui-ac2{margin-top:.5rem}
+.cui-d{border:1px solid var(--line);border-radius:16px;background:#111;overflow:hidden}
+.cui-d summary{list-style:none;display:grid;grid-template-columns:minmax(6.5rem,auto) 1fr 1.5rem;align-items:center;gap:1rem;min-height:3.5rem;padding:.6rem 1.1rem;cursor:pointer}
+.cui-d summary::-webkit-details-marker{display:none}
+.cui-d summary::after{content:none!important}
+.cui-d summary b{font-weight:800;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:#f0453b}
+.cui-d summary span{font-family:var(--disp);text-transform:uppercase;font-size:clamp(1rem,1.8vw,1.25rem);line-height:1.1}
+.cui-d summary i{position:relative;width:1.5rem;height:1.5rem}
+.cui-d summary i::before,.cui-d summary i::after{content:"";position:absolute;left:50%;top:50%;width:.9rem;height:2px;background:var(--bone);translate:-50% -50%;transition:rotate .25s}
+.cui-d summary i::after{rotate:90deg}
+.cui-d[open] summary i::after{rotate:0deg}
+.cui-d[open] summary{border-bottom:1px solid var(--line)}
+.cui-d p{margin:0;padding:.9rem 1.1rem 1.1rem;color:#cfc8bb;line-height:1.6;max-width:62ch}
+.cui-w{background:#160c0b;border-color:rgba(225,37,27,.35)}
+.cui-d summary:focus-visible{outline-offset:-3px}
+@media(max-width:560px){.cui-d summary{grid-template-columns:1fr 1.5rem;gap:.15rem .8rem;padding:.7rem 1rem}.cui-d summary b{grid-column:1}.cui-d summary span{grid-column:1}.cui-d summary i{grid-column:2;grid-row:1/span 2}}
+.a11y-contraste .cui-d p{color:#fff}
+
+.pain{padding:clamp(3.5rem,8vw,6rem) 0}
+.pain-w{margin-top:clamp(1.2rem,3vw,2rem);gap:clamp(1rem,3vw,2rem);align-items:stretch}
+.pain-z{display:grid;gap:1rem;align-content:start}
+.pain-g{display:grid;gap:.5rem}
+.pain-gt{display:flex;align-items:center;gap:.5rem;margin:0;font-weight:800;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.pain-gt i{width:1.6rem;height:4px;border-radius:4px;background:#3fa66a}.g3 .pain-gt i{background:#e0b33a}.g5 .pain-gt i{background:var(--red)}
+.pain-c{display:flex;flex-wrap:wrap;gap:.45rem}
+.pain-b{padding:.55rem .85rem;min-height:44px;font-size:.84rem}
+.pain-r{min-height:0;padding:clamp(1.1rem,2.5vw,1.6rem);display:flex;flex-direction:column;justify-content:center}
+.pain-r h3{font-size:clamp(1.6rem,3vw,2.1rem);margin:.4rem 0 .9rem}
+.pain-tip{margin:.7rem 0 0;padding-top:.7rem;border-top:1px solid var(--line);color:var(--bone)!important;font-weight:700;font-size:.875rem}
+@media(min-width:861px){.pain-w{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)!important}}
+@media(max-width:860px){.pain-c{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding:0 16px 4px;scroll-snap-type:x proximity}.pain-c::-webkit-scrollbar{display:none}.pain-b{flex:none;scroll-snap-align:start}.pain-r{order:-1}}
+@media(max-width:300px){.pain-c{flex-wrap:wrap;margin:0;padding:0}}
+
+.own .own-g{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:center;margin-top:clamp(1.5rem,4vw,2.75rem)}
+.own-f{position:relative;margin:0;border-radius:22px;overflow:hidden;aspect-ratio:4/5;border:1px solid var(--line)}
+.own-f img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.own-f figcaption{position:absolute;left:0;right:0;bottom:0;padding:2.5rem 1rem .9rem;background:linear-gradient(0deg,rgba(10,10,10,.9),rgba(10,10,10,0));font-weight:800;font-size:.8125rem;letter-spacing:.06em}
+.own-q{font-family:var(--disp);text-transform:uppercase;font-size:clamp(1.25rem,2.4vw,1.9rem);line-height:1.08;margin:0 0 1rem}
+.own-t>p:not(.own-q){color:#cfc8bb;line-height:1.6;max-width:56ch}
+.own-t b{color:var(--bone)}
+.own-tags{list-style:none;padding:0;margin:1.1rem 0 0;display:flex;flex-wrap:wrap;gap:.45rem}
+.own-tags li{border:1px solid var(--line);border-radius:999px;padding:.45rem .85rem;font-weight:700;font-size:.8125rem}
+.own-d{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin:1.4rem 0 0}
+.own-d div{border-top:1px solid var(--line);padding-top:.7rem}
+.own-d dt{font-family:var(--disp);font-size:clamp(1.6rem,3vw,2.4rem);line-height:1;color:var(--bone)}
+.own-d dd{margin:.3rem 0 0;color:var(--mute);font-size:.8125rem}
+.own-a{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.5rem}
+.own-h{font-family:var(--disp);text-transform:uppercase;font-size:1.1rem;letter-spacing:.04em;margin:clamp(2rem,5vw,3.5rem) 0 1rem}
+.own-r{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.own-r figure{position:relative;margin:0;border-radius:16px;overflow:hidden;aspect-ratio:1;border:1px solid var(--line)}
+.own-r img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.own-r figcaption{position:absolute;left:0;right:0;bottom:0;padding:1.6rem .7rem .55rem;background:linear-gradient(0deg,rgba(10,10,10,.85),rgba(10,10,10,0));font-weight:700;font-size:.75rem}
+@media(max-width:860px){.own .own-g{grid-template-columns:1fr}.own-f{aspect-ratio:16/11}.own-r{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:300px){.own-d{grid-template-columns:1fr}.own-a .btn{width:100%}}
+
+.pgrid{columns:auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.pgrid .pw{margin:0;padding:0;aspect-ratio:4/5;width:100%;height:auto;min-width:0;min-height:0;align-self:start}.pw img,.pw video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media(max-width:1100px){.pgrid{grid-template-columns:repeat(4,minmax(0,1fr))}.pw:nth-child(n+9){display:none}}
+@media(max-width:760px){.pgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.pw{border-radius:12px;aspect-ratio:1}.pw:nth-child(n+9){display:block}.pw:nth-child(n+10){display:none}.pw figcaption{display:none}}
+@media(max-width:300px){.pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.fc{background:#1a1a1a}.fc>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+@media(hover:hover){.fc:hover>img{transform:scale(1.04)}}
+.fc .cap{z-index:1;color:#fff}.fc::after{content:"";position:absolute;inset:auto 0 0;height:45%;background:linear-gradient(0deg,rgba(10,10,10,.85),rgba(10,10,10,0));pointer-events:none}
+.fc .cap small{color:#e6dfd2}.fc .av{z-index:1}
+.mod-im{display:block;width:100%;max-height:52svh;object-fit:cover;border-radius:16px;margin-bottom:14px}
+
 @media(max-width:700px){.ch.on~.a11y-btn{display:none!important}}
 .ch-l.ch-wa{display:inline-flex;align-items:center;min-height:2.75rem;margin-top:.5rem;padding:0 1rem;border-radius:999px;background:#25d366;color:#052e14;white-space:normal}
 .reloj-acc{display:none}
@@ -537,7 +652,10 @@ footer a{color:inherit}
 /* zonas táctiles de al menos 44 px */
 .ig{display:inline-flex;align-items:center;min-height:44px}
 footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height:44px}
-.fc{min-width:0;max-width:100%;min-height:0}.fc b{overflow-wrap:anywhere}
+.fc{min-width:0;max-width:100%;min-height:0}
+/* Diseños listos: en ordenador los 6 en una fila para que no ocupe tanto */
+@media(min-width:561px) and (max-width:1099px){.fgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(min-width:1100px){.fgrid{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.fc{border-radius:16px}.fc .cap b{font-size:1rem}.fc .cap small{font-size:.7rem}}.fc b{overflow-wrap:anywhere}
 .vis small,.vis b{overflow-wrap:anywhere}
 @media(max-width:767px){.mcar{margin-inline:-16px!important;padding-inline:16px!important;scroll-padding-inline:16px}}
 .ajs-tab a,.ajs-tab button{min-width:0;overflow:hidden;font-size:min(.6875rem,0.875rem)!important}.ajs-tab a>*,.ajs-tab button>*{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -558,7 +676,6 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
-<div class="cur" id="cur" aria-hidden="true"></div>
 <header class="hdr"><div class="wrap">
   <a class="logo" href="#top">Tinta Negra</a>
   <button type="button" class="cart-b" id="cartB" aria-label="Abrir carrito"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><span id="cartN">0</span></button>
@@ -609,7 +726,7 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
 
 <section class="xp xp-ld" id="experiencia" aria-labelledby="t-xp">
   <div class="xp-pin">
-    <canvas class="xp-cv" aria-hidden="true"></canvas>
+    <div class="xp-st" aria-hidden="true"></div>
     <div class="xp-vig" aria-hidden="true"></div>
     <div class="xp-txt wrap">
     <h2 id="t-xp" class="sr-only">La experiencia Tinta Negra</h2>
@@ -656,7 +773,6 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
   </div>
 </section>
 
-<section class="mani"><div class="wrap"><p id="mani">No copiamos tatuajes. Escuchamos tu historia y la convertimos en una pieza que solo llevarás tú, para siempre.</p></div></section>
 
 <section class="est" id="estilos" aria-labelledby="t-est">
   <div class="wrap">
@@ -670,7 +786,6 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
       <a class="li" href="#reserva" data-art="dagger"><span class="n">05</span><h3>Cover up</h3><p>Tapamos o renovamos ese tatuaje que ya no te gusta.</p></a>
     </div>
   </div>
-  <div class="prev" id="prev" aria-hidden="true"></div>
 </section>
 
 <section class="cat" id="catalogo" aria-labelledby="t-cat">
@@ -725,7 +840,7 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
     <div>
       <p class="kick">04 · Idea con IA</p>
       <h2 id="t-ia" class="rv">Describe tu idea, <span class="out">la dibujamos</span></h2>
-      <p class="sim-lead">Escribe qué quieres tatuarte y en segundos verás bocetos para inspirarte. Después tu artista crea la versión definitiva, única para ti.</p>
+      <p class="sim-lead">Escribe qué quieres tatuarte y en segundos verás bocetos para inspirarte. Después Leo crea la versión definitiva, única para ti.</p>
       <label class="gift-l" for="iaT">Tu idea</label>
       <textarea id="iaT" class="ia-t" rows="3" maxlength="240" placeholder="Por ejemplo: un león que represente la fuerza de mi familia, en el antebrazo"></textarea>
       <div class="cat-f" id="iaE" role="group" aria-label="Estilo"></div>
@@ -738,36 +853,48 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
 
 <section class="flash" id="flash" aria-labelledby="t-fl">
   <div class="wrap">
-    <div class="fl-head"><div><p class="kick">05 · Flash del mes</p><h2 id="t-fl" class="rv">Diseños <span class="out">listos</span></h2></div><p style="max-width:360px;color:#b3ac9f">Diseños originales de nuestros artistas. Cada uno se tatúa una sola vez. Toca uno para reservarlo.</p></div>
+    <div class="fl-head"><div><p class="kick">05 · Flash del mes</p><h2 id="t-fl" class="rv">Diseños <span class="out">listos</span></h2></div><p style="max-width:360px;color:#b3ac9f">Diseños originales de Leo, vistos sobre piel. Cada uno se tatúa una sola vez. Toca uno para reservarlo.</p></div>
     <div class="fgrid" id="fgrid"></div>
   </div>
 </section>
 
 <section class="port" id="trabajos" aria-labelledby="t-po">
   <div class="wrap">
-    <div class="fl-head"><div><p class="kick">06 · Trabajos</p><h2 id="t-po" class="rv">Piel <span class="out">real</span></h2></div><p style="max-width:360px;color:#b3ac9f">Una selección de piezas cicatrizadas y recién hechas en el estudio. Toca una para verla en grande.</p></div>
-    <div class="pgrid"><figure class="pw rv" tabindex="0" data-img="img/leon2.webp" data-cap="Realismo · Antebrazo · Sara"><video class="lv" src="vid/leon2.mp4" poster="img/leon2.webp" muted loop playsinline preload="none"></video><figcaption><b>Realismo</b><span>Antebrazo · Sara</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/serpiente.webp" data-cap="Fine line · Espalda · Alba"><video class="lv" src="vid/serpiente.mp4" poster="img/serpiente.webp" muted loop playsinline preload="none"></video><figcaption><b>Fine line</b><span>Espalda · Alba</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/retrato2.webp" data-cap="Realismo · Retrato · Brazo · Sara"><img src="img/retrato2.webp" alt="Tatuaje realismo · retrato en brazo por Sara" loading="lazy"><figcaption><b>Realismo · Retrato</b><span>Brazo · Sara</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/calavera.webp" data-cap="Blackwork · Muslo · Marko"><img src="img/calavera.webp" alt="Tatuaje blackwork en muslo por Marko" loading="lazy"><figcaption><b>Blackwork</b><span>Muslo · Marko</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/lobo2.webp" data-cap="Realismo · Omóplato · Sara"><img src="img/lobo2.webp" alt="Tatuaje realismo en omóplato por Sara" loading="lazy"><figcaption><b>Realismo</b><span>Omóplato · Sara</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/aguila.webp" data-cap="Blackwork · Pecho · Marko"><img src="img/aguila.webp" alt="Tatuaje blackwork en pecho por Marko" loading="lazy"><figcaption><b>Blackwork</b><span>Pecho · Marko</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/rosa.webp" data-cap="Realismo · Mano · Alba"><img src="img/rosa.webp" alt="Tatuaje realismo en mano por Alba" loading="lazy"><figcaption><b>Realismo</b><span>Mano · Alba</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/retrato.webp" data-cap="Realismo · Retrato · Brazo interior · Sara"><img src="img/retrato.webp" alt="Tatuaje realismo · retrato en brazo interior por Sara" loading="lazy"><figcaption><b>Realismo · Retrato</b><span>Brazo interior · Sara</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/lobo.webp" data-cap="Realismo · Omóplato · Sara"><img src="img/lobo.webp" alt="Tatuaje realismo en omóplato por Sara" loading="lazy"><figcaption><b>Realismo</b><span>Omóplato · Sara</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/leon.webp" data-cap="Realismo · Antebrazo · Sara"><img src="img/leon.webp" alt="Tatuaje realismo en antebrazo por Sara" loading="lazy"><figcaption><b>Realismo</b><span>Antebrazo · Sara</span></figcaption></figure></div>
+    <div class="fl-head"><div><p class="kick">06 · Trabajos</p><h2 id="t-po" class="rv">Piel <span class="out">real</span></h2></div><p style="max-width:360px;color:#b3ac9f">Piezas cicatrizadas y recién hechas en el estudio. Toca una para verla en grande.</p></div>
+    <div class="pgrid"><figure class="pw rv" tabindex="0" data-img="img/leon2.webp" data-cap="Realismo · Antebrazo"><video class="lv" src="vid/leon2.mp4" poster="img/th/leon2.webp" muted loop playsinline preload="none"></video><figcaption><b>Realismo</b><span>Antebrazo</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/serpiente.webp" data-cap="Fine line · Espalda"><video class="lv" src="vid/serpiente.mp4" poster="img/th/serpiente.webp" muted loop playsinline preload="none"></video><figcaption><b>Fine line</b><span>Espalda</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/retrato2.webp" data-cap="Realismo · Retrato · Brazo"><img src="img/th/retrato2.webp" alt="Tatuaje realismo · retrato en brazo" loading="lazy"><figcaption><b>Realismo · Retrato</b><span>Brazo</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/calavera.webp" data-cap="Blackwork · Muslo"><img src="img/th/calavera.webp" alt="Tatuaje blackwork en muslo" loading="lazy"><figcaption><b>Blackwork</b><span>Muslo</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/lobo2.webp" data-cap="Realismo · Omóplato"><img src="img/th/lobo2.webp" alt="Tatuaje realismo en omóplato" loading="lazy"><figcaption><b>Realismo</b><span>Omóplato</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/aguila.webp" data-cap="Blackwork · Pecho"><img src="img/th/aguila.webp" alt="Tatuaje blackwork en pecho" loading="lazy"><figcaption><b>Blackwork</b><span>Pecho</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/rosa.webp" data-cap="Realismo · Mano"><img src="img/th/rosa.webp" alt="Tatuaje realismo en mano" loading="lazy"><figcaption><b>Realismo</b><span>Mano</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/retrato.webp" data-cap="Realismo · Retrato · Brazo interior"><img src="img/th/retrato.webp" alt="Tatuaje realismo · retrato en brazo interior" loading="lazy"><figcaption><b>Realismo · Retrato</b><span>Brazo interior</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/lobo.webp" data-cap="Realismo · Omóplato"><img src="img/th/lobo.webp" alt="Tatuaje realismo en omóplato" loading="lazy"><figcaption><b>Realismo</b><span>Omóplato</span></figcaption></figure><figure class="pw rv" tabindex="0" data-img="img/leon.webp" data-cap="Realismo · Antebrazo"><img src="img/th/leon.webp" alt="Tatuaje realismo en antebrazo" loading="lazy"><figcaption><b>Realismo</b><span>Antebrazo</span></figcaption></figure></div>
   </div>
 </section>
 
 <section class="cov" id="coverup" aria-labelledby="t-cov">
   <div class="wrap">
-    <div class="fl-head"><div><p class="kick">07 · Cover up</p><h2 id="t-cov" class="rv">Antes <span class="out">y después</span></h2></div><p style="max-width:380px;color:#b3ac9f">Ese tatuaje que ya no te representa tiene solución. Desliza para ver la transformación.</p></div>
+    <div class="fl-head"><div><p class="kick">07 · Cover up</p><h2 id="t-cov" class="rv">Antes <span class="out">y después</span></h2></div><p style="max-width:380px;color:#b3ac9f">Ese tatuaje que ya no te representa tiene solución. Desliza hacia la derecha para pasar del antes al después.</p></div>
     <div class="cov-g">
-      <figure class="ba rv" style="--p:50%"><img src="img/cover1-despues.webp" alt="Después: rosa realista que cubre un tribal antiguo" loading="lazy"><div class="ba-b"><img src="img/cover1-antes.webp" alt="Antes: tribal antiguo y descolorido" loading="lazy"></div><i class="ba-h" aria-hidden="true"></i><span class="ba-l l">Antes</span><span class="ba-l r">Después</span><input type="range" min="0" max="100" value="50" aria-label="Comparar antes y después"><figcaption>Tribal de 15 años → rosa en realismo · 2 sesiones</figcaption></figure>
-      <figure class="ba rv" style="--p:50%"><img src="img/cover2-despues.webp" alt="Después: diseño botánico blackwork que cubre unas letras" loading="lazy"><div class="ba-b"><img src="img/cover2-antes.webp" alt="Antes: nombre en letras descolorido" loading="lazy"></div><i class="ba-h" aria-hidden="true"></i><span class="ba-l l">Antes</span><span class="ba-l r">Después</span><input type="range" min="0" max="100" value="50" aria-label="Comparar antes y después"><figcaption>Nombre antiguo → botánico blackwork · 1 sesión</figcaption></figure>
+      <figure class="ba rv" style="--p:8%"><img src="img/cover1-antes.webp" alt="Antes: tribal antiguo y descolorido" loading="lazy"><div class="ba-b"><img src="img/cover1-despues.webp" alt="Después: rosa realista que cubre un tribal antiguo" loading="lazy"></div><i class="ba-h" aria-hidden="true"></i><span class="ba-l l">Después</span><span class="ba-l r">Antes</span><input type="range" min="0" max="100" value="8" aria-label="Desliza a la derecha para pasar del antes al después"><figcaption>Tribal de 15 años → rosa en realismo · 2 sesiones</figcaption></figure>
+      <figure class="ba rv" style="--p:8%"><img src="img/cover2-antes.webp" alt="Antes: nombre en letras descolorido" loading="lazy"><div class="ba-b"><img src="img/cover2-despues.webp" alt="Después: diseño botánico blackwork que cubre unas letras" loading="lazy"></div><i class="ba-h" aria-hidden="true"></i><span class="ba-l l">Después</span><span class="ba-l r">Antes</span><input type="range" min="0" max="100" value="8" aria-label="Desliza a la derecha para pasar del antes al después"><figcaption>Nombre antiguo → botánico blackwork · 1 sesión</figcaption></figure>
     </div>
   </div>
 </section>
 
-<section class="art" id="artistas" aria-labelledby="t-ar">
+<section class="own" id="artista" aria-labelledby="t-own">
   <div class="wrap">
-    <p class="kick">08 · El equipo</p>
-    <h2 id="t-ar" class="rv">Artistas <span class="out">residentes</span></h2>
-    <div class="agrid mcar">
-      <article class="ac rv"><div class="aw"><img src="img/serpiente.webp" alt="" loading="lazy"></div><div class="mono">AL</div><h3>Alba</h3><p class="sp">Fine line · Botánico</p><p>Piezas delicadas y florales que acompañan la forma del cuerpo.</p><a class="ig" href="#reserva">Reservar con Alba →</a></article>
-      <article class="ac rv"><div class="aw"><img src="img/calavera.webp" alt="" loading="lazy"></div><div class="mono">MK</div><h3>Marko</h3><p class="sp">Blackwork · Geométrico</p><p>Negro sólido, mandalas y composiciones de gran formato.</p><a class="ig" href="#reserva">Reservar con Marko →</a></article>
-      <article class="ac rv"><div class="aw"><img src="img/retrato2.webp" alt="" loading="lazy"></div><div class="mono">ST</div><h3>Sara</h3><p class="sp">Realismo · Retrato</p><p>Retratos y escenas en negro y gris con mucho detalle.</p><a class="ig" href="#reserva">Reservar con Sara →</a></article>
+    <p class="kick">08 · El artista</p>
+    <h2 id="t-own" class="rv">Leo <span class="out">Navarro</span></h2>
+    <div class="own-g">
+      <figure class="own-f rv"><img src="img/th/leo.webp" alt="Leo Navarro tatuando una rosa en el estudio" loading="lazy" width="560" height="700"><figcaption>Fundador de Tinta Negra · 12 años tatuando</figcaption></figure>
+      <div class="own-t">
+        <p class="own-q">«Cada pieza la dibujo desde cero para una sola persona. No repito diseños: si te lo tatúo, es tuyo.»</p>
+        <p>Leo empezó a tatuar en 2014 en un pequeño estudio de barrio y abrió Tinta Negra en 2019 para trabajar como le gusta: con cita previa, sin prisas y atendiendo a una sola persona cada vez. Se ha especializado en <b>realismo en negro y gris</b> y <b>blackwork</b>, y en tapar tatuajes antiguos con piezas nuevas.</p>
+        <ul class="own-tags" aria-label="Estilos"><li>Realismo negro y gris</li><li>Blackwork</li><li>Fine line</li><li>Cover up</li></ul>
+        <dl class="own-d"><div><dt>12</dt><dd>años tatuando</dd></div><div><dt>+2.400</dt><dd>piezas hechas</dd></div><div><dt>4,9</dt><dd>en Google</dd></div></dl>
+        <div class="own-a"><a class="btn btn-red mag" href="#reserva">Reservar con Leo</a><a class="btn btn-ghost mag" target="_blank" rel="noopener" href="https://wa.me/34688933308?text=Hola%20Leo%2C%20quiero%20hablar%20contigo%20sobre%20un%20tatuaje">Escribirle por WhatsApp</a></div>
+      </div>
+    </div>
+    <h3 class="own-h">Sus tatuajes recientes</h3>
+    <div class="own-r">
+      <figure><img src="img/th/lobo2.webp" alt="Lobo realista en omóplato" loading="lazy" width="560" height="700"><figcaption>Lobo · Omóplato</figcaption></figure>
+      <figure><img src="img/th/calavera.webp" alt="Calavera blackwork en muslo" loading="lazy" width="560" height="700"><figcaption>Calavera · Muslo</figcaption></figure>
+      <figure><img src="img/th/retrato2.webp" alt="Retrato realista en brazo" loading="lazy" width="560" height="700"><figcaption>Retrato · Brazo</figcaption></figure>
+      <figure><img src="img/th/aguila.webp" alt="Águila blackwork en pecho" loading="lazy" width="560" height="700"><figcaption>Águila · Pecho</figcaption></figure>
     </div>
   </div>
 </section>
@@ -781,55 +908,40 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
   </div>
 </section>
 
-<section class="pro" id="proceso" aria-labelledby="t-pr">
-  <div class="pin" id="pin">
-    <div class="wrap"><p class="kick">10 · Cómo trabajamos</p><h2 id="t-pr">De la idea <span class="out">a la piel</span></h2></div>
-    <div class="track" id="track">
-      <div class="step"><img class="si" src="img/estudio.webp" alt="" loading="lazy"><span class="k">01</span><div><h3>Cuéntanos tu idea</h3><p>Rellena el formulario de reserva con estilo, zona y tamaño. Puedes enviarnos referencias por WhatsApp.</p></div></div>
-      <div class="step"><img class="si" src="img/material.webp" alt="" loading="lazy"><span class="k">02</span><div><h3>Diseño a medida</h3><p>Tu artista prepara un boceto único y lo ajustamos contigo hasta que sea exactamente lo que buscas.</p></div></div>
-      <div class="step"><img class="si" src="img/hero.webp" alt="" loading="lazy"><span class="k">03</span><div><h3>La sesión</h3><p>Estudio privado, material estéril de un solo uso y sin prisas. Tú marcas el ritmo.</p></div></div>
-      <div class="step"><img class="si" src="img/leon.webp" alt="" loading="lazy"><span class="k">04</span><div><h3>Cuidados y retoque</h3><p>Te damos la guía de cuidados y revisamos la cicatrización. El retoque, si hace falta, va incluido.</p></div></div>
-    </div>
-  </div>
-</section>
 
-<section class="stu" aria-labelledby="t-stu">
-  <video class="lv" src="vid/estudio.mp4" poster="img/estudio.webp" muted loop playsinline preload="none" aria-hidden="true"></video>
-  <div class="wrap"><p class="kick">11 · El estudio</p><h2 id="t-stu" class="rv">Un espacio <span class="out">solo para ti</span></h2><ul><li>Estudio privado, solo con cita previa</li><li>Material estéril de un solo uso</li><li>Sin prisas: tú marcas el ritmo</li></ul></div>
-</section>
 
 <section class="cui" id="cuidados" aria-labelledby="t-cui">
   <div class="wrap">
-    <p class="kick">12 · Cuidados</p>
+    <p class="kick">10 · Cuidados</p>
     <h2 id="t-cui" class="rv">Tu tatuaje, <span class="out">día a día</span></h2>
-    <ol class="cui-t mcar">
-      <li class="rv"><b>Día 0</b><h3>Film protector</h3><p>Sales con un film transpirable. Déjalo el tiempo que te indique tu artista y lávate siempre las manos antes de tocar la zona.</p></li>
-      <li class="rv"><b>Días 1–3</b><h3>Limpieza suave</h3><p>Lava 2 veces al día con agua tibia y jabón neutro, seca a toquecitos y aplica una capa fina de crema.</p></li>
-      <li class="rv"><b>Días 4–14</b><h3>Pica y se pela</h3><p>Es normal. No rasques ni arranques las pieles. Hidrata y usa ropa holgada.</p></li>
-      <li class="rv"><b>Semanas 3–4</b><h3>Casi listo</h3><p>La superficie está cerrada. Ya puedes volver a la playa y la piscina, siempre con protector solar alto.</p></li>
-      <li class="rv"><b>1–3 meses</b><h3>Cicatrizado</h3><p>Revisamos cómo ha quedado. Si hace falta, el retoque va incluido.</p></li>
-    </ol>
-    <div class="cui-x"><div><h3>Evita las primeras semanas</h3><p>Sol directo · Piscina, mar y sauna · Rascar o arrancar costras · Ropa que roce</p></div><div><h3>Llámanos si notas</h3><p>Enrojecimiento que crece, calor, pus o fiebre. Ante la duda, consulta también con tu médico.</p></div></div>
+    <div class="cui-ac">
+      <details class="cui-d" open><summary><b>Día 0</b><span>Film protector</span><i aria-hidden="true"></i></summary><p>Sales con un film transpirable. Déjalo el tiempo que te indique Leo y lávate siempre las manos antes de tocar la zona.</p></details>
+      <details class="cui-d"><summary><b>Días 1–3</b><span>Limpieza suave</span><i aria-hidden="true"></i></summary><p>Lava 2 veces al día con agua tibia y jabón neutro, seca a toquecitos y aplica una capa fina de crema.</p></details>
+      <details class="cui-d"><summary><b>Días 4–14</b><span>Pica y se pela</span><i aria-hidden="true"></i></summary><p>Es normal. No rasques ni arranques las pieles. Hidrata y usa ropa holgada.</p></details>
+      <details class="cui-d"><summary><b>Semanas 3–4</b><span>Casi listo</span><i aria-hidden="true"></i></summary><p>La superficie está cerrada. Ya puedes volver a la playa y la piscina, siempre con protector solar alto.</p></details>
+      <details class="cui-d"><summary><b>1–3 meses</b><span>Cicatrizado</span><i aria-hidden="true"></i></summary><p>Revisamos cómo ha quedado. Si hace falta, el retoque va incluido.</p></details>
+    </div>
+    <div class="cui-ac cui-ac2"><details class="cui-d cui-w"><summary><b>Importante</b><span>Qué evitar las primeras semanas</span><i aria-hidden="true"></i></summary><p>Sol directo · Piscina, mar y sauna · Rascar o arrancar costras · Ropa que roce</p></details><details class="cui-d cui-w"><summary><b>Atención</b><span>Llámanos si notas</span><i aria-hidden="true"></i></summary><p>Enrojecimiento que crece, calor, pus o fiebre. Ante la duda, consulta también con tu médico.</p></details></div>
     <a class="btn btn-red" href="#tienda" style="margin-top:18px">Ver productos de cuidado</a>
   </div>
 </section>
 
-<section id="regalo" data-brand="Tinta Negra" data-color="#e1251b" data-icon="🖤" data-amounts="50,100,200" data-what="para su próximo tatuaje, con cualquier artista del estudio" data-theme="dark"></section>
+<section id="regalo" data-brand="Tinta Negra" data-color="#e1251b" data-icon="🖤" data-amounts="50,100,200" data-what="para su próximo tatuaje en Tinta Negra" data-theme="dark"></section>
 <section id="amigos" data-brand="Tinta Negra" data-color="#e1251b" data-pct="15" data-min-sessions="2" data-cap="80" data-goal="3" data-goal-reward="una sesión de retoque y un kit de cuidados" data-wa="34688933308" data-theme="dark"></section>
 <section id="fidelidad" data-brand="Tinta Negra" data-color="#e1251b" data-icon="🖤" data-stamps="6" data-each="sesión" data-reward="una hora de tatuaje gratis" data-promo="🖤 Flash day este sábado: diseños del flash desde 60 €." data-theme="dark"></section>
 
 <section class="shop" id="tienda" aria-labelledby="t-shop">
   <div class="wrap">
-    <div class="fl-head"><div><p class="kick">14 · Tienda</p><h2 id="t-shop" class="rv">Cuida <span class="out">tu tinta</span></h2></div><p style="max-width:380px;color:#b3ac9f">Lo que usamos en el estudio, para que tu tatuaje cure perfecto. Recógelo en el estudio o recíbelo en casa.</p></div>
+    <div class="fl-head"><div><p class="kick">11 · Tienda</p><h2 id="t-shop" class="rv">Cuida <span class="out">tu tinta</span></h2></div><p style="max-width:380px;color:#b3ac9f">Lo que usamos en el estudio, para que tu tatuaje cure perfecto. Recógelo en el estudio o recíbelo en casa.</p></div>
     <div class="shop-g m2" id="shopG"><article class="shop-c"><div class="shop-i"><img src="img/shop/balsamo.webp" alt="Bálsamo de cuidado" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Bálsamo de cuidado</h3><p>Vegano, sin perfume. 50 ml</p><div class="shop-p"><b>14,90 €</b><button type="button" class="btn btn-red" data-add="balsamo">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/jabon.webp" alt="Jabón neutro" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Jabón neutro</h3><p>pH suave para los primeros días. 250 ml</p><div class="shop-p"><b>9,90 €</b><button type="button" class="btn btn-red" data-add="jabon">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/film.webp" alt="Film protector" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Film protector</h3><p>Segunda piel transpirable. 2 m</p><div class="shop-p"><b>12,50 €</b><button type="button" class="btn btn-red" data-add="film">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/solar.webp" alt="Stick solar SPF 50" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Stick solar SPF 50</h3><p>Protege el color del sol</p><div class="shop-p"><b>11,90 €</b><button type="button" class="btn btn-red" data-add="solar">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/camiseta.webp" alt="Camiseta Rosa" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Camiseta Rosa</h3><p>Algodón orgánico. Unisex</p><div class="shop-p"><b>24 €</b><button type="button" class="btn btn-red" data-add="camiseta">Añadir</button></div></div></article><article class="shop-c"><div class="shop-i"><img src="img/shop/gorra.webp" alt="Gorra Daga" loading="lazy" width="800" height="800"></div><div class="cat-b"><h3>Gorra Daga</h3><p>Bordado rojo. Talla única</p><div class="shop-p"><b>22 €</b><button type="button" class="btn btn-red" data-add="gorra">Añadir</button></div></div></article><article class="shop-c gc"><div class="shop-i gc-i"><span>TINTA NEGRA</span><b>Tarjeta regalo</b></div><div class="cat-b"><h3>Tarjeta regalo</h3><p>De 50 a 200 €, válida 12 meses</p><div class="shop-p"><b>desde 50 €</b><a class="btn btn-ghost" href="#regalo">Elegir</a></div></div></article></div>
   </div>
 </section>
 
 <section class="rw" aria-labelledby="t-rw">
   <div class="wrap">
-    <div class="fl-head"><div><p class="kick">15 · Opiniones</p><h2 id="t-rw" class="rv">4,9 <span class="out">★★★★★</span></h2></div><p style="max-width:360px;color:#b3ac9f">Más de 230 reseñas en Google. Opiniones de ejemplo para esta demo.</p></div>
+    <div class="fl-head"><div><p class="kick">12 · Opiniones</p><h2 id="t-rw" class="rv">4,9 <span class="out">★★★★★</span></h2></div><p style="max-width:360px;color:#b3ac9f">Más de 230 reseñas en Google. Opiniones de ejemplo para esta demo.</p></div>
     <div class="rw-g">
-      <figure class="rv"><blockquote>“Fui con una idea muy vaga y Sara la convirtió en el retrato más bonito que tengo. Cero dolor de cabeza con la reserva.”</blockquote><figcaption>Lucía · Realismo</figcaption></figure>
+      <figure class="rv"><blockquote>“Fui con una idea muy vaga y Leo la convirtió en el retrato más bonito que tengo. Cero dolor de cabeza con la reserva.”</blockquote><figcaption>Lucía · Realismo</figcaption></figure>
       <figure class="rv"><blockquote>“Probé el diseño con el simulador antes de ir y fue clave para decidir el tamaño. Estudio impecable.”</blockquote><figcaption>Daniel · Blackwork</figcaption></figure>
       <figure class="rv"><blockquote>“Mi primer tatuaje. Me explicaron todo, paramos cuando lo necesité y la cura fue perfecta siguiendo su guía.”</blockquote><figcaption>Marta · Fine line</figcaption></figure>
     </div>
@@ -839,7 +951,7 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
 
 <section class="res" id="reserva" aria-labelledby="t-res">
   <div class="wrap">
-    <p class="kick">16 · Reserva</p>
+    <p class="kick">13 · Reserva</p>
     <h2 id="t-res">Pide tu <span class="out">cita</span></h2>
     <div class="box">
       <div class="bar" aria-hidden="true"><i id="pbar"></i></div>
@@ -847,10 +959,10 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
         <div class="stp on" data-s="1"><h3>¿Qué estilo buscas?</h3><div class="opts" data-k="estilo"><button type="button" class="opt">Blackwork</button><button type="button" class="opt">Fine line</button><button type="button" class="opt">Realismo</button><button type="button" class="opt">Tradicional</button><button type="button" class="opt">Cover up</button><button type="button" class="opt">No lo sé aún</button></div></div>
         <div class="stp" data-s="2"><h3>¿En qué zona?</h3><div class="opts" data-k="zona"><button type="button" class="opt">Brazo</button><button type="button" class="opt">Antebrazo</button><button type="button" class="opt">Mano</button><button type="button" class="opt">Pierna</button><button type="button" class="opt">Espalda</button><button type="button" class="opt">Pecho</button><button type="button" class="opt">Costillas</button><button type="button" class="opt">Otra</button></div></div>
         <div class="stp" data-s="3"><h3>Tamaño aproximado</h3><p class="sz"><span id="szv">10</span> cm</p><input class="range" id="sz" type="range" min="3" max="40" value="10" aria-label="Tamaño en centímetros"><p style="color:#6b655c;font-size:0.875rem;margin-top:8px">Una referencia: 10 cm es como la palma de la mano.</p></div>
-        <div class="stp" data-s="4"><h3>¿Con quién?</h3><div class="opts" data-k="artista"><button type="button" class="opt">Alba</button><button type="button" class="opt">Marko</button><button type="button" class="opt">Sara</button><button type="button" class="opt">Me da igual</button></div></div>
-        <div class="stp" data-s="5"><h3>Elige día y hora</h3><p class="res-s" id="calA">Disponibilidad de todo el equipo</p><div class="cal" id="cal"></div><div class="slots" id="slots"><p class="res-n">Selecciona un día con huecos libres.</p></div><p class="err" id="e5"></p></div>
+        <div class="stp" data-s="4"><h3>¿Es tu primer tatuaje?</h3><div class="opts" data-k="exp"><button type="button" class="opt">Sí, es el primero</button><button type="button" class="opt">Ya tengo alguno</button><button type="button" class="opt">Quiero tapar uno</button></div></div>
+        <div class="stp" data-s="5"><h3>Elige día y hora</h3><p class="res-s" id="calA">Agenda de Leo</p><div class="cal" id="cal"></div><div class="slots" id="slots"><p class="res-n">Selecciona un día con huecos libres.</p></div><p class="err" id="e5"></p></div>
         <div class="stp" data-s="6"><h3>Tus datos</h3><div class="r2"><div><label for="fn">Nombre y apellidos</label><input id="fn" autocomplete="name"></div><div><label for="ft">Móvil</label><input id="ft" type="tel" autocomplete="tel" placeholder="600 000 000"></div></div><label for="fe">Correo electrónico</label><input id="fe" type="email" autocomplete="email" placeholder="tu@correo.com"><label for="fi">Cuéntanos tu idea</label><textarea id="fi" rows="3" placeholder="Por ejemplo: una golondrina fine line con una fecha"></textarea><label class="chk"><input type="checkbox" id="frem" checked> Quiero recordatorio 24 h antes por WhatsApp y correo</label><p class="err" id="e6"></p></div>
-        <div class="stp" data-s="7"><h3>Consentimiento informado</h3><p class="res-n" style="margin-top:0">Obligatorio por normativa sanitaria. Tus respuestas solo las ve tu artista.</p><label for="fb">Fecha de nacimiento</label><input id="fb" type="date"><div class="q"><span>¿Tienes alguna alergia (látex, metales, tintas…)?</span><label><input type="radio" name="qa" value="No" checked> No</label><label><input type="radio" name="qa" value="Sí"> Sí</label></div><input id="fa" placeholder="¿Cuál?" class="hide"><div class="q"><span>¿Estás embarazada o en lactancia?</span><label><input type="radio" name="qe" value="No" checked> No</label><label><input type="radio" name="qe" value="Sí"> Sí</label></div><div class="q"><span>¿Tomas anticoagulantes o tienes diabetes, epilepsia o problemas de piel?</span><label><input type="radio" name="qm" value="No" checked> No</label><label><input type="radio" name="qm" value="Sí"> Sí</label></div><label class="chk"><input type="checkbox" id="facc"> He leído el <a href="legal.html#consentimiento" target="_blank">consentimiento informado</a> y la <a href="legal.html#privacidad" target="_blank">política de privacidad</a>, y los acepto.</label><label>Firma</label><div class="sig"><canvas id="sig" aria-label="Firma con el dedo o el ratón"></canvas><button type="button" id="sigC">Borrar</button><span id="sigH">Firma aquí con el dedo</span></div><p class="err" id="e7"></p></div>
+        <div class="stp" data-s="7"><h3>Consentimiento informado</h3><p class="res-n" style="margin-top:0">Obligatorio por normativa sanitaria. Tus respuestas solo las ve Leo.</p><label for="fb">Fecha de nacimiento</label><input id="fb" type="date"><div class="q"><span>¿Tienes alguna alergia (látex, metales, tintas…)?</span><label><input type="radio" name="qa" value="No" checked> No</label><label><input type="radio" name="qa" value="Sí"> Sí</label></div><input id="fa" placeholder="¿Cuál?" class="hide"><div class="q"><span>¿Estás embarazada o en lactancia?</span><label><input type="radio" name="qe" value="No" checked> No</label><label><input type="radio" name="qe" value="Sí"> Sí</label></div><div class="q"><span>¿Tomas anticoagulantes o tienes diabetes, epilepsia o problemas de piel?</span><label><input type="radio" name="qm" value="No" checked> No</label><label><input type="radio" name="qm" value="Sí"> Sí</label></div><label class="chk"><input type="checkbox" id="facc"> He leído el <a href="legal.html#consentimiento" target="_blank">consentimiento informado</a> y la <a href="legal.html#privacidad" target="_blank">política de privacidad</a>, y los acepto.</label><label>Firma</label><div class="sig"><canvas id="sig" aria-label="Firma con el dedo o el ratón"></canvas><button type="button" id="sigC">Borrar</button><span id="sigH">Firma aquí con el dedo</span></div><p class="err" id="e7"></p></div>
         <div class="stp" data-s="8"><h3>Confirma con la señal</h3><div class="sum" id="sum"></div><div class="dep"><div><b>Señal de reserva</b><small>Se descuenta del total el día de tu sesión</small></div><strong>50 €</strong></div><p class="res-n">Pago seguro con Stripe: tarjeta, Apple Pay, Google Pay o Bizum. Cambios gratis hasta 48 h antes.</p></div>
         <div class="nav2"><button type="button" class="btn btn-ln" id="back">Atrás</button><button type="button" class="btn btn-dk" id="next">Siguiente</button></div>
       </form>
@@ -861,7 +973,7 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
 <section class="vis" id="visitanos" aria-labelledby="t-vis">
   <div class="wrap vis-w">
     <div>
-      <p class="kick">17 · Visítanos</p>
+      <p class="kick">14 · Visítanos</p>
       <h2 id="t-vis" class="rv">Encuéntranos <span class="out">en Google</span></h2>
       <div class="gb">
         <div class="gb-h"><span class="gb-g" aria-hidden="true">G</span><div><b>Tinta Negra · Estudio de tatuaje</b><small>Estudio de tatuajes · Calle Ejemplo, 12</small></div></div>
@@ -877,10 +989,10 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
 
 <section class="faq" aria-labelledby="t-fq">
   <div class="wrap">
-    <p class="kick">18 · Dudas</p>
+    <p class="kick">15 · Dudas</p>
     <h2 id="t-fq" class="rv">Antes de <span class="out">tatuarte</span></h2>
     <div style="margin-top:34px">
-      <details><summary>¿Necesito pagar una señal?</summary><p>Sí, una pequeña señal reserva tu fecha y el tiempo de diseño de tu artista. Se descuenta del total el día de la sesión.</p></details>
+      <details><summary>¿Necesito pagar una señal?</summary><p>Sí, una pequeña señal reserva tu fecha y el tiempo de diseño de Leo. Se descuenta del total el día de la sesión.</p></details>
       <details><summary>¿Duele mucho?</summary><p>Depende de la zona y de cada persona. Te recomendamos la mejor zona según tu idea y hacemos pausas siempre que lo necesites.</p></details>
       <details><summary>¿Cómo cuido el tatuaje?</summary><p>Te entregamos una guía de cuidados por escrito: limpieza suave, crema específica, nada de sol ni piscina durante las primeras semanas.</p></details>
       <details><summary>¿Puedo traer mi propio diseño?</summary><p>Claro. Lo adaptamos a tu piel y a la zona para que envejezca bien, respetando siempre el trabajo de otros artistas.</p></details>
@@ -918,15 +1030,14 @@ var ART={
  snake:'<path class="r" d="M100 40 C 150 40 160 80 120 92 C 70 106 60 140 100 152 C 140 164 146 200 104 210 C 76 216 60 236 80 252"/><path d="M80 252 C 90 262 110 260 112 248 C 114 236 100 232 92 240"/><path d="M100 40 C 92 30 78 28 70 36 C 64 44 72 52 82 48"/><path d="M110 92 l6 6 M96 104 l6 6 M88 120 l6 6 M108 152 l6 6 M124 170 l6 6 M120 192 l6 6"/>'
 };
 var VB='viewBox="0 0 200 260"';
-var FL=[{k:"rose",n:"Rosa botánica",a:"Alba",ok:1},{k:"dagger",n:"Daga y serpiente",a:"Marko",ok:1},{k:"swallow",n:"Golondrina",a:"Alba",ok:0},{k:"moon",n:"Luna y estrellas",a:"Alba",ok:1},{k:"eye",n:"Ojo místico",a:"Marko",ok:1},{k:"snake",n:"Serpiente",a:"Sara",ok:1}];
+var FL=[{k:"rosa",n:"Rosa realista",z:"Espalda alta",ok:1},{k:"daga",n:"Daga y serpiente",z:"Brazo",ok:1},{k:"golondrina",n:"Golondrina",z:"Omóplato",ok:0},{k:"luna",n:"Luna y estrellas",z:"Espalda",ok:1},{k:"ojo",n:"Ojo",z:"Brazo",ok:1},{k:"olivo",n:"Rama de olivo",z:"Hombro",ok:1}];
 var fg=$("#fgrid");
-FL.forEach(function(f){var b=document.createElement("button");b.type="button";b.className="fc rv";b.innerHTML='<span class="av'+(f.ok?'':' no')+'">'+(f.ok?'Disponible':'Reservado')+'</span><svg class="draw" '+VB+' aria-hidden="true">'+ART[f.k]+'</svg><span class="cap"><span><small>'+f.a+'</small><br><b>'+f.n+'</b></span><span aria-hidden="true">↗</span></span>';b.setAttribute("aria-label",f.n+" de "+f.a+(f.ok?", disponible":", reservado"));b.addEventListener("click",function(){openMod(f)});fg.appendChild(b)});
+FL.forEach(function(f){var b=document.createElement("button");b.type="button";b.className="fc rv";b.innerHTML='<img src="img/flash/'+f.k+'.webp" alt="" loading="lazy" decoding="async" width="640" height="800"><span class="av'+(f.ok?'':' no')+'">'+(f.ok?'Disponible':'Reservado')+'</span><span class="cap"><span><small>'+f.z+'</small><br><b>'+f.n+'</b></span><span aria-hidden="true">↗</span></span>';b.setAttribute("aria-label",f.n+", "+f.z.toLowerCase()+(f.ok?", disponible":", reservado"));b.addEventListener("click",function(){openMod(f)});fg.appendChild(b)});
 function prepDraw(svg){$$("path,circle,ellipse,line,polyline",svg).forEach(function(p){var L=p.getTotalLength?p.getTotalLength():300;p.style.strokeDasharray=L;p.style.strokeDashoffset=RM?0:L;p.dataset.len=L})}
 function playDraw(svg,dur,delay){if(RM)return;$$("path,circle,ellipse,line,polyline",svg).forEach(function(p,i){p.style.transition="stroke-dashoffset "+(dur||1.6)+"s cubic-bezier(.6,.1,.2,1) "+((delay||0)+i*.06)+"s";requestAnimationFrame(function(){p.style.strokeDashoffset=0})})}
-$$(".fc svg").forEach(prepDraw);
 /* modal */
 var mod=$("#mod");
-function openMod(f){$("#modb").innerHTML='<svg class="draw" '+VB+' aria-hidden="true">'+ART[f.k]+'</svg><p style="font-weight:800;letter-spacing:.14em;font-size:0.75rem;text-transform:uppercase;color:#6b655c">Flash de '+f.a+'</p><h3 id="mod-t">'+f.n+'</h3><p style="margin:8px 0 18px;color:#4d483f">'+(f.ok?'Diseño único: se tatúa una sola vez. Resérvalo y lo adaptamos a la zona que elijas.':'Este diseño ya está reservado. Podemos crear uno parecido solo para ti.')+'</p><a class="btn btn-red" style="width:100%" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent("Hola, he visto la demo de Tinta Negra en agencia-js.com y quiero una web así para mi estudio. (Flash de ejemplo: "+f.n+")")+'">'+(f.ok?'Reservar este diseño':'Pedir uno parecido')+'</a>';mod.classList.add("open");var s=$("#modb svg");prepDraw(s);playDraw(s,1.4,.1);$("#modx").focus()}
+function openMod(f){$("#modb").innerHTML='<img class="mod-im" src="img/flash/'+f.k+'.webp" alt="'+f.n+' tatuado en '+f.z.toLowerCase()+'" width="640" height="800"><p style="font-weight:800;letter-spacing:.14em;font-size:0.75rem;text-transform:uppercase;color:#6b655c">Flash de Leo · '+f.z+'</p><h3 id="mod-t">'+f.n+'</h3><p style="margin:8px 0 18px;color:#4d483f">'+(f.ok?'Diseño único: se tatúa una sola vez. Resérvalo y lo adaptamos a la zona que elijas.':'Este diseño ya está reservado. Podemos crear uno parecido solo para ti.')+'</p><a class="btn btn-red" style="width:100%" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent((f.ok?"Hola, quiero reservar el diseño del flash «":"Hola, me gusta el diseño del flash «")+f.n+(f.ok?"». ¿Qué fechas tenéis?":"» y quiero uno parecido."))+'">'+(f.ok?'Reservar este diseño':'Pedir uno parecido')+'</a>';mod.classList.add("open");$("#modx").focus()}
 function closeMod(){mod.classList.remove("open")}
 $("#modx").addEventListener("click",closeMod);mod.addEventListener("click",function(e){if(e.target===mod)closeMod()});document.addEventListener("keydown",function(e){if(e.key==="Escape")closeMod()});
 /* hero draw */
@@ -934,14 +1045,7 @@ var ha=$("#heroArt");prepDraw(ha);setTimeout(function(){playDraw(ha,2.4,0)},250)
 /* reveal + flash draw */
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;e.target.classList.add("vis");var s=e.target.querySelector("svg.draw");if(s)playDraw(s,1.8,.2);io.unobserve(e.target)})},{threshold:.2});
 $$(".rv").forEach(function(n,i){n.style.transitionDelay=(i%3)*90+"ms";io.observe(n)});
-/* manifiesto palabra a palabra */
-var mp=$("#mani");var red=["historia","solo","siempre."];mp.innerHTML=mp.textContent.split(" ").map(function(w){return '<span class="w'+(red.indexOf(w.toLowerCase())>-1?' r':'')+'">'+w+'</span>'}).join(" ");
-var ws=$$(".w",mp);function mani(){var r=mp.getBoundingClientRect(),vh=innerHeight;var p=Math.min(1,Math.max(0,(vh*.85-r.top)/(r.height+vh*.4)));var n=Math.round(p*ws.length);ws.forEach(function(w,i){w.classList.toggle("on",i<n)})}
-if(RM)ws.forEach(function(w){w.classList.add("on")});else{addEventListener("scroll",mani,{passive:true});mani()}
-
 /* fotos y vídeo */
-var PIMG={rose:"calavera",moon:"serpiente",eye:"retrato2",swallow:"rosa",dagger:"lobo2"};
-Object.keys(PIMG).forEach(function(k){var i=new Image();i.src="img/"+PIMG[k]+".webp"});
 var vio="IntersectionObserver" in window?new IntersectionObserver(function(es){es.forEach(function(e){var v=e.target;if(e.isIntersecting&&!RM){var p=v.play();if(p&&p.catch)p.catch(function(){})}else v.pause()})},{threshold:.15}):null;
 $$("video.lv").forEach(function(v){if(vio)vio.observe(v)});
 var lb=$("#lb");function lbClose(){lb.classList.remove("on")}
@@ -978,7 +1082,7 @@ function drawCat(){
  var L=CAT.filter(function(c){return(fE==="Todos"||c.e===fE)&&(fT==="Todos"||c.t===fT)});
  if(!L.length){g.innerHTML='<p style="color:#b3ac9f">No hay diseños con esos filtros. Prueba otra combinación o pídenos uno a medida.</p>';return}
  L.forEach(function(c,i){var a=document.createElement("article");a.className="cat-c";a.style.animationDelay=(i*60)+"ms";
-  a.innerHTML='<div class="cat-i"><img src="img/cat/m/'+c.k+'.webp" alt="Diseño de tatuaje: '+c.n+'" loading="lazy"></div><div class="cat-b"><p class="cat-e">'+c.e+' · '+TS[c.t]+'</p><h3>'+c.n+'</h3><p>Ideal en: '+c.z+'<br>Sesión aproximada: '+c.h+'</p><div class="cat-a"><button type="button" class="btn btn-ghost" data-try="'+c.k+'">Probar en mi piel</button><a class="btn btn-red" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent("Hola, he visto la demo de Tinta Negra en agencia-js.com y quiero una web así para mi estudio. (Diseño de ejemplo: "+c.n+")")+'">Reservar</a></div></div>';
+  a.innerHTML='<div class="cat-i"><img src="img/cat/m/'+c.k+'.webp" alt="Diseño de tatuaje: '+c.n+'" loading="lazy"></div><div class="cat-b"><p class="cat-e">'+c.e+' · '+TS[c.t]+'</p><h3>'+c.n+'</h3><p>Ideal en: '+c.z+'<br>Sesión aproximada: '+c.h+'</p><div class="cat-a"><button type="button" class="btn btn-ghost" data-try="'+c.k+'">Probar en mi piel</button><a class="btn btn-red" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent("Hola, quiero reservar el diseño «"+c.n+"» del catálogo. ¿Qué fechas tenéis?")+'">Reservar</a></div></div>';
   g.appendChild(a)});
 }
 $("#catG").addEventListener("click",function(e){var b=e.target.closest("[data-try]");if(!b)return;setDesign(b.dataset.try);$("#simulador").scrollIntoView({behavior:RM?"auto":"smooth"})});
@@ -997,8 +1101,11 @@ TN.shareProof=function(text){var p=TN.proof;if(!p)return false;if(navigator.canS
 /* ===== mapa del dolor ===== */
 var PAIN=[["Antebrazo",2,"Zona ideal para el primer tatuaje: poca sensibilidad."],["Brazo exterior",2,"Mucho músculo y poca terminación nerviosa."],["Hombro",2,"Molestia baja, salvo cerca de la clavícula."],["Muslo",2,"Amplio y cómodo para piezas grandes."],["Pantorrilla",3,"Soportable; algo más cerca del tobillo."],["Espalda alta",3,"Llevadera, más intensa junto a la columna."],["Cuello",3,"Sensible en los laterales y la nuca."],["Muñeca",3,"Piel fina cerca del hueso."],["Mano",4,"Piel fina y muchos tendones. Puede necesitar retoque."],["Pie",4,"Hueso cerca de la piel. Cura más lenta."],["Codo",4,"El hueso hace que vibre bastante."],["Columna",4,"Intensa justo sobre las vértebras."],["Esternón",4,"Vibración sobre el hueso. Sesiones con pausas."],["Rodilla",5,"De las más intensas, sobre todo detrás."],["Costillas",5,"Piel fina sobre hueso y la respiración se nota."]];
 var pz=$("#painZ"),pr=$("#painR");
-function painShow(i){var p=PAIN[i];$$(".pain-b").forEach(function(b,j){b.classList.toggle("on",j===i)});var lv=["","Muy baja","Baja","Media","Alta","Muy alta"][p[1]];pr.innerHTML='<p class="kick" style="margin:0">Nivel de molestia</p><h3>'+p[0]+'</h3><div class="pain-m">'+[1,2,3,4,5].map(function(n){return '<i class="'+(n<=p[1]?'l'+p[1]:'')+'" style="transition-delay:'+(n*60)+'ms"></i>'}).join("")+'</div><p class="pain-lv">'+lv+' · '+p[1]+'/5</p><p>'+p[2]+'</p>'}
-PAIN.forEach(function(p,i){var b=document.createElement("button");b.type="button";b.className="pain-b";b.innerHTML=p[0]+'<span class="d'+p[1]+'"></span>';b.addEventListener("click",function(){painShow(i)});pz.appendChild(b)});painShow(0);
+function painShow(i){var p=PAIN[i];$$(".pain-b").forEach(function(b){var on=+b.dataset.i===i;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on?"true":"false")});var lv=["","Muy baja","Baja","Media","Alta","Muy alta"][p[1]];pr.innerHTML='<p class="kick" style="margin:0">Nivel de molestia</p><h3>'+p[0]+'</h3><div class="pain-m">'+[1,2,3,4,5].map(function(n){return '<i class="'+(n<=p[1]?'l'+p[1]:'')+'" style="transition-delay:'+(n*60)+'ms"></i>'}).join("")+'</div><p class="pain-lv">'+lv+' · '+p[1]+'/5</p><p>'+p[2]+'</p><p class="pain-tip">'+(p[1]<=2?"Buena zona para un primer tatuaje.":p[1]===3?"Llevadera: haremos pausas cuando las necesites.":"Mejor en sesiones cortas, con pausas y habiendo comido.")+'</p>'}
+/* zonas agrupadas por nivel: de un vistazo se ve qué duele poco y qué duele más */
+var GRP=[["Poca molestia",[1,2],"g1"],["Molestia media",[3],"g3"],["Molestia alta",[4,5],"g5"]];
+GRP.forEach(function(g){var row=document.createElement("div");row.className="pain-g "+g[2];row.innerHTML='<p class="pain-gt"><i aria-hidden="true"></i>'+g[0]+'</p>';var ch=document.createElement("div");ch.className="pain-c";row.appendChild(ch);
+PAIN.forEach(function(p,i){if(g[1].indexOf(p[1])<0)return;var b=document.createElement("button");b.type="button";b.className="pain-b";b.dataset.i=i;b.setAttribute("aria-pressed","false");b.innerHTML=p[0]+'<span class="d'+p[1]+'"></span>';b.addEventListener("click",function(){painShow(i)});ch.appendChild(b)});pz.appendChild(row)});painShow(0);
 
 /* ===== tarjeta regalo ===== */
 
@@ -1028,9 +1135,9 @@ function answer(q){var n=nrm(q),z=null;
  if(/idea|recomiend|no se|estilo|diseno|catalogo/.test(n))return "Te ayudo: ¿lo quieres delicado (fine line), con mucho contraste (blackwork), muy detallado (realismo) o clásico (tradicional)? Mira el catálogo y filtra por estilo y tamaño."+link("#catalogo","Ver catálogo");
  if(/tinta|alerg|vegan|piel sensible/.test(n))return "Usamos tintas veganas que cumplen la normativa europea. Si tienes alguna alergia o piel sensible, avísanos antes y valoramos una prueba.";
  if(/embaraz|lactan|medic|diabet/.test(n))return "Por seguridad no tatuamos durante el embarazo ni la lactancia. Si tomas medicación o tienes alguna condición, consúltalo antes con tu médico y cuéntanoslo.";
- if(/regalo|tarjeta/.test(n))return "Tenemos tarjetas regalo de 50 a 200 €, válidas 12 meses con cualquier artista."+link("#regalo","Ver tarjeta regalo");
+ if(/regalo|tarjeta/.test(n))return "Tenemos tarjetas regalo de 50 a 200 €, válidas 12 meses para cualquier tatuaje."+link("#regalo","Ver tarjeta regalo");
  if(/crema|tienda|comprar|producto|balsamo|jabon|film|camiseta|gorra/.test(n))return "En nuestra tienda tienes el bálsamo, el jabón neutro, el film protector y el stick solar que usamos en el estudio."+link("#tienda","Ver tienda");
- if(/inteligencia|ia\b|boceto|dibuj|generar/.test(n))return "Describe tu idea y te mostramos bocetos al momento para inspirarte. Luego tu artista crea el diseño definitivo."+link("#ia","Probar idea con IA");
+ if(/inteligencia|ia\b|boceto|dibuj|generar/.test(n))return "Describe tu idea y te mostramos bocetos al momento para inspirarte. Luego Leo crea el diseño definitivo."+link("#ia","Probar idea con IA");
  if(/consentimiento|firma/.test(n))return "El consentimiento informado se rellena y firma online durante la reserva, y te llevas una copia.";
  if(/cita|reserv|hueco|disponib|cuando/.test(n))return "Puedes pedir cita en 1 minuto desde el formulario o escribirnos por WhatsApp."+link("#reserva","Pedir cita")+wa("Hola, quiero pedir cita para un tatuaje.","Escribir por WhatsApp");
  if(/hola|buenas|hey/.test(n))return "¡Hola! Pregúntame lo que quieras sobre tu tatuaje: dolor, precio, cuidados o qué estilo te pega.";
@@ -1053,9 +1160,9 @@ $$("#payM button").forEach(function(b){b.addEventListener("click",function(){pm=
 $("#payX").addEventListener("click",function(){$("#pay").classList.remove("on")});
 $("#payGo").addEventListener("click",function(){var g=$("#payGo");g.disabled=true;g.innerHTML='<span class="spin"></span> Procesando…';setTimeout(function(){$("#pay").classList.remove("on");if(payCb)payCb(pm)},1400)});
 /* ===== calendario ===== */
-var ARTS=["Alba","Marko","Sara"],SL=["10:00","12:30","16:00","18:30"];
-function freeSlots(d){var a=data.artista&&ARTS.indexOf(data.artista)>-1?[ARTS.indexOf(data.artista)]:[0,1,2],dw=d.getDay(),out=[];if(dw===0||dw===1)return out;SL.forEach(function(h,si){var ok=a.some(function(ai){return((d.getDate()*7+d.getMonth()*3+si*13+ai*5)%5)>1});if(ok)out.push(h)});return out}
-function drawCal(){var c=$("#cal"),t=new Date();t.setHours(0,0,0,0);$("#calA").textContent=data.artista&&data.artista!=="Me da igual"?"Agenda de "+data.artista:"Disponibilidad de todo el equipo";var h='<div class="cal-w">'+["L","M","X","J","V","S","D"].map(function(x){return"<span>"+x+"</span>"}).join("")+"</div><div class=\"cal-g\">";var st=new Date(t);st.setDate(t.getDate()+1);var off=(st.getDay()+6)%7;for(var i=0;i<off;i++)h+="<span></span>";for(var k=0;k<28;k++){var d=new Date(st);d.setDate(st.getDate()+k);var f=freeSlots(d),iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"),sel=data.fecha===iso;h+='<button type="button" class="cal-d'+(sel?" on":"")+'" data-d="'+iso+'"'+(f.length?"":" disabled")+' aria-label="'+d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"})+(f.length?", "+f.length+" huecos":", sin huecos")+'"><b>'+d.getDate()+"</b><small>"+(d.getDate()===1||k===0?d.toLocaleDateString("es-ES",{month:"short"}):"")+"</small>"+(f.length?'<i style="--n:'+f.length+'"></i>':"")+"</button>"}c.innerHTML=h+"</div>";if(data.fecha)drawSlots()}
+var ARTS=["Leo"],SL=["10:00","12:30","16:00","18:30"];
+function freeSlots(d){var a=[0],dw=d.getDay(),out=[];if(dw===0||dw===1)return out;SL.forEach(function(h,si){var ok=a.some(function(ai){return((d.getDate()*7+d.getMonth()*3+si*13+ai*5)%5)>1});if(ok)out.push(h)});return out}
+function drawCal(){var c=$("#cal"),t=new Date();t.setHours(0,0,0,0);$("#calA").textContent="Agenda de Leo";var h='<div class="cal-w">'+["L","M","X","J","V","S","D"].map(function(x){return"<span>"+x+"</span>"}).join("")+"</div><div class=\"cal-g\">";var st=new Date(t);st.setDate(t.getDate()+1);var off=(st.getDay()+6)%7;for(var i=0;i<off;i++)h+="<span></span>";for(var k=0;k<28;k++){var d=new Date(st);d.setDate(st.getDate()+k);var f=freeSlots(d),iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"),sel=data.fecha===iso;h+='<button type="button" class="cal-d'+(sel?" on":"")+'" data-d="'+iso+'"'+(f.length?"":" disabled")+' aria-label="'+d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"})+(f.length?", "+f.length+" huecos":", sin huecos")+'"><b>'+d.getDate()+"</b><small>"+(d.getDate()===1||k===0?d.toLocaleDateString("es-ES",{month:"short"}):"")+"</small>"+(f.length?'<i style="--n:'+f.length+'"></i>':"")+"</button>"}c.innerHTML=h+"</div>";if(data.fecha)drawSlots()}
 function drawSlots(){var d=new Date(data.fecha+"T12:00:00"),f=freeSlots(d),el=$("#slots");el.innerHTML='<p class="res-s">'+d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"})+"</p>"+f.map(function(h){return'<button type="button" class="opt slot" aria-pressed="'+(data.hora===h)+'">'+h+"</button>"}).join("")}
 $("#cal").addEventListener("click",function(e){var b=e.target.closest(".cal-d");if(!b||b.disabled)return;data.fecha=b.dataset.d;data.hora=null;$$(".cal-d").forEach(function(x){x.classList.toggle("on",x===b)});drawSlots()});
 $("#slots").addEventListener("click",function(e){var b=e.target.closest(".slot");if(!b)return;data.hora=b.textContent;$$(".slot").forEach(function(x){x.setAttribute("aria-pressed",x===b)});$("#e5").textContent=""});
@@ -1075,24 +1182,27 @@ function valid(n){
  if(n===6){var e=$("#fe").value.trim(),t=$("#ft").value.replace(/\D/g,"");if($("#fn").value.trim().length<2){$("#e6").textContent="Escribe tu nombre.";return false}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)&&t.length<9){$("#e6").textContent="Déjanos un correo o un móvil para confirmarte la cita.";return false}$("#e6").textContent=""}
  if(n===7){var m="";if(age($("#fb").value)<18)m="Solo tatuamos a mayores de 18 años.";else if(rv("qe")==="Sí")m="Por seguridad no tatuamos durante el embarazo ni la lactancia. ¡Te esperamos más adelante!";else if(!$("#facc").checked)m="Necesitamos que aceptes el consentimiento informado.";else if(signed<8)m="Falta tu firma.";$("#e7").textContent=m;if(m)return false}
  return true}
-function drawSum(){var d=new Date(data.fecha+"T12:00:00");$("#sum").innerHTML=[["Estilo",data.estilo||"Por definir"],["Zona",data.zona||"Por definir"],["Tamaño",sz.value+" cm"],["Artista",data.artista||"Me da igual"],["Cita",d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"})+" · "+data.hora],["A nombre de",$("#fn").value]].map(function(r){return"<div><span>"+r[0]+"</span><b>"+r[1].replace(/</g,"&lt;")+"</b></div>"}).join("")}
+function drawSum(){var d=new Date(data.fecha+"T12:00:00");$("#sum").innerHTML=[["Estilo",data.estilo||"Por definir"],["Zona",data.zona||"Por definir"],["Tamaño",sz.value+" cm"],["Primer tatuaje",data.exp||"Sin indicar"],["Cita",d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"})+" · "+data.hora],["A nombre de",$("#fn").value]].map(function(r){return"<div><span>"+r[0]+"</span><b>"+r[1].replace(/</g,"&lt;")+"</b></div>"}).join("")}
 /* ===== confirmación ===== */
-function bookDone(m){var box=$(".res .box"),d=new Date(data.fecha+"T12:00:00"),ds=d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"});box.innerHTML='<div class="ok"><svg viewBox="0 0 64 64" width="84" height="84" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="none" stroke="#1d8f4e" stroke-width="4"/><path d="M19 33l9 9 17-19" fill="none" stroke="#1d8f4e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>¡Cita confirmada!</h3><p>'+ds+' a las '+data.hora+' · '+(data.artista&&data.artista!=="Me da igual"?"con "+data.artista:"con nuestro equipo")+'</p><p class="res-n">Señal de 50 € pagada con '+m+'. '+($("#frem").checked?"Te enviaremos un recordatorio 24 h antes por WhatsApp y correo.":"")+'</p><div class="ok-a"><button type="button" class="btn btn-dk" id="ics">📅 Añadir a mi calendario</button><button type="button" class="btn btn-ln" id="cdl">📄 Descargar consentimiento firmado</button>'+(window.TN&&TN.proof?'<button type="button" class="btn btn-ln" id="proofSend">📎 Enviar mi prueba del simulador</button>':'')+'<a class="btn btn-ln" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent("Hola, he visto la demo de Tinta Negra en agencia-js.com y quiero una web así para mi estudio. (Reserva de ejemplo: "+ds+" "+data.hora+")")+'">Quiero una web así</a></div><p class="sim-n">Demo: en la web real la cita se guarda en la agenda del estudio y los recordatorios se envían solos.</p></div>';
+function bookDone(m){var box=$(".res .box"),d=new Date(data.fecha+"T12:00:00"),ds=d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"});box.innerHTML='<div class="ok"><svg viewBox="0 0 64 64" width="84" height="84" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="none" stroke="#1d8f4e" stroke-width="4"/><path d="M19 33l9 9 17-19" fill="none" stroke="#1d8f4e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>¡Cita confirmada!</h3><p>'+ds+' a las '+data.hora+' · '+"con Leo"+'</p><p class="res-n">Señal de 50 € pagada con '+m+'. '+($("#frem").checked?"Te enviaremos un recordatorio 24 h antes por WhatsApp y correo.":"")+'</p><div class="ok-a"><button type="button" class="btn btn-dk" id="ics">📅 Añadir a mi calendario</button><button type="button" class="btn btn-ln" id="cdl">📄 Descargar consentimiento firmado</button>'+(window.TN&&TN.proof?'<button type="button" class="btn btn-ln" id="proofSend">📎 Enviar mi prueba del simulador</button>':'')+'<a class="btn btn-ln" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent("Hola, he visto la demo de Tinta Negra en agencia-js.com y quiero una web así para mi estudio. (Reserva de ejemplo: "+ds+" "+data.hora+")")+'">Quiero una web así</a></div><p class="sim-n">Demo: en la web real la cita se guarda en la agenda del estudio y los recordatorios se envían solos.</p></div>';
  $("#ics").addEventListener("click",function(){var ini=AJSCal.fecha(data.fecha,data.hora);AJSCal.descargar({titulo:"Cita de tatuaje · Tinta Negra",inicio:ini,minutos:180,lugar:"Tinta Negra",nota:"Ven descansado/a, habiendo comido y con ropa cómoda que deje la zona a mano. Evita el alcohol las 24 h anteriores.",avisos:[1440,120],extra:[{titulo:"Revisión y retoque gratis · Tinta Negra",inicio:AJSCal.mas(ini,42),minutos:30,nota:"Ya ha cicatrizado tu tatuaje: si necesita un retoque, es gratis. Escríbenos por WhatsApp para darte hora.",avisos:[1440]}]},"cita-tinta-negra.ics")});
  $("#cdl").addEventListener("click",consentPng);var ps=$("#proofSend");if(ps)ps.addEventListener("click",function(){TN.shareProof("Mi prueba del simulador para la cita en Tinta Negra: "+ds+" a las "+data.hora)});box.scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})}
 function dl(blob,name){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove()}
 var sigData=null,FD={};var _bd=bookDone;bookDone=function(m){sigData=sg.toDataURL("image/png");FD={fn:$("#fn").value,fb:$("#fb").value,qa:rv("qa"),fa:$("#fa").value,qe:rv("qe"),qm:rv("qm"),sz:sz.value};_bd(m)};
-function consentPng(){var c=document.createElement("canvas");c.width=1240;c.height=1500;var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,1240,1500);x.fillStyle="#0a0a0a";x.font="bold 48px Arial";x.fillText("TINTA NEGRA",80,120);x.font="bold 34px Arial";x.fillText("Consentimiento informado para tatuaje",80,190);x.font="24px Arial";x.fillStyle="#555";x.fillText("Documento de demostración · Agencia JS",80,232);x.fillStyle="#0a0a0a";var y=320,L=[["Nombre",FD.fn],["Fecha de nacimiento",FD.fb],["Cita",data.fecha+" · "+data.hora],["Artista",data.artista||"Me da igual"],["Estilo / zona / tamaño",(data.estilo||"-")+" / "+(data.zona||"-")+" / "+FD.sz+" cm"],["Alergias",FD.qa+(FD.fa?" ("+FD.fa+")":"")],["Embarazo o lactancia",FD.qe],["Anticoagulantes / otras",FD.qm]];x.font="28px Arial";L.forEach(function(r){x.fillStyle="#777";x.fillText(r[0],80,y);x.fillStyle="#0a0a0a";x.fillText(String(r[1]).slice(0,60),520,y);y+=58});y+=30;x.font="24px Arial";["Declaro que la información facilitada es veraz, que he sido informado/a de los riesgos","del procedimiento y de los cuidados posteriores, y que doy mi consentimiento libre.","Firmado electrónicamente el "+new Date().toLocaleString("es-ES")+"."].forEach(function(t){x.fillText(t,80,y);y+=40});y+=40;x.strokeStyle="#ccc";x.strokeRect(80,y,700,240);var im=new Image();im.onload=function(){x.drawImage(im,90,y+10,680,220);x.fillStyle="#777";x.fillText("Firma",80,y+280);c.toBlob(function(b){dl(b,"consentimiento-tinta-negra.png")})};im.src=sigData}
+function consentPng(){var c=document.createElement("canvas");c.width=1240;c.height=1500;var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,1240,1500);x.fillStyle="#0a0a0a";x.font="bold 48px Arial";x.fillText("TINTA NEGRA",80,120);x.font="bold 34px Arial";x.fillText("Consentimiento informado para tatuaje",80,190);x.font="24px Arial";x.fillStyle="#555";x.fillText("Documento de demostración · Agencia JS",80,232);x.fillStyle="#0a0a0a";var y=320,L=[["Nombre",FD.fn],["Fecha de nacimiento",FD.fb],["Cita",data.fecha+" · "+data.hora],["Primer tatuaje",data.exp||"-"],["Estilo / zona / tamaño",(data.estilo||"-")+" / "+(data.zona||"-")+" / "+FD.sz+" cm"],["Alergias",FD.qa+(FD.fa?" ("+FD.fa+")":"")],["Embarazo o lactancia",FD.qe],["Anticoagulantes / otras",FD.qm]];x.font="28px Arial";L.forEach(function(r){x.fillStyle="#777";x.fillText(r[0],80,y);x.fillStyle="#0a0a0a";x.fillText(String(r[1]).slice(0,60),520,y);y+=58});y+=30;x.font="24px Arial";["Declaro que la información facilitada es veraz, que he sido informado/a de los riesgos","del procedimiento y de los cuidados posteriores, y que doy mi consentimiento libre.","Firmado electrónicamente el "+new Date().toLocaleString("es-ES")+"."].forEach(function(t){x.fillText(t,80,y);y+=40});y+=40;x.strokeStyle="#ccc";x.strokeRect(80,y,700,240);var im=new Image();im.onload=function(){x.drawImage(im,90,y+10,680,220);x.fillStyle="#777";x.fillText("Firma",80,y+280);c.toBlob(function(b){dl(b,"consentimiento-tinta-negra.png")})};im.src=sigData}
 /* ===== generador IA (demo) ===== */
 var iaE="Cualquiera";chips($("#iaE"),["Cualquiera","Fine line","Blackwork","Realismo","Tradicional"],iaE,function f(v){iaE=v;chips($("#iaE"),["Cualquiera","Fine line","Blackwork","Realismo","Tradicional"],iaE,f)});
 var KW=[["rosa|flor|jardin|botan|naturaleza","rosa-realista"],["olivo|rama|hoja|paz|planta","olivo"],["pajaro|golondrina|volar|libertad|viaje","golondrina"],["luna|estrella|noche|cielo|constel|universo","luna"],["mariposa|cambio|transform|renacer","mariposa"],["mandala|geometr|equilibrio|espiritual","mandala"],["serpiente|daga|cuchillo|peligro","serpiente-daga"],["ola|mar|agua|oceano|japon|surf","ola"],["leon|fuerza|valor|familia|rey|coraje","leon-realista"],["ojo|mirada|vision|ver","ojo"],["pantera|gato|felino|salvaje","pantera"],["corazon|amor|pareja|madre|padre","corazon"]];
 $("#iaB").addEventListener("click",function(){var t=nrm($("#iaT").value),o=$("#iaO");if(t.trim().length<3){o.innerHTML='<div class="ia-ph"><span>✦</span><p>Escribe primero tu idea (por ejemplo: “una luna con estrellas, delicada”).</p></div>';return}
  var sc=CAT.map(function(c){var p=0;KW.forEach(function(k){if(k[1]===c.k&&new RegExp(k[0]).test(t))p+=5});if(iaE!=="Cualquiera"&&c.e===iaE)p+=3;if(iaE!=="Cualquiera"&&c.e!==iaE)p-=2;if(/fino|delicad|minimal|pequen/.test(t)&&c.e==="Fine line")p+=2;if(/realis|detalle|retrato/.test(t)&&c.e==="Realismo")p+=2;if(/negro|oscuro|fuerte|contraste/.test(t)&&c.e==="Blackwork")p+=2;if(/clasic|old school|color/.test(t)&&c.e==="Tradicional")p+=2;return[p+Math.random(),c]}).sort(function(a,b){return b[0]-a[0]}).slice(0,3);
  var steps=["Entendiendo tu idea…","Buscando la composición…","Dibujando líneas y sombras…"],i=0;o.innerHTML='<div class="ia-gen"><div class="ia-scan"></div><p id="iaS">'+steps[0]+'</p></div>';var tm=setInterval(function(){i++;if(i<3){$("#iaS").textContent=steps[i];return}clearInterval(tm);
-  o.innerHTML='<div class="ia-r">'+sc.map(function(r,j){var c=r[1];return'<div class="ia-c" style="animation-delay:'+(j*120)+'ms"><div class="cat-i"><img src="img/cat/m/'+c.k+'.webp" alt="Boceto '+(j+1)+': '+c.n+'"></div><p><b>Boceto '+(j+1)+'</b> · '+c.e+'</p><div class="cat-a"><button type="button" class="btn btn-ghost" data-try="'+c.k+'">Probar</button><a class="btn btn-red" href="#reserva" data-pick="'+c.e+'">Pedir</a></div></div>'}).join("")+'</div><p class="sim-n">Tu artista convertirá el boceto elegido en un diseño único y adaptado a tu cuerpo.</p>'},900)});
+  o.innerHTML='<div class="ia-r">'+sc.map(function(r,j){var c=r[1];return'<div class="ia-c" style="animation-delay:'+(j*120)+'ms"><div class="cat-i"><img src="img/cat/m/'+c.k+'.webp" alt="Boceto '+(j+1)+': '+c.n+'"></div><p><b>Boceto '+(j+1)+'</b> · '+c.e+'</p><div class="cat-a"><button type="button" class="btn btn-ghost" data-try="'+c.k+'">Probar</button><a class="btn btn-red" href="#reserva" data-pick="'+c.e+'">Pedir</a></div></div>'}).join("")+'</div><p class="sim-n">Leo convertirá el boceto elegido en un diseño único y adaptado a tu cuerpo.</p>'},900)});
 $("#iaO").addEventListener("click",function(e){var b=e.target.closest("[data-try]");if(b){setDesign(b.dataset.try);$("#simulador").scrollIntoView({behavior:RM?"auto":"smooth"})}var p=e.target.closest("[data-pick]");if(p){var st=p.dataset.pick;$$('.opts[data-k="estilo"] .opt').forEach(function(o){if(o.textContent===st)o.click()})}});
 /* ===== antes / después ===== */
-$$(".ba").forEach(function(f){var r=f.querySelector("input");r.addEventListener("input",function(){f.style.setProperty("--p",r.value+"%")})});
+$$(".ba").forEach(function(f){var r=f.querySelector("input"),toc=false;function set(v){r.value=v;f.style.setProperty("--p",v+"%");et(v)}function et(v){f.classList.toggle("ba-a",v<22);f.classList.toggle("ba-d",v>78)}et(+r.value);
+r.addEventListener("input",function(){toc=true;f.style.setProperty("--p",r.value+"%");et(+r.value)});
+/* al verlo por primera vez: se ve el antes y una pasada suave muestra el después */
+if(!RM&&window.IntersectionObserver){var o=new IntersectionObserver(function(e){if(!e[0].isIntersecting)return;o.disconnect();var t0=null;function an(t){if(toc)return;t0=t0||t;var k=Math.min(1,(t-t0)/1600),e2=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;set(Math.round(8+(62-8)*e2));if(k<1)requestAnimationFrame(an)}setTimeout(function(){requestAnimationFrame(an)},500)},{threshold:.6});o.observe(f)}});
 /* ===== tienda ===== */
 var SHOP=[{k:"balsamo",n:"Bálsamo de cuidado",d:"Vegano, sin perfume. 50 ml",p:14.9},{k:"jabon",n:"Jabón neutro",d:"pH suave para los primeros días. 250 ml",p:9.9},{k:"film",n:"Film protector",d:"Segunda piel transpirable. 2 m",p:12.5},{k:"solar",n:"Stick solar SPF 50",d:"Protege el color del sol",p:11.9},{k:"camiseta",n:"Camiseta Rosa",d:"Algodón orgánico. Unisex",p:24},{k:"gorra",n:"Gorra Daga",d:"Bordado rojo. Talla única",p:22}];
 var cart={};try{cart=JSON.parse(localStorage.getItem("tn_cart")||"{}")}catch(e){}
@@ -1119,20 +1229,8 @@ $("#ckC").addEventListener("click",function(){if(!ck.classList.contains("cfg")){
 $("#ckOpen").addEventListener("click",function(){var v=ckGet()||{};$("#ckA").checked=!!v.a;$("#ckM").checked=!!v.m;ck.classList.add("on","cfg");$("#ckC").textContent="Guardar selección"});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){cartClose();$("#pay").classList.remove("on")}});
 
-/* cursor + preview + magnetic */
-if(FINE&&!RM){var cur=$("#cur"),pv=$("#prev"),x=innerWidth/2,y=innerHeight/2,cx=x,cy=y;
- addEventListener("pointermove",function(e){x=e.clientX;y=e.clientY;pv.style.left=x+"px";pv.style.top=y+"px"});
- (function loop(){cx+=(x-cx)*.2;cy+=(y-cy)*.2;cur.style.left=cx+"px";cur.style.top=cy+"px";requestAnimationFrame(loop)})();
- $$("a,button").forEach(function(a){a.addEventListener("pointerenter",function(){cur.classList.add("big")});a.addEventListener("pointerleave",function(){cur.classList.remove("big")})});
- $$(".li").forEach(function(li){li.addEventListener("pointerenter",function(){pv.innerHTML='<img src="img/'+PIMG[li.dataset.art]+'.webp" alt="">';pv.classList.add("on")});li.addEventListener("pointerleave",function(){pv.classList.remove("on")})});
- $$(".mag").forEach(function(m){m.addEventListener("pointermove",function(e){var r=m.getBoundingClientRect();m.style.transform="translate("+((e.clientX-r.left-r.width/2)*.25)+"px,"+((e.clientY-r.top-r.height/2)*.35)+"px)"});m.addEventListener("pointerleave",function(){m.style.transform=""})});
-}
-/* proceso: scroll horizontal anclado (escritorio) */
-var pin=$("#pin"),track=$("#track"),pro=$("#proceso");
-function hz(){if(innerWidth<861||RM){pro.style.height="";pin.style.position="";track.style.transform="";return}
- var dist=track.scrollWidth-innerWidth+64;pro.style.height=(innerHeight+dist)+"px";pin.style.position="sticky";pin.style.top="0";
- var r=pro.getBoundingClientRect();var p=Math.min(1,Math.max(0,-r.top/(pro.offsetHeight-innerHeight)));track.style.transform="translateX("+(-dist*p)+"px)"}
-addEventListener("scroll",hz,{passive:true});addEventListener("resize",hz);hz();
+/* botones magnéticos (sin cursor ni vista previa al pasar el ratón) */
+if(FINE&&!RM){$$(".mag").forEach(function(m){m.addEventListener("pointermove",function(e){var r=m.getBoundingClientRect();m.style.transform="translate("+((e.clientX-r.left-r.width/2)*.25)+"px,"+((e.clientY-r.top-r.height/2)*.35)+"px)"});m.addEventListener("pointerleave",function(){m.style.transform=""})})}
 /* (oct 2026) sin parallax en el hero */
 /* reserva por pasos */
 var S=1,N=8,data={};
@@ -1149,16 +1247,33 @@ go(1);
 <a href="/#planes" style="display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;background:#E8C766;color:#111;text-decoration:none;font-weight:700">Volver</a>
 <button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:1.125rem;line-height:1;cursor:pointer;padding:4px 6px">×</button>
 </div>
-<script>/* La experiencia 3D: se carga solo al acercarse y nunca con «Sin animaciones», en relojes o sin WebGL */
+<script>/* La experiencia: se carga solo al acercarse y nunca con «Sin animaciones» ni en relojes */
 (function(){var s=document.getElementById("experiencia");if(!s||!window.IntersectionObserver)return;var R=document.documentElement,hecho=false,cerca=false;
 var poster=/[?&]xpposter=/.test(location.search);
-function gl(){try{var c=document.createElement("canvas");return !!(c.getContext("webgl2")||c.getContext("webgl"))}catch(e){return false}}
 function quieto(){if(R.classList.contains("a11y-quieto"))return true;var o={};try{o=JSON.parse(localStorage.getItem("ajs-a11y")||"{}")||{}}catch(e){}return o.quieto===undefined?matchMedia("(prefers-reduced-motion: reduce)").matches:!!o.quieto}
-function cargar(){if(hecho||!cerca||quieto()||innerWidth<=300)return;hecho=true;if(!gl()){s.classList.add("xp-static");return}
+function cargar(){if(hecho||!cerca||quieto()||innerWidth<=300)return;hecho=true;
 import("./experiencia.js").catch(function(){s.classList.add("xp-static")})}
 if(poster){cerca=true;cargar();return}
 new IntersectionObserver(function(e){cerca=e[0].isIntersecting;cargar()},{rootMargin:"800px 0px"}).observe(s);
 new MutationObserver(cargar).observe(R,{attributes:true,attributeFilter:["class"]})})();
+</script>
+<script>/* Simulador: ordena los ajustes en tres pestañas para que no ocupe tanto */
+(function(){var pan=document.querySelector("#simulador .panel");if(!pan)return;
+var zona=document.getElementById("p-zone"),cuerpo=document.getElementById("p-body"),dis=document.getElementById("designs").parentNode,aj=document.getElementById("r-size").closest(".panel>div"),priv=pan.querySelector(".priv"),acts=pan.querySelector(".acts");
+var tabs=document.createElement("div");tabs.className="sim-tabs";tabs.setAttribute("role","tablist");tabs.setAttribute("aria-label","Ajustes del simulador");
+var cont=document.createElement("div");cont.className="sim-cont";
+var grupos=[["Cuerpo",[zona,cuerpo]],["Diseño",[dis]],["Ajustes",[aj]]],bts=[],pns=[];
+grupos.forEach(function(g,i){var b=document.createElement("button");b.type="button";b.setAttribute("role","tab");b.id="simT"+i;b.setAttribute("aria-controls","simP"+i);b.textContent=g[0];tabs.appendChild(b);bts.push(b);
+var pn=document.createElement("div");pn.className="sim-tp";pn.id="simP"+i;pn.setAttribute("role","tabpanel");pn.setAttribute("aria-labelledby","simT"+i);g[1].forEach(function(n){if(n)pn.appendChild(n)});cont.appendChild(pn);pns.push(pn);
+b.addEventListener("click",function(){ver(i)})});
+function ver(i){bts.forEach(function(b,k){b.setAttribute("aria-selected",k===i?"true":"false");b.tabIndex=k===i?0:-1});pns.forEach(function(p,k){p.hidden=k!==i});cont.scrollTop=0}
+tabs.addEventListener("keydown",function(e){var i=bts.indexOf(document.activeElement);if(i<0)return;if(e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault();var n=(i+(e.key==="ArrowRight"?1:2))%3;ver(n);bts[n].focus()}});
+var pie=document.createElement("div");pie.className="sim-pie";if(acts)pie.appendChild(acts);if(priv)pie.appendChild(priv);
+pan.innerHTML="";pan.appendChild(tabs);pan.appendChild(cont);pan.appendChild(pie);
+/* en modo «Tu foto» la primera pestaña se llama «Tu foto» */
+var modo=document.getElementById("mode");if(modo)modo.addEventListener("click",function(){setTimeout(function(){bts[0].textContent=zona&&!zona.hidden?"Tu foto":"Cuerpo"},0)});
+/* se empieza por elegir el diseño */
+ver(1);})();
 </script>
 <script src="sim.js" defer></script><script src="amigos.js" defer></script><script src="regalo.js" defer></script><script src="fidelidad.js" defer></script><script src="appkit.js" defer data-color="#e1251b" data-theme="dark" data-items='[{"i":"brush","l":"Catálogo","h":"#catalogo"},{"i":"sparkles","l":"Simulador","h":"#simulador"},{"i":"users","l":"Amigos","h":"#amigos"},{"i":"gift","l":"Regalo","h":"#regalo"},{"i":"cal","l":"Reservar","h":"#reserva"}]' data-lift=".ch-fab,.ch,.ck"></script>
 <script src="movil.js" defer></script>
