@@ -1,5 +1,5 @@
 /* experiencia.js — Tinta Negra · «La experiencia»: recorrido fotográfico guiado por el scroll.
-   Usa fotos realistas de la camilla (img/exp/camilla*.webp) y fotos y vídeos del estudio (vid/xp-estudio.mp4, img/material.webp, vid/hero.mp4)
+   Usa fotos realistas del estudio (img/exp/estudio-real.webp, img/exp/carrito.webp, img/material.webp) y el vídeo tatuando (vid/hero.mp4)
    con zoom, desenfoque y fundidos entre escenas, como un anuncio de cine. Sin librerías: ligero en cualquier móvil.
    Se carga solo al acercarse a la sección (ver index.html) y solo se mueve mientras está a la vista. */
 const sec = document.getElementById("experiencia");
@@ -22,23 +22,20 @@ function capa(w, h, html) {
   st.appendChild(el);
   return { el, w, h };
 }
-// 0 · La camilla con los utensilios flotando (foto realista)
-const L0 = capa(1600, 900, `<img src="img/exp/camilla-utensilios.webp" alt="" width="1600" height="900" decoding="async">`);
-// 1 · La misma camilla, ya sin utensilios, con el aro de luz que se dibuja a su alrededor
-const L1 = capa(1600, 900, `
-  <img src="img/exp/camilla.webp" alt="" width="1600" height="900" decoding="async">
+// 0 y 1 · El estudio real: la cámara se acerca a la camilla y se dibuja el aro de luz a su alrededor
+const L0 = capa(1600, 900, `
+  <img src="img/exp/estudio-real.webp" alt="" width="1600" height="900" decoding="async">
   <svg class="xp-aro" viewBox="0 0 1600 900" aria-hidden="true">
     <defs>
-      <radialGradient id="xpG" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ff3b2f" stop-opacity=".6"/><stop offset="1" stop-color="#ff3b2f" stop-opacity="0"/></radialGradient>
-      <filter id="xpB" x="-20%" y="-80%" width="140%" height="260%"><feGaussianBlur stdDeviation="9"/></filter>
+      <radialGradient id="xpG" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ff3b2f" stop-opacity=".55"/><stop offset="1" stop-color="#ff3b2f" stop-opacity="0"/></radialGradient>
+      <filter id="xpB" x="-20%" y="-80%" width="140%" height="260%"><feGaussianBlur stdDeviation="8"/></filter>
     </defs>
-    <ellipse class="xp-aro-luz" cx="1023" cy="772" rx="470" ry="95" fill="url(#xpG)"/>
-    <ellipse class="xp-aro-h" cx="1023" cy="772" rx="420" ry="74" fill="none" stroke="#ff3b2f" stroke-width="16" filter="url(#xpB)" pathLength="1"/>
-    <ellipse class="xp-aro-l" cx="1023" cy="772" rx="420" ry="74" fill="none" stroke="#ffd2c8" stroke-width="3.5" pathLength="1"/>
+    <ellipse class="xp-aro-luz" cx="960" cy="792" rx="420" ry="78" fill="url(#xpG)"/>
+    <ellipse class="xp-aro-h" cx="960" cy="792" rx="370" ry="60" fill="none" stroke="#ff3b2f" stroke-width="14" filter="url(#xpB)" pathLength="1"/>
+    <ellipse class="xp-aro-l" cx="960" cy="792" rx="370" ry="60" fill="none" stroke="#ffd2c8" stroke-width="3" pathLength="1"/>
   </svg>`);
-// 2 · Recorrido por el estudio (vídeo que avanza con el scroll)
-const L2 = capa(1024, 576, `<video muted playsinline preload="none" poster="img/poster-estudio.webp" aria-hidden="true"></video>`);
-const vEst = L2.el.querySelector("video");
+// 2 · El carrito de trabajo, preparado antes de cada sesión
+const L2 = capa(1600, 900, `<img src="img/exp/carrito.webp" alt="" width="1600" height="900" decoding="async">`);
 // 3 · El material: la foto se arma con piezas que llegan volando
 const L3 = capa(1600, 900, "");
 const COLS = 5, FILAS = 3, piezas = [];
@@ -57,17 +54,17 @@ const vHero = L4.el.querySelector("video");
 
 /* Encuadre por escena: [capa, foco x, foco y (px de la imagen), zoom] */
 const ESC_ANCHO = [
-  [L0, 1000, 420, 1.0],
-  [L1, 1023, 500, 1.08],
-  [L2, 560, 330, 1.08],
+  [L0, 900, 430, 1.0],
+  [L0, 940, 560, 1.32],
+  [L2, 980, 470, 1.04],
   [L3, 820, 470, 1.04],
   [L4, 614, 360, 1.12]
 ];
 // móvil en vertical: encuadres más abiertos y el sujeto (camilla y aro) por encima de los textos
 const ESC_ALTO = [
-  [L0, 1000, 420, 1.0],
-  [L1, 1023, 470, 1.04],
-  [L2, 520, 340, 1.0],
+  [L0, 930, 470, 1.0],
+  [L0, 940, 600, 1.18],
+  [L2, 1000, 480, 1.0],
   [L3, 900, 430, 1.0],
   [L4, 660, 330, 1.0]
 ];
@@ -110,7 +107,7 @@ function colocar(L, fx, fy, z, extra = 1) {
 }
 const sm = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
 const lerp = (a, b, t) => a + (b - a) * t;
-const CAPAS = [L0, L1, L2, L3, L4];
+const CAPAS = [L0, L2, L3, L4];
 
 function aplicar(c, time) {
   // escena entera más cercana y fundido con la siguiente en los cambios (desenfoque + zoom, como el vídeo de referencia)
@@ -142,13 +139,8 @@ function aplicar(c, time) {
   }
   // aro de luz: se dibuja al llegar a la escena 2 y se apaga al salir
   const ar = sm((c - 0.45) / 0.45) * (1 - sm((c - 1.35) / 0.3));
-  L1.el.style.setProperty("--aro", ar.toFixed(3));
-  L1.el.style.setProperty("--pulso", (0.85 + 0.15 * Math.sin(time * 2.4)).toFixed(3));
-  // vídeo del recorrido: avanza con el scroll durante la escena 3
-  if (vEst.readyState >= 1 && vEst.duration) {
-    const tv = sm((c - 1.5) / 1.5) * (vEst.duration - 0.1);
-    if (Math.abs(vEst.currentTime - tv) > 0.06 && !vEst.seeking) vEst.currentTime = tv;
-  }
+  L0.el.style.setProperty("--aro", ar.toFixed(3));
+  L0.el.style.setProperty("--pulso", (0.85 + 0.15 * Math.sin(time * 2.4)).toFixed(3));
   // material: las piezas llegan y encajan
   const ka = sm((c - 2.45) / 0.55);
   for (const p of piezas) {
@@ -171,11 +163,6 @@ function progreso() {
 function cargarMedios() {
   if (cargado) return;
   cargado = true;
-  vEst.src = movil ? "vid/xp-estudio-m.mp4" : "vid/xp-estudio.mp4";
-  vEst.preload = "auto";
-  vEst.load();
-  // iPhone necesita «arrancar» el vídeo una vez para poder moverlo con el scroll
-  vEst.play().then(() => vEst.pause()).catch(() => {});
   vHero.src = "vid/hero.mp4";
   vHero.preload = "metadata";
 }
@@ -200,10 +187,10 @@ if (POSTER !== null) {
   cargarMedios();
   vHero.preload = "auto"; vHero.load();
   const listo = (v) => new Promise((ok) => { if (v.readyState >= 2) ok(); else { v.addEventListener("loadeddata", ok, { once: true }); setTimeout(ok, 6000); } });
-  Promise.all([listo(vEst), listo(vHero)]).then(() => {
+  listo(vHero).then(() => {
     aplicar(POSTER, 1);
     const fin = () => setTimeout(() => { window.__xpReady = true; }, 700);
-    if (POSTER === 2) { vEst.addEventListener("seeked", fin, { once: true }); vEst.currentTime = vEst.duration * 0.5; } else fin();
+    fin();
   });
 } else {
   new ResizeObserver(() => { medir(); aplicar(cur, (performance.now() - t0) / 1000); }).observe(st);

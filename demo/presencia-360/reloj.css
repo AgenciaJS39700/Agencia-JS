@@ -51,8 +51,8 @@ html .mcar { display: grid !important; margin-inline: 0 !important; padding: 0 !
 
 /* pie */
 .ft .row, footer .row { flex-direction: column; gap: 8px; font-size: .72rem; }
-.vis * { min-width: 0; }
-.vis p, .vis small, .vis span { overflow-wrap: break-word; }
+#visitanos * { min-width: 0; }
+#visitanos p, #visitanos small, #visitanos span { overflow-wrap: break-word; }
 .cat-a { flex-direction: column; align-items: stretch !important; gap: 6px; } .cat-a .btn { width: 100%; }
 #experiencia { display: none !important; }
 /* el artista */
