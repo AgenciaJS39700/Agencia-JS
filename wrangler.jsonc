@@ -10,7 +10,11 @@
   },
   "ai": { "binding": "AI" },
   // Agenda de los asistentes de citas (todos los clientes; esquema en asistentes/schema.sql)
-  "d1_databases": [{ "binding": "CITAS", "database_name": "agencia-citas", "database_id": "742096ec-15ce-442d-947d-ab7f67f19947" }],
+  "d1_databases": [
+    { "binding": "CITAS", "database_name": "agencia-citas", "database_id": "742096ec-15ce-442d-947d-ab7f67f19947" },
+    // Medición propia de la web (anónima, sin cookies; tablas en metricas/schema.sql)
+    { "binding": "METRICAS", "database_name": "agencia-js-metricas", "database_id": "bd8b5791-8af2-471b-8a37-24370b4722d7" }
+  ],
   // Recordatorios de citas: todos los días a las 17:00 UTC (18:00/19:00 en España)
   "triggers": { "crons": ["0 17 * * *"] },
   // Remitente de los correos (Brevo). El secreto BREVO_API_KEY se añade aparte.

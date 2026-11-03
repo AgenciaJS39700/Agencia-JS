@@ -6,6 +6,7 @@ import { responderAsistente } from "./asistentes/motor.js";
 import { atenderVoz } from "./voz/agenda.js";
 import { atenderAgenda, enviarRecordatorios, manifiesto } from "./asistentes/agenda.js";
 import { atenderCuenta } from "./mesas/cuenta.js";
+import { registrarMetricas } from "./metricas/registro.js";
 
 const MODELO = "@cf/meta/llama-3.1-8b-instruct";
 const MODELO_RESPALDO = "@cf/meta/llama-3.2-3b-instruct";
@@ -164,6 +165,8 @@ export default {
       // Sin límite por IP: las llamadas llegan desde los servidores de ElevenLabs (IPs compartidas) y no se guardan datos.
       return atenderVoz(request, url.pathname.endsWith("huecos") ? "huecos" : "cita");
     }
+    // Medición propia de la portada, anónima y sin cookies (tiempo por sección y clics agregados por día)
+    if (url.pathname === "/api/m") return registrarMetricas(request, env, ctx, limitar);
     // Asistentes de citas de clientes reales (agenda en D1, panel, página de citas y widget)
     if (url.pathname.startsWith("/api/as/")) return atenderAgenda(request, env, ctx, limitar);
     // Cuenta compartida de una mesa (demo del bar: pagar entre varios móviles con un QR)

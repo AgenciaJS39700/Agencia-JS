@@ -1467,7 +1467,7 @@ class="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded
 <h3 class="mt-6 font-semibold">2. Cookies utilizadas en este Sitio Web</h3>
 <p class="mt-2 text-sm leading-relaxed text-mute">Este Sitio Web no instala cookies propias ni de terceros con fines analíticos, de personalización o publicitarios. Por ello no se muestra un banner de consentimiento. Los servicios de infraestructura pueden emplear mecanismos técnicos estrictamente necesarios para la seguridad y el funcionamiento del sitio, que están exentos de consentimiento conforme al artículo 22.2 de la LSSI-CE.</p>
 <h3 class="mt-6 font-semibold">3. Recursos de terceros</h3>
-<p class="mt-2 text-sm leading-relaxed text-mute">El Sitio Web no carga tipografías ni hojas de estilo desde servidores de terceros. Para medir las visitas de forma anónima carga un pequeño script de Metricool, que no instala cookies ni guarda información en tu dispositivo: solo envía datos agregados de navegación (páginas vistas, origen de la visita y tipo de dispositivo) para elaborar estadísticas para Agencia JS, sin cruzarlos con otros datos ni cederlos a terceros. Esta medición está exenta de consentimiento conforme al artículo 22.2 de la LSSI-CE. Los enlaces a WhatsApp y a nuestras redes sociales (Instagram, Facebook y TikTok) abren los servicios de esas plataformas, que se rigen por sus propias políticas de privacidad y cookies.</p>
+<p class="mt-2 text-sm leading-relaxed text-mute">El Sitio Web no carga tipografías ni hojas de estilo desde servidores de terceros. Para medir las visitas de forma anónima carga un pequeño script de Metricool, que no instala cookies ni guarda información en tu dispositivo: solo envía datos agregados de navegación (páginas vistas, origen de la visita y tipo de dispositivo) para elaborar estadísticas para Agencia JS, sin cruzarlos con otros datos ni cederlos a terceros. Esta medición está exenta de consentimiento conforme al artículo 22.2 de la LSSI-CE. Además, para mejorar la web medimos de forma anónima, en nuestro propio servidor de Cloudflare, cuánto tiempo se ve cada sección de la portada y en qué botones y zonas se hace clic. Esos datos se suman por día, no se guarda la dirección IP ni ningún identificador, y no se instala ni lee nada en tu dispositivo. Puedes evitar esta medición activando la opción «No rastrear» o «Global Privacy Control» de tu navegador. Los enlaces a WhatsApp y a nuestras redes sociales (Instagram, Facebook y TikTok) abren los servicios de esas plataformas, que se rigen por sus propias políticas de privacidad y cookies.</p>
 <h3 class="mt-6 font-semibold">4. Cómo gestionar o eliminar cookies</h3>
 <p class="mt-2 text-sm leading-relaxed text-mute">Puedes permitir, bloquear o eliminar las cookies desde la configuración de tu navegador (Chrome, Firefox, Safari, Edge, etc.). Consulta la ayuda de tu navegador para conocer el procedimiento.</p>
 <h3 class="mt-6 font-semibold">5. Cambios</h3>
@@ -1840,5 +1840,75 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!box.hidden
 </script>
 <!-- Metricool: medición de visitas sin cookies (LSSI 22.2). Se carga tras la página para no frenarla. No quitar: Metricool depende de este código. -->
 <script>window.addEventListener("load",function(){setTimeout(function(){var s=document.createElement("script");s.src="https://tracker.metricool.com/resources/be.js";s.async=!0;s.onload=function(){window.beTracker&&beTracker.t({hash:"467970a5a8e53725ed4320a55e0da194"})};document.head.appendChild(s)},1500)});</script>
+<!-- Medición propia, anónima y sin cookies (ver /metricas/registro.js): tiempo por sección y clics agregados. No guarda nada en el dispositivo. -->
+<script>
+(function () {
+  if (navigator.webdriver || navigator.globalPrivacyControl || navigator.doNotTrack === "1" || !navigator.sendBeacon) { return; }
+  var IDS = ["inicio", "auditoria", "asistentes", "demos", "planes", "video", "nfc", "servicios", "tecnologia", "faq", "contacto"];
+  var zonas = [];
+  var cab = document.querySelector("header"); if (cab) { zonas.push(["cabecera", cab]); }
+  IDS.forEach(function (id) { var el = document.getElementById(id); if (el) { zonas.push([id, el]); } });
+  var pie = document.querySelector("footer"); if (pie) { zonas.push(["pie", pie]); }
+  var w = window.innerWidth, disp = w < 768 ? "m" : (w < 1100 ? "t" : "e");
+  var inicio = Date.now(), tiempos = {}, clics = [], primera = 1, PASO = 500;
+  function zonaDe(el) {
+    for (var i = 0; i < zonas.length; i++) { if (zonas[i][1].contains(el)) { return zonas[i][0]; } }
+    return null;
+  }
+  setInterval(function () {
+    if (document.visibilityState !== "visible") { return; }
+    var vh = window.innerHeight;
+    zonas.forEach(function (z) {
+      if (z[0] === "cabecera") { return; } /* fija arriba: solo cuentan sus clics */
+      var r = z[1].getBoundingClientRect();
+      var vis = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+      if (vis >= vh * 0.4 || (r.height > 0 && vis >= r.height * 0.6)) { tiempos[z[0]] = (tiempos[z[0]] || 0) + PASO; }
+    });
+  }, PASO);
+  function slug(t) {
+    return (t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+  }
+  function objetivo(el) {
+    var cta = el.closest("[data-cta]");
+    if (cta) { return "cta:" + slug(cta.getAttribute("data-cta")); }
+    var a = el.closest("a");
+    if (a) {
+      var h = a.getAttribute("href") || "";
+      if (/wa\.me|whatsapp/i.test(h)) { return "whatsapp"; }
+      if (h.indexOf("tel:") === 0) { return "llamar"; }
+      if (h.indexOf("mailto:") === 0) { return "email"; }
+      if (h.charAt(0) === "#") { return "ancla:" + slug(h.slice(1)); }
+      try { var u = new URL(h, location.href); return u.host === location.host ? "enlace:" + slug(u.pathname) : "fuera:" + u.host.slice(0, 50); } catch (e) { return "enlace"; }
+    }
+    var b = el.closest("button,[role=tab],summary,select,label,input,textarea");
+    if (b) {
+      if (/^(INPUT|TEXTAREA|SELECT)$/.test(b.tagName)) { return "campo:" + slug(b.getAttribute("name") || b.id || b.type); }
+      return "boton:" + slug(b.id || b.getAttribute("aria-label") || b.textContent);
+    }
+    return "zona";
+  }
+  document.addEventListener("click", function (e) {
+    if (clics.length >= 40 || !e.target || !e.target.closest) { return; }
+    var sec = zonaDe(e.target); if (!sec) { return; }
+    var el = null; for (var i = 0; i < zonas.length; i++) { if (zonas[i][0] === sec) { el = zonas[i][1]; } }
+    var r = el.getBoundingClientRect();
+    var xb = Math.min(19, Math.max(0, Math.floor(e.clientX / window.innerWidth * 20)));
+    var yb = Math.min(19, Math.max(0, Math.floor((e.clientY - r.top) / Math.max(1, r.height) * 20)));
+    var o = objetivo(e.target) || "zona";
+    if (!/^[a-z0-9][a-z0-9:_./#-]{0,59}$/.test(o)) { o = "zona"; }
+    clics.push([o, sec, xb, yb]);
+  }, { capture: true, passive: true });
+  function enviar() {
+    var s = {}, hay = false;
+    for (var k in tiempos) { if (tiempos[k] > 0) { s[k] = tiempos[k]; hay = true; } }
+    if (!hay && !clics.length && !primera) { return; }
+    var datos = { v: 1, d: disp, n: primera, t: Math.min(Date.now() - inicio, 1800000), s: s, c: clics };
+    try { navigator.sendBeacon("/api/m", JSON.stringify(datos)); } catch (e) { /* sin red: se pierde y no pasa nada */ }
+    primera = 0; tiempos = {}; clics = []; inicio = Date.now();
+  }
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") { enviar(); } });
+  window.addEventListener("pagehide", enviar);
+})();
+</script>
 </body>
 </html>
