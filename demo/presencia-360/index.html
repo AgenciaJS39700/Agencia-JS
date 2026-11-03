@@ -488,6 +488,20 @@ footer a{color:inherit}
 .xp-hint::after{content:"";width:1px;height:1.6rem;background:linear-gradient(var(--bone),transparent);animation:xph 1.6s ease-in-out infinite}
 @keyframes xph{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 .xp-po{display:none}
+/* Redes sociales con efecto de neón rojo (opiniones) */
+.rs-neon{margin-top:clamp(2rem,5vw,3.25rem);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1rem 2rem;text-align:center}
+.rs-neon p{margin:0;font-family:var(--disp);text-transform:uppercase;letter-spacing:.08em;font-size:clamp(1rem,2vw,1.35rem);color:#ff3b2f;text-shadow:0 0 6px rgba(255,59,47,.7),0 0 18px rgba(255,59,47,.45)}
+.rs-l{display:flex;gap:clamp(1rem,4vw,2.25rem)}
+.rs-l a{display:grid;justify-items:center;gap:.45rem;min-width:4.5rem;padding:.5rem;color:#ff3b2f;text-decoration:none;border-radius:1rem;transition:transform .25s,color .25s}
+.rs-l svg{width:clamp(2.6rem,6vw,3.4rem);height:auto;overflow:visible;filter:drop-shadow(0 0 2px #ff3b2f) drop-shadow(0 0 7px rgba(255,59,47,.85)) drop-shadow(0 0 18px rgba(255,59,47,.55));animation:neon 5s infinite}
+.rs-l a:nth-child(2) svg{animation-delay:1.7s}.rs-l a:nth-child(3) svg{animation-delay:3.1s}
+.rs-l span{font-weight:800;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 0 8px rgba(255,59,47,.6)}
+.rs-l a:hover,.rs-l a:focus-visible{transform:translateY(-3px) scale(1.06);color:#ff6a5f}
+.rs-l a:hover svg{filter:drop-shadow(0 0 3px #ff6a5f) drop-shadow(0 0 12px #ff3b2f) drop-shadow(0 0 28px rgba(255,59,47,.8))}
+@keyframes neon{0%,18%,22%,62%,64%,100%{opacity:1}20%,63%{opacity:.45}}
+.a11y-quieto .rs-l svg{animation:none}
+@media(prefers-reduced-motion:reduce){.rs-l svg{animation:none}}
+@media(forced-colors:active){.rs-l svg,.rs-neon p,.rs-l span{filter:none;text-shadow:none}}
 /* 10 · Cuidados en ordenador y tablet: como en el móvil, tarjetas en fila que se deslizan hacia un lado */
 @media(min-width:768px){
 #cuidados .cui-t{display:flex!important;grid-template-columns:none!important;flex-wrap:nowrap!important;gap:1rem!important;overflow-x:auto!important;scroll-snap-type:x mandatory;scrollbar-width:none;padding:.2rem 0 1rem!important;margin-inline:0!important;cursor:grab;-webkit-user-select:none;user-select:none}
@@ -914,7 +928,11 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
       <figure class="rv"><blockquote>“Probé el diseño con el simulador antes de ir y fue clave para decidir el tamaño. Estudio impecable.”</blockquote><figcaption>Daniel · Blackwork</figcaption></figure>
       <figure class="rv"><blockquote>“Mi primer tatuaje. Me explicaron todo, paramos cuando lo necesité y la cura fue perfecta siguiendo su guía.”</blockquote><figcaption>Marta · Fine line</figcaption></figure>
     </div>
-    <div class="ig"><span>@tintanegra.studio</span><div class="ig-g"><img src="img/leon2.webp" alt="" loading="lazy"><img src="img/serpiente.webp" alt="" loading="lazy"><img src="img/calavera.webp" alt="" loading="lazy"><img src="img/rosa.webp" alt="" loading="lazy"><img src="img/aguila.webp" alt="" loading="lazy"><img src="img/retrato2.webp" alt="" loading="lazy"></div></div>
+    <div class="rs-neon"><p>Síguenos en redes</p><div class="rs-l">
+      <a href="https://www.instagram.com/agenciajs.webstudio/" target="_blank" rel="noopener" aria-label="Instagram (se abre en otra pestaña)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor"/></svg><span>Instagram</span></a>
+      <a href="https://www.facebook.com/profile.php?id=61594866884681" target="_blank" rel="noopener" aria-label="Facebook (se abre en otra pestaña)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.2 21v-7.6h2.6l.4-3h-3V8.5c0-.9.3-1.5 1.5-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H8.5v3h2.6V21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span>Facebook</span></a>
+      <a href="https://www.tiktok.com/@agenciajs" target="_blank" rel="noopener" aria-label="TikTok (se abre en otra pestaña)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 3c.3 2.3 1.8 3.9 4.2 4.1v3c-1.5 0-2.9-.5-4.1-1.3v6.3c0 3.1-2.5 5.4-5.5 5.4S3.6 18.2 3.6 15.2c0-3.2 2.8-5.6 6-5.2v3.1c-1.5-.4-3 .6-3 2.1 0 1.3 1.1 2.3 2.4 2.3 1.4 0 2.5-1 2.5-2.6V3h3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span>TikTok</span></a>
+    </div></div>
   </div>
 </section>
 
