@@ -1,0 +1,65 @@
+/* accesibilidad.css — Agencia JS (común a la web de la agencia y a las demos)
+   1) La letra sigue el tamaño elegido en el móvil o el navegador (iPhone, Android y ordenador).
+   2) Se adapta a los ajustes del sistema: más contraste, colores forzados, menos movimiento, colores invertidos.
+   3) Panel «Accesibilidad» (accesibilidad.js): letra más grande, alto contraste y modo sin color, sin animaciones.
+   Cada web añade sus propios ajustes dentro de .a11y-contraste (clase que pone accesibilidad.js). */
+
+/* ---------- 1. Tamaño de letra del sistema ---------- */
+html { font-size: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+/* iPhone/iPad: Safari sigue el «Tamaño del texto» del sistema (Dynamic Type) solo con esta fuente. */
+@supports (font: -apple-system-body) {
+  html { font: -apple-system-body; }
+}
+html.a11y-grande { font-size: 125%; }
+@supports (font: -apple-system-body) {
+  html.a11y-grande { font-size: calc(1.25 * 1em); }
+}
+
+/* ---------- 2. Foco siempre visible para teclado y lectores de pantalla ---------- */
+:focus-visible { outline: 3px solid #ffd60a !important; outline-offset: 3px !important; }
+
+/* ---------- 3. Alto contraste (sistema o panel) ---------- */
+.a11y-contraste p a, .a11y-contraste li a, .a11y-contraste small a { text-decoration: underline !important; text-underline-offset: .2em; }
+.a11y-contraste *, .a11y-contraste *::before, .a11y-contraste *::after { text-shadow: none !important; }
+.a11y-contraste ::placeholder { color: #bdbdbd !important; opacity: 1 !important; }
+
+/* ---------- 4. Escala de grises (simula el modo monocromático del móvil para revisar) ---------- */
+html.a11y-gris { filter: grayscale(1); }
+
+/* ---------- 5. Menos movimiento (sistema o panel) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+.a11y-quieto *, .a11y-quieto *::before, .a11y-quieto *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+
+/* ---------- 6. Colores forzados (modo de alto contraste de Windows) ---------- */
+@media (forced-colors: active) {
+  a, button, [role="button"], input, select, textarea { forced-color-adjust: auto; border: 1px solid ButtonText; }
+  svg { forced-color-adjust: auto; }
+}
+
+/* ---------- 7. Colores invertidos (iPhone «Invertir colores» clásico): fotos y vídeos se ven normales ---------- */
+@media (inverted-colors: inverted) {
+  img, video, picture, canvas { filter: invert(1) hue-rotate(180deg); }
+}
+
+/* ---------- 8. Panel de accesibilidad ---------- */
+.a11y-btn { position: fixed; left: 0; top: 45%; z-index: 2147483000; width: 2.75rem; height: 2.75rem; display: grid; place-items: center;
+  border: 2px solid #fff; border-left: 0; border-radius: 0 .75rem .75rem 0; background: #111; color: #fff; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,.35); font: 800 1rem/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.a11y-btn svg { width: 1.5rem; height: 1.5rem; }
+.a11y-pan { position: fixed; left: .5rem; top: 50%; transform: translateY(-50%); z-index: 2147483001; width: min(19rem, calc(100vw - 1rem));
+  max-height: calc(100vh - 1rem); overflow: auto; background: #111; color: #fff; border: 2px solid #fff; border-radius: 1rem; padding: 1rem;
+  font: 400 1rem/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+.a11y-pan[hidden] { display: none; }
+.a11y-pan h2 { font: 800 1.1rem/1.2 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0 0 .6rem; text-transform: none; letter-spacing: 0; color: #fff; }
+.a11y-pan p { margin: 0 0 .8rem; font-size: .85rem; color: #ddd; }
+.a11y-pan button { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: .6rem; min-height: 2.75rem; margin: .35rem 0;
+  padding: .5rem .8rem; border-radius: .7rem; border: 2px solid #fff; background: transparent; color: #fff; font: 700 .95rem/1.2 inherit; font-family: inherit; text-align: left; cursor: pointer; }
+.a11y-pan button[aria-pressed="true"] { background: #fff; color: #111; }
+.a11y-pan button[aria-pressed="true"]::after { content: "✓ Activado"; font-size: .8rem; }
+.a11y-pan button[aria-pressed="false"]::after { content: "Desactivado"; font-size: .8rem; opacity: .8; }
+.a11y-pan .a11y-x { justify-content: center; margin-top: .6rem; }
+.a11y-pan .a11y-x::after { content: none !important; }
+@media (max-width: 300px) { .a11y-btn, .a11y-pan { display: none !important; } }
+@media print { .a11y-btn, .a11y-pan { display: none !important; } }

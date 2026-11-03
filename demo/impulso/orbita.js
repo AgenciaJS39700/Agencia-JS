@@ -20,7 +20,7 @@ var CSS = ".orbita{--c:#f0a14a;position:relative;width:min(100%,560px);aspect-ra
 ".orb-disc{position:absolute;inset:17%;border-radius:50%;background:var(--c);box-shadow:0 46px 90px -34px var(--c),inset 0 -26px 50px rgba(0,0,0,.12),inset 0 18px 40px rgba(255,255,255,.18);transition:background-color .9s cubic-bezier(.4,0,.2,1),box-shadow .9s,transform .7s cubic-bezier(.3,1.4,.5,1)}" +
 ".orbita.chg .orb-disc{transform:scale(.93)}" +
 ".orb-ring{position:absolute;inset:1%;width:98%;height:98%;overflow:visible;animation:orbspin 40s linear infinite;pointer-events:none}" +
-".orb-ring text{font:800 20px/1 system-ui,sans-serif;letter-spacing:6px;text-transform:uppercase;fill:var(--c);transition:fill .9s}" +
+".orb-ring text{font:800 1.25rem/1 system-ui,sans-serif;letter-spacing:6px;text-transform:uppercase;fill:var(--c);transition:fill .9s}" +
 ".orb-st{position:absolute;inset:16%;transform:translateZ(60px)}" +
 ".orb-it{position:absolute;inset:0;opacity:0;pointer-events:none}" +
 ".orb-it img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 34px 30px rgba(30,15,5,.38))}" +
@@ -36,7 +36,7 @@ var CSS = ".orbita{--c:#f0a14a;position:relative;width:min(100%,560px);aspect-ra
 ".orb-nav button{cursor:pointer;border:0;padding:0}" +
 ".orb-dot{width:15px;height:15px;border-radius:50%;background:var(--d);border:2px solid #fff !important;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:transform .3s}" +
 ".orb-dot[aria-pressed=true]{transform:scale(1.5)}" +
-".orb-ar{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.9);color:#1d1410;display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.2);font:700 18px/1 system-ui}" +
+".orb-ar{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.9);color:#1d1410;display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.2);font:700 1.125rem/1 system-ui}" +
 ".orb-nav button:focus-visible{outline:3px solid var(--c);outline-offset:3px}" +
 "@keyframes orbspin{to{transform:rotate(360deg)}}@keyframes orbbob{50%{transform:translateY(-7%) rotate(-4deg)}}" +
 "@media (prefers-reduced-motion:reduce){.orb-ring,.orb-it img[data-sat]{animation:none}.orb-in{transition:none}}";

@@ -32,19 +32,19 @@
     ".fid .fx-ph{position:relative;width:min(300px,76vw);aspect-ratio:9/18.5;margin-inline:auto;border-radius:44px;background:#111;padding:12px;box-shadow:0 40px 80px -30px rgba(0,0,0,.55),inset 0 0 0 2px #333}" +
     ".fid .fx-scr{position:relative;height:100%;border-radius:34px;overflow:hidden;background:linear-gradient(160deg,#f4f1ec,#e7e2da);display:flex;flex-direction:column;align-items:center;padding:48px 14px 16px}" +
     ".fid .fx-isl{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:92px;height:26px;border-radius:20px;background:#000;z-index:3}" +
-    ".fid .fx-wl{align-self:flex-start;font:700 22px/1 -apple-system,system-ui,sans-serif;color:#111;margin:0 4px 12px}" +
+    ".fid .fx-wl{align-self:flex-start;font:700 1.375rem/1 -apple-system,system-ui,sans-serif;color:#111;margin:0 4px 12px}" +
     ".fid .fx-pass{width:100%;border-radius:18px;background:linear-gradient(150deg,var(--fc),color-mix(in srgb,var(--fc) 60%,#000));color:#fff;padding:14px;box-shadow:0 16px 30px -14px rgba(0,0,0,.5);transform-origin:50% 0;transition:transform .5s}" +
     ".fid .fx-pass.fx-pop{animation:fpop .6s cubic-bezier(.2,.9,.3,1.3)}@keyframes fpop{0%{transform:translateY(30px) scale(.9);opacity:0}100%{transform:none;opacity:1}}" +
-    ".fid .fx-ph1{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px}.fid .fx-ph1 span{display:flex;align-items:center;gap:6px}.fid .fx-ph1 em{font-style:normal;width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.22);display:grid;place-items:center}" +
-    ".fid .fx-pl{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin-top:10px}.fid .fx-pv{font-weight:800;font-size:15px}" +
+    ".fid .fx-ph1{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:0.875rem}.fid .fx-ph1 span{display:flex;align-items:center;gap:6px}.fid .fx-ph1 em{font-style:normal;width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.22);display:grid;place-items:center}" +
+    ".fid .fx-pl{font-size:0.5938rem;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin-top:10px}.fid .fx-pv{font-weight:800;font-size:0.9375rem}" +
     ".fid .fx-st{display:grid;grid-template-columns:repeat(" + Math.ceil(TOTAL / 2) + ",1fr);gap:6px;margin-top:10px}" +
-    ".fid .fx-st b{aspect-ratio:1;border-radius:50%;border:1.5px dashed rgba(255,255,255,.55);display:grid;place-items:center;font-size:14px;transition:background .3s}" +
+    ".fid .fx-st b{aspect-ratio:1;border-radius:50%;border:1.5px dashed rgba(255,255,255,.55);display:grid;place-items:center;font-size:0.875rem;transition:background .3s}" +
     ".fid .fx-st b.fx-on{background:#fff;border-style:solid;border-color:#fff}.fid .fx-st b.fx-new{animation:fstamp .7s cubic-bezier(.2,.9,.3,1.4)}@keyframes fstamp{0%{transform:scale(2.2) rotate(-25deg);opacity:0}100%{transform:none;opacity:1}}" +
     ".fid .fx-qr{margin:12px auto 2px;background:#fff;border-radius:10px;padding:8px;width:116px}.fid .fx-qr canvas{display:block;width:100px;height:100px;image-rendering:pixelated}" +
-    ".fid .fx-cd{text-align:center;font:600 10px/1.4 ui-monospace,monospace;opacity:.85}" +
-    ".fid .fx-empty{margin:auto;align-self:center;text-align:center;color:#555;font-size:14px;padding:0 10px}.fid .fx-empty b{display:block;font-size:42px;margin-bottom:8px}" +
-    ".fid .fx-nt{position:absolute;left:10px;right:10px;top:44px;z-index:4;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border-radius:16px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 10px 30px rgba(0,0,0,.2);transform:translateY(-140%);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.3,1.15),opacity .3s;color:#111;font:13px/1.3 -apple-system,system-ui,sans-serif}" +
-    ".fid .fx-nt.fx-on{transform:none;opacity:1}.fid .fx-nt i{flex:none;width:34px;height:34px;border-radius:9px;background:var(--fc);display:grid;place-items:center;font-style:normal;font-size:18px}.fid .fx-nt b{display:flex;justify-content:space-between;font-size:12.5px}.fid .fx-nt b small{font-weight:500;opacity:.55}" +
+    ".fid .fx-cd{text-align:center;font:600 0.625rem/1.4 ui-monospace,monospace;opacity:.85}" +
+    ".fid .fx-empty{margin:auto;align-self:center;text-align:center;color:#555;font-size:0.875rem;padding:0 10px}.fid .fx-empty b{display:block;font-size:2.625rem;margin-bottom:8px}" +
+    ".fid .fx-nt{position:absolute;left:10px;right:10px;top:44px;z-index:4;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border-radius:16px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 10px 30px rgba(0,0,0,.2);transform:translateY(-140%);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.3,1.15),opacity .3s;color:#111;font:0.8125rem/1.3 -apple-system,system-ui,sans-serif}" +
+    ".fid .fx-nt.fx-on{transform:none;opacity:1}.fid .fx-nt i{flex:none;width:34px;height:34px;border-radius:9px;background:var(--fc);display:grid;place-items:center;font-style:normal;font-size:1.125rem}.fid .fx-nt b{display:flex;justify-content:space-between;font-size:0.7812rem}.fid .fx-nt b small{font-weight:500;opacity:.55}" +
     ".fid .fx-pn{background:var(--fcard,#fff);border:1px solid rgba(0,0,0,.08);border-radius:24px;padding:clamp(1.1rem,3vw,1.6rem);box-shadow:0 30px 60px -40px rgba(0,0,0,.4);color:inherit}" +
     ".fid .fx-pn h3{font-size:1.2rem;margin-bottom:.8rem}.fid label{display:block;font-weight:700;font-size:.85rem;margin:.7rem 0 .3rem}" +
     ".fid input[type=text],.fid input[type=email]{width:100%;min-height:48px;border-radius:14px;border:1.5px solid rgba(0,0,0,.15);padding:0 14px;font:inherit;background:#fff;color:#111}" +
@@ -106,10 +106,10 @@
     if (!M) { pass.innerHTML = '<p class="fx-empty"><b>' + ICON + '</b>Crea tu tarjeta y aparecerá aquí, lista para guardar en tu Wallet.</p>'; return; }
     var dots = "";
     for (var i = 0; i < TOTAL; i++) dots += '<b class="' + (i < M.s ? "fx-on" : "") + (i === newIdx ? " fx-new" : "") + '">' + (i < M.s ? ICON : (i === TOTAL - 1 ? "🎁" : "")) + "</b>";
-    pass.innerHTML = '<div class="fx-pass' + (anim ? " fx-pop" : "") + '"><div class="fx-ph1"><span><em>' + ICON + "</em>" + esc(BRAND) + '</span><span style="font-size:11px;opacity:.85">Socio</span></div>' +
+    pass.innerHTML = '<div class="fx-pass' + (anim ? " fx-pop" : "") + '"><div class="fx-ph1"><span><em>' + ICON + "</em>" + esc(BRAND) + '</span><span style="font-size:0.6875rem;opacity:.85">Socio</span></div>' +
       '<p class="fx-pl">Nombre</p><p class="fx-pv">' + esc(M.n) + '</p>' +
       '<p class="fx-pl">Sellos · ' + M.s + " / " + TOTAL + '</p><div class="fx-st">' + dots + "</div>" +
-      '<p class="fx-pl">Premio</p><p class="fx-pv" style="font-size:13px">' + esc(REWARD) + "</p>" +
+      '<p class="fx-pl">Premio</p><p class="fx-pv" style="font-size:0.8125rem">' + esc(REWARD) + "</p>" +
       '<div class="fx-qr"><canvas aria-label="Código de socio"></canvas></div><p class="fx-cd">' + M.id + "</p></div>";
     drawQR(pass.querySelector("canvas"), M.id);
   }

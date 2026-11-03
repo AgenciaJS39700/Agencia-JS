@@ -1,0 +1,56 @@
+/* reloj.css — Tinta Negra en relojes inteligentes (pantallas de hasta 300 px de ancho).
+   Se carga solo en esas pantallas (media del <link>). Deja lo esencial: quiénes somos, estilos, catálogo,
+   flash, artistas y cómo contactar. Lo pesado (simulador 3D, vídeos, tienda, reserva por pasos) se oculta. */
+.reloj-acc { display: grid !important; gap: .4rem; margin: .9rem 0 0; }
+.reloj-acc a { display: flex; align-items: center; justify-content: center; min-height: 2.75rem; border-radius: 999px; font-weight: 800;
+  font-size: .85rem; text-decoration: none; background: var(--red); color: #fff; }
+.reloj-acc a + a { background: transparent; border: 1.5px solid var(--bone); color: var(--bone); }
+
+html, body { overflow-x: clip; }
+.wrap { width: calc(100% - 16px) !important; }
+.grain, .cur, .badge, .hvid, .hero .art, #ajs-demo, .ch-fab, .ch, .ajs-tab, .mjump { display: none !important; }
+#simulador, #ia, #coverup, #dolor, #cuidados, #regalo, #amigos, #fidelidad, #tienda, #reserva, #trabajos { display: none !important; }
+
+/* cabecera: solo el nombre */
+.hdr .wrap { height: 52px; }
+.nav { display: none !important; }
+.logo { font-size: .95rem; }
+
+/* portada */
+.hero { min-height: auto; padding: 64px 0 18px; }
+.hero h1 { font-size: 2.6rem; letter-spacing: -.02em; }
+.hero .row { margin-top: 12px; }
+.hero .row p { font-size: .85rem; }
+.hero .ctas { display: none; }
+
+/* títulos y textos */
+h2 { font-size: 1.7rem !important; line-height: .95; overflow-wrap: anywhere; }
+.kick { letter-spacing: .12em; font-size: .68rem; }
+.mani { padding: 40px 0; }
+.mani p { font-size: 1.15rem; }
+.mani .w { opacity: 1 !important; }
+.out { -webkit-text-stroke: 1px var(--bone); }
+section { padding-top: 36px !important; padding-bottom: 36px !important; }
+
+/* listas y rejillas a una columna */
+.li { grid-template-columns: 1.6rem 1fr !important; gap: 8px; padding: 12px 0; }
+.li h3 { font-size: 1.05rem !important; overflow-wrap: anywhere; }
+.li p, .li .prev { display: none !important; }
+.cat-g, .m2, .fgrid, .agrid, .pgrid, .rw-g, .ig-g, .shop-g, .cui-t { grid-template-columns: 1fr !important; columns: 1 !important; }
+html .mcar { display: grid !important; margin-inline: 0 !important; padding: 0 !important; overflow: visible !important; }
+.mcar > * { max-width: none !important; }
+.mdots, .mhint { display: none !important; }
+
+/* aviso de cookies compacto y legible */
+.ck { left: 6px !important; right: 6px !important; bottom: 6px !important; padding: 10px !important; border-radius: 14px !important; gap: 8px !important; max-height: 70vh; overflow: auto; }
+.ck b, .ck-cfg { display: none !important; }
+.ck p { font-size: .7rem !important; line-height: 1.3; max-height: 3.9em; overflow: hidden; }
+.ck-b { width: 100%; }
+.ck-b .btn { flex: 1 1 100%; min-height: 2.75rem !important; font-size: .72rem !important; }
+#ckC { display: none !important; }
+
+/* pie */
+.ft .row, footer .row { flex-direction: column; gap: 8px; font-size: .72rem; }
+.vis * { min-width: 0; }
+.vis p, .vis small, .vis span { overflow-wrap: break-word; }
+.cat-a { flex-direction: column; align-items: stretch !important; gap: 6px; } .cat-a .btn { width: 100%; }
