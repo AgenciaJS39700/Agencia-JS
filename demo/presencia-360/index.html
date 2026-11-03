@@ -488,6 +488,25 @@ footer a{color:inherit}
 .xp-hint::after{content:"";width:1px;height:1.6rem;background:linear-gradient(var(--bone),transparent);animation:xph 1.6s ease-in-out infinite}
 @keyframes xph{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 .xp-po{display:none}
+/* 10 · Cuidados en ordenador y tablet: como en el móvil, tarjetas en fila que se deslizan hacia un lado */
+@media(min-width:768px){
+#cuidados .cui-t{display:flex!important;grid-template-columns:none!important;flex-wrap:nowrap!important;gap:1rem!important;overflow-x:auto!important;scroll-snap-type:x mandatory;scrollbar-width:none;padding:.2rem 0 1rem!important;margin-inline:0!important;cursor:grab;-webkit-user-select:none;user-select:none}
+#cuidados .cui-t.arr{cursor:grabbing;scroll-snap-type:none}
+#cuidados .cui-t::-webkit-scrollbar{display:none}
+#cuidados .cui-t>li{flex:0 0 min(24rem,38%)!important;max-width:min(24rem,38%)!important;scroll-snap-align:start;opacity:1!important;transform:none!important;padding:1.6rem 1.5rem 1.8rem;min-height:14rem}
+#cuidados .cui-t h3{font-size:1.6rem}#cuidados .cui-t p{font-size:1rem;line-height:1.55}
+#cuidados .mdots{display:flex!important;justify-content:center;gap:.4rem;margin-top:.1rem}#cuidados .mdots i{width:7px;height:7px;border-radius:99px;background:currentColor;opacity:.25;transition:all .25s}#cuidados .mdots i.on{width:20px;opacity:.9}#cuidados .mhint{display:block!important;text-align:center;font-size:.74rem;opacity:.6;margin-top:.3rem}
+#cuidados .cui-nav{display:flex;justify-content:flex-end;gap:.5rem;margin:-.4rem 0 .4rem}
+#cuidados .cui-nav button{width:2.9rem;height:2.9rem;border-radius:50%;border:1px solid var(--line);background:#111;color:var(--bone);font-size:1.25rem;cursor:pointer;display:grid;place-items:center}
+#cuidados .cui-nav button:hover{border-color:var(--bone)}#cuidados .cui-nav button:disabled{opacity:.35;cursor:default}
+}
+@media(max-width:767px){#cuidados .cui-nav{display:none}}
+/* Mientras se ve la escena animada, la barra de apartados (Estilos, Trabajos, Catálogo…) se pliega
+   y la cabecera se vuelve transparente para no tapar la imagen; al salir de la escena vuelven solas */
+.mjump{transition:max-height .35s ease,padding .35s ease,opacity .25s ease,border-color .25s;max-height:4rem}
+.hdr{transition:background .3s,backdrop-filter .3s,border-color .3s}
+html.xp-in .mjump{max-height:0!important;padding-top:0!important;padding-bottom:0!important;opacity:0;border-top-color:transparent!important;pointer-events:none;overflow:hidden}
+html.xp-in .hdr{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important;border-color:transparent!important}
 /* mientras se recorre la escena en pantallas táctiles, la barra «Demo» de la agencia se aparta para no tapar los textos */
 @media (max-width:900px),(max-height:540px){html.xp-in #ajs-demo{opacity:0!important;pointer-events:none!important;transition:opacity .3s}html.xp-in .a11y-btn{top:22%}}
 @media (max-width:380px){.xp-cards small{display:none}.xp-cards li{padding:.55rem .5rem}}
@@ -504,6 +523,8 @@ footer a{color:inherit}
 .xp-dots{right:2px;top:38%}
 .xp-n{bottom:calc(4.2rem + env(safe-area-inset-bottom))}.xp-n .xp-hint{display:none}
 }
+/* tablet en vertical: el texto no llega hasta el botón del chat */
+@media (max-aspect-ratio:4/5) and (min-width:600px){.xp-ch{width:min(34rem,68%)}.xp-ch h3{font-size:clamp(2.4rem,6.4vw,3.6rem)}}
 /* móvil girado (panorámico) y pantallas muy bajas: todo más compacto */
 @media (max-height:540px) and (min-aspect-ratio:4/3){
 .xp-ch{top:4.75rem;bottom:4rem;transform:none;left:2.6rem;width:min(30rem,48%);display:flex;flex-direction:column;justify-content:center}
@@ -1228,6 +1249,18 @@ pan.innerHTML="";pan.appendChild(tabs);pan.appendChild(cont);pan.appendChild(pie
 var modo=document.getElementById("mode");if(modo)modo.addEventListener("click",function(){setTimeout(function(){bts[0].textContent=zona&&!zona.hidden?"Tu foto":"Cuerpo"},0)});
 /* se empieza por elegir el diseño */
 ver(1);})();
+</script>
+<script>/* 10 · Cuidados: flechas, arrastre con el ratón y puntos en ordenador (en el móvil ya se desliza con el dedo) */
+addEventListener("load",function(){var c=document.querySelector("#cuidados .cui-t");if(!c)return;
+var nav=document.createElement("div");nav.className="cui-nav";nav.innerHTML='<button type="button" aria-label="Paso anterior">←</button><button type="button" aria-label="Paso siguiente">→</button>';c.parentNode.insertBefore(nav,c);
+var bA=nav.children[0],bS=nav.children[1];function paso(){var f=c.firstElementChild;return f?f.getBoundingClientRect().width+16:300}
+bA.addEventListener("click",function(){c.scrollBy({left:-paso(),behavior:"smooth"})});bS.addEventListener("click",function(){c.scrollBy({left:paso(),behavior:"smooth"})});
+function upd(){var max=c.scrollWidth-c.clientWidth;bA.disabled=c.scrollLeft<4;bS.disabled=c.scrollLeft>max-4;if(innerWidth<768)return;var d=c.parentNode.querySelector(".mdots");if(d&&max>0){var k=Math.round(c.scrollLeft/max*(d.children.length-1));[].forEach.call(d.children,function(x,j){x.classList.toggle("on",j===k)})}}
+c.addEventListener("scroll",function(){requestAnimationFrame(upd)},{passive:true});addEventListener("resize",upd);upd();
+var x0=0,s0=0,dn=false,mov=false;c.addEventListener("pointerdown",function(e){if(e.pointerType!=="mouse"||innerWidth<768)return;dn=true;mov=false;x0=e.clientX;s0=c.scrollLeft;c.classList.add("arr")});
+addEventListener("pointermove",function(e){if(!dn)return;var dx=e.clientX-x0;if(Math.abs(dx)>4)mov=true;c.scrollLeft=s0-dx});
+addEventListener("pointerup",function(){if(!dn)return;dn=false;c.classList.remove("arr");var i=Math.round(c.scrollLeft/paso());c.scrollTo({left:i*paso(),behavior:"smooth"})});
+c.addEventListener("click",function(e){if(mov){e.preventDefault();e.stopPropagation()}},true)});
 </script>
 <script src="sim.js" defer></script><script src="amigos.js" defer></script><script src="regalo.js" defer></script><script src="fidelidad.js" defer></script><script src="appkit.js" defer data-color="#e1251b" data-theme="dark" data-items='[{"i":"brush","l":"Catálogo","h":"#catalogo"},{"i":"sparkles","l":"Simulador","h":"#simulador"},{"i":"users","l":"Amigos","h":"#amigos"},{"i":"gift","l":"Regalo","h":"#regalo"},{"i":"cal","l":"Reservar","h":"#reserva"}]' data-lift=".ch-fab,.ch,.ck"></script>
 <script src="movil.js" defer></script>

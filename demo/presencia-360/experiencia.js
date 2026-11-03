@@ -196,11 +196,13 @@ if (POSTER !== null) {
   new ResizeObserver(() => { medir(); aplicar(cur, (performance.now() - t0) / 1000); }).observe(st);
   new IntersectionObserver((e) => {
     visible = e[0].isIntersecting;
-    R.classList.toggle("xp-in", visible);
     if (visible) { cargarMedios(); cur = target = progreso() * (N - 1); arrancar(); } else { vHero.pause(); }
   }, { rootMargin: "100px" }).observe(sec);
   document.addEventListener("visibilitychange", arrancar);
   addEventListener("scroll", arrancar, { passive: true });
+  // «dentro de la escena» = mientras la imagen ocupa la pantalla (se pliega la barra de apartados para no taparla)
+  const enEscena = () => { const r = sec.getBoundingClientRect(); R.classList.toggle("xp-in", r.top <= 60 && r.bottom >= innerHeight * 0.6); };
+  addEventListener("scroll", enEscena, { passive: true }); addEventListener("resize", enEscena); enEscena();
   // «Sin animaciones»: se para y se ven todos los textos con sus fotos
   new MutationObserver(() => {
     chActual = -1;
