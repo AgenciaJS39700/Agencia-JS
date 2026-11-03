@@ -448,7 +448,82 @@ footer a{color:inherit}
 .res-proof{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding:10px;border-radius:16px;border:1.5px solid var(--red);background:#fff}.res-proof img{width:64px;height:64px;border-radius:10px;object-fit:cover;flex:none}.res-proof div{flex:1;min-width:0;display:flex;flex-direction:column;color:#111}.res-proof span{font-size:0.8125rem;color:#6b655c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.res-proof button{width:40px;height:40px;border-radius:50%;border:1px solid #ddd;background:#fff;color:#111;cursor:pointer;flex:none}</style>
 <style id="movil-pill">@media(max-width:600px){#ajs-demo{left:auto!important;right:10px;transform:none!important;gap:6px!important;padding:5px 5px 5px 12px!important;font-size:0.75rem!important}#ajs-demo>span+span{display:none}}</style><link rel="stylesheet" href="movil.css">
 <link rel="stylesheet" href="reloj.css" media="(max-width: 300px)">
+<style id="tn-experiencia">/* «La experiencia»: escena 3D guiada por el scroll (experiencia.js) */
+.xp{position:relative;height:560svh;background:var(--bk)}
+.xp-pin{position:sticky;top:0;height:100svh;overflow:hidden;background:#0a0a0a url(img/exp/xp-0.webp) 70% 50%/cover no-repeat}
+.xp-cv{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .8s}
+.xp-ok .xp-cv{opacity:1}
+.xp-vig{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(10,10,10,.92) 0,rgba(10,10,10,.55) 34%,rgba(10,10,10,0) 60%),linear-gradient(0deg,#0a0a0a 0,rgba(10,10,10,0) 22%),linear-gradient(180deg,#0a0a0a 0,rgba(10,10,10,0) 18%)}
+.xp-txt{position:absolute;inset:0;left:50%;translate:-50% 0;pointer-events:none}
+.xp-ch{position:absolute;left:0;top:50%;transform:translateY(-50%);width:min(36rem,46%);opacity:0;filter:blur(12px);translate:0 3rem;pointer-events:none;transition:opacity .55s ease,filter .6s ease,translate .8s cubic-bezier(.2,.8,.2,1)}
+.xp-ch.on{opacity:1;filter:none;translate:0 0;pointer-events:auto}
+.xp-ch .kick{margin:0 0 .9rem}
+.xp-ch h3{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(2.4rem,5.6vw,5.4rem);line-height:.88;letter-spacing:-.02em;margin:0}
+.xp-ch h3 .r{color:var(--red)}
+.xp-ch p:not(.kick){margin:1.1rem 0 0;max-width:32ch;color:#cfc8bb;font-size:clamp(1rem,1.25vw,1.15rem);line-height:1.5}
+.xp-ch .ctas{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.5rem}
+.xp-ch .btn{min-height:3.25rem}
+.xp-cards{list-style:none;padding:0;margin:1.4rem 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem}
+.xp-cards li{padding:.9rem .85rem;border:1px solid rgba(236,230,218,.16);border-radius:1rem;background:rgba(18,18,18,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;translate:0 1.2rem;transition:opacity .5s,translate .6s cubic-bezier(.2,.8,.2,1)}
+.xp-ch.on .xp-cards li{opacity:1;translate:0 0}
+.xp-ch.on .xp-cards li:nth-child(2){transition-delay:.09s}.xp-ch.on .xp-cards li:nth-child(3){transition-delay:.18s}
+.xp-cards b{display:block;font-family:var(--disp);text-transform:uppercase;font-size:.95rem;line-height:1;color:#fff}
+.xp-cards small{display:block;margin-top:.35rem;color:#bfb8ab;font-size:.8rem;line-height:1.35}
+.xp-cards i{display:block;width:1.6rem;height:2px;background:var(--red);margin-bottom:.6rem}
+.xp-dots{position:absolute;right:max(10px,env(safe-area-inset-right));top:50%;translate:0 -50%;display:flex;flex-direction:column;z-index:2}
+.xp-dots button{width:2.75rem;height:2.75rem;display:grid;place-items:center;background:none;border:0;cursor:pointer;padding:0}
+.xp-dots i{width:.5rem;height:.5rem;border-radius:50%;border:1.5px solid rgba(236,230,218,.6);transition:all .35s}
+.xp-dots button.on i{background:var(--red);border-color:var(--red);height:1.6rem;border-radius:999px}
+.xp-n{position:absolute;left:50%;translate:-50% 0;bottom:1.6rem;width:min(1240px,100% - 32px);display:flex;align-items:center;gap:1rem;font-weight:800;letter-spacing:.2em;font-size:.75rem;color:var(--mute);pointer-events:none}
+.xp-n b{color:var(--bone)}.xp-n span{flex:0 0 3rem;height:1px;background:var(--line)}
+.xp-hint{margin-left:auto;display:flex;align-items:center;gap:.6rem;transition:opacity .4s}
+.xp-hint::after{content:"";width:1px;height:1.6rem;background:linear-gradient(var(--bone),transparent);animation:xph 1.6s ease-in-out infinite}
+@keyframes xph{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.xp-po{display:none}
+/* mientras se recorre la escena en pantallas táctiles, la barra «Demo» de la agencia se aparta para no tapar los textos */
+@media (max-width:900px),(max-height:540px){html.xp-in #ajs-demo{opacity:0!important;pointer-events:none!important;transition:opacity .3s}html.xp-in .a11y-btn{top:22%}}
+@media (max-width:380px){.xp-cards small{display:none}.xp-cards li{padding:.55rem .5rem}}
+/* móvil en vertical: la escena arriba y el texto abajo */
+@media (max-aspect-ratio:4/5){
+.xp{height:520svh}
+.xp-pin{background-position:50% 30%}
+.xp-vig{background:linear-gradient(0deg,#0a0a0a 0,rgba(10,10,10,.9) 34%,rgba(10,10,10,0) 58%),linear-gradient(180deg,#0a0a0a 0,rgba(10,10,10,0) 16%)}
+.xp-ch{top:auto;bottom:calc(5.4rem + env(safe-area-inset-bottom));transform:none;width:calc(100% - 4.2rem)}
+.xp-ch h3{font-size:clamp(1.9rem,9.6vw,3.4rem)}
+.xp-ch p:not(.kick){font-size:.98rem;margin-top:.8rem}
+.xp-ch .ctas{margin-top:1rem}.xp-ch .ctas .btn{flex:1 1 auto;padding:0 1.1rem}
+.xp-cards{gap:.4rem;margin-top:1rem}.xp-cards li{padding:.65rem .6rem}.xp-cards b{font-size:.8rem}.xp-cards small{font-size:.72rem}
+.xp-dots{right:2px;top:38%}
+.xp-n{bottom:calc(4.2rem + env(safe-area-inset-bottom))}.xp-n .xp-hint{display:none}
+}
+/* móvil girado (panorámico) y pantallas muy bajas: todo más compacto */
+@media (max-height:540px) and (min-aspect-ratio:4/3){
+.xp-ch{top:4.75rem;bottom:4rem;transform:none;left:2.6rem;width:min(30rem,48%);display:flex;flex-direction:column;justify-content:center}
+.xp-dots{top:calc(50% + 1rem)}.xp-dots button{height:2.2rem}
+.xp-ch .kick{margin-bottom:.4rem;font-size:.65rem}
+.xp-ch h3{font-size:clamp(1.6rem,9.5svh,2.8rem)}
+.xp-ch p:not(.kick){font-size:.85rem;margin-top:.5rem;max-width:40ch}
+.xp-ch .ctas{margin-top:.7rem}.xp-ch .btn{min-height:2.75rem;padding:0 1rem;font-size:.75rem}
+.xp-cards{margin-top:.6rem;gap:.4rem}.xp-cards li{padding:.5rem}.xp-cards i{margin-bottom:.35rem}.xp-cards b{font-size:.75rem}.xp-cards small{display:none}
+.xp-n{display:none}.xp-ch p:not(.kick){display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+}
+/* versión fija: sin animaciones, sin WebGL o mientras no se ha cargado nada */
+:is(.xp-static,.a11y-quieto .xp){height:auto}
+:is(.xp-static,.a11y-quieto .xp) .xp-pin{position:relative;height:auto;background:none;padding:clamp(3rem,8vw,6rem) 0}
+:is(.xp-static,.a11y-quieto .xp) :is(.xp-cv,.xp-vig,.xp-dots,.xp-n){display:none}
+:is(.xp-static,.a11y-quieto .xp) .xp-txt{position:static;translate:none;display:grid;gap:clamp(2.5rem,6vw,4.5rem)}
+:is(.xp-static,.a11y-quieto .xp) .xp-ch{position:static;transform:none;width:auto;opacity:1;filter:none;translate:none;pointer-events:auto;display:grid;gap:1.2rem 3rem;align-items:center}
+:is(.xp-static,.a11y-quieto .xp) .xp-cards li{opacity:1;translate:none}
+:is(.xp-static,.a11y-quieto .xp) .xp-po{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:1.25rem;border:1px solid var(--line);background:#0e0e0f;align-self:center;height:auto}
+@media (min-width:860px){:is(.xp-static,.a11y-quieto .xp) .xp-ch{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}:is(.xp-static,.a11y-quieto .xp) .xp-ch>.xp-po{grid-column:1;grid-row:1/span 9}}
+.a11y-contraste .xp-ch p:not(.kick),.a11y-contraste .xp-cards small{color:#fff}
+.a11y-contraste .xp-vig{background:linear-gradient(90deg,#0a0a0a 0,rgba(10,10,10,.85) 45%,rgba(10,10,10,0) 70%)}
+@media (forced-colors:active){.xp-vig{display:none}.xp-ch{background:Canvas}}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
 <style id="tn-ajustes">/* Ajustes de dispositivos y accesibilidad (nov 2026) */
+@media(max-width:700px){.ch.on~.a11y-btn{display:none!important}}
+.ch-l.ch-wa{display:inline-flex;align-items:center;min-height:2.75rem;margin-top:.5rem;padding:0 1rem;border-radius:999px;background:#25d366;color:#052e14;white-space:normal}
 .reloj-acc{display:none}
 /* tablet: el menú completo solo cabe desde 1100 px; por debajo, «Reservar» + barra inferior */
 @media(max-width:1099px){.nav a:not(:last-child){display:none}}
@@ -531,6 +606,55 @@ footer .row a,footer .row .lnk{display:inline-flex;align-items:center;min-height
 </section>
 
 <div class="mq" aria-hidden="true"><div class="tr"><span>Blackwork</span><span>Fine line</span><span>Realismo</span><span>Tradicional</span><span>Lettering</span><span>Cover up</span><span>Blackwork</span><span>Fine line</span><span>Realismo</span><span>Tradicional</span><span>Lettering</span><span>Cover up</span></div></div>
+
+<section class="xp xp-ld" id="experiencia" aria-labelledby="t-xp">
+  <div class="xp-pin">
+    <canvas class="xp-cv" aria-hidden="true"></canvas>
+    <div class="xp-vig" aria-hidden="true"></div>
+    <div class="xp-txt wrap">
+    <h2 id="t-xp" class="sr-only">La experiencia Tinta Negra</h2>
+    <article class="xp-ch on" aria-labelledby="xp-h0">
+      <img class="xp-po" src="img/exp/xp-0.webp" alt="" loading="lazy" decoding="async" width="1600" height="1000">
+      <p class="kick">La experiencia · 01</p>
+      <h3 id="xp-h0">Tu piel, <span class="out">nuestro</span> lienzo</h3>
+      <p>Una camilla, una aguja y toda la calma del mundo. Así empieza cada pieza en Tinta Negra.</p>
+    </article>
+    <article class="xp-ch" aria-labelledby="xp-h1">
+      <img class="xp-po" src="img/exp/xp-1.webp" alt="" loading="lazy" decoding="async" width="1600" height="1000">
+      <p class="kick">La experiencia · 02</p>
+      <h3 id="xp-h1">Tu próxima pieza <span class="r">empieza aquí</span></h3>
+      <p>Nos cuentas tu idea, la dibujamos contigo y reservamos el tiempo que tu tatuaje necesita.</p>
+      <div class="ctas"><a class="btn btn-red mag" href="#reserva">Pedir cita</a><a class="btn btn-ghost mag" href="#flash">Ver flash</a></div>
+    </article>
+    <article class="xp-ch" aria-labelledby="xp-h2">
+      <img class="xp-po" src="img/exp/xp-2.webp" alt="" loading="lazy" decoding="async" width="1600" height="1000">
+      <p class="kick">La experiencia · 03</p>
+      <h3 id="xp-h2">Precisión. <span class="out">Higiene.</span> Calma.</h3>
+      <p>Material estéril de un solo uso y una camilla que se ajusta a ti para que estés cómodo de principio a fin.</p>
+    </article>
+    <article class="xp-ch" aria-labelledby="xp-h3">
+      <img class="xp-po" src="img/exp/xp-3.webp" alt="" loading="lazy" decoding="async" width="1600" height="1000">
+      <p class="kick">La experiencia · 04</p>
+      <h3 id="xp-h3">Todo, <span class="out">a la vista</span></h3>
+      <p>Abrimos cada envase delante de ti. Sin sorpresas y sin atajos.</p>
+      <ul class="xp-cards">
+        <li><i></i><b>Máquina pen</b><small>Rotativa, silenciosa y precisa</small></li>
+        <li><i></i><b>Cartuchos</b><small>Estériles, de un solo uso</small></li>
+        <li><i></i><b>Tintas</b><small>Veganas y conforme a la normativa europea</small></li>
+      </ul>
+    </article>
+    <article class="xp-ch" aria-labelledby="xp-h4">
+      <img class="xp-po" src="img/exp/xp-4.webp" alt="" loading="lazy" decoding="async" width="1600" height="1000">
+      <p class="kick">La experiencia · 05</p>
+      <h3 id="xp-h4">El <span class="r">oficio</span></h3>
+      <p>Ajustamos aguja, voltaje y ritmo a tu piel. La pieza se termina cuando está perfecta, no cuando acaba el reloj.</p>
+      <div class="ctas"><a class="btn btn-ghost mag" href="#trabajos">Ver trabajos</a><a class="btn btn-red mag" href="#reserva">Reservar</a></div>
+    </article>
+    </div>
+    <nav class="xp-dots" aria-label="Pasos de la experiencia"><button type="button" aria-label="Ir al paso 1 de 5" class="on" aria-current="step"><i></i></button><button type="button" aria-label="Ir al paso 2 de 5"><i></i></button><button type="button" aria-label="Ir al paso 3 de 5"><i></i></button><button type="button" aria-label="Ir al paso 4 de 5"><i></i></button><button type="button" aria-label="Ir al paso 5 de 5"><i></i></button></nav>
+    <div class="xp-n" aria-hidden="true"><b>01</b><span></span>05<div class="xp-hint">Desliza</div></div>
+  </div>
+</section>
 
 <section class="mani"><div class="wrap"><p id="mani">No copiamos tatuajes. Escuchamos tu historia y la convertimos en una pieza que solo llevarás tú, para siempre.</p></div></section>
 
@@ -886,10 +1010,11 @@ function bot(h){var d=bub('<span class="ch-dots"><i></i><i></i><i></i></span>');
 var QK=["¿Duele mucho?","¿Cuánto cuesta?","Es mi primer tatuaje","Tengo una idea","¿Cómo lo cuido?","Quiero tapar un tatuaje","Pedir cita"];
 function quick(){var q=$("#chQ");q.innerHTML="";QK.forEach(function(t){var b=document.createElement("button");b.type="button";b.textContent=t;b.addEventListener("click",function(){ask(t)});q.appendChild(b)})}
 function link(h,t){return ' <a href="'+h+'" class="ch-l" data-close="1">'+t+' →</a>'}
+function wa(msg,t){return ' <a class="ch-l ch-wa" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent(msg)+'">'+t+' →</a>'}
 function answer(q){var n=nrm(q),z=null;
  PAIN.forEach(function(p){var k=nrm(p[0]).split(" ")[0];if(n.indexOf(k)>-1)z=p});
  if(/duel|dolor|molest/.test(n)){if(z)return "En <b>"+z[0].toLowerCase()+"</b> la molestia suele ser de <b>"+z[1]+"/5</b>. "+z[2]+link("#dolor","Ver mapa del dolor");return "Depende mucho de la zona: antebrazo, brazo o muslo son las más llevaderas; costillas, rodilla o pies, las más intensas. Hacemos pausas siempre que lo necesites."+link("#dolor","Ver mapa del dolor")}
- if(/precio|cuest|cuanto|presupuesto|vale|tarifa|cobr/.test(n))return "Cada pieza se presupuesta según tamaño, detalle y zona, y el presupuesto es gratis. Cuéntanos tu idea y te respondemos con una propuesta."+link("#reserva","Pedir presupuesto");
+ if(/precio|cuest|cuanto|presupuesto|vale|tarifa|cobr/.test(n))return "Cada pieza se presupuesta según tamaño, detalle y zona, y el presupuesto es gratis. Escríbenos por WhatsApp con tu idea, la zona y el tamaño aproximado (si tienes una foto de referencia, mejor) y el tatuador te responde con una propuesta."+wa("Hola, quiero pedir presupuesto para un tatuaje. Mi idea es: ","Presupuesto por WhatsApp");
  if(/senal|deposito|adelant/.test(n))return "Para bloquear tu fecha pedimos una pequeña señal que se descuenta del total el día de la sesión.";
  if(/cuid|curar|cura|crema|sol|playa|piscina|gimnas|ducha|pica|pela/.test(n))return "Lava 2 veces al día con jabón neutro, crema fina y nada de sol, piscina ni sauna durante 3–4 semanas. Tienes la guía completa día a día aquí:"+link("#cuidados","Ver cuidados");
  if(/edad|menor|anos|dni/.test(n))return "Solo tatuamos a mayores de 18 años, y te pediremos el DNI el día de la cita.";
@@ -907,9 +1032,9 @@ function answer(q){var n=nrm(q),z=null;
  if(/crema|tienda|comprar|producto|balsamo|jabon|film|camiseta|gorra/.test(n))return "En nuestra tienda tienes el bálsamo, el jabón neutro, el film protector y el stick solar que usamos en el estudio."+link("#tienda","Ver tienda");
  if(/inteligencia|ia\b|boceto|dibuj|generar/.test(n))return "Describe tu idea y te mostramos bocetos al momento para inspirarte. Luego tu artista crea el diseño definitivo."+link("#ia","Probar idea con IA");
  if(/consentimiento|firma/.test(n))return "El consentimiento informado se rellena y firma online durante la reserva, y te llevas una copia.";
- if(/cita|reserv|hueco|disponib|cuando/.test(n))return "Puedes pedir cita en 1 minuto desde el formulario o escribirnos por WhatsApp."+link("#reserva","Pedir cita");
+ if(/cita|reserv|hueco|disponib|cuando/.test(n))return "Puedes pedir cita en 1 minuto desde el formulario o escribirnos por WhatsApp."+link("#reserva","Pedir cita")+wa("Hola, quiero pedir cita para un tatuaje.","Escribir por WhatsApp");
  if(/hola|buenas|hey/.test(n))return "¡Hola! Pregúntame lo que quieras sobre tu tatuaje: dolor, precio, cuidados o qué estilo te pega.";
- return "No estoy seguro de haberte entendido. Puedo ayudarte con el dolor por zona, el presupuesto, los cuidados, los estilos o tu primera cita. Si prefieres, te atiende una persona por WhatsApp:"+' <a class="ch-l" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+encodeURIComponent("Hola, he visto la demo de Tinta Negra en agencia-js.com y quiero una web así para mi estudio.")+'">Hablar con el estudio →</a>'}
+ return "No estoy seguro de haberte entendido. Puedo ayudarte con el dolor por zona, el presupuesto, los cuidados, los estilos o tu primera cita. Si prefieres, te atiende una persona por WhatsApp:"+wa("Hola, tengo una consulta sobre un tatuaje: ","Hablar con el estudio")}
 function ask(t){t=t.trim().slice(0,200);if(!t)return;bub(t,1);bot(answer(t))}
 function chOpen(){ch.classList.add("on");$("#chFab").classList.add("hide");if(!hi){hi=1;bot("¡Hola! Soy el asesor de Tinta Negra ✦ Te ayudo a elegir estilo, zona y tamaño, y resuelvo tus dudas sobre dolor, precio o cuidados.");quick()}setTimeout(function(){$("#chI").focus()},300)}
 function chClose(){ch.classList.remove("on");$("#chFab").classList.remove("hide")}
@@ -1024,6 +1149,17 @@ go(1);
 <a href="/#planes" style="display:inline-flex;align-items:center;min-height:32px;padding:0 14px;border-radius:999px;background:#E8C766;color:#111;text-decoration:none;font-weight:700">Volver</a>
 <button type="button" aria-label="Ocultar aviso de demo" onclick="this.parentNode.remove()" style="background:none;border:0;color:#fff;opacity:.6;font-size:1.125rem;line-height:1;cursor:pointer;padding:4px 6px">×</button>
 </div>
+<script>/* La experiencia 3D: se carga solo al acercarse y nunca con «Sin animaciones», en relojes o sin WebGL */
+(function(){var s=document.getElementById("experiencia");if(!s||!window.IntersectionObserver)return;var R=document.documentElement,hecho=false,cerca=false;
+var poster=/[?&]xpposter=/.test(location.search);
+function gl(){try{var c=document.createElement("canvas");return !!(c.getContext("webgl2")||c.getContext("webgl"))}catch(e){return false}}
+function quieto(){if(R.classList.contains("a11y-quieto"))return true;var o={};try{o=JSON.parse(localStorage.getItem("ajs-a11y")||"{}")||{}}catch(e){}return o.quieto===undefined?matchMedia("(prefers-reduced-motion: reduce)").matches:!!o.quieto}
+function cargar(){if(hecho||!cerca||quieto()||innerWidth<=300)return;hecho=true;if(!gl()){s.classList.add("xp-static");return}
+import("./experiencia.js").catch(function(){s.classList.add("xp-static")})}
+if(poster){cerca=true;cargar();return}
+new IntersectionObserver(function(e){cerca=e[0].isIntersecting;cargar()},{rootMargin:"800px 0px"}).observe(s);
+new MutationObserver(cargar).observe(R,{attributes:true,attributeFilter:["class"]})})();
+</script>
 <script src="sim.js" defer></script><script src="amigos.js" defer></script><script src="regalo.js" defer></script><script src="fidelidad.js" defer></script><script src="appkit.js" defer data-color="#e1251b" data-theme="dark" data-items='[{"i":"brush","l":"Catálogo","h":"#catalogo"},{"i":"sparkles","l":"Simulador","h":"#simulador"},{"i":"users","l":"Amigos","h":"#amigos"},{"i":"gift","l":"Regalo","h":"#regalo"},{"i":"cal","l":"Reservar","h":"#reserva"}]' data-lift=".ch-fab,.ch,.ck"></script>
 <script src="movil.js" defer></script>
 <script src="accesibilidad.js" defer></script>
