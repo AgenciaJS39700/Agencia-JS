@@ -1,0 +1,1136 @@
+{
+ "_info": "Base de conocimiento del asistente de Residencial Mirador del Norte. Cada entrada: id, cat (categoría), t (pregunta tipo), k (palabras o frases que la activan; minúsculas y sin tildes), r (respuesta; admite <b>), a (acciones: precios, visita, recorrido, whatsapp, llamar, legal), rel (preguntas relacionadas). Los datos son de ejemplo para la demo: cada promotora debe revisarlos.",
+ "cats": {
+  "precios": "Precios y gastos",
+  "plazos": "Obra y entrega",
+  "vivienda": "Viviendas y superficies",
+  "garaje": "Garaje y trastero",
+  "comunidad": "Comunidad e impuestos",
+  "pago": "Formas de pago",
+  "financiacion": "Financiación",
+  "calidades": "Calidades y personalización",
+  "zonas": "Zonas comunes y entorno",
+  "contrato": "Contrato y garantías",
+  "visita": "Visitas y contacto"
+ },
+ "faq": [
+  {
+   "id": "precio-desde",
+   "cat": "precios",
+   "t": "¿Qué precios tienen las viviendas?",
+   "k": [
+    "precio",
+    "precios",
+    "cuesta",
+    "cuestan",
+    "cuanto vale",
+    "cuanto valen",
+    "cuanto cuesta",
+    "valor",
+    "tarifa",
+    "lista de precios",
+    "presupuesto"
+   ],
+   "r": "Hay viviendas de 2 dormitorios desde <b>{min2}</b>, de 3 dormitorios desde <b>{min3}</b> y áticos desde <b>{minA}</b>. Los precios incluyen plaza de garaje y trastero; el IVA va aparte. Quedan <b>{disp} viviendas</b> disponibles.",
+   "a": [
+    "precios",
+    "visita"
+   ],
+   "rel": [
+    "iva",
+    "gastos-compra",
+    "incluye-precio"
+   ]
+  },
+  {
+   "id": "incluye-precio",
+   "cat": "precios",
+   "t": "¿Qué incluye el precio?",
+   "k": [
+    "incluye el precio",
+    "que incluye",
+    "viene con",
+    "precio con garaje",
+    "precio total",
+    "que entra en el precio"
+   ],
+   "r": "El precio de cada vivienda incluye <b>una plaza de garaje y un trastero</b> en el sótano, la cocina amueblada con electrodomésticos integrados, los armarios empotrados y la climatización por aerotermia. No incluye el IVA ni los gastos de notaría, registro y gestoría.",
+   "a": [
+    "precios"
+   ],
+   "rel": [
+    "iva",
+    "gastos-compra",
+    "garaje-incluido"
+   ]
+  },
+  {
+   "id": "iva",
+   "cat": "precios",
+   "t": "¿El IVA está incluido?",
+   "k": [
+    "iva",
+    "impuesto",
+    "impuestos",
+    "ajd",
+    "actos juridicos",
+    "itp",
+    "transmisiones",
+    "iva incluido",
+    "con iva",
+    "sin iva"
+   ],
+   "r": "Los precios publicados son <b>sin IVA</b>. En vivienda nueva se paga el <b>10 % de IVA</b> (y el 21 % en plazas de garaje o trasteros que se compren por separado) más el impuesto de Actos Jurídicos Documentados de la escritura, cuyo tipo depende de la comunidad autónoma (normalmente entre el 0,5 % y el 1,5 %). En vivienda nueva no se paga ITP.",
+   "a": [
+    "precios"
+   ],
+   "rel": [
+    "gastos-compra",
+    "precio-desde"
+   ]
+  },
+  {
+   "id": "gastos-compra",
+   "cat": "precios",
+   "t": "¿Qué gastos tiene la compra además del precio?",
+   "k": [
+    "gastos",
+    "gasto",
+    "notaria",
+    "notario",
+    "registro",
+    "gestoria",
+    "tasacion",
+    "gastos de compra",
+    "coste total",
+    "cuanto pagare en total",
+    "ademas del precio",
+    "otros gastos",
+    "gastos tengo",
+    "gastos de la compra",
+    "gastos de escritura"
+   ],
+   "r": "Además del precio y del IVA, cuenta con: Actos Jurídicos Documentados (según la comunidad), <b>notaría y registro</b> (aprox. 1.000–2.000 €) y gestoría. Si pides hipoteca, el banco paga la mayor parte de los gastos del préstamo; tú normalmente solo la tasación (300–500 €). Como referencia, reserva entre un <b>12 % y un 13 %</b> del precio para impuestos y gastos.",
+   "a": [
+    "whatsapp"
+   ],
+   "rel": [
+    "iva",
+    "financiacion-banco"
+   ]
+  },
+  {
+   "id": "descuento",
+   "cat": "precios",
+   "t": "¿Se puede negociar el precio o hay descuentos?",
+   "k": [
+    "descuento",
+    "descuentos",
+    "negociar",
+    "negociable",
+    "rebaja",
+    "oferta",
+    "promocion especial",
+    "mejor precio",
+    "negociar el precio",
+    "precio negociable"
+   ],
+   "r": "Los precios de la lista son los vigentes y se revisan por fases de venta: <b>las primeras reservas tienen el mejor precio</b>. A veces hay condiciones especiales (por ejemplo, plaza de garaje extra o mejoras de acabados). Pregunta al equipo comercial por las condiciones de este mes.",
+   "a": [
+    "whatsapp",
+    "visita"
+   ],
+   "rel": [
+    "precio-desde",
+    "reserva"
+   ]
+  },
+  {
+   "id": "entrega",
+   "cat": "plazos",
+   "t": "¿Cuándo se entregan las viviendas?",
+   "k": [
+    "entrega",
+    "entregan",
+    "cuando",
+    "fecha",
+    "plazo",
+    "plazos",
+    "acabada",
+    "terminada",
+    "llaves",
+    "mudarme",
+    "listo",
+    "listas"
+   ],
+   "r": "La entrega de llaves está prevista para <b>diciembre de 2028</b>. La obra tiene licencia concedida y avanza según el calendario; te avisaremos de cada fase y antes de la entrega podrás revisar tu vivienda.",
+   "a": [
+    "recorrido"
+   ],
+   "rel": [
+    "estado-obra",
+    "retraso",
+    "visita-obra"
+   ]
+  },
+  {
+   "id": "estado-obra",
+   "cat": "plazos",
+   "t": "¿En qué fase está la obra?",
+   "k": [
+    "fase",
+    "estado de la obra",
+    "como va la obra",
+    "avance",
+    "licencia",
+    "estructura",
+    "cimentacion",
+    "empezado"
+   ],
+   "r": "La promoción tiene <b>licencia de obra concedida</b>. El calendario previsto: cimentación y estructura, fachada y cubierta, instalaciones y acabados, urbanización de las zonas comunes y, por último, la licencia de primera ocupación y la entrega. Enviamos a los compradores fotos del avance cada trimestre.",
+   "a": [
+    "recorrido"
+   ],
+   "rel": [
+    "entrega",
+    "visita-obra"
+   ]
+  },
+  {
+   "id": "retraso",
+   "cat": "plazos",
+   "t": "¿Qué pasa si la obra se retrasa?",
+   "k": [
+    "retraso",
+    "retrasa",
+    "se retrasa",
+    "no se termina",
+    "quiebra",
+    "no entregan",
+    "paraliza"
+   ],
+   "r": "Todo lo que pagues antes de la entrega queda <b>garantizado por ley</b> (Ley de Ordenación de la Edificación): va a una cuenta especial y está cubierto por un <b>aval bancario o un seguro</b> a tu nombre. Si la obra no se termina o no obtiene la licencia de primera ocupación en el plazo pactado, puedes recuperar lo pagado más los intereses legales. El contrato fija además el plazo y sus prórrogas.",
+   "a": [
+    "legal"
+   ],
+   "rel": [
+    "avales",
+    "contrato"
+   ]
+  },
+  {
+   "id": "superficies",
+   "cat": "vivienda",
+   "t": "¿Qué tamaño tienen las viviendas?",
+   "k": [
+    "metros",
+    "m2",
+    "m²",
+    "superficie",
+    "tamano",
+    "grande",
+    "grandes",
+    "dimensiones",
+    "cuantos metros",
+    "utiles",
+    "construidos"
+   ],
+   "r": "Hay dos tipos: <b>2 dormitorios de 76–78 m² útiles</b> y <b>3 dormitorios de 98–101 m² útiles</b>, todas con terraza de 12–14 m². Los áticos suman 6 m² más y tienen <b>terraza de 54 m²</b>. Los metros <b>útiles</b> son los que pisas; los construidos incluyen muros y la parte de zonas comunes (unos 20–25 % más).",
+   "a": [
+    "precios"
+   ],
+   "rel": [
+    "dormitorios",
+    "aticos",
+    "planos"
+   ]
+  },
+  {
+   "id": "dormitorios",
+   "cat": "vivienda",
+   "t": "¿Cuántos dormitorios y baños tienen?",
+   "k": [
+    "dormitorios",
+    "dormitorio",
+    "habitaciones",
+    "habitacion",
+    "banos",
+    "bano",
+    "cuartos",
+    "aseo"
+   ],
+   "r": "Las viviendas de <b>2 dormitorios</b> tienen 2 baños (uno en suite) y las de <b>3 dormitorios</b> tienen 2 baños completos y el principal con vestidor. Todas tienen salón-comedor con cocina abierta o semiabierta y terraza.",
+   "a": [
+    "precios"
+   ],
+   "rel": [
+    "superficies",
+    "planos",
+    "disponibles"
+   ]
+  },
+  {
+   "id": "aticos",
+   "cat": "vivienda",
+   "t": "¿Cómo son los áticos?",
+   "k": [
+    "atico",
+    "aticos",
+    "penthouse",
+    "ultima planta",
+    "planta 6",
+    "sexta"
+   ],
+   "r": "Hay 4 áticos en la planta 6, de 2 y 3 dormitorios, con <b>terraza de 54 m²</b> orientada al sur, vistas al mar y preinstalación para jacuzzi. Desde {minA}.",
+   "a": [
+    "precios",
+    "recorrido"
+   ],
+   "rel": [
+    "disponibles",
+    "superficies"
+   ]
+  },
+  {
+   "id": "orientacion",
+   "cat": "vivienda",
+   "t": "¿Qué orientación y vistas tienen?",
+   "k": [
+    "orientacion",
+    "orientada",
+    "sol",
+    "luz",
+    "luminosa",
+    "vistas",
+    "vista al mar",
+    "vistas al mar",
+    "sur",
+    "norte"
+   ],
+   "r": "Las viviendas A y D son de esquina, con doble orientación; las B y C dan al sur, hacia el jardín y el mar. Todas las terrazas miran al sur o al sureste, y desde la 3ª planta hay <b>vistas al mar</b> despejadas.",
+   "a": [
+    "precios",
+    "recorrido"
+   ],
+   "rel": [
+    "superficies",
+    "aticos"
+   ]
+  },
+  {
+   "id": "planos",
+   "cat": "vivienda",
+   "t": "¿Puedo ver los planos?",
+   "k": [
+    "plano",
+    "planos",
+    "distribucion",
+    "plano de la vivienda",
+    "memoria de calidades",
+    "dossier",
+    "folleto",
+    "pdf"
+   ],
+   "r": "Sí. Te enviamos los <b>planos de cada vivienda, la memoria de calidades y el dossier</b> al pedir información, y en la consulta técnica un arquitecto te los explica en detalle.",
+   "a": [
+    "visita",
+    "whatsapp"
+   ],
+   "rel": [
+    "personalizar",
+    "documentacion"
+   ]
+  },
+  {
+   "id": "disponibles",
+   "cat": "vivienda",
+   "t": "¿Qué viviendas quedan disponibles?",
+   "k": [
+    "disponible",
+    "disponibles",
+    "quedan",
+    "libres",
+    "libre",
+    "vendidas",
+    "reservadas",
+    "disponibilidad"
+   ],
+   "r": "{listaDisp}",
+   "a": [
+    "precios",
+    "visita"
+   ],
+   "rel": [
+    "precio-desde",
+    "reserva"
+   ]
+  },
+  {
+   "id": "garaje-incluido",
+   "cat": "garaje",
+   "t": "¿Las viviendas tienen garaje?",
+   "k": [
+    "garaje",
+    "garajes",
+    "parking",
+    "aparcamiento",
+    "plaza",
+    "plazas",
+    "coche",
+    "aparcar"
+   ],
+   "r": "Sí: <b>cada vivienda incluye una plaza de garaje y un trastero</b> en el sótano, con acceso directo en ascensor. La puerta del garaje es automática con mando y las plazas miden al menos 2,50 × 5,00 m.",
+   "a": [
+    "precios"
+   ],
+   "rel": [
+    "garaje-extra",
+    "cargador",
+    "trastero"
+   ]
+  },
+  {
+   "id": "garaje-extra",
+   "cat": "garaje",
+   "t": "¿Puedo comprar otra plaza de garaje?",
+   "k": [
+    "otra plaza",
+    "segunda plaza",
+    "plaza extra",
+    "plaza adicional",
+    "dos plazas",
+    "comprar plaza",
+    "moto",
+    "motos",
+    "plaza de parking extra",
+    "mas plazas"
+   ],
+   "r": "Sí, quedan algunas <b>plazas adicionales desde 18.000 € + IVA</b> y plazas para moto desde 6.000 € + IVA, siempre para propietarios de la promoción. Se reservan por orden de compra.",
+   "a": [
+    "whatsapp"
+   ],
+   "rel": [
+    "garaje-incluido",
+    "cargador"
+   ]
+  },
+  {
+   "id": "cargador",
+   "cat": "garaje",
+   "t": "¿Hay cargador para coche eléctrico?",
+   "k": [
+    "electrico",
+    "cargador",
+    "carga",
+    "recarga",
+    "enchufe",
+    "punto de carga",
+    "tesla"
+   ],
+   "r": "Todas las plazas tienen <b>preinstalación para punto de recarga</b> de vehículo eléctrico (canalización hasta la plaza). Instalar el cargador cuesta normalmente entre 800 y 1.500 € y puedes contratarlo con nosotros como mejora.",
+   "a": [],
+   "rel": [
+    "garaje-incluido",
+    "energia"
+   ]
+  },
+  {
+   "id": "trastero",
+   "cat": "garaje",
+   "t": "¿Cómo son los trasteros?",
+   "k": [
+    "trastero",
+    "trasteros",
+    "almacen",
+    "guardar cosas",
+    "bicicleta",
+    "bicicletas"
+   ],
+   "r": "Cada vivienda tiene un <b>trastero de 5 a 8 m²</b> en el sótano, con puerta metálica y punto de luz. Además hay un cuarto común para bicicletas.",
+   "a": [],
+   "rel": [
+    "garaje-incluido"
+   ]
+  },
+  {
+   "id": "comunidad",
+   "cat": "comunidad",
+   "t": "¿Cuánto será la cuota de comunidad?",
+   "k": [
+    "comunidad",
+    "cuota de comunidad",
+    "gastos de comunidad",
+    "cuota mensual comunidad",
+    "mantenimiento",
+    "administrador"
+   ],
+   "r": "La cuota estimada es de <b>85 a 110 € al mes</b> según el tamaño de la vivienda (los áticos, algo más). Incluye mantenimiento de piscinas y jardines, limpieza, ascensores, seguro del edificio, alumbrado y administrador. Es una estimación: la fija la comunidad de propietarios en su primera junta.",
+   "a": [],
+   "rel": [
+    "ibi",
+    "zonas-comunes"
+   ]
+  },
+  {
+   "id": "ibi",
+   "cat": "comunidad",
+   "t": "¿Cuánto se paga de IBI?",
+   "k": [
+    "ibi",
+    "contribucion",
+    "impuesto municipal",
+    "basura",
+    "tasa de basura",
+    "impuesto anual"
+   ],
+   "r": "El IBI lo fija el ayuntamiento según el valor catastral; para estas viviendas se estima entre <b>350 y 550 € al año</b>. La tasa de basuras es aparte (unos 80–120 € al año). Son estimaciones orientativas.",
+   "a": [],
+   "rel": [
+    "comunidad",
+    "gastos-compra"
+   ]
+  },
+  {
+   "id": "reserva",
+   "cat": "pago",
+   "t": "¿Cómo reservo una vivienda?",
+   "k": [
+    "reservar",
+    "reserva",
+    "senal",
+    "apartar",
+    "bloquear",
+    "quiero comprar",
+    "comprar",
+    "me la quedo",
+    "reservo",
+    "reservarla",
+    "reservarlo",
+    "como reservo"
+   ],
+   "r": "Con <b>6.000 € de reserva</b> (descontados del precio) la vivienda queda a tu nombre. En un plazo de 30 días se firma el contrato privado de compraventa. Si no te conceden la hipoteca en ese plazo, te <b>devolvemos la reserva</b> con el certificado de denegación del banco.",
+   "a": [
+    "visita",
+    "whatsapp"
+   ],
+   "rel": [
+    "forma-pago",
+    "contrato"
+   ]
+  },
+  {
+   "id": "forma-pago",
+   "cat": "pago",
+   "t": "¿Cómo se paga la vivienda?",
+   "k": [
+    "forma de pago",
+    "formas de pago",
+    "como se paga",
+    "pagos",
+    "pago",
+    "plazos de pago",
+    "cuotas",
+    "entrada",
+    "aplazado",
+    "mensualidades"
+   ],
+   "r": "Plan de pagos: <b>6.000 € de reserva</b>; al firmar el contrato privado, hasta completar el <b>10 % + IVA</b>; durante la obra, otro <b>10 % + IVA en cuotas mensuales</b>; y el <b>80 % restante en la escritura</b>, con tu hipoteca o fondos propios. Todo lo que pagas antes de la entrega está avalado.",
+   "a": [
+    "visita"
+   ],
+   "rel": [
+    "avales",
+    "financiacion-banco",
+    "hipoteca-cuota"
+   ]
+  },
+  {
+   "id": "financiacion-banco",
+   "cat": "financiacion",
+   "t": "¿Puedo financiar la compra con un banco?",
+   "k": [
+    "hipoteca",
+    "hipotecas",
+    "banco",
+    "bancos",
+    "financiar",
+    "financiacion",
+    "prestamo",
+    "credito",
+    "financian"
+   ],
+   "r": "Sí. Los bancos suelen financiar hasta el <b>80 % del valor de tasación</b> en primera vivienda (menos en segunda). Puedes pedir tu propia hipoteca en el banco que quieras o usar las condiciones que hemos negociado con entidades colaboradoras. Nuestro equipo te acompaña en el estudio de viabilidad sin coste.",
+   "a": [
+    "visita"
+   ],
+   "rel": [
+    "hipoteca-cuota",
+    "financiacion-privada",
+    "ayudas-jovenes"
+   ]
+  },
+  {
+   "id": "financiacion-privada",
+   "cat": "financiacion",
+   "t": "¿Hay financiación con un fondo privado?",
+   "k": [
+    "fondo privado",
+    "fondo",
+    "fondos",
+    "financiacion privada",
+    "prestamo privado",
+    "capital privado",
+    "inversor",
+    "sin banco",
+    "no me dan hipoteca",
+    "me deniegan",
+    "autonomo",
+    "no me da hipoteca",
+    "no me dan",
+    "no me da",
+    "me deniegan la hipoteca",
+    "sin nomina"
+   ],
+   "r": "Sí, para quien no encaja en los criterios del banco (autónomos recientes, ingresos en el extranjero, más del 80 % de financiación…) colaboramos con <b>fondos de financiación privada</b> regulados. Son más flexibles y rápidos, pero con <b>intereses y comisiones más altos</b> y plazos más cortos que un banco, por lo que conviene compararlos con calma. Te preparamos una comparativa por escrito.",
+   "a": [
+    "visita",
+    "whatsapp"
+   ],
+   "rel": [
+    "financiacion-banco",
+    "hipoteca-cuota"
+   ]
+  },
+  {
+   "id": "ayudas-jovenes",
+   "cat": "financiacion",
+   "t": "¿Hay ayudas para jóvenes o primera vivienda?",
+   "k": [
+    "joven",
+    "jovenes",
+    "ayuda",
+    "ayudas",
+    "aval ico",
+    "ico",
+    "primera vivienda",
+    "menor de 35",
+    "familia numerosa",
+    "subvencion"
+   ],
+   "r": "Existen líneas públicas de <b>avales para la compra de primera vivienda</b> (por ejemplo, las del ICO para menores de 35 años y familias con hijos) que permiten financiar hasta el 100 % si cumples los requisitos de ingresos. Dependen del banco y de la comunidad autónoma: te ayudamos a comprobar si puedes acceder.",
+   "a": [
+    "visita"
+   ],
+   "rel": [
+    "financiacion-banco"
+   ]
+  },
+  {
+   "id": "hipoteca-cuota",
+   "cat": "financiacion",
+   "t": "¿Cuánto pagaría al mes de hipoteca?",
+   "k": [
+    "cuota",
+    "cuota hipoteca",
+    "al mes",
+    "mensual",
+    "cuanto pagaria",
+    "letra",
+    "simular",
+    "simulacion",
+    "calcular hipoteca"
+   ],
+   "r": "{simulacion}",
+   "a": [
+    "visita"
+   ],
+   "rel": [
+    "financiacion-banco",
+    "financiacion-privada",
+    "gastos-compra"
+   ]
+  },
+  {
+   "id": "calidades",
+   "cat": "calidades",
+   "t": "¿Qué calidades tienen las viviendas?",
+   "k": [
+    "calidad",
+    "calidades",
+    "materiales",
+    "acabados",
+    "memoria",
+    "suelo",
+    "suelos",
+    "tarima",
+    "carpinteria",
+    "ventanas"
+   ],
+   "r": "Fachada ventilada con aislamiento térmico, carpintería de aluminio con rotura de puente térmico y doble acristalamiento bajo emisivo, <b>suelo de tarima de roble</b> (porcelánico en baños y terrazas), puerta de entrada blindada, persianas motorizadas en dormitorios y videoportero. Calificación energética <b>A</b>.",
+   "a": [
+    "recorrido",
+    "visita"
+   ],
+   "rel": [
+    "cocina",
+    "clima",
+    "personalizar"
+   ]
+  },
+  {
+   "id": "cocina",
+   "cat": "calidades",
+   "t": "¿Cómo es la cocina?",
+   "k": [
+    "cocina",
+    "electrodomesticos",
+    "horno",
+    "placa",
+    "induccion",
+    "nevera",
+    "frigorifico",
+    "lavavajillas",
+    "encimera"
+   ],
+   "r": "Cocina amueblada con muebles de diseño, <b>encimera de cuarzo compacto</b> y electrodomésticos integrados: placa de inducción, horno, microondas, campana, frigorífico y lavavajillas. La lavadora va en un tendedero independiente.",
+   "a": [
+    "recorrido"
+   ],
+   "rel": [
+    "calidades",
+    "personalizar"
+   ]
+  },
+  {
+   "id": "clima",
+   "cat": "calidades",
+   "t": "¿Qué climatización y agua caliente tienen?",
+   "k": [
+    "calefaccion",
+    "aire acondicionado",
+    "climatizacion",
+    "aerotermia",
+    "suelo radiante",
+    "agua caliente",
+    "frio",
+    "calor"
+   ],
+   "r": "<b>Aerotermia</b> para calefacción, refrigeración y agua caliente, con <b>suelo radiante y refrescante</b> y termostato en cada estancia. Es el sistema más eficiente hoy y reduce mucho el consumo frente al gas.",
+   "a": [],
+   "rel": [
+    "energia",
+    "calidades"
+   ]
+  },
+  {
+   "id": "energia",
+   "cat": "calidades",
+   "t": "¿Qué eficiencia energética tiene el edificio?",
+   "k": [
+    "energia",
+    "energetica",
+    "eficiencia",
+    "certificado energetico",
+    "placas solares",
+    "solar",
+    "consumo",
+    "factura luz"
+   ],
+   "r": "Calificación energética <b>A</b>: aislamiento reforzado, aerotermia, ventilación con recuperación de calor y <b>placas solares en cubierta</b> para las zonas comunes. El consumo en climatización es muy bajo comparado con una vivienda de segunda mano.",
+   "a": [],
+   "rel": [
+    "clima",
+    "cargador"
+   ]
+  },
+  {
+   "id": "personalizar",
+   "cat": "calidades",
+   "t": "¿Puedo personalizar la vivienda?",
+   "k": [
+    "personalizar",
+    "personalizacion",
+    "cambiar",
+    "cambios",
+    "elegir acabados",
+    "modificar",
+    "distribucion distinta",
+    "unir",
+    "tirar tabique",
+    "opciones",
+    "mejoras",
+    "cambiar los acabados",
+    "cambiar acabados",
+    "elegir los acabados"
+   ],
+   "r": "Sí. Sin coste puedes elegir entre <b>3 ambientes de acabados</b> (suelo, alicatados y frentes de cocina). Con coste, hay mejoras como armarios vestidor, domótica o cambios de distribución, siempre que la fase de obra lo permita (normalmente hasta que se levantan los tabiques).",
+   "a": [
+    "visita"
+   ],
+   "rel": [
+    "calidades",
+    "planos"
+   ]
+  },
+  {
+   "id": "seguridad",
+   "cat": "calidades",
+   "t": "¿Qué seguridad y accesibilidad tiene?",
+   "k": [
+    "seguridad",
+    "alarma",
+    "camaras",
+    "vigilancia",
+    "accesible",
+    "accesibilidad",
+    "silla de ruedas",
+    "movilidad reducida",
+    "ascensor"
+   ],
+   "r": "Urbanización <b>cerrada y vallada</b> con control de acceso, videoportero, puerta blindada en cada vivienda y preinstalación de alarma. El edificio es <b>accesible</b> desde la calle hasta cada vivienda, con dos ascensores que bajan al garaje.",
+   "a": [],
+   "rel": [
+    "zonas-comunes"
+   ]
+  },
+  {
+   "id": "zonas-comunes",
+   "cat": "zonas",
+   "t": "¿Qué zonas comunes hay?",
+   "k": [
+    "zonas comunes",
+    "zona comun",
+    "piscina",
+    "piscinas",
+    "jardin",
+    "jardines",
+    "parque infantil",
+    "ninos",
+    "padel",
+    "gimnasio",
+    "solarium",
+    "pergola"
+   ],
+   "r": "Parcela cerrada de 3.900 m² con <b>2.100 m² de jardines</b>, piscina de adultos de 16 × 7 m y piscina infantil, solárium con tumbonas, pérgola chill-out, <b>parque infantil</b> con suelo de seguridad, pista de pádel y local social.",
+   "a": [
+    "recorrido"
+   ],
+   "rel": [
+    "comunidad",
+    "ubicacion"
+   ]
+  },
+  {
+   "id": "ubicacion",
+   "cat": "zonas",
+   "t": "¿Dónde está la promoción?",
+   "k": [
+    "donde",
+    "ubicacion",
+    "direccion",
+    "situado",
+    "zona",
+    "barrio",
+    "playa",
+    "mar",
+    "cerca",
+    "lejos",
+    "como llegar",
+    "mapa"
+   ],
+   "r": "El residencial está a <b>300 m de la playa</b>, en una zona tranquila con colegios, supermercados y centro de salud a menos de 10 minutos a pie y buena conexión por carretera. Te enviamos la ubicación exacta al pedir la visita.",
+   "a": [
+    "visita"
+   ],
+   "rel": [
+    "servicios",
+    "zonas-comunes"
+   ]
+  },
+  {
+   "id": "servicios",
+   "cat": "zonas",
+   "t": "¿Qué servicios hay cerca?",
+   "k": [
+    "colegio",
+    "colegios",
+    "supermercado",
+    "supermercados",
+    "centro de salud",
+    "hospital",
+    "farmacia",
+    "transporte",
+    "autobus",
+    "tren",
+    "servicios"
+   ],
+   "r": "A menos de 10 minutos a pie: <b>colegio e instituto</b>, supermercados, farmacia, centro de salud, restaurantes y parada de autobús. El hospital de referencia está a unos 15 minutos en coche.",
+   "a": [],
+   "rel": [
+    "ubicacion"
+   ]
+  },
+  {
+   "id": "mascotas",
+   "cat": "zonas",
+   "t": "¿Se admiten mascotas?",
+   "k": [
+    "mascota",
+    "mascotas",
+    "perro",
+    "perros",
+    "gato",
+    "gatos",
+    "animales"
+   ],
+   "r": "Sí, las mascotas son bienvenidas. Los estatutos de la comunidad solo regulan su uso en piscinas y zonas infantiles, como es habitual.",
+   "a": [],
+   "rel": [
+    "zonas-comunes"
+   ]
+  },
+  {
+   "id": "alquiler",
+   "cat": "zonas",
+   "t": "¿Puedo alquilar la vivienda o usarla como piso turístico?",
+   "k": [
+    "alquilar",
+    "alquiler",
+    "turistico",
+    "vacacional",
+    "airbnb",
+    "invertir",
+    "inversion",
+    "rentabilidad",
+    "segunda residencia"
+   ],
+   "r": "Puedes alquilarla en <b>alquiler de larga duración o de temporada</b>. El alquiler turístico depende de la normativa de la comunidad autónoma y del ayuntamiento, y de lo que aprueben los estatutos de la comunidad, por lo que no podemos garantizarlo. Para valorar una inversión, consulta a un asesor independiente.",
+   "a": [
+    "whatsapp"
+   ],
+   "rel": [
+    "comunidad",
+    "extranjeros"
+   ]
+  },
+  {
+   "id": "extranjeros",
+   "cat": "contrato",
+   "t": "¿Pueden comprar extranjeros o no residentes?",
+   "k": [
+    "extranjero",
+    "extranjeros",
+    "no residente",
+    "nie",
+    "vivo fuera",
+    "desde fuera",
+    "english",
+    "otro pais",
+    "foreigner"
+   ],
+   "r": "Sí. Solo necesitas un <b>NIE</b> y una cuenta bancaria en España. Podemos firmar por poder notarial si no puedes venir, y algunos bancos financian a no residentes hasta el 60–70 % del valor.",
+   "a": [
+    "whatsapp"
+   ],
+   "rel": [
+    "financiacion-banco",
+    "contrato"
+   ]
+  },
+  {
+   "id": "contrato",
+   "cat": "contrato",
+   "t": "¿Cuáles son los pasos para comprar?",
+   "k": [
+    "contrato",
+    "compraventa",
+    "pasos",
+    "proceso",
+    "firmar",
+    "firma",
+    "escritura",
+    "escriturar",
+    "notario firma",
+    "como comprar",
+    "pasos para comprar",
+    "proceso de compra"
+   ],
+   "r": "Los pasos son: 1) <b>reserva</b> de 6.000 €; 2) <b>contrato privado de compraventa</b> en un máximo de 30 días, con los avales de tus pagos; 3) pagos durante la obra; 4) <b>escritura pública ante notario</b> y entrega de llaves al terminar la obra. Antes de firmar te entregamos el contrato para que lo revises con calma o con tu abogado.",
+   "a": [
+    "visita"
+   ],
+   "rel": [
+    "reserva",
+    "avales",
+    "documentacion"
+   ]
+  },
+  {
+   "id": "avales",
+   "cat": "contrato",
+   "t": "¿Está garantizado el dinero que entrego?",
+   "k": [
+    "aval",
+    "avales",
+    "garantia del dinero",
+    "seguro de cantidades",
+    "cuenta especial",
+    "esta protegido",
+    "mi dinero",
+    "garantizado",
+    "seguro"
+   ],
+   "r": "Sí. Por ley, todas las cantidades que entregues antes de la escritura se ingresan en una <b>cuenta especial</b> y se garantizan con un <b>aval bancario o un seguro de caución</b> individual a tu nombre, que recibes al firmar el contrato.",
+   "a": [
+    "legal"
+   ],
+   "rel": [
+    "retraso",
+    "contrato"
+   ]
+  },
+  {
+   "id": "garantias",
+   "cat": "contrato",
+   "t": "¿Qué garantía tiene la vivienda?",
+   "k": [
+    "garantia",
+    "garantias",
+    "defectos",
+    "desperfectos",
+    "postventa",
+    "reparacion",
+    "humedad",
+    "grietas",
+    "decenal"
+   ],
+   "r": "La vivienda tiene las garantías de la Ley de Ordenación de la Edificación: <b>10 años</b> para daños en la estructura (seguro decenal), <b>3 años</b> para defectos de habitabilidad y <b>1 año</b> para defectos de acabado. Nuestro servicio de postventa atiende las incidencias desde la entrega.",
+   "a": [],
+   "rel": [
+    "avales",
+    "contrato"
+   ]
+  },
+  {
+   "id": "documentacion",
+   "cat": "contrato",
+   "t": "¿Qué documentación me entregáis?",
+   "k": [
+    "documentacion",
+    "documentos",
+    "nota simple",
+    "licencia de obra",
+    "documento informativo",
+    "papeles",
+    "que necesito"
+   ],
+   "r": "Antes de reservar te entregamos el <b>documento informativo</b> de la promoción, planos, memoria de calidades, licencia de obra, plan de pagos y modelo de contrato. Tú necesitas tu DNI o NIE y, si vas a financiar, tus últimas nóminas o declaración de la renta.",
+   "a": [
+    "whatsapp"
+   ],
+   "rel": [
+    "contrato",
+    "planos"
+   ]
+  },
+  {
+   "id": "visita-piloto",
+   "cat": "visita",
+   "t": "¿Puedo visitar el piso piloto?",
+   "k": [
+    "visita",
+    "visitar",
+    "piso piloto",
+    "piloto",
+    "maqueta",
+    "ver el piso",
+    "verlo",
+    "ensenar",
+    "cita",
+    "quedar",
+    "ir a ver"
+   ],
+   "r": "Sí. El <b>piso piloto y la maqueta</b> están en la caseta de ventas, junto a la obra. Horario: de lunes a viernes de 10:00 a 14:00 y de 17:00 a 20:00, y sábados de 10:00 a 13:00. Reserva tu cita en un minuto y te atenderá un asesor.",
+   "a": [
+    "visita",
+    "llamar"
+   ],
+   "rel": [
+    "consulta-tecnica",
+    "visita-obra"
+   ]
+  },
+  {
+   "id": "consulta-tecnica",
+   "cat": "visita",
+   "t": "¿Puedo hablar con un arquitecto?",
+   "k": [
+    "arquitecto",
+    "tecnico",
+    "consulta tecnica",
+    "aparejador",
+    "ingeniero",
+    "dudas tecnicas"
+   ],
+   "r": "Sí. En la <b>consulta técnica</b> un arquitecto de la promoción te explica los planos, las calidades y las opciones de personalización. Puede ser presencial o por videollamada.",
+   "a": [
+    "visita"
+   ],
+   "rel": [
+    "planos",
+    "personalizar"
+   ]
+  },
+  {
+   "id": "visita-obra",
+   "cat": "visita",
+   "t": "¿Se puede visitar la obra?",
+   "k": [
+    "visitar la obra",
+    "ver la obra",
+    "entrar en la obra",
+    "visita de obra"
+   ],
+   "r": "Organizamos <b>visitas guiadas a la obra</b> para compradores en fechas concretas, con casco y chaleco y acompañados por el jefe de obra. Por seguridad, no se puede entrar por libre.",
+   "a": [
+    "visita"
+   ],
+   "rel": [
+    "estado-obra",
+    "visita-piloto"
+   ]
+  },
+  {
+   "id": "contacto",
+   "cat": "visita",
+   "t": "¿Cómo hablo con una persona?",
+   "k": [
+    "persona",
+    "humano",
+    "asesor",
+    "comercial",
+    "llamar",
+    "llamada",
+    "telefono",
+    "contacto",
+    "whatsapp",
+    "hablar con alguien",
+    "atencion",
+    "email",
+    "correo",
+    "hablar con una persona",
+    "hablar con un comercial",
+    "hablar con alguien"
+   ],
+   "r": "Claro. Puedes llamar al <b>688 93 33 08</b>, escribirnos por WhatsApp o pedir que te llamemos reservando una cita. Atendemos de lunes a viernes de 10:00 a 14:00 y de 17:00 a 20:00, y los sábados por la mañana.",
+   "a": [
+    "llamar",
+    "whatsapp",
+    "visita"
+   ],
+   "rel": [
+    "visita-piloto"
+   ]
+  }
+ ]
+}

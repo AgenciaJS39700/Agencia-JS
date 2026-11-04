@@ -1,0 +1,33 @@
+/* /movil.css — Optimización móvil común de Agencia JS (oct 2026)
+   - .mcar: carrusel deslizable solo en móvil (tarjetas al 84 %, imán, puntos y aviso «Desliza»)
+   - .mjump: barra de atajos bajo la cabecera que marca la sección actual
+   - .m2: rejilla de 2 columnas en móvil
+   - .mhide: se oculta en móvil */
+.mjump{display:none}
+@media(max-width:767px){
+ html,body{overflow-x:clip}
+ .mjump{display:flex;gap:.35rem;overflow-x:auto;padding:.4rem .9rem .5rem;scrollbar-width:none;border-top:1px solid rgba(127,127,127,.18)}
+ .mjump::-webkit-scrollbar{display:none}
+ .mjump a{flex:none;padding:.38rem .8rem;border-radius:999px;font-size:.78rem;font-weight:700;text-decoration:none;border:1px solid rgba(127,127,127,.3);color:inherit;opacity:.85;transition:background .2s,color .2s,opacity .2s;white-space:nowrap}
+ .mjump a.on{opacity:1;border-color:transparent}
+ section[id]{scroll-margin-top:120px}
+ .mcar{display:flex!important;grid-template-columns:none!important;flex-direction:row!important;flex-wrap:nowrap!important;gap:.8rem!important;overflow-x:auto!important;scroll-snap-type:x mandatory;scroll-padding-inline:1.25rem;margin-inline:-1.25rem!important;padding:.2rem 1.25rem 1rem!important;scrollbar-width:none;-webkit-overflow-scrolling:touch;width:auto!important;transform:none!important}
+ .mcar::-webkit-scrollbar{display:none}
+ .mcar>*{flex:0 0 84%!important;max-width:84%!important;scroll-snap-align:center;min-width:0;grid-column:auto!important;margin:0!important}
+ .mcar>.rv,.mcar>.reveal{opacity:1!important;transform:none!important}
+ .mdots{display:flex;justify-content:center;gap:.4rem;margin-top:.1rem}
+ .mdots i{width:7px;height:7px;border-radius:99px;background:currentColor;opacity:.25;transition:all .25s}
+ .mdots i.on{width:20px;opacity:.9}
+ .mhint{display:block;text-align:center;font-size:.74rem;opacity:.6;margin-top:.3rem}
+ .m2{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:.7rem!important}
+ .mhide{display:none!important}
+ .mfold-x:not(.mfold-on){display:none!important}
+ .mfold-b{display:flex;width:100%;align-items:center;justify-content:center;gap:.4rem;min-height:50px;margin:.8rem 0;padding:.75rem 1rem;border-radius:999px;border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;font:inherit;font-weight:800;font-size:.95rem;cursor:pointer}
+ .mfold-b[hidden]{display:none}
+ .fx-ph{width:min(220px,58vw)!important}
+ .mmore:not(.mmore-on)>:nth-child(n+9){display:none!important}
+ .mmore[data-max="6"]:not(.mmore-on)>:nth-child(n+7){display:none!important}
+ .mmore[data-max="4"]:not(.mmore-on)>:nth-child(n+5){display:none!important}
+}
+@media(min-width:768px){.mfold-b{display:none!important}}
+@media(min-width:768px){.mdots,.mhint{display:none}}

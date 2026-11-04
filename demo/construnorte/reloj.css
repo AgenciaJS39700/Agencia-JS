@@ -1,0 +1,43 @@
+/* reloj.css — Residencial Mirador del Norte en relojes inteligentes (hasta 300 px).
+   Se carga solo en esas pantallas. Deja lo esencial: el proyecto, las calidades en texto,
+   los precios y cómo pedir visita. El recorrido 3D, el chat y las barras flotantes se ocultan. */
+html, body { overflow-x: clip; }
+.wrap { width: calc(100% - 16px) !important; }
+.nav, .ch-fab, .ch, #ajs-demo, .ajs-tab, .mjump, .rc-po { display: none !important; }
+.hdr .wrap { height: 52px; }
+.logo svg { width: 28px; height: 28px; }
+.logo b { font-size: .9rem; }
+.rc .rc-pin { padding: 3.6rem 0 1rem !important; }
+.rc-ch { padding: .8rem !important; border-radius: .8rem !important; }
+.rc-ch h1 { font-size: 1.5rem !important; }
+.rc-ch h2 { font-size: 1.2rem !important; }
+.rc-ch > p { font-size: .8rem !important; }
+.rc-ch dl { grid-template-columns: 1fr !important; gap: 0 !important; font-size: .75rem !important; }
+.rc-ch dt { margin-top: .35rem; }
+.rc-ch dt, .rc-ch dd { white-space: normal !important; }
+.rc-badges { display: none !important; }
+.rc-ch .ctas .btn { width: 100%; }
+h2 { font-size: 1.5rem !important; overflow-wrap: anywhere; }
+.pr-head p { font-size: .8rem; }
+.pr-t tr { grid-template-columns: 1fr !important; }
+.pr-t .pe, .pr-t .pv { grid-column: 1 !important; grid-row: auto !important; justify-self: start !important; }
+.pr-pl h3 { flex-direction: column; align-items: flex-start; gap: .2rem; font-size: 1rem; }
+.vi-g { grid-template-columns: 1fr !important; }
+.box { padding: .8rem !important; }
+.cal-g button { min-height: 2.2rem !important; font-size: .75rem; }
+.cal-w span { font-size: .6rem; }
+.nav-b { flex-direction: column-reverse; }
+.nav-b .btn { width: 100%; }
+.cb .wrap { flex-direction: column; align-items: flex-start; }
+.ck { left: 4px !important; right: 4px !important; bottom: 4px !important; padding: .55rem !important; max-height: calc(100vh - 8px); overflow: auto; gap: .4rem !important; }
+.ck b { font-size: .8rem; }
+.ck p { font-size: .68rem !important; margin: .2rem 0 0 !important; }
+.ck-cfg { display: none !important; }
+.ck-b { flex-direction: row !important; gap: .3rem !important; }
+.ck-b .btn { flex: 1 1 0; min-height: 2.6rem !important; padding: 0 .4rem !important; font-size: .7rem !important; }
+#ckC { display: none !important; }
+footer { padding-bottom: 1.5rem !important; }
+footer .wrap { flex-direction: column; align-items: flex-start; }
+/* reserva: opciones compactas */
+.opt { min-height: 2.75rem !important; padding: .45rem .6rem !important; }
+.opt small, .opt i { display: none !important; }
