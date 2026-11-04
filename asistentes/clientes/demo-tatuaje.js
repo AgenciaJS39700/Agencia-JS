@@ -22,7 +22,7 @@ export default {
     horario: { 2: TARDE, 3: TARDE, 4: TARDE, 5: TARDE, 6: [["10:00", "15:00"]] },
     extra: [
       "Artistas: Alba (fine line y botánico), Marko (blackwork, geométrico y tradicional) y Sara (realismo y retratos en negro y gris). Si el cliente quiere un artista concreto, que lo diga y se anota en la cita.",
-      "Presupuesto gratis y sin compromiso: depende del tamaño, el detalle y la zona. Precio mínimo desde 50 €. El flash del mes, desde 60 €.",
+      "Presupuesto gratis y sin compromiso: el precio depende del tamaño, el detalle y la zona, y lo da el artista al ver la idea (por WhatsApp o en la consulta gratuita). Tatuajes pequeños desde 50 €. El flash del mes, desde 60 €. No des precios inventados ni confundas la duración de la sesión con el precio.",
       "Para confirmar la fecha se paga una señal de 50 € que se descuenta del total el día de la sesión. Cambios con 48 h de antelación sin perder la señal.",
       "Solo tatuamos a mayores de 18 años. No tatuamos durante el embarazo ni la lactancia. Antes de la sesión se firma el consentimiento informado (alergias, medicación, salud de la piel).",
       "Antes de venir: descansa, come bien, ropa cómoda que deje la zona a mano y nada de alcohol las 24 h anteriores.",
@@ -39,9 +39,9 @@ export default {
   servicios: [
     { id: "consulta", nombre: "Consulta y presupuesto (gratis)", min: 30, precio: "gratis" },
     { id: "pequeno", nombre: "Tatuaje pequeño (hasta 8 cm)", min: 120, precio: "desde 50 €" },
-    { id: "mediano", nombre: "Tatuaje mediano (8–15 cm)", min: 180, precio: "según diseño" },
-    { id: "grande", nombre: "Sesión grande (más de 15 cm)", min: 300, precio: "según diseño" },
-    { id: "dia", nombre: "Sesión de día completo (mangas y piezas grandes)", min: 480, precio: "según diseño" },
+    { id: "mediano", nombre: "Tatuaje mediano (8–15 cm)", min: 180, precio: "presupuesto gratis según diseño y zona" },
+    { id: "grande", nombre: "Sesión grande (más de 15 cm)", min: 300, precio: "presupuesto gratis según diseño y zona" },
+    { id: "dia", nombre: "Sesión de día completo (mangas y piezas grandes)", min: 480, precio: "presupuesto gratis según diseño y zona" },
     { id: "coverup", nombre: "Valoración de cover up (gratis)", min: 30, precio: "gratis" },
     { id: "retoque", nombre: "Retoque", min: 60, precio: "gratis en piezas del estudio" },
   ],
