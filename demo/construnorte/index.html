@@ -132,6 +132,30 @@ html.rc-in .hdr{background:rgba(244,240,233,.55)}
 .rc-dots button{height:1.9rem}
 .rc-asc{top:4.2rem}
 }
+/* móvil y tablet en vertical: pantalla partida. Arriba la escena de fotos sin nada encima; abajo una ficha fija */
+@media (max-aspect-ratio:4/5) and (max-width:899px){
+.rc .rc-pin{--pan:clamp(15.5rem,41svh,22rem)}
+@media(min-width:600px){.rc .rc-pin{--pan:clamp(17.5rem,28svh,21rem)}}
+.rc .rc-ph{bottom:var(--pan)}
+.rc .rc-vig{bottom:var(--pan);background:linear-gradient(0deg,rgba(17,16,14,.35) 0,rgba(17,16,14,0) 18%)}
+.rc .rc-txt{left:0;right:0;width:auto;translate:none}
+.rc .rc-ch{left:0;right:0;top:auto;bottom:0;width:auto;height:var(--pan);transform:none;translate:0 12px;border-radius:1.25rem 1.25rem 0 0;border:0;border-top:1px solid rgba(226,196,143,.35);background:#1b1a18;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 -12px 30px rgba(0,0,0,.25);padding:1rem 1.1rem calc(64px + .8rem + env(safe-area-inset-bottom));overflow:hidden}
+.rc .rc-ch.on{translate:0 0}
+.rc .rc-ch .kick{font-size:.68rem;letter-spacing:.18em}
+.rc .rc-ch h1{font-size:clamp(1.45rem,6.6vw,1.9rem);margin:.3rem 0 .35rem}
+.rc .rc-ch h2{font-size:clamp(1.3rem,5.8vw,1.7rem);margin:.3rem 0 .35rem}
+.rc .rc-ch>p{font-size:.84rem;line-height:1.45}
+.rc .rc-ch dl{font-size:.78rem;gap:.2rem .8rem;margin-top:.45rem}
+.rc .rc-ch dl>:nth-child(n+9){display:none}
+.rc .rc-badges{display:none}
+.rc .rc-ch .ctas{flex-wrap:nowrap;gap:.45rem;margin-top:.7rem}
+.rc .rc-ch .ctas .btn{min-height:2.75rem;padding:0 .8rem;font-size:.78rem;white-space:nowrap}
+.rc .rc-dots{top:calc((100svh - var(--pan)) / 2);bottom:auto}
+.rc .rc-nota{left:auto;right:.8rem;top:4.4rem}
+/* los botones flotantes no tapan la ficha: el chat está en la barra inferior («Asistente») y el de accesibilidad sube a la foto */
+html.rc-in .ch-fab{opacity:0;pointer-events:none}
+html.rc-in .a11y-btn{bottom:auto!important;top:4.4rem!important}
+}
 /* versión fija: sin animaciones o sin WebGL */
 :is(.rc-static,.a11y-quieto .rc){height:auto}
 :is(.rc-static,.a11y-quieto .rc) .rc-pin{position:relative;height:auto;background:var(--dk);padding:6.5rem 0 3rem}
