@@ -236,7 +236,7 @@ export async function enviarRecordatorios(env) {
         if (otra) continue;
         const sem = Math.round(Number(dias) / 7), url = cfg.negocio.web || `https://agencia-js.com/c/${slug}`;
         await correo(env, cfg, c.email, c.nombre, `${c.nombre.split(" ")[0]}, ¿repetimos? · ${cfg.negocio.nombre}`,
-          marco(cfg, `Hace ${sem} semanas de tu ${c.servicio_n.toLowerCase()}`, `<p style="font-size:15px;line-height:1.6">Es el momento ideal para el retoque y que tu pelo siga perfecto. Reserva en un minuto, cuando quieras:</p><p style="margin:20px 0"><a href="${esc(url)}" style="display:inline-block;background:${esc(cfg.color)};color:#111;padding:12px 20px;border-radius:999px;font-weight:700;text-decoration:none">Pedir cita</a></p>`));
+          marco(cfg, cfg.vueltaTitulo ? cfg.vueltaTitulo.replace("{servicio}", c.servicio_n.toLowerCase()) : `Hace ${sem} semanas de tu ${c.servicio_n.toLowerCase()}`, `<p style="font-size:15px;line-height:1.6">${esc(cfg.vueltaTexto || "Es el momento ideal para el retoque y que tu pelo siga perfecto.")} Reserva en un minuto, cuando quieras:</p><p style="margin:20px 0"><a href="${esc(url)}" style="display:inline-block;background:${esc(cfg.color)};color:#111;padding:12px 20px;border-radius:999px;font-weight:700;text-decoration:none">Pedir cita</a></p>`));
       }
     }
   }
@@ -408,7 +408,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
   if (request.method === "GET" && (ruta === "dias" || ruta === "huecos")) {
     const serv = cfg.servicios.find((s) => s.id === url.searchParams.get("servicio"));
     if (!serv) return r({ error: "Servicio no válido" }, 400);
-    if (ruta === "dias") return r({ dias: await proximosDias(env, cfg, serv.min, 10) });
+    if (ruta === "dias") return r({ dias: await proximosDias(env, cfg, serv.min, Math.min(Math.max(+url.searchParams.get("n") || 10, 1), 31)) });
     const fecha = url.searchParams.get("fecha") || "";
     if (!RE_FECHA.test(fecha)) return r({ error: "Fecha no válida" }, 400);
     return r({ fecha, huecos: (await huecosDia(env, cfg, fecha, serv.min)).map(hhmm) });
