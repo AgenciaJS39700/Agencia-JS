@@ -1,4 +1,4 @@
-# Contenido de los carruseles 3 – 8 nov 2026 (Agencia JS)
+# Contenido de los carruseles 14 – 15 nov 2026 (Agencia JS)
 def W(n, title, text, fix):
     return (f'<div class="num">{n}</div><h2>{title}</h2><p>{text}</p>'
             f'<div class="fix"><b>Mejor</b><span>{fix}</span></div>', {})
@@ -15,44 +15,25 @@ def V(n, title, text, tip):
     return (f'<div class="num">{n}</div><h2>{title}</h2><p>{text}</p>'
             f'<div class="fix"><b>Truco</b><span>{tip}</span></div>', {})
 
+def BLOCK(label, title, items):
+    checks = ''.join(f'<div class="check"><i>✓</i><span>{t}</span></div>' for t in items)
+    return (f'<div class="step">{label}</div><h2>{title}</h2>{checks}', {})
+
 POSTS = [
- ('2026-11-03-red-flags', [
-   ('<div class="tag">Red flags 🚩 vs green flags 💚</div><h1>¿La web de tu negocio <span class="g">vende</span> o <span class="g">espanta</span>?</h1><p style="margin-top:44px">5 señales que el cliente ve en los primeros segundos.</p>', {}),
-   F('01', 'Tarda una eternidad en abrir en el móvil', 'Se abre rápido y se lee sin hacer zoom'),
-   F('02', 'Para contactar hay que rellenar un formulario larguísimo', 'Botón de WhatsApp y de llamar siempre a mano'),
-   F('03', 'Fotos de banco de imágenes que salen en mil webs', 'Fotos reales de tu local, tu equipo y tu producto'),
-   F('04', 'No aparece ni el horario ni la dirección', 'Horario, mapa y cómo llegar en un vistazo'),
-   F('05', 'La última novedad es de hace años', 'Ofertas y novedades al día'),
-   (cta('¿Cuántas <span class="g">red flags</span> tiene la tuya?', 'Te revisamos gratis la web y la ficha de Google y te decimos qué mejorar.', 'Comenta AUDITORIA 👇'), {}),
+ ('2026-11-14-bf-sin-bajar-precios', [
+   ('<div class="tag">Black Friday · Faltan 2 semanas</div><h1>5 ideas para tu Black Friday <span class="g">sin bajar precios</span></h1><p style="margin-top:44px">Para cuando tu margen no da para más descuentos.</p>', {}),
+   V('01', 'Regalo con la compra', 'Un detalle a partir de cierto importe: una muestra, un extra o un complemento.', 'Elige algo que a ti te cueste poco y el cliente valore.'),
+   V('02', 'Pack con nombre propio', 'Junta dos o tres productos o servicios que encajan bien entre sí.', 'Ponle nombre y que se entienda de un vistazo.'),
+   V('03', 'Bono o tarjeta regalo', 'Para regalar en Navidad o para usar más adelante.', 'Anúncialo ya, antes de que empiecen las compras navideñas.'),
+   V('04', 'Acceso anticipado', 'Tus clientes de siempre se enteran antes que nadie y reservan primero.', 'Avísales unos días antes por tu lista de difusión de WhatsApp.'),
+   V('05', 'Un servicio extra', 'Envío gratis, envoltorio de regalo o una cita prioritaria.', 'Elige el que menos te cueste y más se note.'),
+   (cta('¿Cuál usarías <span class="g">este año</span>?', 'Cuéntanoslo y te decimos cómo prepararlo en tu web, tu ficha de Google o un vídeo.', 'Comenta del 1 al 5 👇'), {}),
  ]),
- ('2026-11-05-nfc-3-pasos', [
-   ('<div class="tag">Tarjetas NFC de reseñas</div><h1>Cómo funcionan <span class="g">en 3 pasos</span></h1><p style="margin-top:44px">Sin descargar apps y sin buscar tu negocio en Google.</p>', {}),
-   STEP('01', 'El cliente acerca el móvil a la tarjeta', 'En el mostrador, en la mesa o junto a la caja. Un gesto y listo.'),
-   STEP('02', 'Se abre tu ficha de Google para opinar', 'Directo a dejar su reseña, sin pasos intermedios ni búsquedas.'),
-   STEP('03', 'Él decide qué escribir', 'La opinión siempre es del cliente. La tarjeta solo le quita la pereza de buscarte.'),
-   ('<h2>3 consejos para sacarle partido 💡</h2>'
-    '<div class="check"><i>1</i><span>Colócala donde el cliente espera: caja, mesa o recepción</span></div>'
-    '<div class="check"><i>2</i><span>Pídela en el buen momento: al cobrar o al despedirte</span></div>'
-    '<div class="check"><i>3</i><span>Responde a todas las reseñas, también a las mejorables</span></div>', {}),
-   (cta('¿Quieres tus <span class="g">tarjetas NFC</span>?', 'Las preparamos con el enlace a tu ficha de Google.', 'Escríbenos 👇'), {}),
- ]),
- ('2026-11-07-esto-o-esto', [
-   ('<div class="tag">Esto o esto 👀</div><h1>Como cliente, <span class="g">¿qué prefieres?</span></h1><p style="margin-top:44px">Responde en comentarios con tus letras. Ejemplo: A B A B B</p>', {}),
-   ('<h2 style="font-size:64px">Elige una de cada 👇</h2>'
-    '<div class="pair"><div><b>A</b>Carta en PDF</div><em>o</em><div class="b"><b>B</b>Carta en la web</div></div>'
-    '<div class="pair"><div><b>A</b>Formulario de contacto</div><em>o</em><div class="b"><b>B</b>Botón de WhatsApp</div></div>'
-    '<div class="pair"><div><b>A</b>Llamar para reservar</div><em>o</em><div class="b"><b>B</b>Reservar online</div></div>'
-    '<div class="pair"><div><b>A</b>Fotos de stock</div><em>o</em><div class="b"><b>B</b>Fotos reales</div></div>'
-    '<div class="pair"><div><b>A</b>Buscar en Instagram</div><em>o</em><div class="b"><b>B</b>Buscar en Google Maps</div></div>', {}),
-   (cta('Lo que prefieres tú, <span class="g">lo prefieren tus clientes</span>', '¿Tu negocio lo pone fácil? Te lo revisamos gratis.', 'Comenta tus letras 👇'), {}),
- ]),
- ('2026-11-08-ideas-video', [
-   ('<div class="tag">Consejos rápidos 🎬</div><h1>5 vídeos que tu negocio puede grabar <span class="g">esta semana</span></h1><p style="margin-top:44px">Solo con el móvil. Guárdalo para tu próxima idea.</p>', {}),
-   V('01', 'Antes y después', 'Un corte de pelo, un plato emplatado, una reparación o un escaparate nuevo.', 'Mismo encuadre en las dos tomas para que el cambio se note.'),
-   V('02', 'Tu día en 15 segundos', 'Subir la persiana, preparar, el primer cliente, cerrar.', 'Clips cortos de 1–2 segundos cada uno.'),
-   V('03', 'Responde una pregunta frecuente', '«¿Hacéis encargos?», «¿Hay aparcamiento?», «¿Aceptáis tarjeta?»', 'Pon la pregunta en texto en el primer segundo.'),
-   V('04', 'Presenta a tu equipo', 'Quién es quién y qué hace cada uno. La gente compra a personas.', 'Que cada uno diga una frase, no un discurso.'),
-   V('05', 'El proceso de tu producto estrella', 'Cómo se hace, de principio a fin.', 'Graba en vertical y con buena luz, mejor de día.'),
-   (cta('¿Prefieres un vídeo <span class="g">publicitario profesional</span>?', 'Guion, grabación y edición para tu negocio. Lo hacemos nosotros.', 'Escríbenos 👇'), {}),
+ ('2026-11-15-sunday-reset', [
+   ('<div class="tag">Sunday reset 🧺</div><h1>El reset de domingo, pero <span class="g">para tu negocio</span></h1><p style="margin-top:44px">15 minutos para empezar el lunes con todo en orden.</p>', {}),
+   BLOCK('Minutos 1–5', 'Tu ficha de Google', ['Horario al día, festivos incluidos', 'Una foto nueva y real de esta semana']),
+   BLOCK('Minutos 5–10', 'Tus clientes', ['Contesta las reseñas de la semana', 'Responde los mensajes pendientes de WhatsApp y redes']),
+   BLOCK('Minutos 10–15', 'Tus redes', ['Deja lista una publicación para la semana', 'Apunta la pregunta que más te han hecho: ahí tienes tu próximo vídeo']),
+   (cta('¿No te da la vida para <span class="g">el reset</span>?', 'Cuéntanos qué te falta: web, ficha de Google o vídeos para tu negocio.', 'Escríbenos 👇'), {}),
  ]),
 ]
