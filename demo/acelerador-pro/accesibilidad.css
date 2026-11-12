@@ -44,10 +44,24 @@ html.a11y-gris { filter: grayscale(1); }
 }
 
 /* ---------- 8. Panel de accesibilidad ---------- */
-.a11y-btn { position: fixed; left: 0; top: 45%; z-index: 2147483000; width: 2.75rem; height: 2.75rem; display: grid; place-items: center;
-  border: 2px solid #fff; border-left: 0; border-radius: 0 .75rem .75rem 0; background: #111; color: #fff; cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0,0,0,.35); font: 800 1rem/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-.a11y-btn svg { width: 1.5rem; height: 1.5rem; }
+.a11y-btn { position: fixed; left: 0; top: 50%; z-index: 2147483000; width: 2.5rem; height: 2.75rem; display: grid; place-items: center; padding: 0;
+  border: 1px solid rgba(255,255,255,.55); border-left: 0; border-radius: 0 .75rem .75rem 0; background: rgba(17,17,17,.55); color: #fff; cursor: pointer;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); box-shadow: 0 4px 14px rgba(0,0,0,.2); font: 800 1rem/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  opacity: .5; transform: translate(-.6rem, -50%); transition: opacity .2s, transform .2s, width .2s, background .2s; }
+.a11y-btn svg { width: 1.35rem; height: 1.35rem; margin-left: .5rem; }
+/* Al pasar el ratón, con el teclado o con el panel abierto se ve entero */
+.a11y-btn:hover, .a11y-btn:focus-visible, .a11y-btn[aria-expanded="true"] { opacity: 1; transform: translate(0, -50%); background: #111; }
+.a11y-btn:hover svg, .a11y-btn:focus-visible svg, .a11y-btn[aria-expanded="true"] svg { margin-left: 0; }
+/* Mientras se hace scroll, casi invisible */
+.a11y-btn.scroll:not(:hover):not(:focus-visible):not([aria-expanded="true"]) { opacity: .15; }
+/* Minimizado: una pestañita fina en el borde (zona táctil más grande que lo que se ve) */
+.a11y-btn.min { width: .5rem; height: 3rem; opacity: .35; transform: translate(0, -50%); border-radius: 0 .5rem .5rem 0; }
+.a11y-btn.min svg { display: none; }
+.a11y-btn.min::before { content: ""; position: absolute; top: -.5rem; bottom: -.5rem; left: 0; width: 2rem; }
+.a11y-btn.min:hover, .a11y-btn.min:focus-visible, .a11y-btn.min[aria-expanded="true"] { width: 2.5rem; opacity: 1; }
+.a11y-btn.min:hover svg, .a11y-btn.min:focus-visible svg, .a11y-btn.min[aria-expanded="true"] svg { display: block; }
+.a11y-pan .a11y-tip { margin: .6rem 0 0; font-size: .75rem; color: #bbb; text-align: center; }
+@media (prefers-reduced-motion: reduce) { .a11y-btn { transition: none; } }
 .a11y-pan { position: fixed; left: .5rem; top: 50%; transform: translateY(-50%); z-index: 2147483001; width: min(19rem, calc(100vw - 1rem));
   max-height: calc(100vh - 1rem); overflow: auto; background: #111; color: #fff; border: 2px solid #fff; border-radius: 1rem; padding: 1rem;
   font: 400 1rem/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
