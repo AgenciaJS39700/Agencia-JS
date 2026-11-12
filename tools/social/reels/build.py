@@ -1,7 +1,9 @@
 import subprocess, glob, sys
 def run(c): subprocess.run(c, shell=True, check=True)
 SPEC = {
- 'reel-2026-11-13-viernes-13': ([3.2,3.2,3.2,3.2,3.2,4.6], 'spooky', ['fadewhite','slideup','fade','slideup','fade']),
+ 'reel-2026-11-17-web-antigua': ([3.0,3.2,3.2,3.2,3.2,4.6], 'pop', ['fadewhite','slideup','fade','slideup','fade']),
+ 'reel-2026-11-19-expectativa-realidad': ([3.0,2.8,3.2,2.8,3.2,3.0,4.6], 'pop', ['fade','fadewhite','fade','fadewhite','slideup','fade']),
+ 'reel-2026-11-21-navidad-finde': ([3.0,3.0,3.0,3.0,3.0,3.4,4.6], 'pop', ['fadewhite','slideup','slideup','slideup','fade','fade']),
 }
 X=0.35; FPS=30
 for name,(durs,music,trans) in SPEC.items():
