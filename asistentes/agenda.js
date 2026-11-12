@@ -435,6 +435,6 @@ export function manifiesto(slug) {
   if (!cfg) return null;
   return new Response(JSON.stringify({
     name: `Citas · ${cfg.negocio.nombre}`, short_name: "Citas", lang: "es", start_url: `/panel/${slug}`, scope: "/panel/", display: "standalone",
-    background_color: "#0f0f10", theme_color: "#0f0f10", icons: [{ src: "/apple-touch-icon.png", sizes: "180x180", type: "image/png", purpose: "any" }],
+    background_color: "#0a0a0a", theme_color: "#0f0f10", icons: [{ src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" }, { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" }, { src: "/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }],
   }), { headers: { "Content-Type": "application/manifest+json; charset=utf-8", "Cache-Control": "no-store" } });
 }
