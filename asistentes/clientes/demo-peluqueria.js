@@ -9,7 +9,7 @@ export default {
   slug: "demo-peluqueria",
   demo: true,
   plan: "avanzado",
-  motor: "pro",
+  motor: "basico",            // demo pública: siempre el motor gratuito (Workers AI)
   icono: "scissors",
   color: "#d9b77e",
   sector: "Peluquería y estética",
