@@ -488,14 +488,14 @@ body.n3{margin:0;background:var(--n-bg);color:var(--n-tx);font-family:Inter,ui-s
 .n-hero .n-center{gap:22px}
 .n-hero .n-lead{max-width:680px}
 .n-ctas{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px}
-.n-stage{display:grid;grid-template-columns:minmax(0,1fr) 200px 200px;gap:24px;align-items:end;margin-top:64px}
+.n-stage{display:grid;grid-template-columns:minmax(0,1fr) 190px 190px;gap:36px;align-items:end;margin-top:64px;padding-bottom:14px}
 .n-lap{display:flex;flex-direction:column;align-items:center}
 .n-lap-s{width:100%;background:var(--n-card2);border:1px solid var(--n-line);border-bottom:0;border-radius:18px 18px 0 0;padding:12px 12px 0;box-sizing:border-box}
 .n-lap-s img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top;border-radius:8px 8px 0 0}
-.n-lap-b{width:106%;height:14px;background:linear-gradient(#3a3a3c,#1c1c1e);border-radius:0 0 14px 14px}
+.n-lap-b{width:104%;height:14px;background:linear-gradient(#3a3a3c,#1c1c1e);border-radius:0 0 14px 14px}
 .n-ph{border:8px solid var(--n-card2);border-radius:34px;overflow:hidden;background:#000;box-shadow:0 30px 60px rgba(0,0,0,.5)}
 .n-ph img{display:block;width:100%;height:auto;aspect-ratio:9/19.5;object-fit:cover;object-position:top}
-.n-ph.up{margin-bottom:48px}
+.n-ph.up{margin-bottom:0}
 .n-stage a{display:block;color:inherit}
 
 /* Fila de ventajas */
@@ -564,11 +564,17 @@ body.n3{margin:0;background:var(--n-bg);color:var(--n-tx);font-family:Inter,ui-s
 .n-sv .n-k{font-size:14px}
 .n-sv h3{margin:0;font-size:24px;letter-spacing:-.03em;line-height:1.15}
 .n-sv p.p{margin:0;font-size:14px;color:var(--n-mute)}
-.n-sv img{width:100%;height:240px;object-fit:cover;margin-top:22px;display:block}
-.n-sv img.top{object-position:top}
+.n-sv img{width:100%;height:300px;object-fit:cover;margin-top:22px;display:block}
+.n-sv img.top{object-position:left top}
 .n-sv button{all:unset;cursor:pointer;display:block;position:relative;margin-top:22px}
 .n-sv button img{margin-top:0}
 .n-sv button:focus-visible{outline:3px solid var(--n-acc3);outline-offset:-3px}
+.n-sv>.n-vid{padding:0;flex-direction:row;gap:0}
+.n-vid{position:relative;margin-top:22px;height:300px;background:#0d0d0f;display:flex;justify-content:center;align-items:flex-end;overflow:hidden}
+.n-vid video{height:100%;width:auto;aspect-ratio:9/16;object-fit:cover;border-radius:18px 18px 0 0;border:6px solid var(--n-card2);border-bottom:0;background:#000;display:block}
+.n-vid .vlb-c{all:unset;position:absolute;inset:0;cursor:pointer}
+.n-vid .vlb-c:focus-visible{outline:3px solid var(--n-acc3);outline-offset:-3px}
+.n-vid .n-snd{position:absolute;right:14px;bottom:14px;display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.65);color:#fff;font-size:13px;font-weight:600;padding:8px 12px;border-radius:999px;pointer-events:none}
 .n-play{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center}
 .n-dm{display:flex;flex-direction:column;background:var(--n-card);border-radius:24px;overflow:hidden;color:var(--n-tx)!important;transition:transform .3s}
 .n-dm:hover{transform:translateY(-4px)}
@@ -676,8 +682,8 @@ body.n3{margin:0;background:var(--n-bg);color:var(--n-tx);font-family:Inter,ui-s
  .n-hero{padding:56px 0 40px}
  .n-head .n-btn.sm{display:none}
  .n-stage{margin-top:40px;align-items:center}
- .n-stage.mcar>.n-lap{flex-basis:92%}
- .n-stage.mcar>.n-ph{flex-basis:46%}
+ .n-stage{padding-bottom:0;grid-template-columns:repeat(2,minmax(0,170px));justify-content:center;gap:16px}
+ .n-stage .n-lap{display:none}
  .n-asis.mcar{align-items:flex-start}
  .n-h1 br{display:none}
  .n-ph.up{margin-bottom:0}
@@ -761,7 +767,7 @@ requestAnimationFrame(fr)})(t0);
 </div>
 </div>
 <div class="n-wrap">
-<div class="n-stage mcar" data-auto="0">
+<div class="n-stage">
 <a class="n-lap" href="https://constru-norte-demo.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="hero_demo_construnorte" aria-label="Abrir la demo de ConstruNorte, web inmobiliaria">
 <div class="n-lap-s"><img src="/img/portada/construnorte-pc.webp" alt="Web de ejemplo de ConstruNorte, inmobiliaria con recorrido virtual" width="1200" height="750" fetchpriority="high"></div>
 <div class="n-lap-b"></div>
@@ -870,15 +876,15 @@ requestAnimationFrame(fr)})(t0);
 <div class="n-grid3 mcar" data-auto="0">
 <article class="n-sv reveal">
 <div><p class="n-k">Webs a medida</p><h3>Rápidas, para el móvil y preparadas para Google.</h3><p class="p">Desde 349 € o 59 €/mes</p></div>
-<img class="top" src="/img/portada/nacar-pc.webp" alt="Web de ejemplo de un salón de uñas en el ordenador" width="900" height="562" loading="lazy">
+<img class="top" src="/img/portada/sonrisa-pc.webp" alt="Web de ejemplo de una clínica dental en el ordenador" width="900" height="562" loading="lazy">
 </article>
 <article class="n-sv reveal">
 <div><p class="n-k">Tarjetas NFC</p><h3>Acercan el móvil y te dejan reseña en Google.</h3><p class="p">1 pack 25 € · 2 packs 45 €</p></div>
-<img src="/img/portada/nfc.webp" alt="Tarjeta NFC para dejar reseñas en Google" width="480" height="860" loading="lazy">
+<div class="n-vid"><video muted loop playsinline preload="none" poster="/media/anuncio-nfc-v3.webp" data-src="/media/anuncio-nfc-v3.mp4" aria-hidden="true"></video><button type="button" class="vlb-c" data-video="/media/anuncio-nfc-v3.mp4" data-titulo="Anuncio: tarjetas NFC para reseñas" aria-label="Ver con sonido el anuncio de las tarjetas NFC"></button><span class="n-snd" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 14"><path d="M1 1l10 6-10 6z" fill="#fff"/></svg>Ver con sonido</span></div>
 </article>
 <article class="n-sv reveal">
 <div><p class="n-k">Vídeos y campañas</p><h3>Reels, TikTok y anuncios para tu zona.</h3><p class="p">Vídeos desde 49 € · campañas a medida</p></div>
-<button type="button" class="vlb-c" data-video="/media/anuncio-bar.mp4" data-titulo="Anuncio de ejemplo: Bar Marea" aria-label="Ver un anuncio de ejemplo"><img src="/img/portada/video-bar.webp" alt="" width="480" height="860" loading="lazy"><span class="n-play" aria-hidden="true"><svg width="18" height="20" viewBox="0 0 12 14"><path d="M1 1l10 6-10 6z" fill="#0a0a0a"/></svg></span></button>
+<div class="n-vid"><video muted loop playsinline preload="none" poster="/media/anuncio-peluqueria.webp" data-src="/media/anuncio-peluqueria.mp4" aria-hidden="true"></video><button type="button" class="vlb-c" data-video="/media/anuncio-peluqueria.mp4" data-titulo="Anuncio de ejemplo: Salón Marta Vega" aria-label="Ver con sonido un anuncio de ejemplo de peluquería"></button><span class="n-snd" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 14"><path d="M1 1l10 6-10 6z" fill="#fff"/></svg>Ver con sonido</span></div>
 </article>
 </div>
 </div>
@@ -889,15 +895,14 @@ requestAnimationFrame(fr)})(t0);
 <div class="n-wrap" style="display:flex;flex-direction:column;gap:36px">
 <div class="n-sec-h">
 <div><h2 id="dm-t" class="n-h2">Míralo funcionando.</h2><p class="n-lead">Webs de ejemplo que puedes abrir y probar en tu móvil.</p></div>
-<button type="button" class="n-link" id="dm-mas" aria-expanded="false" aria-controls="dm-extra" style="background:none;border:0;cursor:pointer;font:inherit;font-weight:600;font-size:17px">Ver las 7 demos ›</button>
+<button type="button" class="n-link" id="dm-mas" aria-expanded="false" aria-controls="dm-extra" style="background:none;border:0;cursor:pointer;font:inherit;font-weight:600;font-size:17px">Ver más demos ›</button>
 </div>
 <div class="n-grid3 mcar" data-auto="0">
-<a class="n-dm reveal" href="https://constru-norte-demo.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_construnorte"><img src="/img/demos/construnorte.webp" alt="" width="640" height="480" loading="lazy"><span><strong>ConstruNorte</strong><small>Inmobiliaria · Recorrido virtual planta a planta</small><em>Ver demo ›</em></span></a>
-<a class="n-dm reveal" href="https://nacar-demo.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_nacar"><img src="/img/demos/unas.webp" alt="" width="640" height="480" loading="lazy"><span><strong>Nácar Nail Atelier</strong><small>Uñas · Simulador de diseños</small><em>Ver demo ›</em></span></a>
+<a class="n-dm reveal" href="https://peluquer-a-marta-vega.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_peluqueria"><img src="/img/demos/peluqueria.webp" alt="" width="640" height="480" loading="lazy"><span><strong>Salón Marta Vega</strong><small>Peluquería · Probador de color y reservas</small><em>Ver demo ›</em></span></a>
+<a class="n-dm reveal" href="https://barberia.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_barberia"><img src="/img/portada/demo-barberia.webp" alt="" width="640" height="480" loading="lazy"><span><strong>Barbería</strong><small>Barbería · Reserva tu corte en un minuto</small><em>Ver demo ›</em></span></a>
 <a class="n-dm reveal" href="https://taller-motor-norte.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_taller"><img src="/img/demos/taller.webp?v=2" alt="" width="640" height="480" loading="lazy"><span><strong>Taller Motor Norte</strong><small>Taller · Seguimiento de la reparación en directo</small><em>Ver demo ›</em></span></a>
 </div>
-<div class="n-grid4 mcar" id="dm-extra" data-auto="0" hidden>
-<a class="n-dm" href="https://tinta-negra-demo.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_tinta"><img src="/demo/presencia-360/img/estudio.webp" alt="" width="640" height="480" loading="lazy"><span><strong>Tinta Negra</strong><small>Estudio de tatuaje</small><em>Ver demo ›</em></span></a>
+<div class="n-grid3 mcar" id="dm-extra" data-auto="0" hidden>
 <a class="n-dm" href="https://pasteler-a-dulce-nube.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_pasteleria"><img src="/img/demos/pasteleria.webp?v=2" alt="" width="640" height="480" loading="lazy"><span><strong>Pastelería Dulce Nube</strong><small>Obrador · Diseña tu tarta</small><em>Ver demo ›</em></span></a>
 <a class="n-dm" href="https://sonrisa-sur.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_clinica"><img src="/img/demos/clinica.webp?v=2" alt="" width="640" height="480" loading="lazy"><span><strong>Clínica Dental Sonrisa Sur</strong><small>Clínica · Citas y tratamientos</small><em>Ver demo ›</em></span></a>
 <a class="n-dm" href="https://jardin-de-alba.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="demo_floristeria"><img src="/img/demos/floristeria.webp?v=2" alt="" width="640" height="480" loading="lazy"><span><strong>Floristería Jardín de Alba</strong><small>Floristería · Ramos y encargos</small><em>Ver demo ›</em></span></a>
@@ -1321,6 +1326,17 @@ if (pl) {
   pays.forEach(function (b) { b.addEventListener("click", function () { pago(b.dataset.pay); }); });
 }
 
+/* Vídeos de las tarjetas: se reproducen sin sonido cuando se ven (no si se pide menos movimiento o ahorro de datos) */
+var conn = navigator.connection || {};
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches && !conn.saveData && "IntersectionObserver" in window) {
+  var vio = new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      var v = en.target;
+      if (en.isIntersecting) { if (!v.src) { v.src = v.dataset.src; } var pr = v.play(); if (pr && pr.catch) { pr.catch(function () {}); } } else { v.pause(); }
+    });
+  }, { threshold: 0.35 });
+  document.querySelectorAll(".n-vid video").forEach(function (v) { vio.observe(v); });
+}
 /* Demos: ver las 7 */
 var dmB = $("dm-mas"), dmX = $("dm-extra");
 if (dmB && dmX) {
@@ -1328,7 +1344,7 @@ if (dmB && dmX) {
     var abrir = dmX.hidden;
     dmX.hidden = !abrir;
     dmB.setAttribute("aria-expanded", String(abrir));
-    dmB.textContent = abrir ? "Ver menos ›" : "Ver las 7 demos ›";
+    dmB.textContent = abrir ? "Ver menos ›" : "Ver más demos ›";
   });
 }
 
