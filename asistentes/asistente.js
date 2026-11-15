@@ -43,6 +43,7 @@ export const ICONOS = {
 export const svg = (k, s = 20) => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONOS[k] || ""}</svg>`;
 
 /* ---------- utilidades ---------- */
+const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const h = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 const min2 = (t) => { const [a, b] = t.split(":").map(Number); return a * 60 + b; };
 const hhmm = (m) => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
@@ -202,7 +203,7 @@ export function abrirAsistente(id, op = {}) {
   function empezarCita() {
     msg("bot", "Perfecto, vamos a buscarte cita. ¿Qué servicio necesitas?");
     const o = opciones("as-svc");
-    cfg.servicios.forEach((s) => boton(o, `<span>${s.nombre}</span><small>${s.precio} · ${s.min} min</small>`, () => { bloquear(o); cita.servicio = s; msg("yo", s.nombre); elegirDia(); }));
+    cfg.servicios.forEach((s) => boton(o, `<span>${esc(s.nombre)}</span><small>${esc(s.precio)} · ${s.min} min</small>`, () => { bloquear(o); cita.servicio = s; msg("yo", s.nombre); elegirDia(); }));
   }
   async function elegirDia() {
     let dias;

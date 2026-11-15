@@ -348,7 +348,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
 
   /* ---- agente de voz ---- */
   if (ruta === "voz/huecos" || ruta === "voz/cita" || ruta === "voz/recado" || ruta === "voz/anular") {
-    if (env.VOZ_WEBHOOK_SECRET && !igual(request.headers.get("x-voz-clave") || "", env.VOZ_WEBHOOK_SECRET)) return res({ error: "No autorizado" }, 401);
+    if (!env.VOZ_WEBHOOK_SECRET || !igual(request.headers.get("x-voz-clave") || "", env.VOZ_WEBHOOK_SECRET)) return res({ error: "No autorizado" }, 401); // sin secreto configurado, cerrado
     let b; try { b = await cuerpo(request, 2000); } catch (e) { return res({ error: "JSON no válido" }, 400); }
     // Recado: el cliente quiere hablar con una persona o el agente no puede resolverlo → aviso al negocio para devolver la llamada
     if (ruta === "voz/recado") {

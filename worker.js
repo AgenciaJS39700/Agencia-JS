@@ -145,8 +145,47 @@ async function consultar(env, mensajes) {
   throw fallo || new Error("sin respuesta");
 }
 
+/* ---- Cabeceras de seguridad y caché (nivel "empresa grande") ----
+   Se añaden a TODA respuesta del dominio. Los estáticos llevan caché de verdad
+   (hoy todo se revalidaba en cada visita) y el HTML lleva CSP contra inyecciones y clickjacking. */
+const CACHE_EXT = [
+  [/\.(webp|avif|jpe?g|png|gif|ico)(\?|$)/, "public, max-age=86400, stale-while-revalidate=604800"],
+  [/\.svg(\?|$)/, "public, max-age=86400, stale-while-revalidate=604800"],
+  [/\.(mp4|webm)(\?|$)/, "public, max-age=604800, stale-while-revalidate=2592000"],
+  [/\.(js|css)(\?|$)/, "public, max-age=3600, stale-while-revalidate=86400"],
+  [/\.(woff2?|ttf)(\?|$)/, "public, max-age=2592000, immutable"],
+  [/\.webmanifest(\?|$)/, "public, max-age=86400"],
+];
+// Páginas autocontenidas (solo cargan cosas de este dominio): política estricta
+const CSP_APP = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; media-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'";
+// Portada: sin lista cerrada de scripts (lleva widgets de terceros como el de voz), pero sí
+// protección contra clickjacking, <base> malicioso, plugins y envíos de formularios fuera
+const CSP_WEB = "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'";
+function blindar(res, url) {
+  if (res.status >= 300 && res.status < 400) return res; // redirecciones: tal cual
+  const h = new Headers(res.headers);
+  h.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+  h.set("X-Content-Type-Options", "nosniff");
+  h.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  h.set("Permissions-Policy", "camera=(), geolocation=(), payment=(), usb=()");
+  h.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  const tipo = h.get("Content-Type") || "";
+  if (tipo.includes("text/html")) {
+    const app = /^\/(c|panel)\//.test(url.pathname) || url.pathname.startsWith("/asistentes/");
+    h.set("Content-Security-Policy", app ? CSP_APP : CSP_WEB);
+    if (url.pathname.startsWith("/panel/")) h.set("X-Robots-Tag", "noindex"); // el panel del negocio no pinta nada en Google
+  } else {
+    for (const [re, valor] of CACHE_EXT) { if (re.test(url.pathname)) { h.set("Cache-Control", valor); break; } }
+  }
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+}
+
 export default {
   async fetch(request, env, ctx) {
+    const res = await this.atender(request, env, ctx);
+    try { return blindar(res, new URL(request.url)); } catch (e) { return res; }
+  },
+  async atender(request, env, ctx) {
     const url = new URL(request.url);
     // www → dominio sin www (evita contenido duplicado para Google)
     if (url.hostname === "www.agencia-js.com") {
@@ -209,11 +248,9 @@ export default {
     if (request.method !== "POST") return json({ error: "Método no permitido" }, 405);
 
     const origen = request.headers.get("Origin");
-    if (origen) {
-      let host = "";
-      try { host = new URL(origen).host; } catch (e) { /* origen inválido */ }
-      if (host !== url.host) return json({ error: "Origen no permitido" }, 403);
-    }
+    let host = "";
+    try { host = new URL(origen || "").host; } catch (e) { /* origen inválido */ }
+    if (host !== url.host) return json({ error: "Origen no permitido" }, 403);
 
     const ip = request.headers.get("CF-Connecting-IP") || "desconocida";
     if (!limitar(ip)) return json({ error: "Demasiadas consultas. Inténtalo más tarde." }, 429);

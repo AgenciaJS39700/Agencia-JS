@@ -70,11 +70,12 @@ async function iniciar() {
   document.title = `Pedir cita · ${n.nombre}`;
   document.documentElement.style.setProperty("--c", c.color);
   const tel = String(n.telefono || "").replace(/[^\d+]/g, "");
-  const mapa = n.mapa || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n.nombre + " " + n.direccion)}`;
+  const https = (u) => (typeof u === "string" && /^https:\/\//i.test(u) ? u : "");
+  const mapa = https(n.mapa) || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n.nombre + " " + n.direccion)}`;
   app.innerHTML = `
   ${c.demo ? '<p class="demo">Negocio ficticio de demostración (Agencia JS). La agenda es real: las citas se guardan.</p>' : ""}
   <section class="hero" aria-labelledby="t">
-    <div class="logo">${n.logo ? `<img src="${esc(n.logo)}" alt="">` : svg(c.icono, 38)}</div>
+    <div class="logo">${https(n.logo) ? `<img src="${esc(https(n.logo))}" alt="">` : svg(c.icono, 38)}</div>
     <h1 id="t">${esc(n.nombre)}</h1>
     <p class="sub">${esc(c.sector || "")}</p>
     <span class="live">Citas online las 24 horas</span>
@@ -88,7 +89,7 @@ async function iniciar() {
     <ul class="svc">${c.servicios.map((s) => `<li><span>${esc(s.nombre)}</span><small>${esc(s.precio)} · ${s.min} min</small></li>`).join("")}</ul></section>
   <section class="sec" aria-labelledby="s2"><h2 id="s2">${I.reloj} Horario</h2><p>${esc(n.horarioTexto)}</p></section>
   <section class="sec" aria-labelledby="s3"><h2 id="s3">${I.pin} Dónde estamos</h2><p>${esc(n.direccion)}</p>
-    <div class="row"><a class="btn" href="${esc(mapa)}" target="_blank" rel="noopener">Cómo llegar</a>${tel ? `<a class="btn" href="tel:${esc(tel)}">Llamar</a>` : ""}</div>${n.web ? `<p style="margin-top:10px"><a href="${esc(n.web)}">Visitar la web</a></p>` : ""}</section>
+    <div class="row"><a class="btn" href="${esc(mapa)}" target="_blank" rel="noopener">Cómo llegar</a>${tel ? `<a class="btn" href="tel:${esc(tel)}">Llamar</a>` : ""}</div>${https(n.web) ? `<p style="margin-top:10px"><a href="${esc(https(n.web))}" rel="noopener">Visitar la web</a></p>` : ""}</section>
   <section class="sec" id="anular" aria-labelledby="s4"><h2 id="s4">${I.x} Anular una cita</h2>
     <p>Escribe el código que te dimos al reservar y tu teléfono.</p>
     <form class="anular" novalidate>
