@@ -95,9 +95,10 @@ async function pro(env, sistema, mensajes) {
       "x-api-key": env.ANTHROPIC_API_KEY,
       "anthropic-version": "2023-06-01",
     },
-    body: JSON.stringify({ model: env.ANTHROPIC_MODEL || MODELO_PRO, max_tokens: 400, temperature: 0.3, system: sistema, messages: mensajes }),
+    // Haiku 5.5: sin temperature; esfuerzo bajo = piensa poco y responde rápido. max_tokens incluye el razonamiento.
+    body: JSON.stringify({ model: env.ANTHROPIC_MODEL || MODELO_PRO, max_tokens: 2000, output_config: { effort: "low" }, system: sistema, messages: mensajes }),
   });
-  if (!r.ok) throw new Error("Anthropic " + r.status);
+  if (!r.ok) { console.error("motor pro", r.status, (await r.text()).slice(0, 300)); throw new Error("Anthropic " + r.status); }
   const d = await r.json();
   const texto = (d.content || []).filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
   if (!texto) throw new Error("sin texto");
