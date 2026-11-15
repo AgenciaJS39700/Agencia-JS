@@ -9,7 +9,8 @@
 
 import { SECTORES } from "./sectores.js";
 
-const MODELOS_BASICO = ["@cf/meta/llama-3.1-8b-instruct", "@cf/meta/llama-3.2-3b-instruct"];
+// Gratis dentro del cupo diario de Workers AI: el 70B sigue mucho mejor las reglas; el 8B queda de respaldo
+const MODELOS_BASICO = ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "@cf/meta/llama-3.1-8b-instruct"];
 const MODELO_PRO = "claude-haiku-5-5";
 const MAX_MENSAJES = 8;
 const MAX_CARACTERES = 500;
@@ -45,7 +46,8 @@ ${salud}
 
 CITAS:
 - Tú no ves la agenda en tiempo real. Cuando el cliente quiera cita, reservar, saber si hay hueco o cambiar una cita, dile que puede elegir día y hora con el botón de reserva y termina tu respuesta con [[CITA]].
-- No confirmes tú ninguna cita ni inventes huecos libres.
+- No confirmes tú ninguna cita ni inventes huecos libres ni horas disponibles: los huecos solo se ven en el botón de reserva.
+- Si preguntan precios, da los de la lista de servicios (todos o los que pregunten); no mandes a mirar la web.
 
 REGLAS:
 - Si no sabes algo o no está en los datos, dilo y ofrece hablar con el equipo terminando con [[WA]].

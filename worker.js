@@ -8,8 +8,9 @@ import { atenderAgenda, enviarRecordatorios, manifiesto } from "./asistentes/age
 import { atenderCuenta } from "./mesas/cuenta.js";
 import { registrarMetricas } from "./metricas/registro.js";
 
-const MODELO = "@cf/meta/llama-3.1-8b-instruct";
-const MODELO_RESPALDO = "@cf/meta/llama-3.2-3b-instruct";
+// Llama 3.3 70B: mucho mejor siguiendo reglas y en español, y cabe en el cupo gratuito diario de Workers AI
+const MODELO = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+const MODELO_RESPALDO = "@cf/meta/llama-3.1-8b-instruct";
 
 const MAX_MENSAJES = 6; // turnos de historial que se envían al modelo
 const MAX_CARACTERES = 400; // por mensaje
@@ -34,6 +35,8 @@ DATOS (no inventes nada fuera de esto):
 - Vídeo publicitario: servicio aparte: vídeos personalizados para las redes del cliente, en formato vertical para Reels y TikTok, desde 49 € por vídeo (IVA no incluido), sueltos o en packs mensuales, con presupuesto a medida. También campañas de anuncios en Instagram y Facebook (presupuesto a medida; la inversión en anuncios la paga el cliente a la plataforma). No des otros precios de vídeo ni de campañas.
 - Tarjetas NFC: chip NTAG215/216, sin batería ni app, compatibles con Android y iPhone XS o posteriores. Abren directamente la ficha de Google para dejar una opinión. Se venden por packs: cada pack es 1 tarjeta grande + 1 pequeña, configuradas, en blanco o negro. Precio en oferta: 1 pack 25 € (antes 30 €), 2 packs 45 € (antes 50 €), IVA no incluido; más packs, bajo presupuesto. Se piden aparte con cualquier plan; Presencia 360° incluye 2 packs. Producto estándar con logo de Google, sin personalización. La valoración la decide siempre el cliente: NUNCA prometas reseñas ni puntuaciones concretas.
 - Asistentes 24/7 (servicio nuevo, aparte de los planes): un asistente automático en la web del negocio que responde dudas con sus datos (horarios, servicios, precios) y da citas a cualquier hora; avisa al negocio de cada reserva. Pensado sobre todo para negocios con cita: clínicas dentales, peluquerías y barberías, estética y uñas, fisioterapia, veterinarias y talleres. Hay demos para probar en la sección "Asistentes 24/7" de la web. Es un chat escrito en la web (no atiende llamadas). Dos niveles: Básico, 199 € de alta + 39 €/mes; Avanzado, 299 € de alta + 69 €/mes (conversación más natural, agenda real, recordatorios). Si el negocio no tiene web, se incluye una página de citas con el asistente (para enlazar desde Google, redes o WhatsApp). En Presencia 360° el Básico viene incluido. Dentro del WhatsApp del negocio: presupuesto aparte. Precios sin IVA.
+- Horario de atención de Agencia JS: lunes a viernes de 9:00 a 20:00 (por WhatsApp o teléfono). No des otro horario.
+- En este chat no se reservan citas ni reuniones: si quieren hablar con alguien o quedar, anímales a escribir por WhatsApp y termina con [[WA]].
 - Un "cambio de contenido" es modificar textos, precios, horarios, fotos, ofertas o enlaces. Rediseños o secciones nuevas se presupuestan aparte.
 - Promoción: "Webs de 349 €" (oferta de lanzamiento). No prometas plazos ni número de días: el plazo exacto se indica en el presupuesto. Plazos: dependen del contenido que facilite el cliente (logo, textos, fotos, horarios, servicios); se indica en el presupuesto antes de empezar.
 - Auditoría gratuita: revisamos la ficha de Google, la web y las redes y explicamos qué mejorar. Sin coste ni compromiso. Se pide con el botón "Pedir auditoría gratis" de la web.
