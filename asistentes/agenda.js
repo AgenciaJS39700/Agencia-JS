@@ -73,12 +73,43 @@ export const avanzado = (cfg) => cfg.plan === "avanzado" || cfg.motor === "pro";
 /* ---------------------------------------------------------------- disponibilidad */
 const ag = (cfg) => ({ paso: 30, capacidad: 1, antelacionMin: 60, diasMax: 60, festivos: [], maxPorTelefono: 3, ...(cfg.agenda || {}) });
 
-/** Huecos libres (minutos) de un día, dadas sus citas y bloqueos. */
-function calcular(cfg, fecha, dur, citas, bloqueos, ya, forzar) {
+/**
+ * Modo «sesiones»: el negocio no da huecos libres sino clases a hora fija con plazas
+ * (estudios de yoga o pilates, gimnasios, academias, centros con grupos).
+ * Se activa con negocio.sesiones = { 0..6: [{ h:"10:00", s:"servicioId", min:75, cap:14, sala:"Sala 1" }] }.
+ */
+export const porSesiones = (cfg) => !!(cfg.negocio && cfg.negocio.sesiones);
+
+/** Sesiones de un día concreto (ya resueltas con su duración y plazas). */
+function sesionesDia(cfg, fecha) {
+  const a = ag(cfg);
+  if (a.festivos.includes(fecha)) return [];
+  return ((cfg.negocio.sesiones || {})[dow(fecha)] || []).map((x) => {
+    const serv = cfg.servicios.find((s) => s.id === x.s);
+    return { h: x.h, inicio: min2(x.h), s: x.s, nombre: x.nombre || (serv && serv.nombre) || x.s, min: x.min || (serv && serv.min) || 60, cap: x.cap || a.capacidad, sala: x.sala || "", nota: x.nota || "" };
+  }).sort((p, q) => p.inicio - q.inicio);
+}
+
+/** Huecos libres (minutos) de un día, dadas sus citas y bloqueos. `serv` es el servicio elegido (puede ser null en modo sesiones). */
+function calcular(cfg, fecha, serv, citas, bloqueos, ya, forzar) {
   const a = ag(cfg);
   if (fecha < ya.fecha || fecha > sumar(ya.fecha, a.diasMax) || a.festivos.includes(fecha)) return [];
-  const tramos = cfg.negocio.horario[dow(fecha)] || [];
   const out = [];
+
+  if (porSesiones(cfg)) {
+    for (const x of sesionesDia(cfg, fecha)) {
+      if (serv && x.s !== serv.id) continue;
+      // Online: con antelación mínima. Panel (en el local): vale mientras la clase no haya terminado
+      if (fecha === ya.fecha && (forzar ? x.inicio + x.min <= ya.min : x.inicio < ya.min + a.antelacionMin)) continue;
+      if (citas.filter((c) => c.inicio === x.inicio && c.servicio === x.s).length >= x.cap) continue;
+      if (bloqueos.some((b) => b.inicio < x.inicio + x.min && b.fin > x.inicio)) continue;
+      out.push(x.inicio);
+    }
+    return out;
+  }
+
+  const dur = (serv && serv.min) || a.paso;
+  const tramos = cfg.negocio.horario[dow(fecha)] || [];
   for (const [ini, fin] of tramos) {
     for (let t = min2(ini); t + dur <= min2(fin); t += a.paso) {
       // Online: con antelación mínima. Panel (en el local): vale el hueco en curso si aún no ha terminado su primer tramo
@@ -93,25 +124,47 @@ function calcular(cfg, fecha, dur, citas, bloqueos, ya, forzar) {
 }
 async function ocupacion(env, slug, desde, hasta) {
   const [c, b] = await env.CITAS.batch([
-    env.CITAS.prepare("SELECT fecha, inicio, fin FROM citas WHERE slug = ? AND fecha BETWEEN ? AND ? AND estado = 'ok'").bind(slug, desde, hasta),
+    env.CITAS.prepare("SELECT fecha, inicio, fin, servicio FROM citas WHERE slug = ? AND fecha BETWEEN ? AND ? AND estado = 'ok'").bind(slug, desde, hasta),
     env.CITAS.prepare("SELECT fecha, inicio, fin FROM bloqueos WHERE slug = ? AND fecha BETWEEN ? AND ?").bind(slug, desde, hasta),
   ]);
   const por = (rows) => rows.reduce((m, r) => ((m[r.fecha] = m[r.fecha] || []).push(r), m), {});
   return { citas: por(c.results || []), bloqueos: por(b.results || []) };
 }
-export async function huecosDia(env, cfg, fecha, dur, forzar) {
+export async function huecosDia(env, cfg, fecha, serv, forzar) {
   const o = await ocupacion(env, cfg.slug, fecha, fecha);
-  return calcular(cfg, fecha, dur, o.citas[fecha] || [], o.bloqueos[fecha] || [], ahora(), forzar);
+  return calcular(cfg, fecha, serv, o.citas[fecha] || [], o.bloqueos[fecha] || [], ahora(), forzar);
 }
-async function proximosDias(env, cfg, dur, n = 10) {
+async function proximosDias(env, cfg, serv, n = 10) {
   const ya = ahora(), a = ag(cfg), hasta = sumar(ya.fecha, a.diasMax);
   const o = await ocupacion(env, cfg.slug, ya.fecha, hasta);
   const dias = [];
   for (let f = ya.fecha; f <= hasta && dias.length < n; f = sumar(f, 1)) {
-    const h = calcular(cfg, f, dur, o.citas[f] || [], o.bloqueos[f] || [], ya);
+    const h = calcular(cfg, f, serv, o.citas[f] || [], o.bloqueos[f] || [], ya);
     if (h.length) dias.push({ fecha: f, libres: h.length });
   }
   return dias;
+}
+
+/**
+ * Cuadro de clases de varios días con las plazas que quedan en cada una (modo sesiones).
+ * Lo usa la web del negocio para enseñar el horario real, no una imagen.
+ */
+async function clases(env, cfg, desde, dias) {
+  const ya = ahora(), a = ag(cfg);
+  const hasta = sumar(desde, dias - 1);
+  const o = await ocupacion(env, cfg.slug, desde, hasta);
+  const out = [];
+  for (let f = desde; f <= hasta; f = sumar(f, 1)) {
+    const citas = o.citas[f] || [], bloq = o.bloqueos[f] || [];
+    const lista = sesionesDia(cfg, f).map((x) => {
+      const ocupadas = citas.filter((c) => c.inicio === x.inicio && c.servicio === x.s).length;
+      const cerrada = bloq.some((b) => b.inicio < x.inicio + x.min && b.fin > x.inicio);
+      const pasada = f < ya.fecha || (f === ya.fecha && x.inicio < ya.min + a.antelacionMin);
+      return { hora: x.h, servicio: x.s, nombre: x.nombre, min: x.min, sala: x.sala, nota: x.nota, plazas: x.cap, libres: Math.max(0, x.cap - ocupadas), abierta: !cerrada && !pasada && f <= sumar(ya.fecha, a.diasMax) && ocupadas < x.cap };
+    });
+    if (lista.length) out.push({ fecha: f, dia: legible(f), clases: lista });
+  }
+  return out;
 }
 
 /* ---------------------------------------------------------------- reservar */
@@ -128,37 +181,51 @@ export async function reservar(env, cfg, datos, origen = "chat", ctx) {
   // En el panel (cliente que pasa por el local) el teléfono es opcional
   if (tel.replace(/\D/g, "").length < 9 && !(origen === "panel" && !tel)) return { ok: false, estado: 400, mensaje: "El teléfono no parece completo." };
   if (email && !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) return { ok: false, estado: 400, mensaje: "El email no parece correcto." };
-  const inicio = min2(hora), fin = inicio + serv.min;
-  const libres = await huecosDia(env, cfg, fecha, serv.min, origen === "panel");
-  if (!libres.includes(inicio)) return { ok: false, estado: 409, mensaje: "Ese hueco acaba de ocuparse. Elige otra hora.", libres: libres.map(hhmm) };
+  const inicio = min2(hora);
+  // Modo sesiones: la clase manda (su duración y sus plazas). Modo huecos: manda el servicio.
+  const ses = porSesiones(cfg) ? sesionesDia(cfg, fecha).find((x) => x.inicio === inicio && x.s === serv.id) : null;
+  if (porSesiones(cfg) && !ses) return { ok: false, estado: 400, mensaje: "Esa clase no está en el horario de ese día. Elige otra." };
+  const fin = inicio + (ses ? ses.min : serv.min);
+  const cupo = ses ? ses.cap : a.capacidad;
+  const libres = await huecosDia(env, cfg, fecha, serv, origen === "panel");
+  if (!libres.includes(inicio)) return { ok: false, estado: 409, mensaje: ses ? "Esa clase acaba de llenarse. Elige otra hora." : "Ese hueco acaba de ocuparse. Elige otra hora.", libres: libres.map(hhmm) };
 
   if (origen !== "panel") {
     const ya = ahora();
+    if (ses && tel) {
+      const rep = await env.CITAS.prepare("SELECT 1 FROM citas WHERE slug = ? AND fecha = ? AND inicio = ? AND servicio = ? AND telefono = ? AND estado = 'ok'").bind(cfg.slug, fecha, inicio, serv.id, tel).first();
+      if (rep) return { ok: false, estado: 409, mensaje: "Ya tienes reservada esta clase con este teléfono." };
+    }
     const n = await env.CITAS.prepare("SELECT COUNT(*) AS n FROM citas WHERE slug = ? AND telefono = ? AND estado = 'ok' AND fecha >= ?").bind(cfg.slug, tel, ya.fecha).first();
-    if (n && n.n >= a.maxPorTelefono) return { ok: false, estado: 429, mensaje: "Ya tienes varias citas pendientes con este teléfono. Para más, contacta con el negocio." };
+    if (n && n.n >= a.maxPorTelefono) return { ok: false, estado: 429, mensaje: ses ? "Ya tienes muchas clases reservadas con este teléfono. Anula alguna o escríbenos." : "Ya tienes varias citas pendientes con este teléfono. Para más, contacta con el negocio." };
   }
 
   for (let intento = 0; intento < 3; intento++) {
     const cod = codigo();
     try {
+      // Sesiones: cuentan las plazas de ESA clase. Huecos: cuentan los solapes con la cita.
+      const ocupadas = ses
+        ? "(SELECT COUNT(*) FROM citas WHERE slug = ?1 AND fecha = ?5 AND estado = 'ok' AND inicio = ?6 AND servicio = ?3)"
+        : "(SELECT COUNT(*) FROM citas WHERE slug = ?1 AND fecha = ?5 AND estado = 'ok' AND inicio < ?7 AND fin > ?6)";
       const r = await env.CITAS.prepare(
         `INSERT INTO citas (slug, codigo, servicio, servicio_n, fecha, inicio, fin, nombre, telefono, email, nota, origen)
          SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12
-         WHERE (SELECT COUNT(*) FROM citas WHERE slug = ?1 AND fecha = ?5 AND estado = 'ok' AND inicio < ?7 AND fin > ?6) < ?13
+         WHERE ${ocupadas} < ?13
            AND NOT EXISTS (SELECT 1 FROM bloqueos WHERE slug = ?1 AND fecha = ?5 AND inicio < ?7 AND fin > ?6)`
-      ).bind(cfg.slug, cod, serv.id, serv.nombre, fecha, inicio, fin, nombre, tel, email || null, nota || null, origen, a.capacidad).run();
-      if (!r.meta || !r.meta.changes) return { ok: false, estado: 409, mensaje: "Ese hueco acaba de ocuparse. Elige otra hora." };
-      const cita = { id: r.meta.last_row_id, codigo: cod, servicio_n: serv.nombre, precio: serv.precio, fecha, inicio, fin, nombre, telefono: tel, email, nota, origen };
+      ).bind(cfg.slug, cod, serv.id, ses ? ses.nombre : serv.nombre, fecha, inicio, fin, nombre, tel, email || null, nota || null, origen, cupo).run();
+      if (!r.meta || !r.meta.changes) return { ok: false, estado: 409, mensaje: ses ? "Esa clase acaba de llenarse. Elige otra hora." : "Ese hueco acaba de ocuparse. Elige otra hora." };
+      const nomServ = ses ? ses.nombre : serv.nombre;
+      const cita = { id: r.meta.last_row_id, codigo: cod, servicio_n: nomServ, precio: serv.precio, sala: ses ? ses.sala : "", fecha, inicio, fin, nombre, telefono: tel, email, nota, origen };
       const avisos = Promise.all([
         avisarNegocio(env, cfg, cita, "nueva"),
-        origen !== "panel" && cfg.avisos && cfg.avisos.whatsapp ? plantillaWhatsApp(env, cfg.avisos.whatsapp, "cita_nueva", [cfg.negocio.nombre, nombre + (origen === "voz" ? " (por teléfono)" : ""), serv.nombre, `${legible(fecha)} a las ${hhmm(inicio)}`, tel]) : null,
-        cfg.avisos && cfg.avisos.whatsappCliente ? plantillaWhatsApp(env, conPrefijo(tel), "cita_cliente", [nombre.split(" ")[0], cfg.negocio.nombre, serv.nombre, `${legible(fecha)} a las ${hhmm(inicio)}`, cod, cfg.slug]) : null,
-        avanzado(cfg) && origen !== "panel" ? avisarMoviles(env, cfg.slug, `📅 Nueva cita · ${nombre}`, `${serv.nombre} · ${legible(fecha)} a las ${hhmm(inicio)}${origen === "voz" ? " (por teléfono)" : ""}`) : null,
+        origen !== "panel" && cfg.avisos && cfg.avisos.whatsapp ? plantillaWhatsApp(env, cfg.avisos.whatsapp, "cita_nueva", [cfg.negocio.nombre, nombre + (origen === "voz" ? " (por teléfono)" : ""), nomServ, `${legible(fecha)} a las ${hhmm(inicio)}`, tel]) : null,
+        cfg.avisos && cfg.avisos.whatsappCliente ? plantillaWhatsApp(env, conPrefijo(tel), "cita_cliente", [nombre.split(" ")[0], cfg.negocio.nombre, nomServ, `${legible(fecha)} a las ${hhmm(inicio)}`, cod, cfg.slug]) : null,
+        avanzado(cfg) && origen !== "panel" ? avisarMoviles(env, cfg.slug, `📅 Nueva cita · ${nombre}`, `${nomServ} · ${legible(fecha)} a las ${hhmm(inicio)}${origen === "voz" ? " (por teléfono)" : ""}`) : null,
         email ? correo(env, cfg, email, nombre, `Cita confirmada · ${cfg.negocio.nombre}`, plantillaCliente(cfg, cita, "Tu cita está confirmada")) : null,
       ]).catch((e) => console.error("avisos", e && e.message));
       if (ctx) ctx.waitUntil(avisos); else await avisos;
-      return { ok: true, estado: 200, codigo: cod, fecha, hora: hhmm(inicio), dia: legible(fecha), servicio: serv.nombre,
-        mensaje: `Cita confirmada: ${serv.nombre} el ${legible(fecha)} a las ${hhmm(inicio)}, a nombre de ${nombre}. Código ${cod}.` };
+      return { ok: true, estado: 200, codigo: cod, fecha, hora: hhmm(inicio), dia: legible(fecha), servicio: nomServ, sala: ses ? ses.sala : "",
+        mensaje: `${ses ? "Plaza confirmada" : "Cita confirmada"}: ${nomServ} el ${legible(fecha)} a las ${hhmm(inicio)}, a nombre de ${nombre}. Código ${cod}.` };
     } catch (e) {
       if (!/UNIQUE/i.test(String(e && e.message))) throw e; // código repetido: probar otro
     }
@@ -259,6 +326,7 @@ export function configPublica(cfg) {
     slug: cfg.slug, demo: !!cfg.demo, activo: cfg.activo !== false, icono: cfg.icono, color: cfg.color, sector: cfg.sector,
     negocio: { nombre: cfg.negocio.nombre, direccion: cfg.negocio.direccion, telefono: cfg.negocio.telefono, horarioTexto: cfg.negocio.horarioTexto, horario: cfg.negocio.horario, wa: cfg.negocio.wa, web: cfg.negocio.web, mapa: cfg.negocio.mapa, logo: cfg.negocio.logo },
     servicios: cfg.servicios.map(({ id, nombre, min, precio }) => ({ id, nombre, min, precio })),
+    modo: porSesiones(cfg) ? "sesiones" : "huecos", sesiones: cfg.negocio.sesiones || null,
     chips: cfg.chips, saludo: cfg.saludo, pedirEmail: !!a.pedirEmail, diasMax: a.diasMax, avanzado: avanzado(cfg),
   };
 }
@@ -311,7 +379,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     if (ruta === "panel/huecos" && request.method === "GET") {
       const serv = cfg.servicios.find((s) => s.id === url.searchParams.get("servicio")), fecha = url.searchParams.get("fecha") || "";
       if (!serv || !RE_FECHA.test(fecha)) return res({ error: "Servicio o fecha no válidos" }, 400);
-      return res({ fecha, huecos: (await huecosDia(env, cfg, fecha, serv.min, true)).map(hhmm) });
+      return res({ fecha, huecos: (await huecosDia(env, cfg, fecha, serv, true)).map(hhmm) });
     }
     if (ruta === "panel/citas" && request.method === "GET") {
       const desde = RE_FECHA.test(url.searchParams.get("desde") || "") ? url.searchParams.get("desde") : ahora().fecha;
@@ -383,9 +451,9 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const serv = cfg.servicios.find((s) => t && (norm(s.nombre).includes(t) || t.includes(norm(s.nombre).split(" ")[0]) || s.id === t)) || cfg.servicios[0];
     if (ruta === "voz/huecos") {
-      const libres = (await huecosDia(env, cfg, fecha, serv.min)).map(hhmm);
+      const libres = (await huecosDia(env, cfg, fecha, serv)).map(hhmm);
       if (!libres.length) {
-        const sig = (await proximosDias(env, cfg, serv.min, 1))[0];
+        const sig = (await proximosDias(env, cfg, serv, 1))[0];
         return res({ ok: true, fecha, libres: [], mensaje: `El ${legible(fecha)} no hay huecos para ${serv.nombre}.${sig ? ` El primer día con huecos es el ${legible(sig.fecha)}.` : ""}` });
       }
       const man = libres.filter((h) => h < "14:00").slice(0, 3), tar = libres.filter((h) => h >= "14:00").slice(0, 3);
@@ -405,13 +473,21 @@ export async function atenderAgenda(request, env, ctx, limitar) {
   if (ruta === "config") return r(configPublica(cfg));
   if (!env.CITAS && ruta !== "chat") return r({ error: "Agenda no configurada" }, 503);
 
+  // Cuadro de clases con plazas reales (modo sesiones): lo pinta la web del negocio
+  if (ruta === "clases" && request.method === "GET") {
+    if (!porSesiones(cfg)) return r({ error: "Este negocio no trabaja por clases" }, 400);
+    const desde = RE_FECHA.test(url.searchParams.get("desde") || "") ? url.searchParams.get("desde") : ahora().fecha;
+    const dias = Math.min(Math.max(+url.searchParams.get("dias") || 7, 1), 21);
+    return r({ desde, dias: await clases(env, cfg, desde, dias) });
+  }
+
   if (request.method === "GET" && (ruta === "dias" || ruta === "huecos")) {
     const serv = cfg.servicios.find((s) => s.id === url.searchParams.get("servicio"));
     if (!serv) return r({ error: "Servicio no válido" }, 400);
-    if (ruta === "dias") return r({ dias: await proximosDias(env, cfg, serv.min, Math.min(Math.max(+url.searchParams.get("n") || 10, 1), 31)) });
+    if (ruta === "dias") return r({ dias: await proximosDias(env, cfg, serv, Math.min(Math.max(+url.searchParams.get("n") || 10, 1), 31)) });
     const fecha = url.searchParams.get("fecha") || "";
     if (!RE_FECHA.test(fecha)) return r({ error: "Fecha no válida" }, 400);
-    return r({ fecha, huecos: (await huecosDia(env, cfg, fecha, serv.min)).map(hhmm) });
+    return r({ fecha, huecos: (await huecosDia(env, cfg, fecha, serv)).map(hhmm) });
   }
 
   if (request.method !== "POST") return r({ error: "Método no permitido" }, 405);

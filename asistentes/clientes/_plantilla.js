@@ -19,6 +19,11 @@ export default {
     horarioTexto: "TODO horario en texto (lo lee el asistente)",
     // Horario real para la agenda: 0 domingo … 6 sábado → tramos ["HH:MM","HH:MM"]
     horario: { 1: [["09:00", "14:00"], ["16:00", "20:00"]], 2: [["09:00", "14:00"], ["16:00", "20:00"]], 3: [["09:00", "14:00"], ["16:00", "20:00"]], 4: [["09:00", "14:00"], ["16:00", "20:00"]], 5: [["09:00", "14:00"]] },
+    // OPCIONAL — modo «sesiones»: negocios que no dan huecos sino clases a hora fija con plazas
+    // (yoga, pilates, gimnasios, academias, grupos). Si existe, manda sobre `horario` para reservar.
+    //   sesiones: { 1: [{ h: "18:30", s: "idServicio", cap: 14, sala: "Sala 1", nota: "" }], … }
+    // La web del negocio puede pintar el cuadro con plazas reales en GET /api/as/<slug>/clases?dias=7
+    // sesiones: {},
     extra: ["TODO datos que el asistente puede contar (aparcamiento, formas de pago, idiomas…)"],
     wa: "34XXXXXXXXX",           // WhatsApp del negocio, con prefijo y sin «+» (botón «hablar con una persona»)
     web: "",                     // si tiene web, para el enlace de la página de citas
