@@ -143,7 +143,8 @@ export async function compruebaBono(env, cfg, alumno, servicioId, fecha) {
     if ((r ? r.n : 0) < b.sem) return { ok: true, bono: b, aviso: "" };
   }
   const mejor = sirven[0];
-  return { ok: false, bono: mejor, bloqueo: `Tu ${mejor.nombre} ya tiene las ${mejor.sem} clases de esa semana reservadas. Anula una o amplía el bono.` };
+  const cuantas = mejor.sem === 1 ? "su clase de esa semana reservada" : `sus ${mejor.sem} clases de esa semana reservadas`;
+  return { ok: false, bono: mejor, bloqueo: `Tu ${mejor.nombre} ya tiene ${cuantas}. Anula esa clase o amplía el bono.` };
 }
 
 /* ---------------------------------------------------------------- Stripe */
