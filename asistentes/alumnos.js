@@ -922,7 +922,8 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
 
   if (ruta === "panel/asistencia" && post) {
     const b = await cuerpo();
-    await env.CITAS.prepare("UPDATE citas SET asistio = ?3 WHERE id = ?1 AND slug = ?2").bind(+b.id || 0, cfg.slug, b.vino ? 1 : 0).run();
+    const marca = b.vino === null || b.vino === undefined ? null : (b.vino ? 1 : 0);
+    await env.CITAS.prepare("UPDATE citas SET asistio = ?3 WHERE id = ?1 AND slug = ?2").bind(+b.id || 0, cfg.slug, marca).run();
     return res({ ok: true });
   }
 

@@ -109,7 +109,17 @@ $("fl").addEventListener("submit", async (e) => {
   try {
     await cargar();
     try { ($("rec").checked ? localStorage : sessionStorage).setItem(KEY, clave); } catch (er) {}
-  } catch (er) { $("ml").textContent = er.message; clave = ""; }
+  } catch (er) {
+    try {
+      const r = await fetch(`/api/as/${slug}/panel/citas?dias=1`, { headers: { Authorization: "Bearer " + clave } });
+      if (r.ok) {
+        try { ($("rec").checked ? localStorage : sessionStorage).setItem("ajs-panel-" + slug, clave); } catch (e2) {}
+        location.href = "/panel/" + slug;
+        return;
+      }
+    } catch (e3) { /* sin conexión */ }
+    $("ml").textContent = er.message; clave = "";
+  }
 });
 $("ant").onclick = () => { desde = sumar(desde, -7); cargar(); };
 $("sig").onclick = () => { desde = sumar(desde, 7); cargar(); };

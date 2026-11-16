@@ -25,7 +25,10 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
 h1{font-size:1.25rem;margin:0}h1 small{display:block;font-size:.78rem;color:var(--mu);font-weight:500}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:44px;padding:.5rem 1rem;border-radius:12px;border:1px solid var(--ln);background:transparent;color:var(--tx);font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
 .btn:hover{border-color:var(--c)}.btn.main{background:var(--c);color:#0a0a0a;border-color:transparent}.btn.sm{min-height:36px;padding:.3rem .7rem;font-size:.85rem}
-.btn.del{color:#fca5a5}.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+.btn.del{color:#fca5a5}
+.btn.asis[aria-pressed=true]{background:var(--ok);border-color:transparent;color:#07210f}
+.btn.asis.no[aria-pressed=true]{background:var(--no);border-color:transparent;color:#2a0b0b}
+.acc{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--c);outline-offset:2px}
 .bar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
 .st{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:12px}.st b{display:block;font-size:1.5rem}.st span{color:var(--mu);font-size:.8rem}
@@ -234,7 +237,20 @@ $("ver-clave").onclick = () => { const i = $("clave"), v = i.type === "password"
 $("fl").addEventListener("submit", async (e) => {
   e.preventDefault(); clave = $("clave").value.replace(/[\u2010-\u2015\u2212]/g, "-").replace(/\s+/g, ""); $("ml").textContent = "Comprobando…";
   try { await cargar(); try { ($("rec").checked ? localStorage : sessionStorage).setItem(KEY, clave); } catch (er) {} $("ml").textContent = ""; }
-  catch (er) { $("ml").textContent = er.message; }
+  catch (er) {
+    // Una sola puerta: si la clave no es del estudio, se prueba como profesor y se le lleva a lo suyo
+    try {
+      const r = await fetch(`/api/as/${slug}/profe/clases?dias=1`, { headers: { Authorization: "Bearer " + clave } });
+      if (r.ok) {
+        try { ($("rec").checked ? localStorage : sessionStorage).setItem("ajs-profe-" + slug, clave); } catch (er2) {}
+        $("ml").textContent = "Entrando en tus clases…";
+        location.href = "/profe/" + slug;
+        return;
+      }
+    } catch (er3) { /* sin conexión: se enseña el error de siempre */ }
+    clave = "";
+    $("ml").textContent = er.message;
+  }
 });
 
 async function cargar() {
@@ -299,7 +315,10 @@ function citaHTML(c) {
   <div><div class="n">${esc(c.nombre)}${c.estado !== "ok" ? '<span class="tag">cancelada</span>' : ""}<span class="tag">${esc({ chat: "online", voz: "teléfono IA", panel: "en el local" }[c.origen] || c.origen)}</span></div>
   <div class="d">${esc(c.servicio_n)}${c.telefono ? ` · <a href="tel:${tel}">${tel}</a> · <a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : " · sin teléfono"}${c.email ? " · " + esc(c.email) : ""}</div>
   ${c.nota ? `<div class="d">Nota: ${esc(c.nota)}</div>` : ""}<div class="d" style="color:var(--mu);font-size:.78rem">Código ${esc(c.codigo)}</div></div>
-  <div class="acc">${c.estado === "ok" ? `<button class="btn sm del" data-cancelar="${c.id}" type="button" aria-label="Cancelar la cita de ${esc(c.nombre)}">Cancelar</button>` : ""}</div></article>`;
+  <div class="acc">${c.estado === "ok" ? `
+    <button class="btn sm asis" data-vino="${c.id}" type="button" aria-pressed="${c.asistio === 1}" aria-label="Marcar que ${esc(c.nombre)} vino">Vino</button>
+    <button class="btn sm asis no" data-falto="${c.id}" type="button" aria-pressed="${c.asistio === 0}" aria-label="Marcar que ${esc(c.nombre)} no vino">No vino</button>
+    <button class="btn sm del" data-cancelar="${c.id}" type="button" aria-label="Cancelar la cita de ${esc(c.nombre)}">Cancelar</button>` : ""}</div></article>`;
 }
 function blqHTML(b) {
   const todo = b.inicio === 0 && b.fin >= 1440;
@@ -308,6 +327,13 @@ function blqHTML(b) {
 }
 $("lista").addEventListener("click", async (e) => {
   const c = e.target.closest("[data-cancelar]"), a = e.target.closest("[data-abrir]"), v = e.target.closest("[data-ver]");
+  const as = e.target.closest("[data-vino],[data-falto]");
+  if (as) {
+    const id = +(as.dataset.vino || as.dataset.falto), vino = !!as.dataset.vino;
+    const ya = as.getAttribute("aria-pressed") === "true";
+    try { await api("panel/asistencia", { id, vino: ya ? null : vino }); await cargar(); } catch (er) { alert(er.message); }
+    return;
+  }
   const col = !v && !c && !a && e.target.closest(".scol");
   if (col && !e.target.closest(".ev")) {
     const y = e.clientY - col.getBoundingClientRect().top, m = Math.floor((+col.dataset.ini + y / +col.dataset.k) / 30) * 30;

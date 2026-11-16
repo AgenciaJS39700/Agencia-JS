@@ -469,7 +469,8 @@ export async function atenderAgenda(request, env, ctx, limitar) {
 
     if (ruta === "profe/asistencia" && request.method === "POST") {
       let b; try { b = await cuerpo(request); } catch (e) { return res({ error: "JSON no válido" }, 400); }
-      await env.CITAS.prepare("UPDATE citas SET asistio = ?3 WHERE id = ?1 AND slug = ?2").bind(+b.id || 0, cfg.slug, b.vino ? 1 : 0).run();
+      const marca = b.vino === null || b.vino === undefined ? null : (b.vino ? 1 : 0);
+      await env.CITAS.prepare("UPDATE citas SET asistio = ?3 WHERE id = ?1 AND slug = ?2").bind(+b.id || 0, cfg.slug, marca).run();
       return res({ ok: true });
     }
     return res({ error: "No encontrado" }, 404);
