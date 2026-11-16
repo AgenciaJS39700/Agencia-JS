@@ -21,6 +21,7 @@
 //   GET  panel/espera      · GET panel/exportar?que=alumnas|pagos|citas (CSV)
 
 import { correo, marco, boton, esc } from "./correo.js";
+import { confirmaEntrada } from "./eventos.js";
 
 const STRIPE = "https://api.stripe.com/v1";
 const DIAS_SESION = 120;
@@ -292,6 +293,31 @@ async function crearPago(env, cfg, alumno, p, volverA, promo) {
   await env.CITAS.prepare(
     "INSERT OR IGNORE INTO pagos (slug, alumno_id, concepto, importe, estado, stripe_id) VALUES (?1, ?2, ?3, ?4, 'pendiente', ?5)"
   ).bind(cfg.slug, alumno.id, p.nombre, p.precio, r.datos.id).run();
+  return { url: r.datos.url, id: r.datos.id };
+}
+
+/** Cobro de entradas de un taller o evento (una sola vez, sin suscripción). */
+export async function crearPagoEvento(env, cfg, entrada, ev) {
+  if (!claveStripe(env, cfg)) return { error: "Los pagos online todavía no están activados en este negocio." };
+  const sitio = (cfg.negocio.web || "https://agencia-js.com/").replace(/\/?$/, "/");
+  const params = new URLSearchParams();
+  params.set("mode", "payment");
+  params.set("success_url", `${sitio}mi-cuenta/?entrada=ok&s={CHECKOUT_SESSION_ID}`);
+  params.set("cancel_url", `${sitio}actividades/?pago=no`);
+  params.set("customer_email", entrada.email);
+  params.set("locale", "es");
+  params.set("metadata[slug]", cfg.slug);
+  params.set("metadata[tipo]", "evento");
+  params.set("metadata[entrada]", String(entrada.id));
+  params.set("line_items[0][price_data][currency]", cfg.moneda || "eur");
+  params.set("line_items[0][price_data][unit_amount]", String(ev.precio));
+  params.set("line_items[0][price_data][product_data][name]", `${ev.nombre} · ${cfg.negocio.nombre}`.slice(0, 120));
+  params.set("line_items[0][quantity]", String(entrada.cantidad));
+  const r = await stripe(env, cfg, "POST", "/checkout/sessions", params, `ev-${cfg.slug}-${entrada.id}`);
+  if (!r.ok || !r.datos.url) {
+    console.error("Stripe rechazó la entrada:", JSON.stringify(r.datos).slice(0, 300));
+    return { error: "No se ha podido abrir el pago. Inténtalo otra vez o escríbenos." };
+  }
   return { url: r.datos.url, id: r.datos.id };
 }
 
@@ -715,6 +741,7 @@ async function procesaStripe(env, cfg, ev) {
 async function aplicaPago(env, cfg, s) {
   const md = s.metadata || {};
   if (md.slug && md.slug !== cfg.slug) return;
+  if (md.tipo === "evento") return confirmaEntrada(env, cfg, s);
   const alumnoId = +md.alumno || 0, prodId = md.producto || "";
   if (!alumnoId || !prodId) return;
   const r = await env.CITAS.prepare("UPDATE pagos SET estado = 'pagado', importe = ?2 WHERE stripe_id = ?1 AND estado != 'pagado'")

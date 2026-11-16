@@ -22,7 +22,8 @@ import { resolverDia } from "../voz/agenda.js";
 import { avisarMoviles, altaMovil, bajaMovil, clavesVapid } from "./push.js";
 import { plantillaWhatsApp } from "./whatsapp.js";
 import { correo, marco } from "./correo.js";
-import { atenderAlumnos, atenderPanelAlumnos, alumnaDeLaSesion, compruebaBono, avisarEspera } from "./alumnos.js";
+import { atenderAlumnos, atenderPanelAlumnos, alumnaDeLaSesion, compruebaBono, avisarEspera, crearPagoEvento } from "./alumnos.js";
+import { atenderEventos, atenderPanelEventos } from "./eventos.js";
 
 const conPrefijo = (t) => { const d = String(t || "").replace(/\D/g, ""); return d.length === 9 ? "34" + d : d; };
 
@@ -395,6 +396,8 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     }
     const pa1 = await atenderPanelAlumnos(request, env, cfg, ruta, url);
     if (pa1) return pa1;
+    const pe1 = await atenderPanelEventos(request, env, cfg, ruta, url);
+    if (pe1) return pe1;
     if (request.method !== "POST") return res({ error: "Método no permitido" }, 405);
     let b; try { b = await cuerpo(request); } catch (e) { return res({ error: "JSON no válido" }, 400); }
     if (ruta.startsWith("panel/push/")) {
@@ -417,6 +420,58 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     if (ruta === "panel/desbloquear") { await env.CITAS.prepare("DELETE FROM bloqueos WHERE slug = ? AND id = ?").bind(cfg.slug, +b.id || 0).run(); return res({ ok: true }); }
     const pa2 = await atenderPanelAlumnos(request, env, cfg, ruta, url);
     if (pa2) return pa2;
+    const pe2 = await atenderPanelEventos(request, env, cfg, ruta, url);
+    if (pe2) return pe2;
+    return res({ error: "No encontrado" }, 404);
+  }
+
+  /* ---- acceso de profesor: solo sus clases y su lista ---- */
+  if (ruta.startsWith("profe/")) {
+    if (!env.CITAS) return res({ error: "Agenda no configurada" }, 503);
+    const o = request.headers.get("Origin");
+    if (o && new URL(o).host !== url.host && !(cfg.dominios || []).some((d) => { try { return new URL(d).host === new URL(o).host; } catch (e) { return false; } })) {
+      return res({ error: "Origen no permitido" }, 403);
+    }
+    const clave = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+    const suyo = clave ? await sha256(clave) : "";
+    const profe = (cfg.profes || []).find((p) => igual(suyo, p.hash));
+    if (!profe) {
+      if (!limitar(ip)) return res({ error: "Demasiados intentos. Espera unos minutos." }, 429);
+      return res({ error: "Clave incorrecta" }, 401);
+    }
+
+    if (ruta === "profe/clases" && request.method === "GET") {
+      const desde = RE_FECHA.test(url.searchParams.get("desde") || "") ? url.searchParams.get("desde") : ahora().fecha;
+      const dias = Math.min(Math.max(+url.searchParams.get("dias") || 7, 1), 31);
+      const hasta = sumar(desde, dias - 1);
+      const { results } = await env.CITAS.prepare(
+        "SELECT id, codigo, servicio, servicio_n, fecha, inicio, nombre, telefono, email, nota, estado, asistio FROM citas WHERE slug = ? AND fecha BETWEEN ? AND ? ORDER BY fecha, inicio"
+      ).bind(cfg.slug, desde, hasta).all();
+      const citas = results || [];
+      const dias2 = [];
+      for (let f = desde; f <= hasta; f = sumar(f, 1)) {
+        const mias = porSesiones(cfg) ? sesionesDia(cfg, f).filter((x) => x.prof === profe.nombre) : [];
+        if (!mias.length) continue;
+        dias2.push({
+          fecha: f, dia: legible(f),
+          clases: mias.map((x) => {
+            const g = citas.filter((c) => c.fecha === f && c.inicio === x.inicio && c.servicio === x.s);
+            return {
+              hora: x.h, nombre: x.nombre, sala: x.sala, min: x.min, plazas: x.cap,
+              apuntadas: g.filter((c) => c.estado === "ok").length,
+              gente: g.map((c) => ({ id: c.id, nombre: c.nombre, telefono: c.telefono, nota: c.nota, estado: c.estado, asistio: c.asistio, codigo: c.codigo })),
+            };
+          }),
+        });
+      }
+      return res({ profe: profe.nombre, negocio: cfg.negocio.nombre, color: cfg.color, desde, dias: dias2 });
+    }
+
+    if (ruta === "profe/asistencia" && request.method === "POST") {
+      let b; try { b = await cuerpo(request); } catch (e) { return res({ error: "JSON no válido" }, 400); }
+      await env.CITAS.prepare("UPDATE citas SET asistio = ?3 WHERE id = ?1 AND slug = ?2").bind(+b.id || 0, cfg.slug, b.vino ? 1 : 0).run();
+      return res({ ok: true });
+    }
     return res({ error: "No encontrado" }, 404);
   }
 
@@ -499,6 +554,10 @@ export async function atenderAgenda(request, env, ctx, limitar) {
   // Cuentas, bonos, pagos y lista de espera (alumnos.js). Devuelve null si no es cosa suya.
   const alu = await atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, request.headers.get("Origin") || "");
   if (alu) return alu;
+
+  // Talleres, retiros y encuentros con entrada (eventos.js)
+  const ev = await atenderEventos(request, env, ctx, cfg, ruta, url, cab, await alumnaDeLaSesion(env, request, cfg.slug), crearPagoEvento);
+  if (ev) return ev;
 
   if (request.method !== "POST") return r({ error: "Método no permitido" }, 405);
   if (!limitar(ip)) return r({ error: "Demasiadas peticiones. Inténtalo más tarde." }, 429);

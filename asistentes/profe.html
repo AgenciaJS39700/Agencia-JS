@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mis clases</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f0f10">
+<link rel="icon" href="/favicon.svg">
+<style>
+:root{--c:#e8c766;--bg:#0f0f10;--tx:#fafafa;--mu:#a1a1aa;--ln:rgba(255,255,255,.1);--card:#17171a;--ok:#22c55e;--no:#ef4444}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:0.9375rem/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:18px 16px calc(28px + env(safe-area-inset-bottom))}
+h1{font-size:1.25rem;margin:0}h1 small{display:block;font-size:.78rem;color:var(--mu);font-weight:500}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:44px;padding:.5rem 1rem;border-radius:12px;border:1px solid var(--ln);background:transparent;color:var(--tx);font:inherit;font-weight:600;cursor:pointer}
+.btn:hover{border-color:var(--c)}.btn.main{background:var(--c);color:#0a0a0a;border-color:transparent}
+.btn.sm{min-height:36px;padding:.3rem .7rem;font-size:.85rem}
+.btn:focus-visible,input:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+label{display:block;font-size:.8rem;color:var(--mu);margin-bottom:4px}
+input{width:100%;min-height:46px;padding:.5rem .8rem;border-radius:12px;border:1px solid var(--ln);background:#0f0f10;color:var(--tx);font:inherit;font-size:1rem}
+.box{background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:18px;margin:12px 0}
+.login{max-width:380px;margin:12vh auto}.login p{color:var(--mu)}
+.dia{margin-top:20px}
+.dia h2{font-size:.95rem;margin:0 0 8px;color:var(--c)}
+.cl{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:14px;margin-bottom:10px}
+.cl .h{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.cl .h b{font-size:1.05rem}
+.cl .h span{color:var(--mu);font-size:.82rem}
+.cl .n{font-weight:700;margin:.2rem 0 .1rem}
+.cl .m{color:var(--mu);font-size:.82rem;margin-bottom:.5rem}
+ul{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+li{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;background:#0f0f10;border:1px solid var(--ln);border-radius:12px;padding:9px 12px}
+li .d{min-width:0}
+li b{display:block;font-weight:600}
+li small{color:var(--mu);display:block;font-size:.78rem}
+li.vino{border-color:rgba(34,197,94,.45)}li.falta{opacity:.55}
+li.cancel{opacity:.5;text-decoration:line-through}
+.acc{display:flex;gap:6px;flex:none}
+.acc button{min-height:38px;padding:.3rem .7rem;border-radius:10px;border:1px solid var(--ln);background:transparent;color:var(--tx);font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
+.acc button[aria-pressed=true]{background:var(--ok);border-color:transparent;color:#07210f}
+.acc button.n[aria-pressed=true]{background:var(--no);color:#2a0b0b}
+.vacio{color:var(--mu);font-size:.88rem;padding:4px 2px}
+.msg{min-height:1.2em;color:#fca5a5;font-size:.88rem;margin:.6rem 0 0}
+a{color:var(--c)}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="login box" id="login">
+    <h1>Mis clases<small>Acceso para profesores</small></h1>
+    <p>Entra con la clave que te ha dado el estudio para ver quién viene a tus clases y pasar lista.</p>
+    <form id="fl">
+      <label for="clave">Tu clave</label>
+      <div style="display:flex;gap:8px"><input id="clave" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" required><button class="btn" type="button" id="ver" aria-label="Mostrar la clave" aria-pressed="false">👁</button></div>
+      <label style="display:flex;gap:.5rem;align-items:center;margin:10px 0 12px;color:var(--tx)"><input type="checkbox" id="rec" style="width:auto;min-height:0" checked> Recordar en este dispositivo</label>
+      <button class="btn main" type="submit" style="width:100%">Entrar</button>
+      <p class="msg" role="alert" id="ml"></p>
+    </form>
+  </section>
+
+  <section id="app" hidden>
+    <div class="top">
+      <h1 id="tit">Mis clases<small id="sub"></small></h1>
+      <button class="btn sm" id="salir" type="button">Salir</button>
+    </div>
+    <div class="bar">
+      <button class="btn sm" id="ant" type="button">‹ Antes</button>
+      <button class="btn sm" id="hoy" type="button">Esta semana</button>
+      <button class="btn sm" id="sig" type="button">Después ›</button>
+    </div>
+    <div id="lista" aria-live="polite"></div>
+  </section>
+</main>
+
+<script type="module">
+const slug = (location.pathname.match(/^\/profe\/([a-z0-9-]{2,40})/) || [])[1];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const hoyISO = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" }).format(new Date());
+const sumar = (f, n) => new Date(Date.parse(f + "T12:00:00Z") + n * 864e5).toISOString().slice(0, 10);
+const KEY = "ajs-profe-" + slug;
+let clave = "";
+try { clave = localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || ""; } catch (e) {}
+let desde = hoyISO();
+
+async function api(ruta, cuerpo) {
+  const r = await fetch(`/api/as/${slug}/${ruta}`, {
+    method: cuerpo ? "POST" : "GET",
+    headers: { Authorization: "Bearer " + clave, ...(cuerpo ? { "Content-Type": "application/json" } : {}) },
+    body: cuerpo ? JSON.stringify(cuerpo) : undefined,
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || "Error");
+  return d;
+}
+function salir() {
+  clave = "";
+  try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch (e) {}
+  $("app").hidden = true; $("login").hidden = false;
+}
+$("salir").onclick = salir;
+$("ver").onclick = () => { const i = $("clave"), v = i.type === "password"; i.type = v ? "text" : "password"; $("ver").setAttribute("aria-pressed", String(v)); };
+$("fl").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  clave = $("clave").value.trim();
+  try {
+    await cargar();
+    try { ($("rec").checked ? localStorage : sessionStorage).setItem(KEY, clave); } catch (er) {}
+  } catch (er) { $("ml").textContent = er.message; clave = ""; }
+});
+$("ant").onclick = () => { desde = sumar(desde, -7); cargar(); };
+$("sig").onclick = () => { desde = sumar(desde, 7); cargar(); };
+$("hoy").onclick = () => { desde = hoyISO(); cargar(); };
+
+async function cargar() {
+  const d = await api(`profe/clases?desde=${desde}&dias=7`);
+  document.documentElement.style.setProperty("--c", d.color || "#e8c766");
+  document.title = "Mis clases · " + d.negocio;
+  $("tit").firstChild.textContent = "Hola, " + d.profe;
+  $("sub").textContent = d.negocio;
+  $("login").hidden = true; $("app").hidden = false;
+  $("lista").innerHTML = d.dias.length ? d.dias.map((x) => `
+    <section class="dia"><h2>${esc(x.dia.charAt(0).toUpperCase() + x.dia.slice(1))}${x.fecha === hoyISO() ? " · hoy" : ""}</h2>
+      ${x.clases.map((c) => `<article class="cl">
+        <div class="h"><b>${esc(c.hora)}</b><span>${c.apuntadas} de ${c.plazas} plazas</span></div>
+        <p class="n">${esc(c.nombre)}</p>
+        <p class="m">${esc(c.sala || "")} · ${c.min} min</p>
+        ${c.gente.length ? `<ul>${c.gente.map((g) => `
+          <li class="${g.estado !== "ok" ? "cancel" : g.asistio === 1 ? "vino" : g.asistio === 0 ? "falta" : ""}">
+            <div class="d"><b>${esc(g.nombre)}</b><small>${esc(g.telefono || "")}${g.nota ? " · " + esc(g.nota) : ""}</small></div>
+            ${g.estado === "ok" ? `<div class="acc">
+              <button type="button" data-v="${g.id}" aria-pressed="${g.asistio === 1}">Vino</button>
+              <button type="button" class="n" data-f="${g.id}" aria-pressed="${g.asistio === 0}">No vino</button></div>` : '<span class="m">anulada</span>'}
+          </li>`).join("")}</ul>` : '<p class="vacio">Todavía no se ha apuntado nadie.</p>'}
+      </article>`).join("")}
+    </section>`).join("") : '<p class="vacio">No tienes clases esta semana.</p>';
+}
+
+$("lista").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-v],[data-f]");
+  if (!b) return;
+  const id = +(b.dataset.v || b.dataset.f), vino = !!b.dataset.v;
+  const ya = b.getAttribute("aria-pressed") === "true";
+  try { await api("profe/asistencia", { id, vino: ya ? null : vino }); await cargar(); } catch (er) {}
+});
+
+if (clave) cargar().catch(() => salir()); else $("clave").focus();
+</script>
+</body>
+</html>

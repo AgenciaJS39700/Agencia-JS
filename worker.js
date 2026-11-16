@@ -173,7 +173,7 @@ function blindar(res, url) {
   if (tipo.includes("text/html")) {
     const app = /^\/(c|panel)\//.test(url.pathname) || url.pathname.startsWith("/asistentes/");
     h.set("Content-Security-Policy", app ? CSP_APP : CSP_WEB);
-    if (url.pathname.startsWith("/panel/")) h.set("X-Robots-Tag", "noindex"); // el panel del negocio no pinta nada en Google
+    if (url.pathname.startsWith("/panel/") || url.pathname.startsWith("/profe/")) h.set("X-Robots-Tag", "noindex"); // panel y acceso de profesores no pintan nada en Google
   } else {
     for (const [re, valor] of CACHE_EXT) { if (re.test(url.pathname)) { h.set("Cache-Control", valor); break; } }
   }
@@ -220,9 +220,9 @@ export default {
     }
     const man = url.pathname.match(/^\/panel\/([a-z0-9-]{2,40})\/app\.webmanifest$/);
     if (man) return manifiesto(man[1]) || new Response("No encontrado", { status: 404 });
-    const pag = url.pathname.match(/^\/(c|panel)\/([a-z0-9-]{2,40})\/?$/);
+    const pag = url.pathname.match(/^\/(c|panel|profe)\/([a-z0-9-]{2,40})\/?$/);
     if (pag && env.ASSETS) {
-      const archivo = pag[1] === "c" ? "/asistentes/pagina" : "/asistentes/panel";
+      const archivo = pag[1] === "c" ? "/asistentes/pagina" : pag[1] === "profe" ? "/asistentes/profe" : "/asistentes/panel";
       const r = await env.ASSETS.fetch(new Request(new URL(archivo, url), request));
       return new Response(r.body, { status: r.status, headers: r.headers });
     }

@@ -119,6 +119,15 @@ export default {
     exento: "Operación exenta de IVA por el artículo 20.Uno.13.º de la Ley 37/1992 (servicios deportivos). Confírmalo con tu asesoría.",
   },
   avisos: { email: "agencia39700@gmail.com", whatsapp: "", whatsappCliente: false },
+  // Acceso de profesores: cada uno ve solo SUS clases y pasa lista. El nombre
+  // tiene que coincidir con el de las sesiones del horario.
+  profes: [
+    { nombre: "Adriana", hash: "72da9f3a58c9c9804833dda67c41696d34c740ebebdb7244eab21f9a83aa1e38" },
+    { nombre: "Sandra", hash: "deffe2cd54e36216eea16de1a6354ec081b2c2c6cf84ba7bf8c0220de5dd60f8" },
+    { nombre: "Sus", hash: "738c74b0920a362bef1f76b13d9508a90c329ec1d01e1707f0dcfd53868380e8" },
+    { nombre: "Juanjo", hash: "1e8fe2c729bdba3a9c5256cbc025b95cda60a580c16dfc0e178bdb53de32165c" },
+    { nombre: "Sergio", hash: "308382be604b5993087bce0db0702efd40a774134bbd6cd662c1d6813059f870" },
+  ],
   panel: {
     hash: "6eefe7d0d002aafce2c192f50f63573ffcb39c9925839c783fd4d5c4604a8e9d",
     // Cada persona del equipo con su clave, para no compartir una sola entre todas
