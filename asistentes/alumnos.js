@@ -476,12 +476,24 @@ async function miCuenta(env, cfg, a) {
 }
 
 /* ---------------------------------------------------------------- Stripe: eventos */
+/** La suscripción de una factura, mire donde mire la versión de la API de Stripe. */
+function subDeFactura(f) {
+  if (!f) return null;
+  if (f.subscription) return typeof f.subscription === "string" ? f.subscription : f.subscription.id;
+  const p = f.parent && f.parent.subscription_details;
+  if (p && p.subscription) return typeof p.subscription === "string" ? p.subscription : p.subscription.id;
+  const l = f.lines && f.lines.data && f.lines.data[0];
+  const d = l && l.parent && l.parent.subscription_item_details;
+  if (d && d.subscription) return d.subscription;
+  return null;
+}
+
 async function procesaStripe(env, cfg, ev) {
   const t = ev.type;
   if (t === "checkout.session.completed" || t === "checkout.session.async_payment_succeeded") return aplicaPago(env, cfg, ev.data.object);
-  if (t === "invoice.paid") {
+  if (t === "invoice.paid" || t === "invoice.payment_succeeded") {
     // Renovación mensual de una suscripción: se estira el bono
-    const sub = ev.data.object.subscription;
+    const sub = subDeFactura(ev.data.object);
     if (!sub) return;
     const b = await env.CITAS.prepare("SELECT * FROM bonos WHERE stripe_sub = ?1").bind(sub).first();
     if (!b) return;
@@ -492,7 +504,7 @@ async function procesaStripe(env, cfg, ev) {
     return;
   }
   if (t === "invoice.payment_failed") {
-    const sub = ev.data.object.subscription;
+    const sub = subDeFactura(ev.data.object);
     if (sub) await env.CITAS.prepare("UPDATE bonos SET estado = 'impago' WHERE stripe_sub = ?1").bind(sub).run();
     return;
   }
@@ -515,7 +527,9 @@ async function aplicaPago(env, cfg, s) {
     await env.CITAS.prepare("INSERT INTO pagos (slug, alumno_id, concepto, importe, estado, stripe_id) VALUES (?1,?2,?3,?4,'pagado',?5)")
       .bind(cfg.slug, alumnoId, (producto(cfg, prodId) || {}).nombre || prodId, s.amount_total || 0, s.id).run();
   }
-  const bonoId = await activarBono(env, cfg, alumnoId, prodId, { sub: s.subscription || null, cust: s.customer || null });
+  const sub = typeof s.subscription === "string" ? s.subscription : (s.subscription && s.subscription.id) || null;
+  const cust = typeof s.customer === "string" ? s.customer : (s.customer && s.customer.id) || null;
+  const bonoId = await activarBono(env, cfg, alumnoId, prodId, { sub: sub, cust: cust });
   if (bonoId) await env.CITAS.prepare("UPDATE pagos SET bono_id = ?2 WHERE stripe_id = ?1").bind(s.id, bonoId).run();
   const a = await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1").bind(alumnoId).first();
   const b = await env.CITAS.prepare("SELECT * FROM bonos WHERE id = ?1").bind(bonoId).first();
