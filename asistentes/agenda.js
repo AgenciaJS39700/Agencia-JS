@@ -397,7 +397,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       const dias = Math.min(Math.max(+url.searchParams.get("dias") || 14, 1), 92);
       const hasta = sumar(desde, dias - 1);
       const [c, b] = await env.CITAS.batch([
-        env.CITAS.prepare("SELECT id, codigo, servicio_n, fecha, inicio, fin, nombre, telefono, email, nota, origen, estado, creada FROM citas WHERE slug = ? AND fecha BETWEEN ? AND ? ORDER BY fecha, inicio").bind(cfg.slug, desde, hasta),
+        env.CITAS.prepare("SELECT id, codigo, servicio, servicio_n, fecha, inicio, fin, nombre, telefono, email, nota, origen, estado, asistio, creada FROM citas WHERE slug = ? AND fecha BETWEEN ? AND ? ORDER BY fecha, inicio").bind(cfg.slug, desde, hasta),
         env.CITAS.prepare("SELECT id, fecha, inicio, fin, motivo FROM bloqueos WHERE slug = ? AND fecha BETWEEN ? AND ? ORDER BY fecha, inicio").bind(cfg.slug, desde, hasta),
       ]);
       return res({ negocio: configPublica(cfg), desde, hasta, citas: c.results || [], bloqueos: b.results || [] });
