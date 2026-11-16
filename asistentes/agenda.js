@@ -21,6 +21,8 @@ import { responderAsistente } from "./motor.js";
 import { resolverDia } from "../voz/agenda.js";
 import { avisarMoviles, altaMovil, bajaMovil, clavesVapid } from "./push.js";
 import { plantillaWhatsApp } from "./whatsapp.js";
+import { correo, marco } from "./correo.js";
+import { atenderAlumnos, atenderPanelAlumnos, alumnaDeLaSesion, compruebaBono, avisarEspera } from "./alumnos.js";
 
 const conPrefijo = (t) => { const d = String(t || "").replace(/\D/g, ""); return d.length === 9 ? "34" + d : d; };
 
@@ -208,11 +210,11 @@ export async function reservar(env, cfg, datos, origen = "chat", ctx) {
         ? "(SELECT COUNT(*) FROM citas WHERE slug = ?1 AND fecha = ?5 AND estado = 'ok' AND inicio = ?6 AND servicio = ?3)"
         : "(SELECT COUNT(*) FROM citas WHERE slug = ?1 AND fecha = ?5 AND estado = 'ok' AND inicio < ?7 AND fin > ?6)";
       const r = await env.CITAS.prepare(
-        `INSERT INTO citas (slug, codigo, servicio, servicio_n, fecha, inicio, fin, nombre, telefono, email, nota, origen)
-         SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12
+        `INSERT INTO citas (slug, codigo, servicio, servicio_n, fecha, inicio, fin, nombre, telefono, email, nota, origen, alumno_id)
+         SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?14
          WHERE ${ocupadas} < ?13
            AND NOT EXISTS (SELECT 1 FROM bloqueos WHERE slug = ?1 AND fecha = ?5 AND inicio < ?7 AND fin > ?6)`
-      ).bind(cfg.slug, cod, serv.id, ses ? ses.nombre : serv.nombre, fecha, inicio, fin, nombre, tel, email || null, nota || null, origen, cupo).run();
+      ).bind(cfg.slug, cod, serv.id, ses ? ses.nombre : serv.nombre, fecha, inicio, fin, nombre, tel, email || null, nota || null, origen, cupo, datos.alumno_id || null).run();
       if (!r.meta || !r.meta.changes) return { ok: false, estado: 409, mensaje: ses ? "Esa clase acaba de llenarse. Elige otra hora." : "Ese hueco acaba de ocuparse. Elige otra hora." };
       const nomServ = ses ? ses.nombre : serv.nombre;
       const cita = { id: r.meta.last_row_id, codigo: cod, servicio_n: nomServ, precio: serv.precio, sala: ses ? ses.sala : "", fecha, inicio, fin, nombre, telefono: tel, email, nota, origen };
@@ -239,6 +241,7 @@ async function cancelar(env, cfg, where, binds, ctx, quien) {
   await env.CITAS.prepare("UPDATE citas SET estado = 'cancelada' WHERE id = ?").bind(c.id).run();
   const p = Promise.all([
     avisarNegocio(env, cfg, c, quien === "cliente" ? "anulada por el cliente" : "cancelada"),
+    avisarEspera(env, cfg, c),
     quien === "cliente" && cfg.avisos && cfg.avisos.whatsapp ? plantillaWhatsApp(env, cfg.avisos.whatsapp, "cita_anulada", [cfg.negocio.nombre, c.nombre, c.servicio_n, `${legible(c.fecha)} a las ${hhmm(c.inicio)}`]) : null,
     quien === "cliente" && avanzado(cfg) ? avisarMoviles(env, cfg.slug, `❌ Cita anulada · ${c.nombre}`, `${c.servicio_n} · ${legible(c.fecha)} a las ${hhmm(c.inicio)}. El hueco vuelve a estar libre.`) : null,
     c.email && quien !== "cliente" ? correo(env, cfg, c.email, c.nombre, `Cita cancelada · ${cfg.negocio.nombre}`, plantillaCliente(cfg, c, "Tu cita se ha cancelado", "Si quieres otra fecha, puedes pedirla de nuevo cuando quieras.")) : null,
@@ -247,21 +250,7 @@ async function cancelar(env, cfg, where, binds, ctx, quien) {
   return c;
 }
 
-/* ---------------------------------------------------------------- correo (Brevo, opcional) */
-async function correo(env, cfg, a, nombre, asunto, html) {
-  if (!env.BREVO_API_KEY || !env.MAIL_FROM || !a) { console.log("Correo no enviado (falta BREVO_API_KEY, MAIL_FROM o destinatario):", asunto); return false; }
-  const r = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST", headers: { "api-key": env.BREVO_API_KEY, "content-type": "application/json", accept: "application/json" },
-    body: JSON.stringify({ sender: { name: cfg.negocio.nombre.slice(0, 60), email: env.MAIL_FROM }, to: [{ email: a, name: nombre || undefined }], subject: asunto, htmlContent: html }),
-  });
-  if (!r.ok) console.error("Brevo rechazó el correo:", r.status, (await r.text().catch(() => "")).slice(0, 200));
-  return r.ok;
-}
-function marco(cfg, titulo, dentro) {
-  return `<!doctype html><html lang="es"><body style="margin:0;background:#f4f4f6;font-family:Arial,Helvetica,sans-serif;color:#141414"><div style="max-width:560px;margin:0 auto;padding:24px 16px"><div style="background:#fff;border-radius:16px;padding:28px;border-top:6px solid ${esc(cfg.color)}">
-<p style="font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;margin:0 0 16px;color:#555">${esc(cfg.negocio.nombre)}</p><h1 style="font-size:22px;margin:0 0 12px">${esc(titulo)}</h1>${dentro}</div>
-<p style="font-size:12px;color:#8d8c88;text-align:center;margin:14px 0 0">${esc(cfg.negocio.direccion)} · ${esc(cfg.negocio.telefono)}</p></div></body></html>`;
-}
+/* ---------------------------------------------------------------- correos de las citas (el envío está en correo.js) */
 function bloque(c) {
   return `<p style="font-size:15px;line-height:1.7;background:#f6f6f8;padding:14px 16px;border-radius:10px;margin:14px 0"><b>${esc(legible(c.fecha))} · ${hhmm(c.inicio)}</b><br>${esc(c.servicio_n)}<br>A nombre de ${esc(c.nombre)} · ${esc(c.telefono)}${c.nota ? "<br>Nota: " + esc(c.nota) : ""}<br>Código: <b>${esc(c.codigo)}</b></p>`;
 }
@@ -339,7 +328,7 @@ function cors(request, cfg, url) {
   const propio = host === url.host || host === "agencia-js.com";
   const permitido = propio || !(cfg.dominios && cfg.dominios.length) || cfg.dominios.some((d) => { try { return new URL(d).host === host; } catch (e) { return false; } });
   if (!permitido) return null;
-  return { "Access-Control-Allow-Origin": o, Vary: "Origin", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Max-Age": "86400" };
+  return { "Access-Control-Allow-Origin": o, Vary: "Origin", "Access-Control-Allow-Credentials": "true", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Max-Age": "86400" };
 }
 
 /* ---------------------------------------------------------------- router */
@@ -391,6 +380,8 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       ]);
       return res({ negocio: configPublica(cfg), desde, hasta, citas: c.results || [], bloqueos: b.results || [] });
     }
+    const pa1 = await atenderPanelAlumnos(request, env, cfg, ruta, url);
+    if (pa1) return pa1;
     if (request.method !== "POST") return res({ error: "Método no permitido" }, 405);
     let b; try { b = await cuerpo(request); } catch (e) { return res({ error: "JSON no válido" }, 400); }
     if (ruta.startsWith("panel/push/")) {
@@ -411,6 +402,8 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       return res({ ok: true, dias: fechas.length });
     }
     if (ruta === "panel/desbloquear") { await env.CITAS.prepare("DELETE FROM bloqueos WHERE slug = ? AND id = ?").bind(cfg.slug, +b.id || 0).run(); return res({ ok: true }); }
+    const pa2 = await atenderPanelAlumnos(request, env, cfg, ruta, url);
+    if (pa2) return pa2;
     return res({ error: "No encontrado" }, 404);
   }
 
@@ -490,11 +483,29 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     return r({ fecha, huecos: (await huecosDia(env, cfg, fecha, serv)).map(hhmm) });
   }
 
+  // Cuentas, bonos, pagos y lista de espera (alumnos.js). Devuelve null si no es cosa suya.
+  const alu = await atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, request.headers.get("Origin") || "");
+  if (alu) return alu;
+
   if (request.method !== "POST") return r({ error: "Método no permitido" }, 405);
   if (!limitar(ip)) return r({ error: "Demasiadas peticiones. Inténtalo más tarde." }, 429);
   let b; try { b = await cuerpo(request, 6000); } catch (e) { return r({ error: "JSON no válido" }, 400); }
 
-  if (ruta === "cita") { const x = await reservar(env, cfg, b, "chat", ctx); return r(x, x.estado); }
+  if (ruta === "cita") {
+    const al = await alumnaDeLaSesion(env, request, cfg.slug);
+    if (al) {
+      b.alumno_id = al.id;
+      b.nombre = b.nombre || al.nombre;
+      b.telefono = b.telefono || al.telefono;
+      b.email = b.email || al.email;
+    }
+    const bono = await compruebaBono(env, cfg, al, b.servicio, b.fecha);
+    if (!bono.ok) return r({ ok: false, estado: 409, mensaje: bono.bloqueo }, 409);
+    const x = await reservar(env, cfg, b, al ? "cuenta" : "chat", ctx);
+    if (x.ok && bono.aviso) x.aviso = bono.aviso;
+    if (x.ok && bono.bono) x.bono = bono.bono.nombre;
+    return r(x, x.estado);
+  }
   if (ruta === "anular") {
     const cod = limpiar(b.codigo, 8).toUpperCase(), tel = soloTel(b.telefono).replace(/\D/g, "").slice(-9);
     if (cod.length < 6 || tel.length < 9) return r({ ok: false, mensaje: "Escribe el código de la cita y tu teléfono." }, 400);

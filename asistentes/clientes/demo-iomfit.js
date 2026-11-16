@@ -6,8 +6,8 @@ import plantilla from "./_plantilla.js";
 // Salas reales del estudio
 const CH = "Sala Chandra", SU = "Sala Surya";
 
-// Atajos de sesión: { h: hora, s: id del servicio, cap: plazas, sala }
-const s = (h, id, cap, sala, extra) => ({ h, s: id, cap, sala, ...(extra || {}) });
+// Atajos de sesión: { h: hora, s: id del servicio, cap: plazas, sala, prof, on: también online }
+const s = (h, id, cap, sala, prof, extra) => ({ h, s: id, cap, sala, prof, ...(extra || {}) });
 
 export default {
   ...plantilla,
@@ -26,18 +26,18 @@ export default {
     horarioTexto: "Clases de lunes a viernes de 10:00 a 21:40 y sábados por la mañana. Cada clase tiene plazas limitadas y se reserva antes de venir.",
     // Horario de apertura (informativo; las reservas van por «sesiones»)
     horario: { 1: [["17:00", "20:30"]], 2: [["10:00", "21:40"]], 3: [["10:00", "20:30"]], 4: [["10:00", "21:40"]], 5: [["17:00", "19:45"]], 6: [["10:30", "11:45"]] },
-    // Cuadro real de clases: 0 domingo … 6 sábado
+    // Cuadro real de clases (tomado de su Momoyoga, semana del 16/11/2026): 0 domingo … 6 sábado
     sesiones: {
-      1: [s("17:30", "func-inicial", 12, SU), s("18:30", "power-flow", 14, CH), s("19:30", "gap-suelo", 12, SU)],
-      2: [s("10:00", "yinyang", 14, CH), s("11:20", "embarazo", 10, CH), s("12:30", "postnatal", 10, CH),
-          s("17:30", "restaurativo", 14, CH), s("18:30", "embarazo", 10, CH), s("18:45", "fisiopilates", 10, SU),
-          s("19:30", "yinyang", 14, CH), s("19:45", "func-avanzado", 12, SU), s("20:45", "gap-tonif", 12, SU)],
-      3: [s("10:00", "gap-tonif", 12, SU), s("17:30", "func-inicial", 12, SU), s("18:30", "power-flow", 14, CH), s("19:30", "gap-suelo", 12, SU)],
-      4: [s("10:00", "yinyang", 14, CH), s("11:20", "embarazo", 10, CH), s("12:30", "postnatal", 10, CH),
-          s("17:30", "restaurativo-core", 14, CH), s("18:30", "embarazo", 10, CH), s("18:45", "fisiopilates", 10, SU),
-          s("19:30", "yinyang", 14, CH), s("19:45", "func-avanzado", 12, SU), s("20:45", "gap-tonif", 12, SU)],
-      5: [s("17:00", "familia", 16, CH, { nota: "Un viernes al mes" }), s("17:00", "salsa-1", 20, SU), s("18:45", "salsa-0", 20, SU)],
-      6: [s("10:30", "restaurativo", 14, CH)],
+      1: [s("17:30", "func-inicial", 12, SU, "Sandra"), s("18:30", "power-flow", 14, CH, "Sandra", { on: 1 }), s("19:30", "gap-suelo", 12, CH, "Sandra", { on: 1 })],
+      2: [s("10:00", "yinyang", 14, CH, "Adriana", { on: 1 }), s("11:20", "embarazo", 10, CH, "Adriana", { on: 1 }), s("12:30", "postnatal", 10, CH, "Adriana", { on: 1 }),
+          s("17:30", "restaurativo", 14, CH, "Adriana"), s("18:15", "fisiopilates", 10, SU, "Sus"), s("18:30", "embarazo", 10, CH, "Adriana", { on: 1 }),
+          s("19:30", "func-avanzado", 12, SU, "Sus"), s("19:30", "yinyang", 14, CH, "Adriana", { on: 1 }), s("20:45", "power-flow", 12, SU, "Sus")],
+      3: [s("17:30", "func-inicial", 12, SU, "Juanjo"), s("18:30", "power-flow", 14, CH, "Juanjo", { on: 1 }), s("19:30", "gap-suelo", 12, CH, "Juanjo", { on: 1 })],
+      4: [s("10:00", "yinyang", 14, CH, "Adriana", { on: 1 }), s("11:20", "embarazo", 10, CH, "Adriana", { on: 1 }), s("12:30", "postnatal", 10, CH, "Adriana", { on: 1 }),
+          s("17:30", "restaurativo-core", 14, CH, "Sandra"), s("18:15", "fisiopilates", 10, SU, "Sus"), s("18:30", "embarazo", 10, CH, "Sandra", { on: 1 }),
+          s("19:30", "func-avanzado", 12, SU, "Sus"), s("19:30", "yinyang", 14, CH, "Sandra", { on: 1 }), s("20:45", "gap-tonif", 12, CH, "Sus")],
+      5: [s("17:15", "familia", 16, SU, "Adriana", { nota: "Un viernes al mes" }), s("17:30", "salsa-1", 20, SU, "Sergio"), s("19:00", "salsa-0", 20, SU, "Sergio")],
+      6: [s("10:30", "restaurativo", 14, CH, "Adriana")],
     },
     extra: [
       "Bono Ilimitado Bienestar: 69 € al mes, todas las clases de yoga, pilates, fisiopilates y entrenamiento funcional que quieras, sin matrícula. Es la mejor opción si vienes 3 o más veces por semana.",
@@ -60,21 +60,42 @@ export default {
   },
   // Un servicio por tipo de clase: es lo que se reserva
   servicios: [
-    { id: "yinyang", nombre: "Vinyasa YinYang Yoga", min: 75, precio: "incluida en tu bono · suelta 12 €" },
-    { id: "power-flow", nombre: "Vinyasa Power Flow", min: 75, precio: "incluida en tu bono · suelta 12 €" },
-    { id: "restaurativo", nombre: "Yoga Restaurativo YTSO®", min: 75, precio: "incluida en tu bono · suelta 12 €" },
-    { id: "restaurativo-core", nombre: "Yoga Restaurativo & Core", min: 75, precio: "incluida en tu bono · suelta 12 €" },
-    { id: "embarazo", nombre: "Yoga & Pilates Embarazo", min: 70, precio: "bono embarazo desde 40 € · suelta 12 €" },
-    { id: "postnatal", nombre: "Yoga & Pilates Postnatal con bebés", min: 70, precio: "bono postnatal desde 40 € · suelta 12 €" },
-    { id: "gap-tonif", nombre: "Pilates GAP + Tonificación", min: 55, precio: "incluida en tu bono · suelta 12 €" },
-    { id: "gap-suelo", nombre: "Pilates GAP + Suelo Pélvico", min: 55, precio: "incluida en tu bono · suelta 12 €" },
-    { id: "fisiopilates", nombre: "Fisiopilates", min: 55, precio: "incluida en tu bono · suelta 12 €" },
-    { id: "func-inicial", nombre: "Entrenamiento Funcional Inicial", min: 55, precio: "incluida en tu bono · suelta 12 €" },
-    { id: "func-avanzado", nombre: "Entrenamiento Funcional Avanzado", min: 55, precio: "incluida en tu bono · suelta 12 €" },
-    { id: "salsa-0", nombre: "Salsa & Bachata · Nivel Cero", min: 60, precio: "bono 40 € al mes · suelta 12 €" },
-    { id: "salsa-1", nombre: "Salsa & Bachata · Básico 1", min: 60, precio: "bono 40 € al mes · suelta 12 €" },
-    { id: "familia", nombre: "Taller Yoga en Familia", min: 60, precio: "20 € un adulto y un peque · 5 € extra" },
+    { id: "yinyang", tipo: "bienestar", nombre: "Vinyasa YinYang Yoga", min: 75, precio: "incluida en tu bono · suelta 12 €" },
+    { id: "power-flow", tipo: "bienestar", nombre: "Vinyasa Power Flow", min: 75, precio: "incluida en tu bono · suelta 12 €" },
+    { id: "restaurativo", tipo: "bienestar", nombre: "Yoga Restaurativo YTSO®", min: 75, precio: "incluida en tu bono · suelta 12 €" },
+    { id: "restaurativo-core", tipo: "bienestar", nombre: "Yoga Restaurativo & Core", min: 75, precio: "incluida en tu bono · suelta 12 €" },
+    { id: "embarazo", tipo: "maternidad", nombre: "Yoga & Pilates Embarazo", min: 70, precio: "bono embarazo desde 40 € · suelta 12 €" },
+    { id: "postnatal", tipo: "maternidad", nombre: "Yoga & Pilates Postnatal con bebés", min: 70, precio: "bono postnatal desde 40 € · suelta 12 €" },
+    { id: "gap-tonif", tipo: "fuerza", nombre: "Pilates GAP + Tonificación", min: 55, precio: "incluida en tu bono · suelta 12 €" },
+    { id: "gap-suelo", tipo: "fuerza", nombre: "Pilates GAP + Suelo Pélvico", min: 55, precio: "incluida en tu bono · suelta 12 €" },
+    { id: "fisiopilates", tipo: "fuerza", nombre: "Fisiopilates", min: 55, precio: "incluida en tu bono · suelta 12 €" },
+    { id: "func-inicial", tipo: "fuerza", nombre: "Entrenamiento Funcional Inicial", min: 55, precio: "incluida en tu bono · suelta 12 €" },
+    { id: "func-avanzado", tipo: "fuerza", nombre: "Entrenamiento Funcional Avanzado", min: 55, precio: "incluida en tu bono · suelta 12 €" },
+    { id: "salsa-0", tipo: "baile", nombre: "Salsa & Bachata · Nivel Cero", min: 60, precio: "bono 40 € al mes · suelta 12 €" },
+    { id: "salsa-1", tipo: "baile", nombre: "Salsa & Bachata · Básico 1", min: 60, precio: "bono 40 € al mes · suelta 12 €" },
+    { id: "familia", tipo: "taller", nombre: "Taller Yoga en Familia", min: 60, precio: "20 € un adulto y un peque · 5 € extra" },
   ],
+  // Bonos reales del estudio (los mismos que tienen cargados en Momoyoga, 16/11/2026).
+  // precio en céntimos · meses de validez (o dias) · sem: clases por semana (0 = sin límite)
+  // tipos: qué actividades cubre · recurrente: se renueva solo cada mes con Stripe
+  productos: [
+    { id: "ilimitado", nombre: "Bono Ilimitado Bienestar", precio: 6900, meses: 1, sem: 0, tipos: ["bienestar", "fuerza"], recurrente: true, destacado: true, nota: "Sin matrícula. Todas las clases de yoga, pilates, fisiopilates y funcional que quieras." },
+    { id: "tres", nombre: "Bono 3 clases por semana", precio: 6250, meses: 1, sem: 3, tipos: ["bienestar", "fuerza"], recurrente: true },
+    { id: "dos", nombre: "Bono 2 clases por semana", precio: 4750, meses: 1, sem: 2, tipos: ["bienestar", "fuerza"], recurrente: true },
+    { id: "uno", nombre: "Bono 1 clase por semana", precio: 3250, meses: 1, sem: 1, tipos: ["bienestar", "fuerza"], recurrente: true },
+    { id: "dos-tri", nombre: "Bono 2 clases por semana · trimestral", precio: 12800, meses: 3, sem: 2, tipos: ["bienestar", "fuerza"], nota: "Tres meses pagando de una vez: ahorras 14,50 €." },
+    { id: "uno-tri", nombre: "Bono 1 clase por semana · trimestral", precio: 8800, meses: 3, sem: 1, tipos: ["bienestar", "fuerza"], nota: "Tres meses pagando de una vez: ahorras 9,50 €." },
+    { id: "emb2", nombre: "Embarazo y postparto · 2 días por semana", precio: 5500, meses: 1, sem: 2, tipos: ["maternidad"], recurrente: true },
+    { id: "emb1", nombre: "Embarazo y postparto · 1 día por semana", precio: 4000, meses: 1, sem: 1, tipos: ["maternidad"], recurrente: true },
+    { id: "salsa", nombre: "Salsa y bachata · 1 día por semana", precio: 4000, meses: 1, sem: 1, tipos: ["baile"], recurrente: true },
+    { id: "familia", nombre: "Yoga en Familia · 1 día por semana", precio: 5500, meses: 1, sem: 1, tipos: ["taller"], recurrente: true },
+    { id: "online", nombre: "Yoga o pilates online · 1 día por semana", precio: 2800, meses: 1, sem: 1, tipos: ["bienestar", "fuerza"], online: true, recurrente: true },
+    { id: "ilim21", nombre: "Bono Ilimitado 21 días", precio: 3900, dias: 21, sem: 0, tipos: ["bienestar", "fuerza"], nuevas: true, nota: "Solo para quien empieza: 21 días de todo lo que quieras." },
+    { id: "suelta", nombre: "Clase suelta", precio: 1200, dias: 1, sem: 1, tipos: ["bienestar", "fuerza", "maternidad", "baile"] },
+    { id: "prueba", nombre: "1.ª clase de prueba", precio: 0, dias: 1, sem: 1, tipos: ["bienestar", "fuerza", "maternidad", "baile"], nuevas: true, nota: "Gratis. Si ese mismo día te apuntas a un bono mensual, no pagas nada." },
+  ],
+  matricula: { precio: 1500, nombre: "Matrícula", nota: "Se paga una sola vez. Con el Bono Ilimitado no hay matrícula.", exentos: ["ilimitado", "ilim21", "prueba", "suelta"] },
+
   salud: false,
   urgencia: "",
   chips: ["Quiero reservar una clase", "¿Cuánto cuesta el Bono Ilimitado?", "Estoy embarazada, ¿puedo venir?"],
