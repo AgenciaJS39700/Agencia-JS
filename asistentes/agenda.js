@@ -96,7 +96,7 @@ function sesionesDia(cfg, fecha) {
   if (a.festivos.includes(fecha)) return [];
   return ((cfg.negocio.sesiones || {})[dow(fecha)] || []).map((x) => {
     const serv = cfg.servicios.find((s) => s.id === x.s);
-    return { h: x.h, inicio: min2(x.h), s: x.s, nombre: x.nombre || (serv && serv.nombre) || x.s, min: x.min || (serv && serv.min) || 60, cap: x.cap || a.capacidad, sala: x.sala || "", nota: x.nota || "" };
+    return { h: x.h, inicio: min2(x.h), s: x.s, nombre: x.nombre || (serv && serv.nombre) || x.s, min: x.min || (serv && serv.min) || 60, cap: x.cap || a.capacidad, sala: x.sala || "", prof: x.prof || "", on: !!x.on, nota: x.nota || "" };
   }).sort((p, q) => p.inicio - q.inicio);
 }
 
@@ -170,7 +170,7 @@ async function clases(env, cfg, desde, dias) {
       const ocupadas = citas.filter((c) => c.inicio === x.inicio && c.servicio === x.s).length;
       const cerrada = bloq.some((b) => b.inicio < x.inicio + x.min && b.fin > x.inicio);
       const pasada = f < ya.fecha || (f === ya.fecha && x.inicio < ya.min + a.antelacionMin);
-      return { hora: x.h, servicio: x.s, nombre: x.nombre, min: x.min, sala: x.sala, nota: x.nota, plazas: x.cap, libres: Math.max(0, x.cap - ocupadas), abierta: !cerrada && !pasada && f <= sumar(ya.fecha, a.diasMax) && ocupadas < x.cap };
+      return { hora: x.h, servicio: x.s, nombre: x.nombre, min: x.min, sala: x.sala, prof: x.prof, on: x.on, nota: x.nota, plazas: x.cap, libres: Math.max(0, x.cap - ocupadas), abierta: !cerrada && !pasada && f <= sumar(ya.fecha, a.diasMax) && ocupadas < x.cap };
     });
     if (lista.length) out.push({ fecha: f, dia: legible(f), clases: lista });
   }
