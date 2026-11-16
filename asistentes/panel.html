@@ -438,9 +438,9 @@ async function verAlumnas(q) {
       <div class="st"><b>${eur(t.mes || 0)}</b><span>cobrado este mes</span></div></div>
      <div class="bar bus"><input id="qAlum" placeholder="Buscar por nombre, correo o teléfono" value="${esc(q || "")}" style="flex:1;min-width:200px">
       <a class="btn" href="/api/as/${slug}/panel/exportar?que=alumnas&k=${encodeURIComponent(clave)}" download>Exportar CSV</a></div>
-     <p class="vacio">${t.ofertas || 0} han aceptado recibir ofertas y novedades por correo.</p>` +
+     <p class="vacio">${(t.ofertas || 0) === 1 ? "1 alumna ha aceptado" : (t.ofertas || 0) + " alumnas han aceptado"} recibir ofertas y novedades por correo.</p>` +
     (d.alumnas.length ? d.alumnas.map((a) => `<div class="fila" data-alum="${a.id}">
-       <div><b>${esc(a.nombre || a.email)}</b><span>${esc(a.email)}${a.telefono ? " · " + esc(a.telefono) : ""} · ${a.clases || 0} clases</span></div>
+       <div><b>${esc(a.nombre || a.email)}</b><span>${esc(a.email)}${a.telefono ? " · " + esc(a.telefono) : ""} · ${(a.clases || 0) === 1 ? "1 clase" : (a.clases || 0) + " clases"}</span></div>
        <div>${a.bono ? `<span class="eti ok">${esc(a.bono)}</span>` : '<span class="eti no">sin bono</span>'}</div></div>`).join("")
       : '<p class="vacio">Todavía no hay alumnas dadas de alta.</p>');
   const i = $("qAlum");
@@ -461,7 +461,7 @@ async function verAlumna(id) {
      <div class="bar" style="margin:10px 0"><button class="btn main sm" type="button" id="darBono">+ Dar un bono</button>
        <button class="btn sm" type="button" id="cobrar">Apuntar un cobro</button></div>
      <h3 style="font-size:.9rem;color:var(--c);margin:14px 0 6px">Bonos</h3>
-     ${d.bonos.length ? d.bonos.map((b) => `<div class="fila" style="cursor:default"><div><b>${esc(b.nombre)}</b><span>${corto(b.inicio)} → ${corto(b.fin)} · ${b.sem ? b.sem + "/semana" : "sin límite"}${b.recurrente ? " · se renueva" : ""}</span></div>
+     ${d.bonos.length ? d.bonos.map((b) => `<div class="fila" style="cursor:default"><div><b>${esc(b.nombre)}</b><span>${corto(b.inicio)} → ${corto(b.fin)} · ${b.sem ? b.sem + "/semana" : "sin límite"}${b.recurrente && b.stripe_sub ? " · se renueva sola" : ""}</span></div>
         <div>${b.estado === "activo" && b.fin >= hoyISO() ? `<button class="btn sm del" type="button" data-nobono="${b.id}">Dar de baja</button>` : `<span class="eti no">${esc(b.estado)}</span>`}</div></div>`).join("") : '<p class="vacio">Sin bonos.</p>'}
      <h3 style="font-size:.9rem;color:var(--c);margin:14px 0 6px">Últimas clases</h3>
      ${d.citas.length ? `<div class="tt-w"><table class="tt"><tbody>${d.citas.slice(0, 12).map((c) => `<tr><td>${corto(c.fecha)}</td><td>${c.hora}</td><td>${esc(c.servicio_n)}</td><td>${c.estado === "ok" ? (c.asistio === 1 ? "vino" : c.asistio === 0 ? "no vino" : "") : "cancelada"}</td></tr>`).join("")}</tbody></table></div>` : '<p class="vacio">Sin clases.</p>'}

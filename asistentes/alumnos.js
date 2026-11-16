@@ -467,7 +467,7 @@ async function miCuenta(env, cfg, a) {
   return {
     dentro: true,
     alumna: { id: a.id, email: a.email, nombre: a.nombre, telefono: a.telefono, marketing: !!a.marketing },
-    bonos: bonos.map((b) => ({ id: b.id, nombre: b.nombre, fin: b.fin, finTexto: legible(b.fin), sem: b.sem, recurrente: !!b.recurrente, tipos: b.tipos ? b.tipos.split(",") : [] })),
+    bonos: bonos.map((b) => ({ id: b.id, nombre: b.nombre, fin: b.fin, finTexto: legible(b.fin), sem: b.sem, recurrente: !!(b.recurrente && b.stripe_sub), tipos: b.tipos ? b.tipos.split(",") : [] })),
     semana: { usadas: usadas ? usadas.n : 0, desde: sem },
     proximas: (proximas.results || []).map((c) => ({ ...c, hora: hhmm(c.inicio), dia: legible(c.fecha) })),
     pasadas: (pasadas.results || []).map((c) => ({ ...c, hora: hhmm(c.inicio), dia: legible(c.fecha) })),
