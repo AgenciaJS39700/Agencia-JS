@@ -69,6 +69,13 @@ async function cuerpo(request, max = 4000) {
   return t ? JSON.parse(t) : {};
 }
 
+/** Minutos que faltan para una clase (negativo si ya ha pasado). */
+function faltan(fecha, inicio) {
+  const ya = ahora();
+  const dias = Math.round((Date.parse(fecha + "T12:00:00Z") - Date.parse(ya.fecha + "T12:00:00Z")) / 864e5);
+  return dias * 1440 + inicio - ya.min;
+}
+
 /** Plan Avanzado: avisos push al móvil y vista semanal en el panel. */
 export const avanzado = (cfg) => cfg.plan === "avanzado" || cfg.motor === "pro";
 
@@ -317,6 +324,7 @@ export function configPublica(cfg) {
     servicios: cfg.servicios.map(({ id, nombre, min, precio }) => ({ id, nombre, min, precio })),
     modo: porSesiones(cfg) ? "sesiones" : "huecos", sesiones: cfg.negocio.sesiones || null,
     gestion: !!(cfg.productos && cfg.productos.length),
+    cancelarHoras: ag(cfg).cancelarHoras || 0,
     productos: (cfg.productos || []).map(({ id, nombre, precio, recurrente }) => ({ id, nombre, precio, recurrente: !!recurrente })),
     chips: cfg.chips, saludo: cfg.saludo, pedirEmail: !!a.pedirEmail, diasMax: a.diasMax, avanzado: avanzado(cfg),
   };
@@ -355,7 +363,9 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     if (o && new URL(o).host !== url.host) return res({ error: "Origen no permitido" }, 403);
     const porURL = ruta === "agenda.ics" || ruta === "panel/exportar";
     const clave = porURL ? url.searchParams.get("k") : (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-    if (!clave || !cfg.panel || !igual(await sha256(clave), cfg.panel.hash)) {
+    const hashes = cfg.panel ? [cfg.panel.hash, ...((cfg.panel.equipo || []).map((p) => p.hash))].filter(Boolean) : [];
+    const suyo = clave ? await sha256(clave) : "";
+    if (!clave || !hashes.some((h) => igual(suyo, h))) {
       if (!limitar(ip)) return res({ error: "Demasiados intentos. Espera unos minutos." }, 429);
       return res({ error: "Clave incorrecta" }, 401);
     }
@@ -512,6 +522,14 @@ export async function atenderAgenda(request, env, ctx, limitar) {
   if (ruta === "anular") {
     const cod = limpiar(b.codigo, 8).toUpperCase(), tel = soloTel(b.telefono).replace(/\D/g, "").slice(-9);
     if (cod.length < 6 || tel.length < 9) return r({ ok: false, mensaje: "Escribe el código de la cita y tu teléfono." }, 400);
+    // Ventana de cancelación: pasado el plazo, la plaza ya no se libera sola
+    const horas = ag(cfg).cancelarHoras || 0;
+    if (horas) {
+      const prev = await env.CITAS.prepare("SELECT fecha, inicio FROM citas WHERE slug = ? AND codigo = ? AND estado = 'ok' AND substr(replace(telefono, '+', ''), -9) = ?").bind(cfg.slug, cod, tel).first();
+      if (prev && faltan(prev.fecha, prev.inicio) < horas * 60) {
+        return r({ ok: false, mensaje: `Quedan menos de ${horas} ${horas === 1 ? "hora" : "horas"} para la clase y ya no se puede anular desde aquí. Llámanos o escríbenos y lo vemos.`, tarde: true }, 409);
+      }
+    }
     const c = await cancelar(env, cfg, "codigo = ? AND substr(replace(telefono, '+', ''), -9) = ? AND fecha >= ?", [cod, tel, ahora().fecha], ctx, "cliente");
     return c ? r({ ok: true, mensaje: `Cita del ${legible(c.fecha)} a las ${hhmm(c.inicio)} anulada.` }) : r({ ok: false, mensaje: "No encontramos una cita pendiente con ese código y teléfono." }, 404);
   }

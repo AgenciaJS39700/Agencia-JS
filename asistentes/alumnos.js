@@ -201,6 +201,22 @@ async function firmaStripe(cuerpo, cabecera, secreto) {
   return sigs.some((s) => igual(s, esperado));
 }
 
+/* ---------------------------------------------------------------- códigos promocionales */
+/** Busca un código y comprueba que se puede usar con ese bono. */
+export async function buscaPromo(env, cfg, codigo, prodId) {
+  const c = limpiar(codigo, 32).toUpperCase().replace(/\s+/g, "");
+  if (!c) return { ok: false };
+  const p = await env.CITAS.prepare("SELECT * FROM promos WHERE slug = ?1 AND codigo = ?2 AND activo = 1").bind(cfg.slug, c).first();
+  if (!p) return { ok: false, error: "Ese código no existe." };
+  if (p.caduca && p.caduca < hoyMadrid()) return { ok: false, error: "Ese código ya ha caducado." };
+  if (p.usos_max && p.usados >= p.usos_max) return { ok: false, error: "Ese código ya se ha agotado." };
+  if (p.productos && prodId && !p.productos.split(",").includes(prodId)) return { ok: false, error: "Ese código no vale para este bono." };
+  return { ok: true, promo: p };
+}
+/** Lo que queda a pagar con el descuento aplicado. */
+const conDescuento = (precio, p) => p.tipo === "importe" ? Math.max(0, precio - p.valor) : Math.max(0, Math.round(precio * (100 - p.valor) / 100));
+const textoPromo = (p) => p.tipo === "importe" ? `${euros(p.valor)} de descuento` : `${p.valor} % de descuento`;
+
 /** ¿Le toca pagar matrícula? Solo la primera vez y según el bono. */
 async function tocaMatricula(env, cfg, alumno, p) {
   const m = cfg.matricula;
@@ -210,7 +226,7 @@ async function tocaMatricula(env, cfg, alumno, p) {
 }
 
 /** Crea el pago en Stripe: suscripción si el bono es recurrente, pago único si no. */
-async function crearPago(env, cfg, alumno, p, volverA) {
+async function crearPago(env, cfg, alumno, p, volverA, promo) {
   if (!env.STRIPE_SECRET_KEY) return { error: "Los pagos online todavía no están activados en este negocio." };
   const moneda = cfg.moneda || "eur";
   const params = new URLSearchParams();
@@ -223,6 +239,7 @@ async function crearPago(env, cfg, alumno, p, volverA) {
   params.set("metadata[slug]", cfg.slug);
   params.set("metadata[alumno]", String(alumno.id));
   params.set("metadata[producto]", p.id);
+  if (promo) params.set("metadata[promo]", promo.codigo);
 
   let i = 0;
   const linea = (nombre, importe, recurrente) => {
@@ -234,6 +251,21 @@ async function crearPago(env, cfg, alumno, p, volverA) {
     i++;
   };
   linea(`${p.nombre} · ${cfg.negocio.nombre}`, p.precio, p.recurrente);
+  if (promo) {
+    // Cupón de Stripe: en los bonos mensuales se aplica a los meses que diga el código
+    const cp = new URLSearchParams();
+    if (promo.tipo === "importe") { cp.set("amount_off", String(promo.valor)); cp.set("currency", moneda); }
+    else cp.set("percent_off", String(promo.valor));
+    if (p.recurrente) {
+      if (promo.meses <= 0) cp.set("duration", "forever");
+      else if (promo.meses === 1) cp.set("duration", "once");
+      else { cp.set("duration", "repeating"); cp.set("duration_in_months", String(promo.meses)); }
+    } else cp.set("duration", "once");
+    cp.set("name", `${promo.codigo} · ${textoPromo(promo)}`);
+    const cup = await stripe(env, "POST", "/coupons", cp);
+    if (cup.ok && cup.datos.id) params.set("discounts[0][coupon]", cup.datos.id);
+    else console.error("Stripe no aceptó el cupón:", JSON.stringify(cup.datos).slice(0, 200));
+  }
   if (await tocaMatricula(env, cfg, alumno, p)) {
     if (p.recurrente) {
       // En una suscripción la matrícula va como cargo de alta, no como línea mensual
@@ -521,6 +553,16 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
     return r(await miCuenta(env, cfg, a2));
   }
 
+  if (ruta === "promo" && post) {
+    const b = await cuerpo();
+    const p = producto(cfg, String(b.producto || ""));
+    const x = await buscaPromo(env, cfg, b.codigo, p ? p.id : "");
+    if (!x.ok) return r({ ok: false, error: x.error || "Ese código no es válido." }, 200);
+    return r({ ok: true, codigo: x.promo.codigo, texto: textoPromo(x.promo),
+      precio: p ? conDescuento(p.precio, x.promo) : null,
+      meses: x.promo.meses });
+  }
+
   if (ruta === "pagar" && post) {
     if (!alumna) return r({ error: "Entra en tu cuenta para pagar." }, 401);
     const b = await cuerpo();
@@ -530,7 +572,13 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
       const id = await activarBono(env, cfg, alumna.id, p.id, null);
       return r({ ok: true, gratis: true, bono: id });
     }
-    const x = await crearPago(env, cfg, alumna, p, sitio + "mi-cuenta/");
+    let promo = null;
+    if (b.codigo) {
+      const x = await buscaPromo(env, cfg, b.codigo, p.id);
+      if (!x.ok) return r({ error: x.error || "Ese código no es válido." }, 400);
+      promo = x.promo;
+    }
+    const x = await crearPago(env, cfg, alumna, p, sitio + "mi-cuenta/", promo);
     return x.error ? r({ error: x.error }, 400) : r(x);
   }
 
@@ -548,6 +596,15 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
       }
     }
     return r({ estado: p ? p.estado : "pendiente" });
+  }
+
+  if (ruta === "factura" && request.method === "GET") {
+    if (!alumna) return r({ error: "Entra en tu cuenta." }, 401);
+    const id = +url.searchParams.get("id") || 0;
+    const p = await env.CITAS.prepare("SELECT * FROM pagos WHERE id = ?1 AND slug = ?2 AND alumno_id = ?3 AND estado = 'pagado'").bind(id, cfg.slug, alumna.id).first();
+    if (!p) return r({ error: "Factura no encontrada." }, 404);
+    if (!p.numero) p.numero = await numeraFactura(env, cfg, null, p.id);
+    return new Response(facturaHTML(cfg, p, alumna), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
   }
 
   if (ruta === "bono/baja" && post) {
@@ -662,11 +719,79 @@ async function aplicaPago(env, cfg, s) {
   }
   const sub = typeof s.subscription === "string" ? s.subscription : (s.subscription && s.subscription.id) || null;
   const cust = typeof s.customer === "string" ? s.customer : (s.customer && s.customer.id) || null;
+  if (md.promo) {
+    await env.CITAS.prepare("UPDATE promos SET usados = usados + 1 WHERE slug = ?1 AND codigo = ?2").bind(cfg.slug, md.promo).run();
+    await env.CITAS.prepare("UPDATE pagos SET promo = ?2 WHERE stripe_id = ?1").bind(s.id, md.promo).run();
+  }
+  await numeraFactura(env, cfg, s.id);
   const bonoId = await activarBono(env, cfg, alumnoId, prodId, { sub: sub, cust: cust });
   if (bonoId) await env.CITAS.prepare("UPDATE pagos SET bono_id = ?2 WHERE stripe_id = ?1").bind(s.id, bonoId).run();
   const a = await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1").bind(alumnoId).first();
   const b = await env.CITAS.prepare("SELECT * FROM bonos WHERE id = ?1").bind(bonoId).first();
   if (a && b) await correo(env, cfg, a.email, a.nombre, `Bono activado · ${cfg.negocio.nombre}`, correoBono(cfg, b, producto(cfg, prodId) || {}));
+}
+
+/* ---------------------------------------------------------------- facturas */
+/**
+ * Pone número de factura a un pago ya cobrado. Correlativo por año y sin huecos,
+ * que es lo que pide Hacienda. El contador se incrementa de forma atómica.
+ */
+export async function numeraFactura(env, cfg, stripeId, pagoId) {
+  const año = hoyMadrid().slice(0, 4);
+  const serie = (cfg.factura && cfg.factura.serie ? cfg.factura.serie : "F") + año;
+  const donde = stripeId ? "stripe_id = ?1" : "id = ?1";
+  const clave = stripeId || pagoId;
+  const p = await env.CITAS.prepare(`SELECT id, numero FROM pagos WHERE slug = ?2 AND ${donde}`).bind(clave, cfg.slug).first();
+  if (!p || p.numero) return p ? p.numero : null;
+  await env.CITAS.prepare("INSERT INTO contador (slug, serie, n) VALUES (?1, ?2, 0) ON CONFLICT(slug, serie) DO NOTHING").bind(cfg.slug, serie).run();
+  await env.CITAS.prepare("UPDATE contador SET n = n + 1 WHERE slug = ?1 AND serie = ?2").bind(cfg.slug, serie).run();
+  const c = await env.CITAS.prepare("SELECT n FROM contador WHERE slug = ?1 AND serie = ?2").bind(cfg.slug, serie).first();
+  const numero = `${serie}-${String(c.n).padStart(4, "0")}`;
+  await env.CITAS.prepare("UPDATE pagos SET numero = ?2 WHERE id = ?1 AND numero IS NULL").bind(p.id, numero).run();
+  return numero;
+}
+
+/** Factura imprimible (el navegador la guarda como PDF con Imprimir → Guardar como PDF). */
+function facturaHTML(cfg, pago, alumna) {
+  const f = cfg.factura || {};
+  const base = f.iva ? Math.round(pago.importe / (1 + f.iva / 100)) : pago.importe;
+  const cuota = pago.importe - base;
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Factura ${esc(pago.numero || "")}</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f4f4f6;font:15px/1.6 -apple-system,system-ui,"Segoe UI",sans-serif;color:#1a1a1a}
+.h{max-width:760px;margin:0 auto;padding:28px 20px}
+.p{background:#fff;border-radius:14px;padding:34px;box-shadow:0 10px 40px -24px rgba(0,0,0,.5)}
+.top{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;border-bottom:3px solid ${esc(cfg.color)};padding-bottom:18px;margin-bottom:22px}
+h1{font-size:22px;margin:0 0 4px}.mu{color:#666;font-size:13px}
+.n{text-align:right}.n b{font-size:18px;display:block}
+table{width:100%;border-collapse:collapse;margin:22px 0}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #e6e6ea;font-size:14px}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#666}
+td.r,th.r{text-align:right}
+.tot{display:flex;justify-content:flex-end}.tot table{width:auto;min-width:260px}
+.tot td{border:0;padding:5px 8px}.tot tr:last-child td{border-top:2px solid #1a1a1a;font-weight:800;font-size:17px;padding-top:10px}
+.pie{margin-top:26px;font-size:12px;color:#666;line-height:1.6}
+.btn{display:inline-block;margin:0 0 16px;background:${esc(cfg.color)};color:#fff;border:0;border-radius:999px;padding:11px 22px;font:inherit;font-weight:700;cursor:pointer}
+@media print{body{background:#fff}.h{padding:0}.p{box-shadow:none;border-radius:0;padding:0}.btn{display:none}}
+</style></head><body><div class="h">
+<button class="btn" onclick="window.print()">Imprimir o guardar en PDF</button>
+<div class="p">
+ <div class="top">
+  <div><h1>${esc(f.nombre || cfg.negocio.nombre)}</h1>
+   <p class="mu">${esc(f.nif ? "NIF " + f.nif : "")}<br>${esc(f.direccion || cfg.negocio.direccion)}<br>${esc(cfg.negocio.telefono)}</p></div>
+  <div class="n"><span class="mu">Factura</span><b>${esc(pago.numero || "—")}</b>
+   <span class="mu">${esc(String(pago.fecha).slice(0, 10).split("-").reverse().join("/"))}</span></div>
+ </div>
+ <p class="mu">Facturar a</p>
+ <p><b>${esc(alumna ? (alumna.nombre || alumna.email) : "Cliente")}</b><br><span class="mu">${esc(alumna ? alumna.email : "")}</span></p>
+ <table><thead><tr><th>Concepto</th><th class="r">Importe</th></tr></thead>
+  <tbody><tr><td>${esc(pago.concepto)}${pago.promo ? ` <span class="mu">(código ${esc(pago.promo)})</span>` : ""}</td><td class="r">${euros(base)}</td></tr></tbody></table>
+ <div class="tot"><table>
+  ${f.iva ? `<tr><td>Base imponible</td><td class="r">${euros(base)}</td></tr><tr><td>IVA ${f.iva} %</td><td class="r">${euros(cuota)}</td></tr>` : ""}
+  <tr><td>Total</td><td class="r">${euros(pago.importe)}</td></tr></table></div>
+ <p class="pie">Forma de pago: ${esc(pago.metodo === "tarjeta" ? "tarjeta" : pago.metodo)}. Pagada el ${esc(String(pago.fecha).slice(0, 10).split("-").reverse().join("/"))}.
+ ${f.exento ? "<br>" + esc(f.exento) : ""}</p>
+</div></div></body></html>`;
 }
 
 /* ---------------------------------------------------------------- lista de espera: avisar */
@@ -770,6 +895,49 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     const { results } = await env.CITAS.prepare(
       "SELECT * FROM espera WHERE slug = ?1 AND fecha >= date('now') ORDER BY fecha, inicio, id LIMIT 200").bind(cfg.slug).all();
     return res({ espera: (results || []).map((e) => ({ ...e, hora: hhmm(e.inicio) })) });
+  }
+
+  if (ruta === "panel/factura" && request.method === "GET") {
+    const id = +url.searchParams.get("id") || 0;
+    const p = await env.CITAS.prepare("SELECT * FROM pagos WHERE id = ?1 AND slug = ?2").bind(id, cfg.slug).first();
+    if (!p) return res({ error: "No encontrada" }, 404);
+    if (!p.numero && p.estado === "pagado") p.numero = await numeraFactura(env, cfg, null, p.id);
+    const a = p.alumno_id ? await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1").bind(p.alumno_id).first() : null;
+    return new Response(facturaHTML(cfg, p, a), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+  }
+
+  if (ruta === "panel/promos" && request.method === "GET") {
+    const { results } = await env.CITAS.prepare("SELECT * FROM promos WHERE slug = ?1 ORDER BY id DESC LIMIT 100").bind(cfg.slug).all();
+    return res({ promos: results || [] });
+  }
+  if (ruta === "panel/promo" && post) {
+    const b = await cuerpo();
+    const cod = limpiar(b.codigo, 32).toUpperCase().replace(/\s+/g, "");
+    if (!cod) return res({ error: "Escribe un código" }, 400);
+    const valor = Math.max(1, Math.round(+b.valor || 0));
+    if (b.tipo === "porcentaje" && valor > 100) return res({ error: "El porcentaje no puede pasar de 100" }, 400);
+    await env.CITAS.prepare(
+      `INSERT INTO promos (slug, codigo, tipo, valor, meses, caduca, usos_max, productos) VALUES (?1,?2,?3,?4,?5,?6,?7,?8)
+       ON CONFLICT(slug, codigo) DO UPDATE SET tipo = ?3, valor = ?4, meses = ?5, caduca = ?6, usos_max = ?7, productos = ?8, activo = 1`
+    ).bind(cfg.slug, cod, b.tipo === "importe" ? "importe" : "porcentaje", valor, Math.max(0, Math.round(+b.meses || 1)),
+      /^\d{4}-\d{2}-\d{2}$/.test(b.caduca || "") ? b.caduca : null, Math.max(0, Math.round(+b.usos || 0)), limpiar(b.productos, 200)).run();
+    return res({ ok: true });
+  }
+  if (ruta === "panel/promo/baja" && post) {
+    const b = await cuerpo();
+    await env.CITAS.prepare("UPDATE promos SET activo = 0 WHERE slug = ?1 AND id = ?2").bind(cfg.slug, +b.id || 0).run();
+    return res({ ok: true });
+  }
+
+  if (ruta === "panel/stats" && request.method === "GET") {
+    const desde = /^\d{4}-\d{2}-\d{2}$/.test(url.searchParams.get("desde") || "") ? url.searchParams.get("desde") : sumarDias(hoyMadrid(), -180);
+    const [ing, cls, alt, ocu] = await Promise.all([
+      env.CITAS.prepare("SELECT substr(fecha,1,7) AS mes, SUM(importe) AS total, COUNT(*) AS n FROM pagos WHERE slug = ?1 AND estado = 'pagado' AND fecha >= ?2 GROUP BY mes ORDER BY mes DESC LIMIT 12").bind(cfg.slug, desde).all(),
+      env.CITAS.prepare("SELECT servicio_n AS clase, COUNT(*) AS n FROM citas WHERE slug = ?1 AND estado = 'ok' AND fecha >= ?2 GROUP BY servicio ORDER BY n DESC LIMIT 12").bind(cfg.slug, desde).all(),
+      env.CITAS.prepare("SELECT substr(creado,1,7) AS mes, COUNT(*) AS n FROM alumnos WHERE slug = ?1 AND creado >= ?2 GROUP BY mes ORDER BY mes DESC LIMIT 12").bind(cfg.slug, desde).all(),
+      env.CITAS.prepare("SELECT COUNT(*) AS reservas, SUM(CASE WHEN estado = 'cancelada' THEN 1 ELSE 0 END) AS anuladas, SUM(CASE WHEN asistio = 1 THEN 1 ELSE 0 END) AS vinieron, SUM(CASE WHEN asistio = 0 THEN 1 ELSE 0 END) AS faltaron FROM citas WHERE slug = ?1 AND fecha >= ?2").bind(cfg.slug, desde).first(),
+    ]);
+    return res({ desde, ingresos: ing.results || [], clases: cls.results || [], altas: alt.results || [], asistencia: ocu || {} });
   }
 
   if (ruta === "panel/exportar" && request.method === "GET") {

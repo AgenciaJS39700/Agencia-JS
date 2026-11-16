@@ -107,8 +107,25 @@ export default {
     diasMax: 21,            // se abre la reserva con tres semanas de margen
     maxPorTelefono: 12,     // quien viene a diario reserva varias clases
     pedirEmail: true,
+    cancelarHoras: 4,       // hasta 4 h antes se puede anular sola y la plaza se libera
+  },
+  // Datos para la factura. CAMBIAR por los fiscales reales del estudio antes de cobrar de verdad.
+  factura: {
+    serie: "F",
+    nombre: "IOMFIT Yoga & Pilates Studio (datos de ejemplo)",
+    nif: "B00000000",
+    direccion: "Avda. José Ribera 11, 29010 Málaga",
+    iva: 0,
+    exento: "Operación exenta de IVA por el artículo 20.Uno.13.º de la Ley 37/1992 (servicios deportivos). Confírmalo con tu asesoría.",
   },
   avisos: { email: "agencia39700@gmail.com", whatsapp: "", whatsappCliente: false },
-  panel: { hash: "6eefe7d0d002aafce2c192f50f63573ffcb39c9925839c783fd4d5c4604a8e9d" },
+  panel: {
+    hash: "6eefe7d0d002aafce2c192f50f63573ffcb39c9925839c783fd4d5c4604a8e9d",
+    // Cada persona del equipo con su clave, para no compartir una sola entre todas
+    equipo: [
+      { nombre: "Adriana", hash: "4590dc9b187159b0a11fe80c528bb013ba41a3a024581b8a60f4c3f42c19d878" },
+      { nombre: "Recepción", hash: "080aeb5d14bf151d037043da295baf8470cc13ae55150f6f94aee3f9ff51e4fe" },
+    ],
+  },
   dominios: ["https://iomfit-demo.agencia39700.workers.dev"],
 };
