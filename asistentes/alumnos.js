@@ -39,6 +39,34 @@ const RE_MAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/;
 const soloTel = (v) => String(v || "").replace(/[^\d+ ]/g, "").trim().slice(0, 16);
 const euros = (c) => (c / 100).toLocaleString("es-ES", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }) + " €";
 
+/* ---------------------------------------------------------------- contraseñas */
+// PBKDF2-SHA256 con sal propia por persona. Workers admite 100.000 iteraciones como máximo.
+const ITER = 100000;
+const deHex = (h) => new Uint8Array((String(h).match(/.{2}/g) || []).map((x) => parseInt(x, 16)));
+async function hashPass(pass, salHex, iter) {
+  const k = await crypto.subtle.importKey("raw", te.encode(pass), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: deHex(salHex), iterations: iter }, k, 256);
+  return hex(bits);
+}
+/** Mínimos razonables sin volverse insoportable: 8 caracteres y que no sea el propio correo. */
+function passFloja(pass, email) {
+  const p = String(pass || "");
+  if (p.length < 8) return "La contraseña tiene que tener al menos 8 caracteres.";
+  if (p.length > 200) return "La contraseña es demasiado larga.";
+  if (p.toLowerCase() === String(email || "").toLowerCase()) return "La contraseña no puede ser tu correo.";
+  if (/^(\d)\1+$/.test(p) || ["12345678", "123456789", "contrasena", "contraseña", "password"].includes(p.toLowerCase())) return "Esa contraseña es demasiado fácil de adivinar.";
+  return "";
+}
+async function ponPass(env, alumnoId, pass) {
+  const sal = alAzar(16);
+  await env.CITAS.prepare("UPDATE alumnos SET pass_hash = ?2, pass_salt = ?3, pass_iter = ?4 WHERE id = ?1")
+    .bind(alumnoId, await hashPass(pass, sal, ITER), sal, ITER).run();
+}
+async function passCorrecta(a, pass) {
+  if (!a || !a.pass_hash || !a.pass_salt) return false;
+  return igual(await hashPass(String(pass || ""), a.pass_salt, a.pass_iter || ITER), a.pass_hash);
+}
+
 function igual(a, b) {
   a = String(a); b = String(b);
   let d = a.length ^ b.length;
@@ -255,6 +283,18 @@ function correoCodigo(cfg, codigo, nombre) {
      <p style="font-size:34px;letter-spacing:.3em;font-weight:800;text-align:center;background:#f6f6f8;border-radius:12px;padding:18px 0;margin:18px 0">${esc(codigo)}</p>
      <p style="font-size:14px;color:#555;line-height:1.6">Vale durante ${MIN_CODIGO} minutos y solo se puede usar una vez. Si no has sido tú, puedes ignorar este correo.</p>`);
 }
+function correoNueva(cfg, nombre, sitio) {
+  return marco(cfg, "Bienvenida a " + cfg.negocio.nombre,
+    `<p style="font-size:15px;line-height:1.7">${nombre ? "Hola " + esc(nombre) + ", t" : "T"}u cuenta ya está creada. Desde aquí puedes reservar tus clases, ver tu bono y anular si no puedes venir.</p>
+     ${boton(cfg, sitio + "mi-cuenta/", "Ir a mi cuenta")}
+     <p style="font-size:13px;color:#555">Si no has sido tú quien ha creado esta cuenta, avísanos respondiendo a este correo.</p>`);
+}
+function correoReset(cfg, nombre, enlace) {
+  return marco(cfg, "Cambiar tu contraseña",
+    `<p style="font-size:15px;line-height:1.7">${nombre ? "Hola " + esc(nombre) + ", h" : "H"}emos recibido una petición para cambiar la contraseña de tu cuenta.</p>
+     ${boton(cfg, enlace, "Poner una contraseña nueva")}
+     <p style="font-size:14px;color:#555;line-height:1.6">El enlace vale durante 1 hora y solo se puede usar una vez. Si no lo has pedido tú, ignora este correo: tu contraseña no cambia.</p>`);
+}
 function correoBono(cfg, b, p) {
   return marco(cfg, "Bono activado",
     `<p style="font-size:15px;line-height:1.7">Ya está. Tu <b>${esc(p.nombre)}</b> está activo.</p>
@@ -314,6 +354,82 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
     return res({ recibido: true });
   }
 
+  /* ---- registro con contraseña ---- */
+  if (ruta === "registro" && post) {
+    const b = await cuerpo();
+    const email = correoLimpio(b.email), nombre = limpiar(b.nombre, 60), pass = String(b.pass || "");
+    if (!RE_MAIL.test(email)) return r({ error: "Escribe un correo correcto." }, 400);
+    if (nombre.length < 2) return r({ error: "Escribe tu nombre." }, 400);
+    const flojo = passFloja(pass, email);
+    if (flojo) return r({ error: flojo }, 400);
+    if (await demasiados(env, ["ip:" + ip])) return r({ error: "Demasiados intentos. Espera unos minutos." }, 429);
+    await apunta(env, ["ip:" + ip]);
+
+    const ya = await env.CITAS.prepare("SELECT id, pass_hash FROM alumnos WHERE slug = ?1 AND email = ?2").bind(cfg.slug, email).first();
+    if (ya && ya.pass_hash) return r({ error: "Ya hay una cuenta con ese correo. Entra con tu contraseña o pide una nueva." }, 409);
+    let id;
+    if (ya) { id = ya.id; if (nombre) await env.CITAS.prepare("UPDATE alumnos SET nombre = ?2 WHERE id = ?1").bind(id, nombre).run(); }
+    else {
+      const ins = await env.CITAS.prepare("INSERT INTO alumnos (slug, email, nombre, baja_token) VALUES (?1, ?2, ?3, ?4)").bind(cfg.slug, email, nombre, alAzar(16)).run();
+      id = ins.meta.last_row_id;
+    }
+    await ponPass(env, id, pass);
+    if (b.marketing) await env.CITAS.prepare("UPDATE alumnos SET marketing = 1, marketing_fecha = datetime('now') WHERE id = ?1").bind(id).run();
+    const a = await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1").bind(id).first();
+    const tok = alAzar(32);
+    await env.CITAS.prepare("INSERT INTO al_sesiones (token_hash, alumno_id, expira) VALUES (?1, ?2, datetime('now', ?3))").bind(await sha256(tok), id, `+${DIAS_SESION} days`).run();
+    ctx.waitUntil(correo(env, cfg, email, nombre, `Bienvenida a ${cfg.negocio.nombre}`, correoNueva(cfg, nombre, sitio)).catch(() => {}));
+    return r(await miCuenta(env, cfg, a), 200, { "Set-Cookie": ponCookie(tok, DIAS_SESION * 86400) });
+  }
+
+  /* ---- he olvidado mi contraseña ---- */
+  if (ruta === "olvidada" && post) {
+    const b = await cuerpo();
+    const email = correoLimpio(b.email);
+    if (!RE_MAIL.test(email)) return r({ error: "Escribe un correo correcto." }, 400);
+    if (await demasiados(env, ["ip:" + ip, "olv:" + email])) return r({ error: "Demasiados intentos. Espera unos minutos." }, 429);
+    await apunta(env, ["ip:" + ip, "olv:" + email]);
+    const a = await env.CITAS.prepare("SELECT * FROM alumnos WHERE slug = ?1 AND email = ?2").bind(cfg.slug, email).first();
+    // Se responde siempre igual: así nadie puede averiguar qué correos tienen cuenta
+    if (a) {
+      const tok = alAzar(24);
+      await env.CITAS.batch([
+        env.CITAS.prepare("UPDATE al_codigos SET usado = 1 WHERE slug = ?1 AND email = ?2 AND tipo = 'reset' AND usado = 0").bind(cfg.slug, email),
+        env.CITAS.prepare("INSERT INTO al_codigos (slug, email, codigo_hash, expira, tipo) VALUES (?1, ?2, ?3, datetime('now', '+60 minutes'), 'reset')").bind(cfg.slug, email, await sha256(tok)),
+      ]);
+      ctx.waitUntil(correo(env, cfg, email, a.nombre, `Cambiar tu contraseña · ${cfg.negocio.nombre}`,
+        correoReset(cfg, a.nombre, `${sitio}mi-cuenta/?nueva=${tok}&m=${encodeURIComponent(email)}`)).catch(() => {}));
+    }
+    return r({ ok: true });
+  }
+
+  /* ---- poner la contraseña nueva con el enlace del correo ---- */
+  if (ruta === "nueva-pass" && post) {
+    const b = await cuerpo();
+    const email = correoLimpio(b.email), tok = String(b.token || "").trim(), pass = String(b.pass || "");
+    if (!RE_MAIL.test(email) || !/^[0-9a-f]{48}$/.test(tok)) return r({ error: "El enlace no es válido. Pide otro." }, 400);
+    const flojo = passFloja(pass, email);
+    if (flojo) return r({ error: flojo }, 400);
+    if (await demasiados(env, ["ip:" + ip])) return r({ error: "Demasiados intentos. Espera unos minutos." }, 429);
+    await apunta(env, ["ip:" + ip]);
+    const c = await env.CITAS.prepare(
+      "SELECT id FROM al_codigos WHERE slug = ?1 AND email = ?2 AND tipo = 'reset' AND usado = 0 AND expira > datetime('now') AND codigo_hash = ?3 ORDER BY id DESC LIMIT 1"
+    ).bind(cfg.slug, email, await sha256(tok)).first();
+    if (!c) return r({ error: "Ese enlace ya se ha usado o ha caducado. Pide otro." }, 401);
+    const a = await env.CITAS.prepare("SELECT * FROM alumnos WHERE slug = ?1 AND email = ?2").bind(cfg.slug, email).first();
+    if (!a) return r({ error: "No encontramos esa cuenta." }, 404);
+    await ponPass(env, a.id, pass);
+    // Cambiar la contraseña cierra las sesiones abiertas en otros aparatos
+    const tok2 = alAzar(32);
+    await env.CITAS.batch([
+      env.CITAS.prepare("UPDATE al_codigos SET usado = 1 WHERE id = ?1").bind(c.id),
+      env.CITAS.prepare("DELETE FROM al_sesiones WHERE alumno_id = ?1").bind(a.id),
+      env.CITAS.prepare("INSERT INTO al_sesiones (token_hash, alumno_id, expira) VALUES (?1, ?2, datetime('now', ?3))").bind(await sha256(tok2), a.id, `+${DIAS_SESION} days`),
+    ]);
+    const a2 = await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1").bind(a.id).first();
+    return r(await miCuenta(env, cfg, a2), 200, { "Set-Cookie": ponCookie(tok2, DIAS_SESION * 86400) });
+  }
+
   /* ---- acceso: pedir código ---- */
   if (ruta === "acceso" && post) {
     const b = await cuerpo();
@@ -331,33 +447,43 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
     }
     const codigo = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1e6).padStart(6, "0");
     await env.CITAS.batch([
-      env.CITAS.prepare("UPDATE al_codigos SET usado = 1 WHERE slug = ?1 AND email = ?2 AND usado = 0").bind(cfg.slug, email),
-      env.CITAS.prepare("INSERT INTO al_codigos (slug, email, codigo_hash, expira) VALUES (?1, ?2, ?3, datetime('now', ?4))").bind(cfg.slug, email, await sha256(codigo), `+${MIN_CODIGO} minutes`),
+      env.CITAS.prepare("UPDATE al_codigos SET usado = 1 WHERE slug = ?1 AND email = ?2 AND tipo = 'acceso' AND usado = 0").bind(cfg.slug, email),
+      env.CITAS.prepare("INSERT INTO al_codigos (slug, email, codigo_hash, expira, tipo) VALUES (?1, ?2, ?3, datetime('now', ?4), 'acceso')").bind(cfg.slug, email, await sha256(codigo), `+${MIN_CODIGO} minutes`),
     ]);
     const enviado = await correo(env, cfg, email, a.nombre || nombre, `Tu código: ${codigo}`, correoCodigo(cfg, codigo, a.nombre || nombre));
     if (!enviado) console.log(`[${cfg.slug}] código de acceso no enviado por falta de BREVO_API_KEY`);
     return r({ ok: true, enviado, nueva: !a.nombre });
   }
 
-  /* ---- acceso: entrar con el código ---- */
+  /* ---- entrar: con contraseña o con el código del correo ---- */
   if (ruta === "entrar" && post) {
     const b = await cuerpo();
-    const email = correoLimpio(b.email), codigo = String(b.codigo || "").replace(/\D/g, "").slice(0, 6);
-    if (!RE_MAIL.test(email) || codigo.length !== 6) return r({ error: "Falta el correo o el código." }, 400);
+    const email = correoLimpio(b.email);
+    const codigo = String(b.codigo || "").replace(/\D/g, "").slice(0, 6);
+    const pass = String(b.pass || "");
+    if (!RE_MAIL.test(email) || (!pass && codigo.length !== 6)) return r({ error: "Falta el correo, la contraseña o el código." }, 400);
     if (await demasiados(env, ["ip:" + ip, "cod:" + email])) return r({ error: "Demasiados intentos. Espera unos minutos." }, 429);
     await apunta(env, ["ip:" + ip, "cod:" + email]);
-    const c = await env.CITAS.prepare(
-      "SELECT id FROM al_codigos WHERE slug = ?1 AND email = ?2 AND usado = 0 AND expira > datetime('now') AND codigo_hash = ?3 ORDER BY id DESC LIMIT 1"
-    ).bind(cfg.slug, email, await sha256(codigo)).first();
-    if (!c) return r({ error: "El código no es correcto o ha caducado. Pide uno nuevo." }, 401);
+
     const a = await env.CITAS.prepare("SELECT * FROM alumnos WHERE slug = ?1 AND email = ?2").bind(cfg.slug, email).first();
-    if (!a) return r({ error: "No encontramos esa cuenta." }, 404);
+    let usado = 0;
+    if (pass) {
+      if (!a || !a.pass_hash) return r({ error: "Esa cuenta no tiene contraseña. Entra con el código que te mandamos al correo.", sinPass: true }, 401);
+      if (!(await passCorrecta(a, pass))) return r({ error: "El correo o la contraseña no son correctos." }, 401);
+    } else {
+      const c = await env.CITAS.prepare(
+        "SELECT id FROM al_codigos WHERE slug = ?1 AND email = ?2 AND tipo = 'acceso' AND usado = 0 AND expira > datetime('now') AND codigo_hash = ?3 ORDER BY id DESC LIMIT 1"
+      ).bind(cfg.slug, email, await sha256(codigo)).first();
+      if (!c || !a) return r({ error: "El código no es correcto o ha caducado. Pide uno nuevo." }, 401);
+      usado = c.id;
+    }
     const tok = alAzar(32);
-    await env.CITAS.batch([
-      env.CITAS.prepare("UPDATE al_codigos SET usado = 1 WHERE id = ?1").bind(c.id),
+    const ops = [
       env.CITAS.prepare("INSERT INTO al_sesiones (token_hash, alumno_id, expira) VALUES (?1, ?2, datetime('now', ?3))").bind(await sha256(tok), a.id, `+${DIAS_SESION} days`),
       env.CITAS.prepare("UPDATE alumnos SET visto = datetime('now') WHERE id = ?1").bind(a.id),
-    ]);
+    ];
+    if (usado) ops.unshift(env.CITAS.prepare("UPDATE al_codigos SET usado = 1 WHERE id = ?1").bind(usado));
+    await env.CITAS.batch(ops);
     return r(await miCuenta(env, cfg, a), 200, { "Set-Cookie": ponCookie(tok, DIAS_SESION * 86400) });
   }
 
@@ -384,6 +510,13 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
        marketing_fecha = CASE WHEN ?4 = 1 AND marketing = 0 THEN datetime('now') WHEN ?4 = 0 THEN NULL ELSE marketing_fecha END,
        baja_token = COALESCE(baja_token, ?5) WHERE id = ?1`
     ).bind(alumna.id, nombre || alumna.nombre, tel, marketing, alAzar(16)).run();
+    // Cambiar la contraseña (o ponerla por primera vez si entró con código)
+    if (b.pass) {
+      const flojo = passFloja(b.pass, alumna.email);
+      if (flojo) return r({ error: flojo }, 400);
+      if (alumna.pass_hash && !(await passCorrecta(alumna, b.passActual))) return r({ error: "La contraseña actual no es correcta." }, 401);
+      await ponPass(env, alumna.id, b.pass);
+    }
     const a2 = await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1").bind(alumna.id).first();
     return r(await miCuenta(env, cfg, a2));
   }
@@ -466,7 +599,7 @@ async function miCuenta(env, cfg, a) {
     .bind(cfg.slug, a.id, sem, sumarDias(sem, 6)).first();
   return {
     dentro: true,
-    alumna: { id: a.id, email: a.email, nombre: a.nombre, telefono: a.telefono, marketing: !!a.marketing },
+    alumna: { id: a.id, email: a.email, nombre: a.nombre, telefono: a.telefono, marketing: !!a.marketing, pass: !!a.pass_hash },
     bonos: bonos.map((b) => ({ id: b.id, nombre: b.nombre, fin: b.fin, finTexto: legible(b.fin), sem: b.sem, recurrente: !!(b.recurrente && b.stripe_sub), tipos: b.tipos ? b.tipos.split(",") : [] })),
     semana: { usadas: usadas ? usadas.n : 0, desde: sem },
     proximas: (proximas.results || []).map((c) => ({ ...c, hora: hhmm(c.inicio), dia: legible(c.fecha) })),
