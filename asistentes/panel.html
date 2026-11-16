@@ -73,6 +73,20 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 @media (max-width:320px){.wrap{padding-left:10px;padding-right:10px}#app .bar{margin:0 -10px 12px;padding:2px 10px}h1{font-size:1rem}.stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.st{padding:8px;border-radius:12px}.st b{font-size:1.1rem}.st span{font-size:.7rem}.cita,.blq{grid-template-columns:1fr!important;padding:10px}.h{display:flex;gap:6px;align-items:baseline}.btn{padding:.4rem .7rem}header{gap:6px}}
 @media (max-width:520px){.stats{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}.cita,.blq{grid-template-columns:54px 1fr}.cita .acc,.blq .acc{grid-column:1/-1;justify-self:end}}
 @media print{.bar,.acc,header .btn{display:none}body{background:#fff;color:#000}.cita,.blq{background:#fff;border-color:#ccc}}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--ln);margin:0 0 14px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;min-height:44px;padding:.5rem .9rem;border:0;border-bottom:2px solid transparent;background:none;color:var(--mu);font:inherit;font-weight:700;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--c);border-bottom-color:var(--c)}
+.fila{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--ln);margin-bottom:8px;cursor:pointer}
+.fila:hover{border-color:var(--c)}
+.fila b{display:block}.fila span{color:var(--mu);font-size:.82rem}
+.eti{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .55rem;border-radius:999px;background:rgba(232,199,102,.16);color:var(--c)}
+.eti.no{background:rgba(239,68,68,.16);color:#fca5a5}.eti.ok{background:rgba(34,197,94,.16);color:#86efac}
+.tt{width:100%;border-collapse:collapse;font-size:.86rem}
+.tt th,.tt td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--ln);white-space:nowrap}
+.tt th{color:var(--mu);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+.tt-w{overflow-x:auto;background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:4px 8px}
+.bus{margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -108,7 +122,16 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <button class="btn" id="b-ant" type="button" aria-label="Semanas anteriores">‹</button>
       <button class="btn" id="b-sig" type="button" aria-label="Semanas siguientes">›</button>
     </div>
+    <nav class="tabs" id="tabs" role="tablist" hidden>
+      <button type="button" data-t="agenda" role="tab" aria-selected="true">Agenda</button>
+      <button type="button" data-t="alumnas" role="tab" aria-selected="false">Alumnas</button>
+      <button type="button" data-t="pagos" role="tab" aria-selected="false">Cobros</button>
+      <button type="button" data-t="espera" role="tab" aria-selected="false">Lista de espera</button>
+    </nav>
     <div id="lista" aria-live="polite"></div>
+    <div id="vAlumnas" hidden></div>
+    <div id="vPagos" hidden></div>
+    <div id="vEspera" hidden></div>
   </section>
 </main>
 
@@ -168,6 +191,20 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
   <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" id="copiar" type="button">Copiar enlace</button><button class="btn main" type="button" onclick="this.closest('dialog').close()">Listo</button></div>
 </dialog>
 
+<dialog id="d-alum" aria-labelledby="da-t"><h2 id="da-t">Alumna</h2><div id="alumDet"></div>
+  <div class="bar" style="justify-content:flex-end;margin:10px 0 0"><button class="btn" type="button" onclick="this.closest('dialog').close()">Cerrar</button></div></dialog>
+
+<dialog id="d-bono" aria-labelledby="db-t"><form id="fb" method="dialog">
+  <h2 id="db-t">Dar un bono</h2>
+  <div class="grid">
+    <div class="full"><label for="b-prod">Bono</label><select id="b-prod" required></select></div>
+    <div class="full"><label style="display:flex;gap:.5rem;align-items:center;color:var(--tx)"><input type="checkbox" id="b-cobrar" style="width:auto;min-height:0" checked> Apuntar también el cobro</label></div>
+    <div class="full"><label for="b-metodo">Forma de pago</label><select id="b-metodo"><option value="efectivo">Efectivo</option><option value="bizum">Bizum</option><option value="transferencia">Transferencia</option><option value="tarjeta">Tarjeta (datáfono)</option></select></div>
+  </div>
+  <p class="msg" role="alert" id="mb"></p>
+  <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn main" value="ok">Guardar</button></div>
+</form></dialog>
+
 <script type="module">
 const slug = (location.pathname.match(/^\/panel\/([a-z0-9-]{2,40})/) || [])[1];
 const $ = (id) => document.getElementById(id);
@@ -213,6 +250,7 @@ async function cargar() {
   $("tit").firstChild.textContent = negocio.negocio.nombre;
   $("sub").textContent = sem ? `Semana del ${largo(d.desde)}` : desde === hoyISO() ? "Próximas 2 semanas" : `Del ${largo(d.desde)} al ${largo(d.hasta)}`;
   $("login").hidden = true; $("app").hidden = false;
+  $("tabs").hidden = !negocio.gestion;
   const ok = d.citas.filter((c) => c.estado === "ok"), hoy = hoyISO(), fin7 = sumar(hoy, 6);
   $("s-hoy").textContent = ok.filter((c) => c.fecha === hoy).length;
   $("s-sem").textContent = ok.filter((c) => c.fecha >= hoy && c.fecha <= fin7).length;
@@ -367,6 +405,125 @@ $("fc").addEventListener("submit", async (e) => {
 /* calendario */
 $("b-cal").onclick = () => { $("ics").textContent = `${location.origin}/api/as/${slug}/agenda.ics?k=${encodeURIComponent(clave)}`; $("d-cal").showModal(); };
 $("copiar").onclick = async () => { try { await navigator.clipboard.writeText($("ics").textContent); $("copiar").textContent = "Copiado ✓"; } catch (e) { $("copiar").textContent = "Cópialo a mano"; } };
+
+
+/* ---------------------------------------------------------------- gestión del estudio */
+/* Alumnas, cobros y lista de espera: lo que antes había que mirar en una plataforma aparte. */
+const eur = (c) => (c / 100).toLocaleString("es-ES", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }) + " €";
+const corto = (f) => String(f || "").slice(0, 10).split("-").reverse().join("/");
+let pestana = "agenda", alumnaAbierta = 0;
+
+const VISTAS = { agenda: "lista", alumnas: "vAlumnas", pagos: "vPagos", espera: "vEspera" };
+$("tabs").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-t]");
+  if (!b) return;
+  pestana = b.dataset.t;
+  $("tabs").querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", String(x.dataset.t === pestana)));
+  Object.entries(VISTAS).forEach(([k, id]) => { $(id).hidden = k !== pestana; });
+  // los botones de la agenda solo valen en la agenda
+  ["b-nueva", "b-cerrar", "b-cal", "b-ant", "b-sig"].forEach((id) => { $(id).hidden = pestana !== "agenda"; });
+  if (negocio && negocio.avanzado) $("vista").hidden = pestana !== "agenda";
+  if (pestana === "alumnas") verAlumnas();
+  if (pestana === "pagos") verPagos();
+  if (pestana === "espera") verEspera();
+});
+
+/* ---- alumnas ---- */
+async function verAlumnas(q) {
+  const d = await api("panel/alumnas?q=" + encodeURIComponent(q || ""));
+  const t = d.totales || {};
+  $("vAlumnas").innerHTML =
+    `<div class="stats"><div class="st"><b>${t.alumnas || 0}</b><span>alumnas</span></div>
+      <div class="st"><b>${t.bonos || 0}</b><span>bonos activos</span></div>
+      <div class="st"><b>${eur(t.mes || 0)}</b><span>cobrado este mes</span></div></div>
+     <div class="bar bus"><input id="qAlum" placeholder="Buscar por nombre, correo o teléfono" value="${esc(q || "")}" style="flex:1;min-width:200px">
+      <a class="btn" href="/api/as/${slug}/panel/exportar?que=alumnas&k=${encodeURIComponent(clave)}" download>Exportar CSV</a></div>
+     <p class="vacio">${t.ofertas || 0} han aceptado recibir ofertas y novedades por correo.</p>` +
+    (d.alumnas.length ? d.alumnas.map((a) => `<div class="fila" data-alum="${a.id}">
+       <div><b>${esc(a.nombre || a.email)}</b><span>${esc(a.email)}${a.telefono ? " · " + esc(a.telefono) : ""} · ${a.clases || 0} clases</span></div>
+       <div>${a.bono ? `<span class="eti ok">${esc(a.bono)}</span>` : '<span class="eti no">sin bono</span>'}</div></div>`).join("")
+      : '<p class="vacio">Todavía no hay alumnas dadas de alta.</p>');
+  const i = $("qAlum");
+  if (i) { let t2; i.oninput = () => { clearTimeout(t2); t2 = setTimeout(() => verAlumnas(i.value.trim()), 350); }; }
+}
+$("vAlumnas").addEventListener("click", (e) => {
+  const f = e.target.closest("[data-alum]");
+  if (f) verAlumna(+f.dataset.alum);
+});
+
+async function verAlumna(id) {
+  alumnaAbierta = id;
+  const d = await api("panel/alumna?id=" + id);
+  const a = d.alumna;
+  $("da-t").textContent = a.nombre || a.email;
+  $("alumDet").innerHTML =
+    `<p class="d">${esc(a.email)}${a.telefono ? " · " + esc(a.telefono) : ""}<br>Alta: ${corto(a.creado)} · Ofertas: ${a.marketing ? "sí" : "no"}</p>
+     <div class="bar" style="margin:10px 0"><button class="btn main sm" type="button" id="darBono">+ Dar un bono</button>
+       <button class="btn sm" type="button" id="cobrar">Apuntar un cobro</button></div>
+     <h3 style="font-size:.9rem;color:var(--c);margin:14px 0 6px">Bonos</h3>
+     ${d.bonos.length ? d.bonos.map((b) => `<div class="fila" style="cursor:default"><div><b>${esc(b.nombre)}</b><span>${corto(b.inicio)} → ${corto(b.fin)} · ${b.sem ? b.sem + "/semana" : "sin límite"}${b.recurrente ? " · se renueva" : ""}</span></div>
+        <div>${b.estado === "activo" && b.fin >= hoyISO() ? `<button class="btn sm del" type="button" data-nobono="${b.id}">Dar de baja</button>` : `<span class="eti no">${esc(b.estado)}</span>`}</div></div>`).join("") : '<p class="vacio">Sin bonos.</p>'}
+     <h3 style="font-size:.9rem;color:var(--c);margin:14px 0 6px">Últimas clases</h3>
+     ${d.citas.length ? `<div class="tt-w"><table class="tt"><tbody>${d.citas.slice(0, 12).map((c) => `<tr><td>${corto(c.fecha)}</td><td>${c.hora}</td><td>${esc(c.servicio_n)}</td><td>${c.estado === "ok" ? (c.asistio === 1 ? "vino" : c.asistio === 0 ? "no vino" : "") : "cancelada"}</td></tr>`).join("")}</tbody></table></div>` : '<p class="vacio">Sin clases.</p>'}
+     <h3 style="font-size:.9rem;color:var(--c);margin:14px 0 6px">Pagos</h3>
+     ${d.pagos.length ? `<div class="tt-w"><table class="tt"><tbody>${d.pagos.map((p) => `<tr><td>${corto(p.fecha)}</td><td>${esc(p.concepto)}</td><td>${eur(p.importe)}</td><td>${esc(p.metodo)}</td></tr>`).join("")}</tbody></table></div>` : '<p class="vacio">Sin pagos.</p>'}`;
+  $("d-alum").showModal();
+  $("darBono").onclick = () => abrirBono(id);
+  $("cobrar").onclick = async () => {
+    const c = prompt("¿Por qué concepto?", "Clase suelta");
+    if (c === null) return;
+    const i = prompt("¿Cuánto, en euros?", "12");
+    if (i === null) return;
+    await api("panel/pago", { alumno: id, concepto: c, importe: Math.round(parseFloat(String(i).replace(",", ".")) * 100) || 0, metodo: "efectivo" });
+    verAlumna(id);
+  };
+}
+$("alumDet").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-nobono]");
+  if (!b) return;
+  if (!confirm("¿Dar de baja este bono? Si era mensual, deja de renovarse.")) return;
+  await api("panel/bono/baja", { id: +b.dataset.nobono });
+  verAlumna(alumnaAbierta);
+});
+
+function abrirBono(id) {
+  const ps = (negocio && negocio.productos) || [];
+  $("b-prod").innerHTML = ps.map((p) => `<option value="${esc(p.id)}">${esc(p.nombre)} · ${eur(p.precio)}</option>`).join("");
+  $("mb").textContent = "";
+  $("d-bono").dataset.alum = id;
+  $("d-bono").showModal();
+}
+$("fb").addEventListener("submit", async (e) => {
+  if (e.submitter && e.submitter.value === "x") return;
+  e.preventDefault();
+  try {
+    await api("panel/bono", { alumno: +$("d-bono").dataset.alum, producto: $("b-prod").value, cobrar: $("b-cobrar").checked, metodo: $("b-metodo").value });
+    $("d-bono").close();
+    verAlumna(+$("d-bono").dataset.alum);
+  } catch (er) { $("mb").textContent = er.message; }
+});
+
+/* ---- cobros ---- */
+async function verPagos() {
+  const d = await api("panel/pagos");
+  $("vPagos").innerHTML =
+    `<div class="stats"><div class="st"><b>${eur(d.total)}</b><span>desde el ${corto(d.desde)}</span></div>
+      <div class="st"><b>${d.n}</b><span>cobros</span></div></div>
+     <div class="bar"><a class="btn" href="/api/as/${slug}/panel/exportar?que=pagos&k=${encodeURIComponent(clave)}" download>Exportar CSV</a></div>` +
+    (d.pagos.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Fecha</th><th>Alumna</th><th>Concepto</th><th>Importe</th><th>Forma</th><th>Estado</th></tr></thead><tbody>
+       ${d.pagos.map((p) => `<tr><td>${corto(p.fecha)}</td><td>${esc(p.alumna || "—")}</td><td>${esc(p.concepto)}</td><td>${eur(p.importe)}</td><td>${esc(p.metodo)}</td><td>${p.estado === "pagado" ? '<span class="eti ok">pagado</span>' : `<span class="eti no">${esc(p.estado)}</span>`}</td></tr>`).join("")}
+       </tbody></table></div>` : '<p class="vacio">Todavía no hay cobros.</p>');
+}
+
+/* ---- lista de espera ---- */
+async function verEspera() {
+  const d = await api("panel/espera");
+  $("vEspera").innerHTML = d.espera.length
+    ? `<p class="vacio">Cuando alguien anula, el primero de la lista recibe un correo automático.</p>` +
+      d.espera.map((e) => `<div class="fila" style="cursor:default"><div><b>${esc(e.nombre || e.email)}</b><span>${corto(e.fecha)} · ${e.hora} · ${esc(e.servicio)}${e.telefono ? " · " + esc(e.telefono) : ""}</span></div>
+        <div>${e.avisado ? '<span class="eti ok">avisada</span>' : '<span class="eti">esperando</span>'}</div></div>`).join("")
+    : '<p class="vacio">No hay nadie en lista de espera.</p>';
+}
 
 if (clave) cargar().catch(() => salir()); else $("clave").focus();
 setInterval(() => { if (clave && !document.hidden && !document.querySelector("dialog[open]")) cargar().catch(() => {}); }, 60000);

@@ -316,6 +316,8 @@ export function configPublica(cfg) {
     negocio: { nombre: cfg.negocio.nombre, direccion: cfg.negocio.direccion, telefono: cfg.negocio.telefono, horarioTexto: cfg.negocio.horarioTexto, horario: cfg.negocio.horario, wa: cfg.negocio.wa, web: cfg.negocio.web, mapa: cfg.negocio.mapa, logo: cfg.negocio.logo },
     servicios: cfg.servicios.map(({ id, nombre, min, precio }) => ({ id, nombre, min, precio })),
     modo: porSesiones(cfg) ? "sesiones" : "huecos", sesiones: cfg.negocio.sesiones || null,
+    gestion: !!(cfg.productos && cfg.productos.length),
+    productos: (cfg.productos || []).map(({ id, nombre, precio, recurrente }) => ({ id, nombre, precio, recurrente: !!recurrente })),
     chips: cfg.chips, saludo: cfg.saludo, pedirEmail: !!a.pedirEmail, diasMax: a.diasMax, avanzado: avanzado(cfg),
   };
 }
@@ -351,7 +353,8 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     if (!env.CITAS) return res({ error: "Agenda no configurada" }, 503);
     const o = request.headers.get("Origin");
     if (o && new URL(o).host !== url.host) return res({ error: "Origen no permitido" }, 403);
-    const clave = ruta === "agenda.ics" ? url.searchParams.get("k") : (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+    const porURL = ruta === "agenda.ics" || ruta === "panel/exportar";
+    const clave = porURL ? url.searchParams.get("k") : (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     if (!clave || !cfg.panel || !igual(await sha256(clave), cfg.panel.hash)) {
       if (!limitar(ip)) return res({ error: "Demasiados intentos. Espera unos minutos." }, 429);
       return res({ error: "Clave incorrecta" }, 401);
