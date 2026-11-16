@@ -176,8 +176,16 @@ export async function compruebaBono(env, cfg, alumno, servicioId, fecha) {
 }
 
 /* ---------------------------------------------------------------- Stripe */
-async function stripe(env, metodo, ruta, params, idem) {
-  const cab = { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` };
+/**
+ * La cuenta de Stripe que cobra. Cada negocio puede tener la suya:
+ * con cfg.stripe = "IOMFIT" se usan los secretos STRIPE_SK_IOMFIT y STRIPE_WHSEC_IOMFIT.
+ * Sin eso, se usan STRIPE_SECRET_KEY y STRIPE_WEBHOOK_SECRET (los de la demo).
+ */
+export const claveStripe = (env, cfg) => (cfg.stripe && env["STRIPE_SK_" + cfg.stripe]) || env.STRIPE_SECRET_KEY || "";
+export const firmaWebhook = (env, cfg) => (cfg.stripe && env["STRIPE_WHSEC_" + cfg.stripe]) || env.STRIPE_WEBHOOK_SECRET || "";
+
+async function stripe(env, cfg, metodo, ruta, params, idem) {
+  const cab = { Authorization: `Bearer ${claveStripe(env, cfg)}` };
   let body;
   if (params) { cab["Content-Type"] = "application/x-www-form-urlencoded"; body = params.toString(); }
   if (idem) cab["Idempotency-Key"] = idem;
@@ -227,7 +235,7 @@ async function tocaMatricula(env, cfg, alumno, p) {
 
 /** Crea el pago en Stripe: suscripción si el bono es recurrente, pago único si no. */
 async function crearPago(env, cfg, alumno, p, volverA, promo) {
-  if (!env.STRIPE_SECRET_KEY) return { error: "Los pagos online todavía no están activados en este negocio." };
+  if (!claveStripe(env, cfg)) return { error: "Los pagos online todavía no están activados en este negocio." };
   const moneda = cfg.moneda || "eur";
   const params = new URLSearchParams();
   params.set("mode", p.recurrente ? "subscription" : "payment");
@@ -262,7 +270,7 @@ async function crearPago(env, cfg, alumno, p, volverA, promo) {
       else { cp.set("duration", "repeating"); cp.set("duration_in_months", String(promo.meses)); }
     } else cp.set("duration", "once");
     cp.set("name", `${promo.codigo} · ${textoPromo(promo)}`);
-    const cup = await stripe(env, "POST", "/coupons", cp);
+    const cup = await stripe(env, cfg, "POST", "/coupons", cp);
     if (cup.ok && cup.datos.id) params.set("discounts[0][coupon]", cup.datos.id);
     else console.error("Stripe no aceptó el cupón:", JSON.stringify(cup.datos).slice(0, 200));
   }
@@ -276,7 +284,7 @@ async function crearPago(env, cfg, alumno, p, volverA, promo) {
   if (p.recurrente) params.set("subscription_data[metadata][alumno]", String(alumno.id));
   if (p.recurrente) params.set("subscription_data[metadata][producto]", p.id);
 
-  const r = await stripe(env, "POST", "/checkout/sessions", params, `${cfg.slug}-${alumno.id}-${p.id}-${Date.now()}`);
+  const r = await stripe(env, cfg, "POST", "/checkout/sessions", params, `${cfg.slug}-${alumno.id}-${p.id}-${Date.now()}`);
   if (!r.ok || !r.datos.url) {
     console.error("Stripe rechazó el pago:", JSON.stringify(r.datos).slice(0, 300));
     return { error: "No se ha podido abrir el pago. Inténtalo otra vez o paga en el estudio." };
@@ -356,7 +364,7 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
       productos: productos(cfg).map(({ id, nombre, precio, meses, dias, sem, tipos, recurrente, destacado, nota, nuevas, online }) =>
         ({ id, nombre, precio, meses, dias, sem, tipos, recurrente: !!recurrente, destacado: !!destacado, nota: nota || "", nuevas: !!nuevas, online: !!online })),
       matricula: cfg.matricula || null,
-      pagos: !!env.STRIPE_SECRET_KEY,
+      pagos: !!claveStripe(env, cfg),
     });
   }
 
@@ -380,7 +388,7 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
   /* ---- webhook de Stripe (sin cookie, firma verificada) ---- */
   if (ruta === "stripe" && post) {
     const crudo = await request.text();
-    if (!(await firmaStripe(crudo, request.headers.get("stripe-signature"), env.STRIPE_WEBHOOK_SECRET))) return res({ error: "Firma no válida" }, 400);
+    if (!(await firmaStripe(crudo, request.headers.get("stripe-signature"), firmaWebhook(env, cfg)))) return res({ error: "Firma no válida" }, 400);
     let ev; try { ev = JSON.parse(crudo); } catch (e) { return res({ error: "JSON no válido" }, 400); }
     ctx.waitUntil(procesaStripe(env, cfg, ev).catch((e) => console.error("stripe", e && e.message)));
     return res({ recibido: true });
@@ -588,8 +596,8 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
     const p = await env.CITAS.prepare("SELECT estado, concepto, importe FROM pagos WHERE stripe_id = ?1 AND slug = ?2").bind(sid, cfg.slug).first();
     if (p && p.estado === "pagado") return r({ estado: "pagado", concepto: p.concepto, importe: p.importe });
     // Aún no ha llegado el webhook: se pregunta a Stripe directamente
-    if (env.STRIPE_SECRET_KEY) {
-      const s = await stripe(env, "GET", `/checkout/sessions/${sid}`, null);
+    if (claveStripe(env, cfg)) {
+      const s = await stripe(env, cfg, "GET", `/checkout/sessions/${sid}`, null);
       if (s.ok && s.datos.payment_status === "paid") {
         await aplicaPago(env, cfg, s.datos);
         return r({ estado: "pagado", concepto: p ? p.concepto : "", importe: s.datos.amount_total || 0 });
@@ -612,9 +620,9 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
     const b = await cuerpo();
     const bono = await env.CITAS.prepare("SELECT * FROM bonos WHERE id = ?1 AND slug = ?2 AND alumno_id = ?3").bind(+b.id || 0, cfg.slug, alumna.id).first();
     if (!bono) return r({ error: "No encontramos ese bono." }, 404);
-    if (bono.stripe_sub && env.STRIPE_SECRET_KEY) {
+    if (bono.stripe_sub && claveStripe(env, cfg)) {
       const pr = new URLSearchParams(); pr.set("cancel_at_period_end", "true");
-      await stripe(env, "POST", `/subscriptions/${bono.stripe_sub}`, pr);
+      await stripe(env, cfg, "POST", `/subscriptions/${bono.stripe_sub}`, pr);
     }
     await env.CITAS.prepare("UPDATE bonos SET recurrente = 0 WHERE id = ?1").bind(bono.id).run();
     return r({ ok: true, mensaje: `Tu bono no se renovará. Puedes seguir viniendo hasta el ${legible(bono.fin)}.` });
@@ -864,7 +872,7 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     const b = await cuerpo();
     const bono = await env.CITAS.prepare("SELECT * FROM bonos WHERE id = ?1 AND slug = ?2").bind(+b.id || 0, cfg.slug).first();
     if (!bono) return res({ error: "No encontrado" }, 404);
-    if (bono.stripe_sub && env.STRIPE_SECRET_KEY) await stripe(env, "DELETE", `/subscriptions/${bono.stripe_sub}`, null);
+    if (bono.stripe_sub && claveStripe(env, cfg)) await stripe(env, cfg, "DELETE", `/subscriptions/${bono.stripe_sub}`, null);
     await env.CITAS.prepare("UPDATE bonos SET estado = 'cancelado', recurrente = 0 WHERE id = ?1").bind(bono.id).run();
     return res({ ok: true });
   }
