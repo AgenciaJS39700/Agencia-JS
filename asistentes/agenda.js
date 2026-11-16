@@ -70,6 +70,14 @@ async function cuerpo(request, max = 4000) {
   return t ? JSON.parse(t) : {};
 }
 
+/** ¿La petición viene de agencia-js.com o de la propia web del negocio? */
+function mismoSitio(origen, url, cfg) {
+  let host = "";
+  try { host = new URL(origen).host; } catch (e) { return false; }
+  if (host === url.host || host === "agencia-js.com") return true;
+  return (cfg.dominios || []).some((d) => { try { return new URL(d).host === host; } catch (e) { return false; } });
+}
+
 /** Minutos que faltan para una clase (negativo si ya ha pasado). */
 function faltan(fecha, inicio) {
   const ya = ahora();
@@ -361,7 +369,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
   if (ruta.startsWith("panel/") || ruta === "agenda.ics") {
     if (!env.CITAS) return res({ error: "Agenda no configurada" }, 503);
     const o = request.headers.get("Origin");
-    if (o && new URL(o).host !== url.host) return res({ error: "Origen no permitido" }, 403);
+    if (o && !mismoSitio(o, url, cfg)) return res({ error: "Origen no permitido" }, 403);
     const porURL = ruta === "agenda.ics" || ruta === "panel/exportar";
     const clave = porURL ? url.searchParams.get("k") : (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     const hashes = cfg.panel ? [cfg.panel.hash, ...((cfg.panel.equipo || []).map((p) => p.hash))].filter(Boolean) : [];
@@ -429,9 +437,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
   if (ruta.startsWith("profe/")) {
     if (!env.CITAS) return res({ error: "Agenda no configurada" }, 503);
     const o = request.headers.get("Origin");
-    if (o && new URL(o).host !== url.host && !(cfg.dominios || []).some((d) => { try { return new URL(d).host === new URL(o).host; } catch (e) { return false; } })) {
-      return res({ error: "Origen no permitido" }, 403);
-    }
+    if (o && !mismoSitio(o, url, cfg)) return res({ error: "Origen no permitido" }, 403);
     const clave = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     const suyo = clave ? await sha256(clave) : "";
     const profe = (cfg.profes || []).find((p) => igual(suyo, p.hash));
