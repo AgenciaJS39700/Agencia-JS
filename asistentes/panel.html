@@ -1249,7 +1249,33 @@ async function verEquipo() {
       <p class="msg" role="alert"></p>
       <div class="bar" style="margin:12px 0 0"><button class="btn main" type="submit">Dar acceso</button></div>
       ${enHorario.length ? `<p class="vacio">Para una profesora, el nombre tiene que ser el mismo que figura en el horario: ${enHorario.map(esc).join(", ")}.</p>` : ""}
-    </form>`;
+    </form>
+    <section class="dia" id="eqReg"><h2>Quién ha hecho qué<span>cargando…</span></h2></section>`;
+  pintaRegistro();
+}
+
+/* Con tres personas entrando al panel, esto es lo que zanja las discusiones:
+   quién cobró, quién anuló, quién emitió, quién movió una clase de hora. */
+const TIPO = { cobro: "Cobro", cita: "Agenda", factura: "Factura", gestoria: "Gestoría", horario: "Horario",
+               equipo: "Equipo", alumna: "Alumna", bono: "Bono", cierre: "Cierre", sustitucion: "Sustitución", recado: "Tablón", promo: "Promoción" };
+async function pintaRegistro(quien, tipo) {
+  const s = $("eqReg"); if (!s) return;
+  let d;
+  try { d = await api(`panel/registro?quien=${encodeURIComponent(quien || "")}&tipo=${encodeURIComponent(tipo || "")}`); }
+  catch (e) { s.innerHTML = '<h2>Quién ha hecho qué</h2><p class="vacio">No se ha podido cargar.</p>'; return; }
+  s.innerHTML = `<h2>Quién ha hecho qué<span>${d.apuntes.length === 300 ? "últimos 300" : d.apuntes.length + (d.apuntes.length === 1 ? " apunte" : " apuntes")}</span></h2>
+    <div class="bar">
+      <select id="regQ" style="width:auto" aria-label="Persona"><option value="">todo el equipo</option>
+        ${d.gente.map((g) => `<option value="${esc(g)}"${g === quien ? " selected" : ""}>${esc(g)}</option>`).join("")}</select>
+      <select id="regT" style="width:auto" aria-label="Tipo"><option value="">todo</option>
+        ${d.tipos.map((t) => `<option value="${esc(t)}"${t === tipo ? " selected" : ""}>${esc(TIPO[t] || t)}</option>`).join("")}</select>
+    </div>
+    ${d.apuntes.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Cuándo</th><th>Quién</th><th class="opt">Qué</th><th>Detalle</th></tr></thead><tbody>
+      ${d.apuntes.map((a) => `<tr><td>${esc(cuando(a.cuando))}</td><td>${esc(a.quien)}</td><td class="opt">${esc(TIPO[a.tipo] || a.tipo)}</td><td>${esc(a.detalle || "")}</td></tr>`).join("")}
+     </tbody></table></div><p class="vacio">Solo se apunta lo que cambia algo, nunca quién mira qué. Se guarda algo más de un año.</p>`
+      : '<p class="vacio">Todavía no hay nada apuntado.</p>'}`;
+  $("regQ").onchange = () => pintaRegistro($("regQ").value, $("regT").value);
+  $("regT").onchange = () => pintaRegistro($("regQ").value, $("regT").value);
 }
 
 $("vEquipo").addEventListener("click", async (e) => {

@@ -27,6 +27,7 @@ import { atenderEventos, atenderPanelEventos } from "./eventos.js";
 import { atenderPanelFacturas } from "./facturas.js";
 import { recuperarAcceso, atenderRecados, atenderSustituciones, recadosDe, cambiosDe, dirigidoA } from "./equipo-extra.js";
 import { conHorario, atenderHorario } from "./horario.js";
+import { anotador, atenderRegistro } from "./registro.js";
 
 const conPrefijo = (t) => { const d = String(t || "").replace(/\D/g, ""); return d.length === 9 ? "34" + d : d; };
 
@@ -696,15 +697,19 @@ ${gente.length} de ${ses.cap} plazas · ${libres} libre${libres === 1 ? "" : "s"
           }),
       });
     }
-    const ph1 = await atenderHorario(request, env, cfg, cfgArchivo, ruta, url, yo, null);
+    // Con varias personas entrando, lo que cambia algo deja constancia de quién fue
+    const apuntar = anotador(env, cfg, yo, ctx);
+    const pg1 = await atenderRegistro(request, env, cfg, ruta, url, yo);
+    if (pg1) return pg1;
+    const ph1 = await atenderHorario(request, env, cfg, cfgArchivo, ruta, url, yo, apuntar);
     if (ph1) return ph1;
     const pr1 = await atenderRecados(request, env, cfg, ruta, url, yo);
     if (pr1) return pr1;
-    const ps1 = await atenderSustituciones(request, env, cfg, ruta, url, yo);
+    const ps1 = await atenderSustituciones(request, env, cfg, ruta, url, yo, apuntar);
     if (ps1) return ps1;
-    const pf1 = await atenderPanelFacturas(request, env, cfg, ruta, url);
+    const pf1 = await atenderPanelFacturas(request, env, cfg, ruta, url, apuntar);
     if (pf1) return pf1;
-    const pa1 = await atenderPanelAlumnos(request, env, cfg, ruta, url);
+    const pa1 = await atenderPanelAlumnos(request, env, cfg, ruta, url, apuntar);
     if (pa1) return pa1;
     const pe1 = await atenderPanelEventos(request, env, cfg, ruta, url);
     if (pe1) return pe1;
@@ -736,6 +741,7 @@ ${gente.length} de ${ses.cap} plazas · ${libres} libre${libres === 1 ? "" : "s"
           `INSERT INTO accesos (slug, nombre, usuario, rol, hash, pass_salt, pass_iter, activo, creado)
            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9) ON CONFLICT(slug, nombre) DO UPDATE SET activo = ?8`
         ).bind(cfg.slug, nombre, actual.usuario, actual.rol, actual.hash, actual.sal, actual.iter, activo, hoy).run();
+        await apuntar("equipo", `${b.accion === "alta" ? "devolvió el acceso a" : "quitó el acceso a"} ${nombre}`);
         return res({ ok: true });
       }
 
@@ -760,10 +766,21 @@ ${gente.length} de ${ses.cap} plazas · ${libres} libre${libres === 1 ? "" : "s"
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 1, ?8)
          ON CONFLICT(slug, nombre) DO UPDATE SET usuario = ?3, rol = ?4, hash = ?5, pass_salt = ?6, pass_iter = ?7, activo = 1`
       ).bind(cfg.slug, nombre, usuario, rol, hash, sal, iter, hoy).run();
+      await apuntar("equipo", actual
+        ? `cambió ${clave ? "la contraseña" : "los datos"} de ${nombre}${rol !== actual.rol ? ` y su papel a ${rol}` : ""}`
+        : `dio de alta a ${nombre} como ${rol} (usuario ${usuario})`);
       return res({ ok: true, nuevo: !actual, usuario });
     }
-    if (ruta === "panel/cita") { const r = await reservar(env, cfg, b, "panel", ctx); return res(r, r.estado); }
-    if (ruta === "panel/cancelar") { const c = await cancelar(env, cfg, "id = ?", [+b.id || 0], ctx, "negocio"); return c ? res({ ok: true }) : res({ error: "Cita no encontrada" }, 404); }
+    if (ruta === "panel/cita") {
+      const r = await reservar(env, cfg, b, "panel", ctx);
+      if (r.ok) await apuntar("cita", `apuntó a ${limpiar(b.nombre, 60)} el ${b.fecha} a las ${b.hora}`);
+      return res(r, r.estado);
+    }
+    if (ruta === "panel/cancelar") {
+      const c = await cancelar(env, cfg, "id = ?", [+b.id || 0], ctx, "negocio");
+      if (c) await apuntar("cita", `anuló la reserva de ${c.nombre || "?"} del ${c.fecha} a las ${hhmm(c.inicio)}`);
+      return c ? res({ ok: true }) : res({ error: "Cita no encontrada" }, 404);
+    }
     if (ruta === "panel/bloquear") {
       if (!RE_FECHA.test(b.fecha || "")) return res({ error: "Fecha no válida" }, 400);
       const ini = b.desde ? min2(b.desde) : 0, fin = b.hasta ? min2(b.hasta) : 1440;
@@ -771,9 +788,14 @@ ${gente.length} de ${ses.cap} plazas · ${libres} libre${libres === 1 ? "" : "s"
       const fechas = [b.fecha]; const hasta = RE_FECHA.test(b.fechaFin || "") ? b.fechaFin : b.fecha;
       for (let f = sumar(b.fecha, 1); f <= hasta && fechas.length < 92; f = sumar(f, 1)) fechas.push(f);
       await env.CITAS.batch(fechas.map((f) => env.CITAS.prepare("INSERT INTO bloqueos (slug, fecha, inicio, fin, motivo) VALUES (?, ?, ?, ?, ?)").bind(cfg.slug, f, ini, fin, limpiar(b.motivo, 80) || null)));
+      await apuntar("cierre", `cerró ${fechas.length === 1 ? "el " + fechas[0] : fechas.length + " días, del " + fechas[0] + " al " + fechas[fechas.length - 1]}${b.desde || b.hasta ? ` (${hhmm(ini)}–${hhmm(fin)})` : " entero"}${limpiar(b.motivo, 80) ? " · " + limpiar(b.motivo, 80) : ""}`);
       return res({ ok: true, dias: fechas.length });
     }
-    if (ruta === "panel/desbloquear") { await env.CITAS.prepare("DELETE FROM bloqueos WHERE slug = ? AND id = ?").bind(cfg.slug, +b.id || 0).run(); return res({ ok: true }); }
+    if (ruta === "panel/desbloquear") {
+      await env.CITAS.prepare("DELETE FROM bloqueos WHERE slug = ? AND id = ?").bind(cfg.slug, +b.id || 0).run();
+      await apuntar("cierre", `volvió a abrir un cierre (nº ${+b.id || 0})`);
+      return res({ ok: true });
+    }
     const pr2 = await atenderRecados(request, env, cfg, ruta, url, yo);
     if (pr2) return pr2;
     const ps2 = await atenderSustituciones(request, env, cfg, ruta, url, yo);

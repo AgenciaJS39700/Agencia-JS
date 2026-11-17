@@ -172,7 +172,7 @@ function csvLibro(cfg, mes, filas) {
 
 /* ---------------------------------------------------------------- panel */
 
-export async function atenderPanelFacturas(request, env, cfg, ruta, url) {
+export async function atenderPanelFacturas(request, env, cfg, ruta, url, apuntar) {
   if (!ruta.startsWith("panel/factura")) return null;
   const post = request.method === "POST";
   const cuerpo = async () => { try { return await request.json(); } catch (e) { return {}; } };
@@ -222,6 +222,7 @@ export async function atenderPanelFacturas(request, env, cfg, ruta, url) {
     ).bind(cfg.slug, mes).all();
     let n = 0;
     for (const p of results || []) if (await emitirFactura(env, cfg, { id: p.id })) n++;
+    if (apuntar && n) await apuntar("factura", `emitió de golpe ${n === 1 ? "1 factura" : n + " facturas"} de ${mes}`);
     return res({ ok: true, emitidas: n });
   }
 
@@ -249,6 +250,7 @@ export async function atenderPanelFacturas(request, env, cfg, ruta, url) {
       pct, nombre, limpiar(b.nif, 20), limpiar(b.direccion, 120), limpiar(b.nota, 200)).run();
     const id = r.meta.last_row_id;
     const numero = await emitirFactura(env, cfg, { id });
+    if (apuntar) await apuntar("factura", `emitió a mano la factura ${numero || "(sin número)"} a ${nombre} por ${(importe / 100).toFixed(2)} €`);
     return res({ ok: true, id, numero });
   }
 
@@ -267,6 +269,7 @@ export async function atenderPanelFacturas(request, env, cfg, ruta, url) {
     ).bind(cfg.slug, o.alumno_id, "Rectificación de " + o.concepto, -Math.abs(o.importe), o.metodo, hoyMadrid(),
       o.iva_pct, o.numero, o.cliente, o.cliente_nif, o.cliente_dir, motivo).run();
     const numero = await emitirFactura(env, cfg, { id: r.meta.last_row_id });
+    if (apuntar) await apuntar("factura", `rectificó la factura ${o.numero} con la ${numero || "(sin número)"} · ${motivo}`);
     return res({ ok: true, numero });
   }
 
@@ -308,6 +311,7 @@ export async function atenderPanelFacturas(request, env, cfg, ruta, url) {
          <p style="font-size:13px;color:#555;line-height:1.7">El adjunto es un CSV con una línea por factura: fecha de expedición, número, cliente, NIF, base, IVA, total y forma de pago. Las rectificativas van con importe negativo.${!t.iva && f.exento ? "<br>" + esc(f.exento) : ""}</p>`),
       { responder: (cfg.avisos && cfg.avisos.email) || undefined, adjuntos: [{ nombre: `facturas-${cfg.slug}-${mes}.csv`, contenido: b64 }] });
     if (!ok) return res({ error: "No se ha podido enviar el correo. Inténtalo en un momento." }, 502);
+    if (apuntar) await apuntar("gestoria", `mandó la facturación de ${mes} a ${para} (${t.n} facturas, ${euros(t.total)})`);
     return res({ ok: true, enviadas: t.n, para });
   }
 

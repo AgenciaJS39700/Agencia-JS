@@ -785,7 +785,7 @@ export async function avisarEspera(env, cfg, cita) {
 }
 
 /* ---------------------------------------------------------------- panel del negocio */
-export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
+export async function atenderPanelAlumnos(request, env, cfg, ruta, url, apuntar) {
   const post = request.method === "POST";
   const cuerpo = async () => { try { return await request.json(); } catch (e) { return {}; } };
 
@@ -870,6 +870,7 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     const b = await cuerpo();
     await env.CITAS.prepare("UPDATE alumnos SET nif = ?3, direccion = ?4 WHERE id = ?1 AND slug = ?2")
       .bind(+b.id || 0, cfg.slug, limpiar(b.nif, 20) || null, limpiar(b.direccion, 120) || null).run();
+    if (apuntar) await apuntar("alumna", `cambió los datos fiscales de la alumna nº ${+b.id || 0}`);
     return res({ ok: true });
   }
 
@@ -885,6 +886,7 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
       // La factura se emite en el acto: así el libro nunca se queda con cobros sueltos
       await emitirFactura(env, cfg, { id: r.meta.last_row_id });
     }
+    if (apuntar) await apuntar("bono", `dio de alta «${p.nombre}» a ${a.nombre || a.email}${b.cobrar ? ` y lo cobró (${(p.precio / 100).toFixed(2)} €, ${limpiar(b.metodo, 20) || "efectivo"})` : " sin cobrar"}`);
     return res({ ok: true, bono: id });
   }
 
@@ -894,6 +896,7 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     if (!bono) return res({ error: "No encontrado" }, 404);
     if (bono.stripe_sub && claveStripe(env, cfg)) await stripe(env, cfg, "DELETE", `/subscriptions/${bono.stripe_sub}`, null);
     await env.CITAS.prepare("UPDATE bonos SET estado = 'cancelado', recurrente = 0 WHERE id = ?1").bind(bono.id).run();
+    if (apuntar) await apuntar("bono", `dio de baja el bono «${bono.nombre}» (nº ${bono.id})`);
     return res({ ok: true });
   }
 
@@ -943,6 +946,7 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     const r = await env.CITAS.prepare("INSERT INTO pagos (slug, alumno_id, concepto, importe, estado, metodo) VALUES (?1,?2,?3,?4,'pagado',?5)")
       .bind(cfg.slug, +b.alumno || null, limpiar(b.concepto, 80) || "Cobro en el estudio", Math.max(0, Math.round(+b.importe || 0)), limpiar(b.metodo, 20) || "efectivo").run();
     const numero = await emitirFactura(env, cfg, { id: r.meta.last_row_id });
+    if (apuntar) await apuntar("cobro", `${(Math.max(0, Math.round(+b.importe || 0)) / 100).toFixed(2)} € en ${limpiar(b.metodo, 20) || "efectivo"} · ${limpiar(b.concepto, 80) || "Cobro en el estudio"}${numero ? ` · factura ${numero}` : ""}`);
     return res({ ok: true, numero });
   }
 

@@ -184,7 +184,7 @@ export async function cambiosDe(env, cfg, desde, hasta) {
   } catch (e) { return {}; }
 }
 
-export async function atenderSustituciones(request, env, cfg, ruta, url, yo) {
+export async function atenderSustituciones(request, env, cfg, ruta, url, yo, apuntar) {
   const res = (d, e = 200) => new Response(JSON.stringify(d), { status: e, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
 
   if (ruta === "panel/sustituciones" && request.method === "GET") {
@@ -204,6 +204,7 @@ export async function atenderSustituciones(request, env, cfg, ruta, url, yo) {
     if (!prof) {   // sin profesor: se quita la sustitución y vuelve el del horario
       await env.CITAS.prepare("DELETE FROM cambios WHERE slug = ?1 AND fecha = ?2 AND inicio = ?3 AND servicio = ?4")
         .bind(cfg.slug, b.fecha, inicio, servicio).run();
+      if (apuntar) await apuntar("sustitucion", `quitó la sustitución del ${b.fecha} a las ${hhmm(inicio)} (${servicio})`);
       return res({ ok: true, quitada: true });
     }
     const l = await equipo(env, cfg);
@@ -212,6 +213,7 @@ export async function atenderSustituciones(request, env, cfg, ruta, url, yo) {
       `INSERT INTO cambios (slug, fecha, inicio, servicio, prof, nota, creado) VALUES (?1,?2,?3,?4,?5,?6,?7)
        ON CONFLICT(slug, fecha, inicio, servicio) DO UPDATE SET prof = ?5, nota = ?6`
     ).bind(cfg.slug, b.fecha, inicio, servicio, prof, limpiar(b.nota, 200) || null, new Date().toISOString()).run();
+    if (apuntar) await apuntar("sustitucion", `puso a ${prof} en la clase del ${b.fecha} a las ${hhmm(inicio)} (${servicio})`);
     return res({ ok: true });
   }
   return null;
