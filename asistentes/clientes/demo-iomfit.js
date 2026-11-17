@@ -118,6 +118,9 @@ export default {
     iva: 0,
     exento: "Operación exenta de IVA por el artículo 20.Uno.13.º de la Ley 37/1992 (servicios deportivos). Confírmalo con tu asesoría.",
   },
+  // A dónde se manda el resumen mensual de facturación desde el panel.
+  // Se puede cambiar sobre la marcha en el propio envío.
+  gestoria: { nombre: "Asesoría", email: "agencia39700@gmail.com" },
   avisos: { email: "agencia39700@gmail.com", whatsapp: "", whatsappCliente: false },
   // Acceso de profesores: cada uno ve solo SUS clases y pasa lista. El nombre
   // tiene que coincidir con el de las sesiones del horario.

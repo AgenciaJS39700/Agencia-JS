@@ -15,6 +15,10 @@ export async function correo(env, cfg, a, nombre, asunto, html, opciones) {
   // Los envíos comerciales llevan baja en un clic, como exige la ley y piden Gmail y Outlook
   if (opciones && opciones.baja) cuerpo.headers = { "List-Unsubscribe": `<${opciones.baja}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" };
   if (opciones && opciones.responder) cuerpo.replyTo = { email: opciones.responder };
+  // Adjuntos: [{ nombre, contenido }] con el contenido ya en base64 (lo usa el envío a la gestoría)
+  if (opciones && opciones.adjuntos && opciones.adjuntos.length) {
+    cuerpo.attachment = opciones.adjuntos.map((x) => ({ name: x.nombre, content: x.contenido }));
+  }
   const r = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST", headers: { "api-key": env.BREVO_API_KEY, "content-type": "application/json", accept: "application/json" },
     body: JSON.stringify(cuerpo),

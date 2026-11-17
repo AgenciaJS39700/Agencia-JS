@@ -24,6 +24,7 @@ import { plantillaWhatsApp } from "./whatsapp.js";
 import { correo, marco } from "./correo.js";
 import { atenderAlumnos, atenderPanelAlumnos, alumnaDeLaSesion, compruebaBono, avisarEspera, crearPagoEvento } from "./alumnos.js";
 import { atenderEventos, atenderPanelEventos } from "./eventos.js";
+import { atenderPanelFacturas } from "./facturas.js";
 
 const conPrefijo = (t) => { const d = String(t || "").replace(/\D/g, ""); return d.length === 9 ? "34" + d : d; };
 
@@ -460,6 +461,8 @@ export async function atenderAgenda(request, env, ctx, limitar) {
           .sort((a, b2) => (a.rol === b2.rol ? a.nombre.localeCompare(b2.nombre, "es") : a.rol === "panel" ? -1 : 1)),
       });
     }
+    const pf1 = await atenderPanelFacturas(request, env, cfg, ruta, url);
+    if (pf1) return pf1;
     const pa1 = await atenderPanelAlumnos(request, env, cfg, ruta, url);
     if (pa1) return pa1;
     const pe1 = await atenderPanelEventos(request, env, cfg, ruta, url);
@@ -520,6 +523,8 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       return res({ ok: true, dias: fechas.length });
     }
     if (ruta === "panel/desbloquear") { await env.CITAS.prepare("DELETE FROM bloqueos WHERE slug = ? AND id = ?").bind(cfg.slug, +b.id || 0).run(); return res({ ok: true }); }
+    const pf2 = await atenderPanelFacturas(request, env, cfg, ruta, url);
+    if (pf2) return pf2;
     const pa2 = await atenderPanelAlumnos(request, env, cfg, ruta, url);
     if (pa2) return pa2;
     const pe2 = await atenderPanelEventos(request, env, cfg, ruta, url);

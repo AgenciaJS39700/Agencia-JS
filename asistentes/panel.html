@@ -90,7 +90,8 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .eqf-n b{font-size:1.02rem}
 .eqf-d{color:var(--mu);font-size:.84rem;margin:.35rem 0 0;line-height:1.5}
 .eqf-d.av{color:#fca5a5}
-.eqf-b{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.eti.ok{background:rgba(34,197,94,.16);color:#86efac}
+.eqf-b{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.enlace{background:none;border:0;padding:0;font:inherit;font-size:inherit;color:var(--c);text-decoration:underline;cursor:pointer}.eti.ok{background:rgba(34,197,94,.16);color:#86efac}
 .tt{width:100%;border-collapse:collapse;font-size:.86rem}
 .tt th,.tt td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--ln);white-space:nowrap}
 .tt th{color:var(--mu);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
@@ -135,12 +136,14 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <button type="button" data-t="agenda" role="tab" aria-selected="true">Agenda</button>
       <button type="button" data-t="alumnas" role="tab" aria-selected="false">Alumnas</button>
       <button type="button" data-t="pagos" role="tab" aria-selected="false">Cobros</button>
+      <button type="button" data-t="facturas" role="tab" aria-selected="false">Facturación</button>
       <button type="button" data-t="espera" role="tab" aria-selected="false">Lista de espera</button>
       <button type="button" data-t="equipo" role="tab" aria-selected="false">Equipo y claves</button>
     </nav>
     <div id="lista" aria-live="polite"></div>
     <div id="vAlumnas" hidden></div>
     <div id="vPagos" hidden></div>
+    <div id="vFacturas" hidden></div>
     <div id="vEspera" hidden></div>
     <div id="vEquipo" hidden></div>
   </section>
@@ -214,6 +217,23 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
   </div>
   <p class="msg" role="alert" id="mb"></p>
   <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn main" value="ok">Guardar</button></div>
+</form></dialog>
+
+<dialog id="d-fac" aria-labelledby="df-t"><form id="ff" method="dialog">
+  <h2 id="df-t">Emitir una factura</h2>
+  <p class="vacio" style="margin:0 0 12px">Para cobros que no pasan por la web: una formación, un bono regalo, una empresa. Se numera sola en la serie del año.</p>
+  <div class="grid">
+    <div class="full"><label for="fc-cliente">A nombre de</label><input id="fc-cliente" required maxlength="90" placeholder="Nombre de la persona o de la empresa"></div>
+    <div><label for="fc-nif">NIF <small>(opcional)</small></label><input id="fc-nif" maxlength="20" placeholder="12345678Z"></div>
+    <div><label for="fc-fecha">Fecha</label><input id="fc-fecha" type="date" required></div>
+    <div class="full"><label for="fc-dir">Dirección <small>(opcional)</small></label><input id="fc-dir" maxlength="120" placeholder="Calle, número, ciudad"></div>
+    <div class="full"><label for="fc-concepto">Concepto</label><input id="fc-concepto" required maxlength="120" placeholder="Formación YTT200h · matrícula"></div>
+    <div><label for="fc-importe">Total con IVA (€)</label><input id="fc-importe" type="number" min="0" step="0.01" required placeholder="150,00"></div>
+    <div><label for="fc-iva">IVA (%)</label><input id="fc-iva" type="number" min="0" max="21" step="1" placeholder="0"></div>
+    <div class="full"><label for="fc-metodo">Forma de pago</label><select id="fc-metodo"><option value="efectivo">Efectivo</option><option value="bizum">Bizum</option><option value="transferencia">Transferencia</option><option value="tarjeta">Tarjeta</option></select></div>
+  </div>
+  <p class="msg" role="alert" id="fc-msg"></p>
+  <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn main" value="ok">Emitir</button></div>
 </form></dialog>
 
 <script type="module">
@@ -451,7 +471,7 @@ const eur = (c) => (c / 100).toLocaleString("es-ES", { minimumFractionDigits: c 
 const corto = (f) => String(f || "").slice(0, 10).split("-").reverse().join("/");
 let pestana = "agenda", alumnaAbierta = 0;
 
-const VISTAS = { agenda: "lista", alumnas: "vAlumnas", pagos: "vPagos", espera: "vEspera", equipo: "vEquipo" };
+const VISTAS = { agenda: "lista", alumnas: "vAlumnas", pagos: "vPagos", facturas: "vFacturas", espera: "vEspera", equipo: "vEquipo" };
 $("tabs").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-t]");
   if (!b) return;
@@ -463,6 +483,7 @@ $("tabs").addEventListener("click", (e) => {
   if (negocio && negocio.avanzado) $("vista").hidden = pestana !== "agenda";
   if (pestana === "alumnas") verAlumnas();
   if (pestana === "pagos") verPagos();
+  if (pestana === "facturas") verFacturas();
   if (pestana === "espera") verEspera();
   if (pestana === "equipo") verEquipo();
 });
@@ -504,9 +525,20 @@ async function verAlumna(id) {
         <div>${b.estado === "activo" && b.fin >= hoyISO() ? `<button class="btn sm del" type="button" data-nobono="${b.id}">Dar de baja</button>` : `<span class="eti no">${esc(b.estado)}</span>`}</div></div>`).join("") : '<p class="vacio">Sin bonos.</p>'}
      <h3 style="font-size:.9rem;color:var(--c);margin:14px 0 6px">Últimas clases</h3>
      ${d.citas.length ? `<div class="tt-w"><table class="tt"><tbody>${d.citas.slice(0, 12).map((c) => `<tr><td>${corto(c.fecha)}</td><td>${c.hora}</td><td>${esc(c.servicio_n)}</td><td>${c.estado === "ok" ? (c.asistio === 1 ? "vino" : c.asistio === 0 ? "no vino" : "") : "cancelada"}</td></tr>`).join("")}</tbody></table></div>` : '<p class="vacio">Sin clases.</p>'}
-     <h3 style="font-size:.9rem;color:var(--c);margin:14px 0 6px">Pagos</h3>
-     ${d.pagos.length ? `<div class="tt-w"><table class="tt"><tbody>${d.pagos.map((p) => `<tr><td>${corto(p.fecha)}</td><td>${esc(p.concepto)}</td><td>${eur(p.importe)}</td><td>${esc(p.metodo)}</td></tr>`).join("")}</tbody></table></div>` : '<p class="vacio">Sin pagos.</p>'}`;
+     <h3 style="font-size:.9rem;color:var(--c);margin:14px 0 6px">Pagos y facturas</h3>
+     <p class="vacio" style="margin:0 0 8px">Facturado a esta alumna: <b>${eur((d.facturado || {}).total || 0)}</b> en ${((d.facturado || {}).n || 0) === 1 ? "1 factura" : ((d.facturado || {}).n || 0) + " facturas"}.
+      ${a.nif ? "NIF " + esc(a.nif) + "." : '<button class="enlace" type="button" id="datosFis">Añadir NIF y dirección</button>'}</p>
+     ${d.pagos.length ? `<div class="tt-w"><table class="tt"><tbody>${d.pagos.map((p) => `<tr${p.tipo === "rectificativa" ? ' style="color:#fca5a5"' : ""}><td>${corto(p.fecha)}</td><td>${esc(p.concepto)}</td><td>${eur(p.importe)}</td><td>${esc(p.metodo)}</td>
+       <td>${p.numero ? `<a class="btn sm" href="/api/as/${slug}/panel/factura?id=${p.id}&k=${encodeURIComponent(clave)}" target="_blank" rel="noopener">${esc(p.numero)}</a>` : (p.estado === "pagado" ? '<span class="eti">sin factura</span>' : `<span class="eti no">${esc(p.estado)}</span>`)}</td></tr>`).join("")}</tbody></table></div>` : '<p class="vacio">Sin pagos.</p>'}`;
   $("d-alum").showModal();
+  const df = $("datosFis");
+  if (df) df.onclick = async () => {
+    const nif = prompt("NIF o CIF de " + (a.nombre || a.email) + " (para que sus facturas lo lleven):", a.nif || "");
+    if (nif === null) return;
+    const dir = prompt("Dirección fiscal (opcional):", a.direccion || "");
+    await api("panel/alumna/fiscal", { id, nif, direccion: dir || "" });
+    verAlumna(id);
+  };
   $("darBono").onclick = () => abrirBono(id);
   $("cobrar").onclick = async () => {
     const c = prompt("¿Por qué concepto?", "Clase suelta");
@@ -552,6 +584,113 @@ async function verPagos() {
     (d.pagos.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Fecha</th><th>Alumna</th><th>Concepto</th><th>Importe</th><th>Forma</th><th>Estado</th></tr></thead><tbody>
        ${d.pagos.map((p) => `<tr><td>${corto(p.fecha)}</td><td>${esc(p.alumna || "—")}</td><td>${esc(p.concepto)}</td><td>${eur(p.importe)}</td><td>${esc(p.metodo)}</td><td>${p.estado === "pagado" ? '<span class="eti ok">pagado</span>' : `<span class="eti no">${esc(p.estado)}</span>`}</td></tr>`).join("")}
        </tbody></table></div>` : '<p class="vacio">Todavía no hay cobros.</p>');
+}
+
+/* ---- facturación ----
+   El libro de facturas emitidas de cada mes, con lo que la asesoría necesita para
+   cuadrar: base, IVA, total y forma de pago. Una factura emitida no se borra nunca:
+   se corrige con una rectificativa. */
+let mesFac = "";
+function selMes(meses, actual) {
+  const hoy = new Date().toISOString().slice(0, 7);
+  const lista = [...new Set([hoy, actual, ...meses])].filter(Boolean).sort().reverse().slice(0, 24);
+  const MES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  return `<select id="fMes" aria-label="Mes" style="width:auto;min-width:180px">${lista.map((m) =>
+    `<option value="${m}"${m === actual ? " selected" : ""}>${MES[+m.slice(5, 7) - 1]} de ${m.slice(0, 4)}</option>`).join("")}</select>`;
+}
+async function verFacturas(mes) {
+  const d = await api("panel/facturacion" + (mes ? "?mes=" + mes : ""));
+  mesFac = d.mes;
+  const t = d.totales, sinIva = !t.iva;
+  const metodos = Object.entries(t.metodos || {}).map(([m, v]) => `${esc(m)} ${eur(v)}`).join(" · ");
+  $("vFacturas").innerHTML =
+    `<div class="bar">${selMes(d.meses, d.mes)}
+      <button class="btn main" type="button" id="facNueva">+ Emitir una factura</button>
+      <a class="btn" id="facCsv" href="/api/as/${slug}/panel/facturacion/csv?mes=${d.mes}&k=${encodeURIComponent(clave)}" download>Descargar libro (CSV)</a>
+      <button class="btn" type="button" id="facEnviar">Enviar a la gestoría</button></div>
+
+     <div class="stats"><div class="st"><b>${eur(t.total)}</b><span>facturado en ${esc(d.mesTexto)}</span></div>
+      <div class="st"><b>${eur(t.base)}</b><span>base imponible</span></div>
+      <div class="st"><b>${sinIva ? "exento" : eur(t.iva)}</b><span>${sinIva ? "de IVA" : "cuota de IVA"}</span></div></div>
+     <p class="vacio">${t.n === 1 ? "1 factura emitida" : t.n + " facturas emitidas"}${t.rectificativas ? ` · ${t.rectificativas === 1 ? "1 rectificativa" : t.rectificativas + " rectificativas"}` : ""}${metodos ? " · " + metodos : ""}</p>
+
+     ${d.pendientes.length ? `<div class="box" style="border-color:var(--c)">
+       <h2>${d.pendientes.length === 1 ? "1 cobro de este mes sin factura" : d.pendientes.length + " cobros de este mes sin factura"}</h2>
+       <p class="vacio" style="margin:0 0 10px">${d.pendientes.map((p) => esc((p.alumna || "—") + " · " + p.concepto + " · " + eur(p.importe))).join("<br>")}</p>
+       <button class="btn main" type="button" id="facEmitir">Emitir ${d.pendientes.length === 1 ? "la factura" : "las " + d.pendientes.length + " facturas"}</button>
+      </div>` : ""}
+
+     ${d.facturas.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Número</th><th>Fecha</th><th>Cliente</th><th>Concepto</th><th>Base</th>${sinIva ? "" : "<th>IVA</th>"}<th>Total</th><th>Forma</th><th></th></tr></thead><tbody>
+       ${d.facturas.map((p) => `<tr${p.tipo === "rectificativa" ? ' style="color:#fca5a5"' : ""}>
+         <td><b>${esc(p.numero)}</b>${p.rectifica ? `<br><small>rectifica ${esc(p.rectifica)}</small>` : ""}</td>
+         <td>${corto(p.emitida || p.fecha)}</td>
+         <td>${esc(p.cliente_n)}${p.cliente_f ? `<br><small>${esc(p.cliente_f)}</small>` : ""}</td>
+         <td>${esc(p.concepto)}</td>
+         <td>${eur(p.base == null ? p.importe : p.base)}</td>
+         ${sinIva ? "" : `<td>${eur(p.iva || 0)}</td>`}
+         <td><b>${eur(p.importe)}</b></td>
+         <td>${esc(p.metodo)}</td>
+         <td class="acc"><a class="btn sm" href="/api/as/${slug}/panel/factura?id=${p.id}&k=${encodeURIComponent(clave)}" target="_blank" rel="noopener">Ver</a>
+          ${p.tipo === "rectificativa" ? "" : `<button class="btn sm" type="button" data-rect="${p.id}" data-num="${esc(p.numero)}">Rectificar</button>`}</td></tr>`).join("")}
+       </tbody></table></div>` : '<p class="vacio">Ese mes no tiene ninguna factura emitida.</p>'}
+
+     <p class="vacio" style="margin-top:14px">Datos fiscales de la factura: <b>${esc(d.fiscal.nombre)}</b>${d.fiscal.nif ? " · NIF " + esc(d.fiscal.nif) : ""}${d.fiscal.iva ? " · IVA " + d.fiscal.iva + " %" : " · sin IVA"}.${d.fiscal.exento ? " " + esc(d.fiscal.exento) : ""}</p>`;
+
+  $("fMes").onchange = (e) => verFacturas(e.target.value);
+  $("facNueva").onclick = facturaNueva;
+  $("facEnviar").onclick = () => enviarGestoria(d);
+  const em = $("facEmitir");
+  if (em) em.onclick = async () => { em.disabled = true; await api("panel/facturar", { mes: d.mes }); verFacturas(d.mes); };
+}
+
+$("vFacturas").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-rect]");
+  if (!b) return;
+  const motivo = prompt(`Vas a emitir una rectificativa de la factura ${b.dataset.num}. La original no se borra: queda anulada por la nueva.\n\n¿Por qué se rectifica?`, "Anulación por devolución.");
+  if (motivo === null) return;
+  try {
+    const r = await api("panel/factura/rectificar", { id: +b.dataset.rect, motivo });
+    alert("Emitida la rectificativa " + r.numero + ".");
+  } catch (er) { alert(er.message); }
+  verFacturas(mesFac);
+});
+
+function facturaNueva() {
+  const d = $("d-fac");
+  d.querySelector("form").reset();
+  $("fc-fecha").value = hoyISO();
+  $("fc-msg").textContent = "";
+  d.showModal();
+}
+$("ff").addEventListener("submit", async (e) => {
+  if (e.submitter && e.submitter.value !== "ok") return;
+  e.preventDefault();
+  const msg = $("fc-msg");
+  msg.style.color = "#fca5a5"; msg.textContent = "";
+  const importe = Math.round((parseFloat(String($("fc-importe").value).replace(",", ".")) || 0) * 100);
+  if (!(importe > 0)) { msg.textContent = "El importe tiene que ser mayor que cero."; return; }
+  try {
+    const r = await api("panel/factura/nueva", {
+      cliente: $("fc-cliente").value.trim(), nif: $("fc-nif").value.trim(), direccion: $("fc-dir").value.trim(),
+      concepto: $("fc-concepto").value.trim(), importe, iva: $("fc-iva").value === "" ? null : +$("fc-iva").value,
+      metodo: $("fc-metodo").value, fecha: $("fc-fecha").value,
+    });
+    $("d-fac").close();
+    verFacturas(mesFac);
+    if (confirm("Emitida la factura " + r.numero + ".\n\n¿Quieres verla ahora para imprimirla o guardarla en PDF?")) {
+      window.open(`/api/as/${slug}/panel/factura?id=${r.id}&k=${encodeURIComponent(clave)}`, "_blank", "noopener");
+    }
+  } catch (er) { msg.textContent = er.message; }
+});
+async function enviarGestoria(d) {
+  const t = d.totales;
+  if (!t.n) return alert("Ese mes no tiene ninguna factura emitida.");
+  const email = prompt(`Se le manda a la gestoría el resumen de ${d.mesTexto} y el libro de facturas en CSV adjunto (${t.n} facturas, ${eur(t.total)}).\n\n¿A qué correo?`, d.gestoria || "");
+  if (!email) return;
+  try {
+    const r = await api("panel/facturacion/enviar", { mes: d.mes, email });
+    alert("Enviado a " + r.para + " (" + r.enviadas + " facturas).");
+  } catch (er) { alert(er.message); }
 }
 
 /* ---- lista de espera ---- */

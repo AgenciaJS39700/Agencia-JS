@@ -22,6 +22,7 @@
 
 import { correo, marco, boton, esc } from "./correo.js";
 import { confirmaEntrada } from "./eventos.js";
+import { emitirFactura, facturaHTML } from "./facturas.js";
 
 const STRIPE = "https://api.stripe.com/v1";
 const DIAS_SESION = 120;
@@ -637,7 +638,7 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
     const id = +url.searchParams.get("id") || 0;
     const p = await env.CITAS.prepare("SELECT * FROM pagos WHERE id = ?1 AND slug = ?2 AND alumno_id = ?3 AND estado = 'pagado'").bind(id, cfg.slug, alumna.id).first();
     if (!p) return r({ error: "Factura no encontrada." }, 404);
-    if (!p.numero) p.numero = await numeraFactura(env, cfg, null, p.id);
+    if (!p.numero) p.numero = await emitirFactura(env, cfg, { id: p.id });
     return new Response(facturaHTML(cfg, p, alumna), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
   }
 
@@ -758,75 +759,12 @@ async function aplicaPago(env, cfg, s) {
     await env.CITAS.prepare("UPDATE promos SET usados = usados + 1 WHERE slug = ?1 AND codigo = ?2").bind(cfg.slug, md.promo).run();
     await env.CITAS.prepare("UPDATE pagos SET promo = ?2 WHERE stripe_id = ?1").bind(s.id, md.promo).run();
   }
-  await numeraFactura(env, cfg, s.id);
+  await emitirFactura(env, cfg, { stripeId: s.id });
   const bonoId = await activarBono(env, cfg, alumnoId, prodId, { sub: sub, cust: cust });
   if (bonoId) await env.CITAS.prepare("UPDATE pagos SET bono_id = ?2 WHERE stripe_id = ?1").bind(s.id, bonoId).run();
   const a = await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1").bind(alumnoId).first();
   const b = await env.CITAS.prepare("SELECT * FROM bonos WHERE id = ?1").bind(bonoId).first();
   if (a && b) await correo(env, cfg, a.email, a.nombre, `Bono activado · ${cfg.negocio.nombre}`, correoBono(cfg, b, producto(cfg, prodId) || {}));
-}
-
-/* ---------------------------------------------------------------- facturas */
-/**
- * Pone número de factura a un pago ya cobrado. Correlativo por año y sin huecos,
- * que es lo que pide Hacienda. El contador se incrementa de forma atómica.
- */
-export async function numeraFactura(env, cfg, stripeId, pagoId) {
-  const año = hoyMadrid().slice(0, 4);
-  const serie = (cfg.factura && cfg.factura.serie ? cfg.factura.serie : "F") + año;
-  const donde = stripeId ? "stripe_id = ?1" : "id = ?1";
-  const clave = stripeId || pagoId;
-  const p = await env.CITAS.prepare(`SELECT id, numero FROM pagos WHERE slug = ?2 AND ${donde}`).bind(clave, cfg.slug).first();
-  if (!p || p.numero) return p ? p.numero : null;
-  await env.CITAS.prepare("INSERT INTO contador (slug, serie, n) VALUES (?1, ?2, 0) ON CONFLICT(slug, serie) DO NOTHING").bind(cfg.slug, serie).run();
-  await env.CITAS.prepare("UPDATE contador SET n = n + 1 WHERE slug = ?1 AND serie = ?2").bind(cfg.slug, serie).run();
-  const c = await env.CITAS.prepare("SELECT n FROM contador WHERE slug = ?1 AND serie = ?2").bind(cfg.slug, serie).first();
-  const numero = `${serie}-${String(c.n).padStart(4, "0")}`;
-  await env.CITAS.prepare("UPDATE pagos SET numero = ?2 WHERE id = ?1 AND numero IS NULL").bind(p.id, numero).run();
-  return numero;
-}
-
-/** Factura imprimible (el navegador la guarda como PDF con Imprimir → Guardar como PDF). */
-function facturaHTML(cfg, pago, alumna) {
-  const f = cfg.factura || {};
-  const base = f.iva ? Math.round(pago.importe / (1 + f.iva / 100)) : pago.importe;
-  const cuota = pago.importe - base;
-  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Factura ${esc(pago.numero || "")}</title><style>
-*{box-sizing:border-box}body{margin:0;background:#f4f4f6;font:15px/1.6 -apple-system,system-ui,"Segoe UI",sans-serif;color:#1a1a1a}
-.h{max-width:760px;margin:0 auto;padding:28px 20px}
-.p{background:#fff;border-radius:14px;padding:34px;box-shadow:0 10px 40px -24px rgba(0,0,0,.5)}
-.top{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;border-bottom:3px solid ${esc(cfg.color)};padding-bottom:18px;margin-bottom:22px}
-h1{font-size:22px;margin:0 0 4px}.mu{color:#666;font-size:13px}
-.n{text-align:right}.n b{font-size:18px;display:block}
-table{width:100%;border-collapse:collapse;margin:22px 0}
-th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #e6e6ea;font-size:14px}
-th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#666}
-td.r,th.r{text-align:right}
-.tot{display:flex;justify-content:flex-end}.tot table{width:auto;min-width:260px}
-.tot td{border:0;padding:5px 8px}.tot tr:last-child td{border-top:2px solid #1a1a1a;font-weight:800;font-size:17px;padding-top:10px}
-.pie{margin-top:26px;font-size:12px;color:#666;line-height:1.6}
-.btn{display:inline-block;margin:0 0 16px;background:${esc(cfg.color)};color:#fff;border:0;border-radius:999px;padding:11px 22px;font:inherit;font-weight:700;cursor:pointer}
-@media print{body{background:#fff}.h{padding:0}.p{box-shadow:none;border-radius:0;padding:0}.btn{display:none}}
-</style></head><body><div class="h">
-<button class="btn" onclick="window.print()">Imprimir o guardar en PDF</button>
-<div class="p">
- <div class="top">
-  <div><h1>${esc(f.nombre || cfg.negocio.nombre)}</h1>
-   <p class="mu">${esc(f.nif ? "NIF " + f.nif : "")}<br>${esc(f.direccion || cfg.negocio.direccion)}<br>${esc(cfg.negocio.telefono)}</p></div>
-  <div class="n"><span class="mu">Factura</span><b>${esc(pago.numero || "—")}</b>
-   <span class="mu">${esc(String(pago.fecha).slice(0, 10).split("-").reverse().join("/"))}</span></div>
- </div>
- <p class="mu">Facturar a</p>
- <p><b>${esc(alumna ? (alumna.nombre || alumna.email) : "Cliente")}</b><br><span class="mu">${esc(alumna ? alumna.email : "")}</span></p>
- <table><thead><tr><th>Concepto</th><th class="r">Importe</th></tr></thead>
-  <tbody><tr><td>${esc(pago.concepto)}${pago.promo ? ` <span class="mu">(código ${esc(pago.promo)})</span>` : ""}</td><td class="r">${euros(base)}</td></tr></tbody></table>
- <div class="tot"><table>
-  ${f.iva ? `<tr><td>Base imponible</td><td class="r">${euros(base)}</td></tr><tr><td>IVA ${f.iva} %</td><td class="r">${euros(cuota)}</td></tr>` : ""}
-  <tr><td>Total</td><td class="r">${euros(pago.importe)}</td></tr></table></div>
- <p class="pie">Forma de pago: ${esc(pago.metodo === "tarjeta" ? "tarjeta" : pago.metodo)}. Pagada el ${esc(String(pago.fecha).slice(0, 10).split("-").reverse().join("/"))}.
- ${f.exento ? "<br>" + esc(f.exento) : ""}</p>
-</div></div></body></html>`;
 }
 
 /* ---------------------------------------------------------------- lista de espera: avisar */
@@ -877,9 +815,20 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     const [bonos, citas, pagos] = await Promise.all([
       env.CITAS.prepare("SELECT * FROM bonos WHERE slug = ?1 AND alumno_id = ?2 ORDER BY id DESC LIMIT 20").bind(cfg.slug, id).all(),
       env.CITAS.prepare("SELECT codigo, servicio_n, fecha, inicio, estado, asistio FROM citas WHERE slug = ?1 AND alumno_id = ?2 ORDER BY fecha DESC, inicio DESC LIMIT 40").bind(cfg.slug, id).all(),
-      env.CITAS.prepare("SELECT concepto, importe, estado, metodo, fecha FROM pagos WHERE slug = ?1 AND alumno_id = ?2 ORDER BY id DESC LIMIT 30").bind(cfg.slug, id).all(),
+      env.CITAS.prepare("SELECT id, concepto, importe, estado, metodo, fecha, numero, tipo FROM pagos WHERE slug = ?1 AND alumno_id = ?2 ORDER BY id DESC LIMIT 30").bind(cfg.slug, id).all(),
     ]);
-    return res({ alumna: a, bonos: bonos.results || [], citas: (citas.results || []).map((c) => ({ ...c, hora: hhmm(c.inicio) })), pagos: pagos.results || [] });
+    // Lo facturado de verdad a esta alumna: suma de sus facturas emitidas (las
+    // rectificativas van en negativo, así que restan solas)
+    const fac = await env.CITAS.prepare(
+      "SELECT COALESCE(SUM(importe),0) AS total, COUNT(*) AS n FROM pagos WHERE slug = ?1 AND alumno_id = ?2 AND numero IS NOT NULL").bind(cfg.slug, id).first();
+    return res({ alumna: a, bonos: bonos.results || [], citas: (citas.results || []).map((c) => ({ ...c, hora: hhmm(c.inicio) })), pagos: pagos.results || [], facturado: fac || { total: 0, n: 0 } });
+  }
+
+  if (ruta === "panel/alumna/fiscal" && post) {
+    const b = await cuerpo();
+    await env.CITAS.prepare("UPDATE alumnos SET nif = ?3, direccion = ?4 WHERE id = ?1 AND slug = ?2")
+      .bind(+b.id || 0, cfg.slug, limpiar(b.nif, 20) || null, limpiar(b.direccion, 120) || null).run();
+    return res({ ok: true });
   }
 
   if (ruta === "panel/bono" && post) {
@@ -889,8 +838,10 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     if (!a || !p) return res({ error: "Alumna o bono no válidos" }, 400);
     const id = await activarBono(env, cfg, a.id, p.id, null);
     if (b.cobrar) {
-      await env.CITAS.prepare("INSERT INTO pagos (slug, alumno_id, bono_id, concepto, importe, estado, metodo) VALUES (?1,?2,?3,?4,?5,'pagado',?6)")
+      const r = await env.CITAS.prepare("INSERT INTO pagos (slug, alumno_id, bono_id, concepto, importe, estado, metodo) VALUES (?1,?2,?3,?4,?5,'pagado',?6)")
         .bind(cfg.slug, a.id, id, p.nombre, p.precio, limpiar(b.metodo, 20) || "efectivo").run();
+      // La factura se emite en el acto: así el libro nunca se queda con cobros sueltos
+      await emitirFactura(env, cfg, { id: r.meta.last_row_id });
     }
     return res({ ok: true, bono: id });
   }
@@ -915,9 +866,10 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
 
   if (ruta === "panel/pago" && post) {   // cobro a mano (efectivo, bizum, transferencia)
     const b = await cuerpo();
-    await env.CITAS.prepare("INSERT INTO pagos (slug, alumno_id, concepto, importe, estado, metodo) VALUES (?1,?2,?3,?4,'pagado',?5)")
+    const r = await env.CITAS.prepare("INSERT INTO pagos (slug, alumno_id, concepto, importe, estado, metodo) VALUES (?1,?2,?3,?4,'pagado',?5)")
       .bind(cfg.slug, +b.alumno || null, limpiar(b.concepto, 80) || "Cobro en el estudio", Math.max(0, Math.round(+b.importe || 0)), limpiar(b.metodo, 20) || "efectivo").run();
-    return res({ ok: true });
+    const numero = await emitirFactura(env, cfg, { id: r.meta.last_row_id });
+    return res({ ok: true, numero });
   }
 
   if (ruta === "panel/asistencia" && post) {
@@ -931,15 +883,6 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     const { results } = await env.CITAS.prepare(
       "SELECT * FROM espera WHERE slug = ?1 AND fecha >= date('now') ORDER BY fecha, inicio, id LIMIT 200").bind(cfg.slug).all();
     return res({ espera: (results || []).map((e) => ({ ...e, hora: hhmm(e.inicio) })) });
-  }
-
-  if (ruta === "panel/factura" && request.method === "GET") {
-    const id = +url.searchParams.get("id") || 0;
-    const p = await env.CITAS.prepare("SELECT * FROM pagos WHERE id = ?1 AND slug = ?2").bind(id, cfg.slug).first();
-    if (!p) return res({ error: "No encontrada" }, 404);
-    if (!p.numero && p.estado === "pagado") p.numero = await numeraFactura(env, cfg, null, p.id);
-    const a = p.alumno_id ? await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1").bind(p.alumno_id).first() : null;
-    return new Response(facturaHTML(cfg, p, a), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
   }
 
   if (ruta === "panel/promos" && request.method === "GET") {
