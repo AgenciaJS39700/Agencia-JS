@@ -25,7 +25,7 @@ import { correo, marco } from "./correo.js";
 import { atenderAlumnos, atenderPanelAlumnos, alumnaDeLaSesion, compruebaBono, avisarEspera, crearPagoEvento } from "./alumnos.js";
 import { atenderEventos, atenderPanelEventos } from "./eventos.js";
 import { atenderPanelFacturas } from "./facturas.js";
-import { recuperarAcceso, atenderRecados, atenderSustituciones, recadosDe, cambiosDe } from "./equipo-extra.js";
+import { recuperarAcceso, atenderRecados, atenderSustituciones, recadosDe, cambiosDe, dirigidoA } from "./equipo-extra.js";
 
 const conPrefijo = (t) => { const d = String(t || "").replace(/\D/g, ""); return d.length === 9 ? "34" + d : d; };
 
@@ -558,7 +558,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
         // El acumulado del mes es cuenta de resultados: recepción cuadra la caja del día
         mes: yo.rol === "panel" ? { nombre: mes, total: m.total, n: m.n } : null,
         pendientes: pend || { n: 0, total: 0 },
-        recados: recs.filter((r) => !r.leido).length,
+        recados: recs.filter((r) => !r.leido && dirigidoA(r, yo)).length,   // la misma cuenta que la pestaña Tablón
       });
     }
 

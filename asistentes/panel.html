@@ -31,6 +31,7 @@ h1{font-size:1.25rem;margin:0}h1 small{display:block;font-size:.78rem;color:var(
 .acc{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--c);outline-offset:2px}
 .bar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stats[hidden]{display:none!important}   /* con display:grid, el atributo hidden no oculta nada */
 .st{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:12px}.st b{display:block;font-size:1.5rem}.st span{color:var(--mu);font-size:.8rem}
 .dia{margin-top:18px}.dia h2{font-size:.95rem;margin:0 0 8px;color:var(--c);display:flex;justify-content:space-between}
 .dia h2 span{color:var(--mu);font-weight:500}
@@ -128,7 +129,7 @@ textarea{width:100%;min-height:84px;padding:.6rem .8rem;border-radius:12px;borde
       <h1 id="tit">Citas<small id="sub"></small></h1>
       <button class="btn sm" id="salir" type="button">Salir</button>
     </header>
-    <div class="stats" aria-live="polite">
+    <div class="stats" id="resumen" aria-live="polite">
       <div class="st"><b id="s-hoy">0</b><span>hoy</span></div>
       <div class="st"><b id="s-sem">0</b><span>próx. 7 días</span></div>
       <div class="st"><b id="s-onl">0</b><span>reservadas solas</span></div>
@@ -570,6 +571,8 @@ $("tabs").addEventListener("click", (e) => {
   Object.entries(VISTAS).forEach(([k, id]) => { $(id).hidden = k !== pestana; });
   // los botones de la agenda solo valen en la agenda
   ["b-nueva", "b-cerrar", "b-sust", "b-cal", "b-ant", "b-sig"].forEach((id) => { $(id).hidden = pestana !== "agenda"; });
+  // En «Hoy» el resumen de arriba sobra: repite lo mismo con otras palabras
+  $("resumen").hidden = pestana === "hoy";
   if (negocio && negocio.avanzado) $("vista").hidden = pestana !== "agenda";
   if (pestana === "hoy") verHoy();
   if (pestana === "recados") verRecados();

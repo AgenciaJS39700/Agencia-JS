@@ -80,7 +80,7 @@ export async function recuperarAcceso(env, cfg, ruta, b) {
 /* ---------------------------------------------------------------- recados del equipo */
 
 /** ¿Este recado va dirigido a esta persona? (lo que cuenta como «sin leer»). */
-const dirigidoA = (r, yo) =>
+export const dirigidoA = (r, yo) =>
   r.para === "todos" ||
   (r.para === "profes" && yo.rol === "profe") ||
   (r.para === "gestion" && (yo.rol === "panel" || yo.rol === "recepcion")) ||
