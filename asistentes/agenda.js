@@ -150,7 +150,7 @@ async function quienEs(env, cfg, usuario, clave, roles) {
 }
 
 /** Partes del panel que solo ve quien gestiona el estudio, no recepción. */
-const SOLO_DUENA = (ruta) => ruta.startsWith("panel/factura") || ruta === "panel/equipo" || ruta === "panel/stats";
+const SOLO_DUENA = (ruta) => ruta.startsWith("panel/factura") || ruta === "panel/equipo" || ruta === "panel/stats" || ruta === "panel/horas";
 
 /** Deja constancia del último acceso, sin hacer esperar a quien entra. */
 function visto(env, cfg, nombre, ctx) {
@@ -474,7 +474,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     }
     // Rutas que se abren como enlace (descarga o suscripción), donde la clave no
     // puede ir en una cabecera y viaja en ?k=
-    const porURL = ruta === "agenda.ics" || ruta === "panel/exportar" || ruta === "panel/facturacion/csv" || ruta === "panel/factura";
+    const porURL = ruta === "agenda.ics" || ruta === "panel/exportar" || ruta === "panel/facturacion/csv" || ruta === "panel/factura" || ruta === "panel/lista";
     // El navegador manda «Bearer usuario:contraseña»; los enlaces de descarga, ?u= y ?k=
     const cab = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     const corte = cab.indexOf(":");
@@ -518,6 +518,125 @@ export async function atenderAgenda(request, env, ctx, limitar) {
                    prof: x.prof || "", da: sub && sub.prof ? sub.prof : x.prof || "", sustituida: !!(sub && sub.prof), nota: sub ? sub.nota || "" : "" };
         }),
       });
+    }
+
+    // Lo primero que ve la jefa al entrar: cómo va el día y cuánto hay en caja.
+    // Si para saberlo hay que pasear por cuatro pestañas, no se mira nunca.
+    if (ruta === "panel/hoy" && request.method === "GET") {
+      const f = RE_FECHA.test(url.searchParams.get("fecha") || "") ? url.searchParams.get("fecha") : ahora().fecha;
+      const mes = f.slice(0, 7);
+      const [cam, cit, caja, mesT, pend, recs] = await Promise.all([
+        cambiosDe(env, cfg, f, f),
+        env.CITAS.prepare("SELECT servicio, inicio, estado, asistio FROM citas WHERE slug = ? AND fecha = ?").bind(cfg.slug, f).all(),
+        // Caja del día: por método, para cuadrar el cajón antes de cerrar
+        env.CITAS.prepare(
+          `SELECT COALESCE(metodo,'tarjeta') AS metodo, COUNT(*) AS n, COALESCE(SUM(importe),0) AS total
+           FROM pagos WHERE slug = ? AND estado = 'pagado' AND fecha = ? GROUP BY COALESCE(metodo,'tarjeta')`).bind(cfg.slug, f).all(),
+        env.CITAS.prepare("SELECT COALESCE(SUM(importe),0) AS total, COUNT(*) AS n FROM pagos WHERE slug = ? AND estado = 'pagado' AND substr(fecha,1,7) = ?").bind(cfg.slug, mes).all(),
+        env.CITAS.prepare("SELECT COUNT(*) AS n, COALESCE(SUM(importe),0) AS total FROM pagos WHERE slug = ? AND estado = 'pendiente'").bind(cfg.slug).first(),
+        recadosDe(env, cfg, yo).catch(() => []),
+      ]);
+      const citas = cit.results || [];
+      const clases = !porSesiones(cfg) ? [] : sesionesDia(cfg, f).map((x) => {
+        const sub = cam[`${f}|${x.inicio}|${x.s}`];
+        const g = citas.filter((c) => c.inicio === x.inicio && c.servicio === x.s && c.estado === "ok");
+        return { hora: x.h, inicio: x.inicio, nombre: x.nombre, sala: x.sala, servicio: x.s, plazas: x.cap,
+                 apuntadas: g.length, libres: Math.max(0, x.cap - g.length),
+                 da: sub && sub.prof ? sub.prof : x.prof || "", sustituida: !!(sub && sub.prof),
+                 pasadas: g.filter((c) => c.asistio !== null).length };
+      });
+      const m = (mesT.results || [])[0] || { total: 0, n: 0 };
+      return res({
+        fecha: f, dia: legible(f), sesiones: porSesiones(cfg),
+        clases,
+        ocupacion: clases.length ? Math.round((clases.reduce((s, c) => s + c.apuntadas, 0) / clases.reduce((s, c) => s + c.plazas, 0)) * 100) : 0,
+        reservas: citas.filter((c) => c.estado === "ok").length,
+        anuladas: citas.filter((c) => c.estado === "cancelada").length,
+        sinPasar: clases.filter((c) => c.apuntadas && !c.pasadas).length,
+        caja: caja.results || [],
+        cajaTotal: (caja.results || []).reduce((s, x) => s + x.total, 0),
+        // El acumulado del mes es cuenta de resultados: recepción cuadra la caja del día
+        mes: yo.rol === "panel" ? { nombre: mes, total: m.total, n: m.n } : null,
+        pendientes: pend || { n: 0, total: 0 },
+        recados: recs.filter((r) => !r.leido).length,
+      });
+    }
+
+    // La lista de una clase en papel, para colgarla en la sala o llevarla a mano
+    // cuando el móvil se queda sin batería a mitad de clase.
+    if (ruta === "panel/lista" && request.method === "GET") {
+      const f = RE_FECHA.test(url.searchParams.get("fecha") || "") ? url.searchParams.get("fecha") : ahora().fecha;
+      const ini = +url.searchParams.get("inicio") || 0;
+      const sv = String(url.searchParams.get("servicio") || "");
+      const ses = porSesiones(cfg) ? sesionesDia(cfg, f).find((x) => x.inicio === ini && x.s === sv) : null;
+      if (!ses) return res({ error: "Esa clase no está en el horario de ese día." }, 404);
+      const [g, cam, nt] = await Promise.all([
+        env.CITAS.prepare(
+          `SELECT c.nombre, c.telefono, c.email, c.estado, a.nota_interna
+           FROM citas c LEFT JOIN alumnos a ON a.id = c.alumno_id
+           WHERE c.slug = ? AND c.fecha = ? AND c.inicio = ? AND c.servicio = ? AND c.estado = 'ok'
+           ORDER BY c.nombre`).bind(cfg.slug, f, ini, sv).all(),
+        cambiosDe(env, cfg, f, f),
+        env.CITAS.prepare("SELECT email, telefono, nota_interna FROM alumnos WHERE slug = ? AND nota_interna IS NOT NULL AND nota_interna <> ''").bind(cfg.slug).all().catch(() => ({ results: [] })),
+      ]);
+      const xM = {}, xT = {};
+      for (const a2 of nt.results || []) {
+        if (a2.email) xM[String(a2.email).toLowerCase()] = a2.nota_interna;
+        if (a2.telefono) xT[String(a2.telefono)] = a2.nota_interna;
+      }
+      const sub = cam[`${f}|${ini}|${sv}`];
+      const gente = g.results || [];
+      const filas = gente.map((c, i) => {
+        const nota = c.nota_interna || xM[String(c.email || "").toLowerCase()] || xT[String(c.telefono || "")] || "";
+        return `<tr><td class="num">${i + 1}</td><td>${esc(c.nombre)}${nota ? `<div class="av">⚠︎ ${esc(nota)}</div>` : ""}</td><td>${esc(c.telefono || "")}</td><td class="fir"></td></tr>`;
+      }).join("");
+      const libres = Math.max(0, ses.cap - gente.length);
+      const html = `<!doctype html><html lang="es"><head><meta charset="utf-8">
+<title>${esc(ses.nombre)} · ${esc(f)}</title>
+<style>
+*{box-sizing:border-box}body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#111;margin:0;padding:24px;background:#fff}
+h1{font-size:1.35rem;margin:0 0 .15rem}.sub{color:#555;margin:0 0 1rem}
+table{width:100%;border-collapse:collapse;margin-top:.5rem}
+th,td{border-bottom:1px solid #ddd;padding:.5rem .4rem;text-align:left;vertical-align:top}
+th{background:#f3f3f3;font-size:.85rem;text-transform:uppercase;letter-spacing:.03em}
+.num{width:2.2rem;color:#777}.fir{width:38%}.av{color:#8a5b00;font-size:.82rem;font-weight:600}
+.pie{margin-top:1.2rem;color:#666;font-size:.85rem}
+@media print{body{padding:0}.no{display:none}}
+button{margin-bottom:1rem;padding:.55rem 1rem;border:1px solid #bbb;border-radius:9px;background:#fff;font:inherit;cursor:pointer}
+</style></head><body>
+<button class="no" onclick="window.print()" type="button">Imprimir</button>
+<h1>${esc(ses.nombre)}</h1>
+<p class="sub">${esc(legible(f))} · ${esc(ses.h)} · ${esc(ses.sala || "")} · ${esc(sub && sub.prof ? sub.prof : ses.prof || "")}${sub && sub.prof ? " (sustituye)" : ""}<br>
+${gente.length} de ${ses.cap} plazas · ${libres} libre${libres === 1 ? "" : "s"}</p>
+<table><thead><tr><th class="num">#</th><th>Alumna</th><th>Teléfono</th><th>Firma</th></tr></thead>
+<tbody>${filas || '<tr><td colspan="4">Nadie apuntado todavía.</td></tr>'}</tbody></table>
+<p class="pie">${esc(cfg.negocio?.nombre || "")} · lista sacada el ${esc(ahora().fecha)}. Los avisos marcados son información interna: no se deja a la vista de las alumnas.</p>
+</body></html>`;
+      return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+    }
+
+    // Clases y horas de cada profesor en un mes, contando sustituciones:
+    // es lo que hace falta para pagarles sin discutir.
+    if (ruta === "panel/horas" && request.method === "GET") {
+      const mes = /^\d{4}-\d{2}$/.test(url.searchParams.get("mes") || "") ? url.searchParams.get("mes") : ahora().fecha.slice(0, 7);
+      if (!porSesiones(cfg)) return res({ mes, sesiones: false, profes: [] });
+      const desde = mes + "-01", hasta = mes + "-31";
+      const cam = await cambiosDe(env, cfg, desde, hasta);
+      const cuenta = {};
+      const suma = (quien, min, sust) => {
+        if (!quien) return;
+        const p = (cuenta[quien] = cuenta[quien] || { nombre: quien, clases: 0, min: 0, sustituciones: 0 });
+        p.clases++; p.min += min; if (sust) p.sustituciones++;
+      };
+      for (let f = desde; f <= hasta && f.slice(0, 7) === mes; f = sumar(f, 1)) {
+        for (const x of sesionesDia(cfg, f)) {
+          const sub = cam[`${f}|${x.inicio}|${x.s}`];
+          suma(sub && sub.prof ? sub.prof : x.prof, x.min, !!(sub && sub.prof));
+        }
+      }
+      const profes = Object.values(cuenta).sort((a, b) => b.min - a.min)
+        .map((p) => ({ ...p, horas: Math.round((p.min / 60) * 10) / 10 }));
+      return res({ mes, sesiones: true, profes, totalHoras: Math.round((profes.reduce((s, p) => s + p.min, 0) / 60) * 10) / 10 });
     }
 
     if (ruta === "panel/citas" && request.method === "GET") {

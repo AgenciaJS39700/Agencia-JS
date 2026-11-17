@@ -897,6 +897,38 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     return res({ ok: true });
   }
 
+  // Quién debe dinero y quién va a quedarse colgada: el agujero que no se ve
+  // hasta que alguien se planta en recepción sin bono.
+  if (ruta === "panel/deudas" && request.method === "GET") {
+    const hoy = hoyMadrid();
+    const [pend, sin, colgadas] = await Promise.all([
+      env.CITAS.prepare(
+        `SELECT p.id, p.concepto, p.importe, p.fecha, p.metodo, a.id AS alumna_id, a.nombre AS alumna, a.telefono, a.email
+         FROM pagos p LEFT JOIN alumnos a ON a.id = p.alumno_id
+         WHERE p.slug = ?1 AND p.estado = 'pendiente' ORDER BY p.fecha LIMIT 100`).bind(cfg.slug).all(),
+      // Tiene clase reservada y no tiene ningún bono en vigor: viene sin pagar
+      env.CITAS.prepare(
+        `SELECT a.id, a.nombre, a.telefono, a.email, COUNT(c.id) AS reservas, MIN(c.fecha) AS proxima
+         FROM alumnos a JOIN citas c ON c.alumno_id = a.id AND c.estado = 'ok' AND c.fecha >= ?2
+         WHERE a.slug = ?1 AND NOT EXISTS (SELECT 1 FROM bonos b WHERE b.alumno_id = a.id AND b.estado = 'activo' AND b.fin >= ?2)
+         GROUP BY a.id ORDER BY proxima LIMIT 60`).bind(cfg.slug, hoy).all(),
+      // Tiene bono, pero se le termina antes de las clases que ya tiene cogidas
+      env.CITAS.prepare(
+        `SELECT a.id, a.nombre, a.telefono, a.email, b.nombre AS bono, b.fin, b.recurrente,
+                (SELECT COUNT(*) FROM citas c WHERE c.alumno_id = a.id AND c.estado = 'ok' AND c.fecha > b.fin) AS despues
+         FROM bonos b JOIN alumnos a ON a.id = b.alumno_id
+         WHERE b.slug = ?1 AND b.estado = 'activo' AND b.fin >= ?2 AND b.recurrente = 0
+         ORDER BY b.fin LIMIT 60`).bind(cfg.slug, hoy).all(),
+    ]);
+    const p = pend.results || [];
+    return res({
+      pendientes: p,
+      pendienteTotal: p.reduce((s, x) => s + (x.importe || 0), 0),
+      sinBono: sin.results || [],
+      colgadas: (colgadas.results || []).filter((x) => x.despues > 0),
+    });
+  }
+
   if (ruta === "panel/pagos" && request.method === "GET") {
     const desde = String(url.searchParams.get("desde") || "").match(/^\d{4}-\d{2}-\d{2}$/) ? url.searchParams.get("desde") : sumarDias(hoyMadrid(), -30);
     const { results } = await env.CITAS.prepare(

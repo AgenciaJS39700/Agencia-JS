@@ -144,6 +144,7 @@ textarea{width:100%;min-height:84px;padding:.6rem .8rem;border-radius:12px;borde
       <button class="btn" id="b-sig" type="button" aria-label="Semanas siguientes">›</button>
     </div>
     <nav class="tabs" id="tabs" role="tablist" hidden>
+      <button type="button" data-t="hoy" role="tab" aria-selected="false">Hoy</button>
       <button type="button" data-t="agenda" role="tab" aria-selected="true">Agenda</button>
       <button type="button" data-t="recados" role="tab" aria-selected="false">Tablón <span id="pinta-sin" class="eti" hidden></span></button>
       <button type="button" data-t="alumnas" role="tab" aria-selected="false">Alumnas</button>
@@ -153,6 +154,7 @@ textarea{width:100%;min-height:84px;padding:.6rem .8rem;border-radius:12px;borde
       <button type="button" data-t="equipo" role="tab" aria-selected="false">Equipo y claves</button>
     </nav>
     <div id="lista" aria-live="polite"></div>
+    <div id="vHoy" hidden></div>
     <div id="vRecados" hidden></div>
     <div id="vAlumnas" hidden></div>
     <div id="vPagos" hidden></div>
@@ -380,6 +382,13 @@ async function cargar() {
   }
   $("login").hidden = true; $("app").hidden = false;
   $("tabs").hidden = !negocio.gestion;
+  // Al entrar se aterriza en «Hoy»: cómo va el día y qué hay pendiente, antes
+  // de ponerse a buscar nada. Solo la primera vez, para no pisar la navegación.
+  if (negocio.gestion && !aterrizado) {
+    aterrizado = true;
+    const h = $("tabs").querySelector('button[data-t="hoy"]');
+    if (h) h.click();   // sin return: la agenda sigue pintándose detrás
+  }
   const ok = d.citas.filter((c) => c.estado === "ok"), hoy = hoyISO(), fin7 = sumar(hoy, 6);
   $("s-hoy").textContent = ok.filter((c) => c.fecha === hoy).length;
   $("s-sem").textContent = ok.filter((c) => c.fecha >= hoy && c.fecha <= fin7).length;
@@ -550,9 +559,9 @@ $("copiar").onclick = async () => { try { await navigator.clipboard.writeText($(
 /* Alumnas, cobros y lista de espera: lo que antes había que mirar en una plataforma aparte. */
 const eur = (c) => (c / 100).toLocaleString("es-ES", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }) + " €";
 const corto = (f) => String(f || "").slice(0, 10).split("-").reverse().join("/");
-let pestana = "agenda", alumnaAbierta = 0;
+let pestana = "agenda", alumnaAbierta = 0, aterrizado = false;
 
-const VISTAS = { agenda: "lista", recados: "vRecados", alumnas: "vAlumnas", pagos: "vPagos", facturas: "vFacturas", espera: "vEspera", equipo: "vEquipo" };
+const VISTAS = { hoy: "vHoy", agenda: "lista", recados: "vRecados", alumnas: "vAlumnas", pagos: "vPagos", facturas: "vFacturas", espera: "vEspera", equipo: "vEquipo" };
 $("tabs").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-t]");
   if (!b) return;
@@ -562,6 +571,7 @@ $("tabs").addEventListener("click", (e) => {
   // los botones de la agenda solo valen en la agenda
   ["b-nueva", "b-cerrar", "b-sust", "b-cal", "b-ant", "b-sig"].forEach((id) => { $(id).hidden = pestana !== "agenda"; });
   if (negocio && negocio.avanzado) $("vista").hidden = pestana !== "agenda";
+  if (pestana === "hoy") verHoy();
   if (pestana === "recados") verRecados();
   if (pestana === "alumnas") verAlumnas();
   if (pestana === "pagos") verPagos();
@@ -698,6 +708,87 @@ $("fb").addEventListener("submit", async (e) => {
 });
 
 /* ---- cobros ---- */
+/* ---- hoy ----
+   La pantalla de entrada: cómo va el día, qué falta por hacer y cuánto hay en
+   caja. Si para saber cómo va el día hay que pasear por cuatro pestañas, nadie
+   lo mira. */
+const METODO = { efectivo: "efectivo", tarjeta: "tarjeta", bizum: "Bizum", transferencia: "transferencia", stripe: "tarjeta (online)" };
+async function verHoy() {
+  $("vHoy").innerHTML = '<p class="vacio">Cargando…</p>';
+  const [d, deu] = await Promise.all([api("panel/hoy"), api("panel/deudas").catch(() => null)]);
+  const duena = !yo || yo.rol === "panel";
+  const pend = deu ? deu.pendientes.length : 0;
+  const avisos = [];
+  if (d.recados) avisos.push(`<button class="btn sm" type="button" data-ir="recados">${d.recados === 1 ? "1 recado sin leer" : d.recados + " recados sin leer"}</button>`);
+  if (d.sinPasar) avisos.push(`<button class="btn sm" type="button" data-ir="agenda">${d.sinPasar === 1 ? "1 clase sin pasar lista" : d.sinPasar + " clases sin pasar lista"}</button>`);
+  if (pend) avisos.push(`<button class="btn sm" type="button" data-ir="pagos">${pend === 1 ? "1 cobro pendiente" : pend + " cobros pendientes"} · ${eur(deu.pendienteTotal)}</button>`);
+  if (deu && deu.sinBono.length) avisos.push(`<button class="btn sm" type="button" data-deu="1">${deu.sinBono.length === 1 ? "1 alumna reserva sin bono" : deu.sinBono.length + " alumnas reservan sin bono"}</button>`);
+  if (deu && deu.colgadas.length) avisos.push(`<button class="btn sm" type="button" data-deu="1">${deu.colgadas.length === 1 ? "1 bono se termina antes de sus clases" : deu.colgadas.length + " bonos se terminan antes de sus clases"}</button>`);
+
+  $("vHoy").innerHTML =
+    `<div class="stats">
+      <div class="st"><b>${d.reservas}</b><span>reservas hoy</span></div>
+      <div class="st"><b>${d.ocupacion}%</b><span>de las plazas</span></div>
+      <div class="st"><b>${eur(d.cajaTotal)}</b><span>en caja hoy</span></div>
+      ${duena && d.mes ? `<div class="st"><b>${eur(d.mes.total)}</b><span>cobrado este mes</span></div>` : ""}
+     </div>
+     <div class="bar bus"><input id="qHoy" placeholder="Buscar una alumna por nombre, correo o teléfono" style="flex:1;min-width:220px" aria-label="Buscar una alumna"></div>
+     ${avisos.length ? `<div class="bar" style="flex-wrap:wrap;gap:6px">${avisos.join("")}</div>` : '<p class="vacio">Nada pendiente ahora mismo.</p>'}
+     <section class="dia"><h2>${esc(d.dia)}<span>${d.clases.length === 1 ? "1 clase" : d.clases.length + " clases"}${d.anuladas ? " · " + d.anuladas + " anulada" + (d.anuladas === 1 ? "" : "s") : ""}</span></h2>
+      ${d.clases.length ? d.clases.map((c) => `<article class="cita">
+        <div class="h">${esc(c.hora)}<small>${c.apuntadas}/${c.plazas}</small></div>
+        <div><div class="n">${esc(c.nombre)}${c.sustituida ? '<span class="tag">sustituye</span>' : ""}${c.apuntadas && !c.pasadas ? '<span class="tag">sin pasar lista</span>' : ""}</div>
+         <div class="d">${esc(c.sala || "")}${c.da ? " · " + esc(c.da) : ""} · ${c.libres ? c.libres + " libre" + (c.libres === 1 ? "" : "s") : "completa"}</div></div>
+        <div class="acc"><a class="btn sm" href="/api/as/${slug}/panel/lista?fecha=${encodeURIComponent(d.fecha)}&inicio=${c.inicio}&servicio=${encodeURIComponent(c.servicio)}&${acc()}" target="_blank" rel="noopener">Lista en papel</a></div>
+       </article>`).join("") : '<p class="vacio">Hoy no hay clases en el cuadro.</p>'}
+     </section>
+     <section class="dia"><h2>Caja de hoy<span>${eur(d.cajaTotal)}</span></h2>
+      ${d.caja.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Forma de pago</th><th>Cobros</th><th>Importe</th></tr></thead><tbody>
+        ${d.caja.map((x) => `<tr><td>${esc(METODO[x.metodo] || x.metodo)}</td><td>${x.n}</td><td>${eur(x.total)}</td></tr>`).join("")}
+        </tbody></table></div><p class="vacio">El efectivo y el Bizum son lo que tiene que cuadrar con el cajón al cerrar.</p>`
+       : '<p class="vacio">Hoy no ha entrado ningún cobro.</p>'}
+     </section>
+     ${duena ? `<section class="dia" id="hHoras"><h2>Horas del equipo<span>cargando…</span></h2></section>` : ""}`;
+
+  const q = $("qHoy");
+  if (q) q.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" || !q.value.trim()) return;
+    const t = $("tabs").querySelector('button[data-t="alumnas"]');
+    if (t) { t.click(); verAlumnas(q.value.trim()); }
+  });
+  $("vHoy").querySelectorAll("button[data-ir]").forEach((b) => b.addEventListener("click", () => {
+    const t = $("tabs").querySelector(`button[data-t="${b.dataset.ir}"]`); if (t) t.click();
+  }));
+  $("vHoy").querySelectorAll("button[data-deu]").forEach((b) => b.addEventListener("click", () => verDeudas(deu)));
+  if (duena) api("panel/horas").then((h) => {
+    const s = $("hHoras"); if (!s) return;
+    s.innerHTML = `<h2>Horas del equipo<span>${h.totalHoras || 0} h este mes</span></h2>` +
+      (h.profes && h.profes.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Profesor</th><th>Clases</th><th>Horas</th><th>Sustituciones</th></tr></thead><tbody>
+        ${h.profes.map((p) => `<tr><td>${esc(p.nombre)}</td><td>${p.clases}</td><td>${p.horas} h</td><td>${p.sustituciones || "—"}</td></tr>`).join("")}
+       </tbody></table></div><p class="vacio">Cuenta el cuadro de clases del mes con las sustituciones ya aplicadas.</p>` : '<p class="vacio">Sin clases en el cuadro este mes.</p>');
+  }).catch(() => { const s = $("hHoras"); if (s) s.innerHTML = '<h2>Horas del equipo</h2><p class="vacio">No se han podido calcular.</p>'; });
+}
+function verDeudas(d) {
+  if (!d) return;
+  const fila = (a, extra) => `<div class="fila" data-alum="${a.id}"><div><b>${esc(a.nombre || "—")}</b><span>${esc(a.telefono || a.email || "")}${extra ? " · " + extra : ""}</span></div>
+    <div><button class="btn sm" type="button" data-alum2="${a.id}">Ver ficha</button></div></div>`;
+  const h = `<h2>Quién debe dinero o se queda sin bono<span>${d.pendientes.length + d.sinBono.length + d.colgadas.length}</span></h2>
+    ${d.pendientes.length ? `<p class="d"><b>Cobros pendientes · ${eur(d.pendienteTotal)}</b></p>` + d.pendientes.map((p) => fila({ id: p.alumna_id, nombre: p.alumna, telefono: p.telefono, email: p.email }, esc(p.concepto) + " · " + eur(p.importe))).join("") : ""}
+    ${d.sinBono.length ? `<p class="d"><b>Tienen clase cogida y no tienen bono en vigor</b></p>` + d.sinBono.map((a) => fila(a, (a.reservas === 1 ? "1 clase" : a.reservas + " clases") + " · la primera el " + corto(a.proxima))).join("") : ""}
+    ${d.colgadas.length ? `<p class="d"><b>El bono se les termina antes de las clases que ya tienen</b></p>` + d.colgadas.map((a) => fila(a, esc(a.bono) + " acaba el " + corto(a.fin) + " · " + (a.despues === 1 ? "1 clase después" : a.despues + " clases después"))).join("") : ""}`;
+  const s = document.createElement("section");
+  s.className = "dia"; s.innerHTML = h;
+  const vieja = $("vHoy").querySelector("#hDeudas");
+  if (vieja) vieja.remove();
+  s.id = "hDeudas";
+  $("vHoy").appendChild(s);
+  s.querySelectorAll("button[data-alum2]").forEach((b) => b.addEventListener("click", () => {
+    const t = $("tabs").querySelector('button[data-t="alumnas"]');
+    if (t) { t.click(); verAlumna(+b.dataset.alum2); }
+  }));
+  s.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 async function verPagos() {
   const d = await api("panel/pagos");
   $("vPagos").innerHTML =
@@ -839,6 +930,7 @@ async function verSust() {
           ${(d.equipo || []).map((n) => `<option value="${esc(n)}"${n === c.da ? " selected" : ""}>${esc(n)}</option>`).join("")}
         </select>
         ${c.sustituida ? `<button class="btn sm" type="button" data-quitar="${c.inicio}|${esc(c.servicio)}">Volver al cartel</button>` : ""}
+        <a class="btn sm" href="/api/as/${slug}/panel/lista?fecha=${encodeURIComponent(d.fecha)}&inicio=${c.inicio}&servicio=${encodeURIComponent(c.servicio)}&${acc()}" target="_blank" rel="noopener">Lista en papel</a>
       </div></div>`).join("")
       : '<p class="vacio">Ese día no hay clases en el cuadro.</p>');
   $("sd-fecha").onchange = (e) => { diaSust = e.target.value; verSust(); };
@@ -1032,7 +1124,11 @@ $("vEquipo").addEventListener("submit", async (e) => {
 });
 
 if (usuario && clave) cargar().catch(() => salir()); else $("usuario").focus();
-setInterval(() => { if (usuario && clave && !document.hidden && !document.querySelector("dialog[open]")) cargar().catch(() => {}); }, 60000);
+setInterval(() => {
+  if (!usuario || !clave || document.hidden || document.querySelector("dialog[open]")) return;
+  cargar().catch(() => {});
+  if (pestana === "hoy") verHoy().catch(() => {});   // la pantalla de entrada también se refresca sola
+}, 60000);
 </script>
 <script src="/accesibilidad.js" defer></script>
 </body>
