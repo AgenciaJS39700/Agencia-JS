@@ -78,6 +78,43 @@ function mismoSitio(origen, url, cfg) {
   return (cfg.dominios || []).some((d) => { try { return new URL(d).host === host; } catch (e) { return false; } });
 }
 
+/* ---------------------------------------------------------------- accesos del equipo
+   Quién puede entrar y con qué clave. Hay dos sitios donde puede estar una clave:
+   el archivo del cliente (la de partida) y la tabla `accesos` de la base de datos
+   (las que el propio negocio cambia desde el panel). La base de datos MANDA: si
+   alguien aparece ahí, su línea del archivo deja de valer. Así se cambia una clave
+   o se da de baja a una persona sin tocar el código ni volver a publicar. */
+async function equipo(env, cfg) {
+  let filas = [];
+  try {
+    const r = await env.CITAS.prepare("SELECT nombre, rol, hash, activo, visto FROM accesos WHERE slug = ?").bind(cfg.slug).all();
+    filas = r.results || [];
+  } catch (e) { /* tabla aún sin crear: seguimos con el archivo */ }
+  const gobierna = new Set(filas.map((f) => f.nombre));
+  const lista = filas.map((f) => ({ nombre: f.nombre, rol: f.rol === "panel" ? "panel" : "profe", hash: f.hash, activo: !!f.activo, visto: f.visto, propia: true }));
+  const delArchivo = [];
+  if (cfg.panel && cfg.panel.hash) delArchivo.push({ nombre: cfg.panel.nombre || "Responsable", rol: "panel", hash: cfg.panel.hash });
+  for (const p of (cfg.panel && cfg.panel.equipo) || []) delArchivo.push({ nombre: p.nombre, rol: "panel", hash: p.hash });
+  for (const p of cfg.profes || []) delArchivo.push({ nombre: p.nombre, rol: "profe", hash: p.hash });
+  for (const p of delArchivo) if (p.hash && !gobierna.has(p.nombre)) lista.push({ ...p, activo: true, visto: null, propia: false });
+  return lista;
+}
+
+/** Devuelve a quién pertenece la clave, o null. Solo cuenta si está de alta. */
+async function quienEs(env, cfg, clave, rol) {
+  if (!clave) return null;
+  const suyo = await sha256(clave);
+  const l = await equipo(env, cfg);
+  return l.find((p) => p.activo && p.rol === rol && igual(suyo, p.hash)) || null;
+}
+
+/** Deja constancia del último acceso, sin hacer esperar a quien entra. */
+function visto(env, cfg, nombre, ctx) {
+  const t = new Date().toISOString();
+  const p = env.CITAS.prepare("UPDATE accesos SET visto = ?3 WHERE slug = ?1 AND nombre = ?2").bind(cfg.slug, nombre, t).run().catch(() => {});
+  if (ctx && ctx.waitUntil) ctx.waitUntil(p);
+}
+
 /** Minutos que faltan para una clase (negativo si ya ha pasado). */
 function faltan(fecha, inicio) {
   const ya = ahora();
@@ -372,9 +409,8 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     if (o && !mismoSitio(o, url, cfg)) return res({ error: "Origen no permitido" }, 403);
     const porURL = ruta === "agenda.ics" || ruta === "panel/exportar";
     const clave = porURL ? url.searchParams.get("k") : (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-    const hashes = cfg.panel ? [cfg.panel.hash, ...((cfg.panel.equipo || []).map((p) => p.hash))].filter(Boolean) : [];
-    const suyo = clave ? await sha256(clave) : "";
-    if (!clave || !hashes.some((h) => igual(suyo, h))) {
+    const yo = await quienEs(env, cfg, clave, "panel");
+    if (!yo) {
       if (!limitar(ip)) return res({ error: "Demasiados intentos. Espera unos minutos." }, 429);
       return res({ error: "Clave incorrecta" }, 401);
     }
@@ -400,7 +436,22 @@ export async function atenderAgenda(request, env, ctx, limitar) {
         env.CITAS.prepare("SELECT id, codigo, servicio, servicio_n, fecha, inicio, fin, nombre, telefono, email, nota, origen, estado, asistio, creada FROM citas WHERE slug = ? AND fecha BETWEEN ? AND ? ORDER BY fecha, inicio").bind(cfg.slug, desde, hasta),
         env.CITAS.prepare("SELECT id, fecha, inicio, fin, motivo FROM bloqueos WHERE slug = ? AND fecha BETWEEN ? AND ? ORDER BY fecha, inicio").bind(cfg.slug, desde, hasta),
       ]);
-      return res({ negocio: configPublica(cfg), desde, hasta, citas: c.results || [], bloqueos: b.results || [] });
+      visto(env, cfg, yo.nombre, ctx);
+      return res({ negocio: configPublica(cfg), yo: { nombre: yo.nombre, rol: yo.rol }, desde, hasta, citas: c.results || [], bloqueos: b.results || [] });
+    }
+    /* ---- equipo: quién entra y con qué clave ---- */
+    if (ruta === "panel/equipo" && request.method === "GET") {
+      const l = await equipo(env, cfg);
+      // Nombres que aparecen dando clase en el horario: sirve para avisar si una
+      // profesora está escrita de otra forma y por eso no vería ninguna clase.
+      const enHorario = new Set();
+      if (porSesiones(cfg)) for (const d of Object.values(cfg.negocio.sesiones || {})) for (const s of d || []) if (s && s.prof) enHorario.add(s.prof);
+      return res({
+        yo: yo.nombre,
+        horario: [...enHorario].sort((a, b2) => a.localeCompare(b2, "es")),
+        gente: l.map((p) => ({ nombre: p.nombre, rol: p.rol, activo: p.activo, visto: p.visto, propia: p.propia }))
+          .sort((a, b2) => (a.rol === b2.rol ? a.nombre.localeCompare(b2.nombre, "es") : a.rol === "panel" ? -1 : 1)),
+      });
     }
     const pa1 = await atenderPanelAlumnos(request, env, cfg, ruta, url);
     if (pa1) return pa1;
@@ -413,6 +464,42 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       if (ruta === "panel/push/alta") return (await altaMovil(env, cfg.slug, b.sub)) ? res({ ok: true }) : res({ error: "Suscripción no válida" }, 400);
       if (ruta === "panel/push/baja") { await bajaMovil(env, cfg.slug, b.endpoint); return res({ ok: true }); }
       if (ruta === "panel/push/prueba") { const n = await avisarMoviles(env, cfg.slug, "🔔 Aviso de prueba", "Así te llegarán las citas nuevas en este móvil."); return res({ ok: true, moviles: n }); }
+    }
+    if (ruta === "panel/equipo") {
+      const nombre = limpiar(b.nombre, 40);
+      if (nombre.length < 2) return res({ error: "Escribe el nombre de la persona." }, 400);
+      const l = await equipo(env, cfg);
+      const actual = l.find((p) => p.nombre === nombre);
+      const jefes = l.filter((p) => p.activo && p.rol === "panel");
+      const ultimoJefe = (n) => jefes.length <= 1 && jefes[0] && jefes[0].nombre === n;
+      const hoy = new Date().toISOString();
+
+      if (b.accion === "baja" || b.accion === "alta") {
+        if (!actual) return res({ error: "Esa persona no existe." }, 404);
+        if (b.accion === "baja") {
+          if (nombre === yo.nombre) return res({ error: "No puedes quitarte el acceso a ti misma. Que lo haga otra persona del equipo." }, 400);
+          if (ultimoJefe(nombre)) return res({ error: "Es la única persona que gestiona el estudio. Da de alta a otra antes de quitarle el acceso." }, 400);
+        }
+        const activo = b.accion === "alta" ? 1 : 0;
+        await env.CITAS.prepare(
+          "INSERT INTO accesos (slug, nombre, rol, hash, activo, creado) VALUES (?1, ?2, ?3, ?4, ?5, ?6) ON CONFLICT(slug, nombre) DO UPDATE SET activo = ?5"
+        ).bind(cfg.slug, nombre, actual.rol, actual.hash, activo, hoy).run();
+        return res({ ok: true });
+      }
+
+      // Sin rol en la petición (solo se cambia la clave), se queda con el que ya tenía.
+      const rol = b.rol === "panel" || b.rol === "profe" ? b.rol : actual ? actual.rol : "profe";
+      const clave = String(b.clave == null ? "" : b.clave).replace(/\s+/g, "");
+      if (actual && rol !== actual.rol && actual.rol === "panel" && ultimoJefe(nombre)) {
+        return res({ error: "Es la única persona que gestiona el estudio. Da de alta a otra antes de cambiarle el papel." }, 400);
+      }
+      if (!actual && !clave) return res({ error: "Ponle una clave para que pueda entrar." }, 400);
+      if (clave && (clave.length < 8 || clave.length > 60)) return res({ error: "La clave tiene que tener entre 8 y 60 caracteres, sin espacios." }, 400);
+      const hash = clave ? await sha256(clave) : actual.hash;
+      await env.CITAS.prepare(
+        "INSERT INTO accesos (slug, nombre, rol, hash, activo, creado) VALUES (?1, ?2, ?3, ?4, 1, ?5) ON CONFLICT(slug, nombre) DO UPDATE SET rol = ?3, hash = ?4, activo = 1"
+      ).bind(cfg.slug, nombre, rol, hash, hoy).run();
+      return res({ ok: true, nuevo: !actual });
     }
     if (ruta === "panel/cita") { const r = await reservar(env, cfg, b, "panel", ctx); return res(r, r.estado); }
     if (ruta === "panel/cancelar") { const c = await cancelar(env, cfg, "id = ?", [+b.id || 0], ctx, "negocio"); return c ? res({ ok: true }) : res({ error: "Cita no encontrada" }, 404); }
@@ -439,11 +526,22 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     const o = request.headers.get("Origin");
     if (o && !mismoSitio(o, url, cfg)) return res({ error: "Origen no permitido" }, 403);
     const clave = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-    const suyo = clave ? await sha256(clave) : "";
-    const profe = (cfg.profes || []).find((p) => igual(suyo, p.hash));
+    const profe = await quienEs(env, cfg, clave, "profe");
     if (!profe) {
       if (!limitar(ip)) return res({ error: "Demasiados intentos. Espera unos minutos." }, 429);
       return res({ error: "Clave incorrecta" }, 401);
+    }
+
+    /* Cada profesora cambia su propia clave sin tener que pedírselo a nadie. */
+    if (ruta === "profe/clave" && request.method === "POST") {
+      let b; try { b = await cuerpo(request); } catch (e) { return res({ error: "JSON no válido" }, 400); }
+      const nueva = String(b.nueva == null ? "" : b.nueva).replace(/\s+/g, "");
+      if (nueva.length < 8 || nueva.length > 60) return res({ error: "La clave nueva tiene que tener entre 8 y 60 caracteres, sin espacios." }, 400);
+      if (igual(await sha256(nueva), profe.hash)) return res({ error: "Esa es la clave que ya tienes." }, 400);
+      await env.CITAS.prepare(
+        "INSERT INTO accesos (slug, nombre, rol, hash, activo, creado) VALUES (?1, ?2, 'profe', ?3, 1, ?4) ON CONFLICT(slug, nombre) DO UPDATE SET hash = ?3, activo = 1"
+      ).bind(cfg.slug, profe.nombre, await sha256(nueva), new Date().toISOString()).run();
+      return res({ ok: true });
     }
 
     if (ruta === "profe/clases" && request.method === "GET") {
@@ -470,6 +568,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
           }),
         });
       }
+      visto(env, cfg, profe.nombre, ctx);
       return res({ profe: profe.nombre, negocio: cfg.negocio.nombre, color: cfg.color, desde, dias: dias2 });
     }
 

@@ -86,3 +86,18 @@ CREATE TABLE IF NOT EXISTS espera (
   creado TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS espera_clase ON espera(slug, fecha, inicio, servicio, avisado);
+
+-- Accesos del equipo (responsables y profesores).
+-- Lo que hay aquí MANDA sobre las claves escritas en el archivo del cliente:
+-- así se puede cambiar una clave o dar de baja a alguien sin tocar el código.
+CREATE TABLE IF NOT EXISTS accesos (
+  id     INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug   TEXT NOT NULL,
+  nombre TEXT NOT NULL,
+  rol    TEXT NOT NULL DEFAULT 'profe',   -- 'panel' (gestiona todo) | 'profe' (solo sus clases)
+  hash   TEXT NOT NULL,
+  activo INTEGER NOT NULL DEFAULT 1,
+  visto  TEXT,                            -- último acceso
+  creado TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS accesos_slug_nombre ON accesos (slug, nombre);

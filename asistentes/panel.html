@@ -130,11 +130,13 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <button type="button" data-t="alumnas" role="tab" aria-selected="false">Alumnas</button>
       <button type="button" data-t="pagos" role="tab" aria-selected="false">Cobros</button>
       <button type="button" data-t="espera" role="tab" aria-selected="false">Lista de espera</button>
+      <button type="button" data-t="equipo" role="tab" aria-selected="false">Equipo y claves</button>
     </nav>
     <div id="lista" aria-live="polite"></div>
     <div id="vAlumnas" hidden></div>
     <div id="vPagos" hidden></div>
     <div id="vEspera" hidden></div>
+    <div id="vEquipo" hidden></div>
   </section>
 </main>
 
@@ -267,7 +269,8 @@ async function cargar() {
   document.documentElement.style.setProperty("--c", negocio.color);
   document.title = "Citas · " + negocio.nombre;
   $("tit").firstChild.textContent = negocio.negocio.nombre;
-  $("sub").textContent = sem ? `Semana del ${largo(d.desde)}` : desde === hoyISO() ? "Próximas 2 semanas" : `Del ${largo(d.desde)} al ${largo(d.hasta)}`;
+  const cuandoTxt = sem ? `Semana del ${largo(d.desde)}` : desde === hoyISO() ? "Próximas 2 semanas" : `Del ${largo(d.desde)} al ${largo(d.hasta)}`;
+  $("sub").textContent = (d.yo && d.yo.nombre ? d.yo.nombre + " · " : "") + cuandoTxt;
   $("login").hidden = true; $("app").hidden = false;
   $("tabs").hidden = !negocio.gestion;
   const ok = d.citas.filter((c) => c.estado === "ok"), hoy = hoyISO(), fin7 = sumar(hoy, 6);
@@ -442,7 +445,7 @@ const eur = (c) => (c / 100).toLocaleString("es-ES", { minimumFractionDigits: c 
 const corto = (f) => String(f || "").slice(0, 10).split("-").reverse().join("/");
 let pestana = "agenda", alumnaAbierta = 0;
 
-const VISTAS = { agenda: "lista", alumnas: "vAlumnas", pagos: "vPagos", espera: "vEspera" };
+const VISTAS = { agenda: "lista", alumnas: "vAlumnas", pagos: "vPagos", espera: "vEspera", equipo: "vEquipo" };
 $("tabs").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-t]");
   if (!b) return;
@@ -455,6 +458,7 @@ $("tabs").addEventListener("click", (e) => {
   if (pestana === "alumnas") verAlumnas();
   if (pestana === "pagos") verPagos();
   if (pestana === "espera") verEspera();
+  if (pestana === "equipo") verEquipo();
 });
 
 /* ---- alumnas ---- */
@@ -553,6 +557,94 @@ async function verEspera() {
         <div>${e.avisado ? '<span class="eti ok">avisada</span>' : '<span class="eti">esperando</span>'}</div></div>`).join("")
     : '<p class="vacio">No hay nadie en lista de espera.</p>';
 }
+
+/* ---- equipo y claves ----
+   Una persona, una clave. Lo que se cambia aquí manda desde el momento en que se guarda. */
+let equipoAbierto = "";
+function cuando(t) {
+  if (!t) return "todavía no ha entrado";
+  const d = new Date(t), h = Math.round((Date.now() - d.getTime()) / 36e5);
+  if (h < 1) return "hace un momento";
+  if (h < 24) return "hace " + h + (h === 1 ? " hora" : " horas");
+  const dd = Math.round(h / 24);
+  return dd < 30 ? "hace " + dd + (dd === 1 ? " día" : " días") : "el " + corto(t);
+}
+async function verEquipo() {
+  const d = await api("panel/equipo");
+  const enHorario = d.horario || [];
+  const gente = d.gente.map((p) => {
+    const falta = p.rol === "profe" && p.activo && enHorario.length && enHorario.indexOf(p.nombre) < 0;
+    return `<div class="fila" style="cursor:default">
+      <div><b>${esc(p.nombre)}${p.nombre === d.yo ? ' <span class="tag">eres tú</span>' : ""}</b>
+        <span>${p.rol === "panel" ? "Gestiona el estudio: lo ve y lo cambia todo" : "Profesora: solo sus clases y pasar lista"} · ${p.activo ? "entró " + cuando(p.visto) : "sin acceso"}</span>
+        ${falta ? '<span style="color:#fca5a5">Con este nombre no aparece ninguna clase en el horario. Escríbelo igual que en el cuadro de clases.</span>' : ""}</div>
+      <div class="acc">
+        ${p.activo ? '<span class="eti ok">activa</span>' : '<span class="eti no">sin acceso</span>'}
+        <button class="btn sm" type="button" data-eq-clave="${esc(p.nombre)}">Cambiar clave</button>
+        ${p.activo
+          ? `<button class="btn sm" type="button" data-eq-baja="${esc(p.nombre)}"${p.nombre === d.yo ? " disabled title='Que te lo quite otra persona del equipo'" : ""}>Quitar acceso</button>`
+          : `<button class="btn sm" type="button" data-eq-alta="${esc(p.nombre)}">Devolver acceso</button>`}
+      </div>
+    </div>
+    ${equipoAbierto === p.nombre ? `<form class="box" data-eq-form="${esc(p.nombre)}" style="margin:-4px 0 12px">
+      <label for="eq-c">Clave nueva para ${esc(p.nombre)} <small>(mínimo 8 caracteres, sin espacios)</small></label>
+      <input id="eq-c" name="clave" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" required minlength="8" placeholder="Escribe la clave nueva">
+      <p class="msg" role="alert"></p>
+      <div class="bar" style="margin:10px 0 0"><button class="btn main" type="submit">Guardar la clave</button>
+        <button class="btn" type="button" data-eq-cerrar>Dejarlo</button></div>
+      <p class="vacio" style="margin-top:6px">Apúntala y dásela a ${esc(p.nombre)}. Aquí no se puede volver a ver: si se pierde, se pone otra.</p>
+    </form>` : ""}`;
+  }).join("");
+
+  $("vEquipo").innerHTML =
+    `<p class="vacio">Cada persona entra en <b>/panel</b> con su propia clave y el sistema la lleva a lo suyo: quien gestiona el estudio ve todo; una profesora ve solo sus clases y pasa lista. Cuando alguien se va, quítale el acceso aquí.</p>` +
+    gente +
+    `<form class="box" id="fEqNueva">
+      <h2>Añadir una persona</h2>
+      <div class="grid">
+        <div><label for="eq-n">Nombre</label><input id="eq-n" name="nombre" required maxlength="40" placeholder="Nombre de pila"></div>
+        <div><label for="eq-r">¿Qué puede hacer?</label><select id="eq-r" name="rol">
+          <option value="profe">Profesora: solo sus clases</option>
+          <option value="panel">Gestiona el estudio: todo</option></select></div>
+        <div class="full"><label for="eq-k">Su clave <small>(mínimo 8 caracteres, sin espacios)</small></label>
+          <input id="eq-k" name="clave" required minlength="8" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="La clave con la que entrará"></div>
+      </div>
+      <p class="msg" role="alert"></p>
+      <div class="bar" style="margin:12px 0 0"><button class="btn main" type="submit">Dar acceso</button></div>
+      ${enHorario.length ? `<p class="vacio">Para una profesora, el nombre tiene que ser el mismo que figura en el horario: ${enHorario.map(esc).join(", ")}.</p>` : ""}
+    </form>`;
+}
+
+$("vEquipo").addEventListener("click", async (e) => {
+  const c = e.target.closest("[data-eq-clave]"), b = e.target.closest("[data-eq-baja]"),
+        a = e.target.closest("[data-eq-alta]"), x = e.target.closest("[data-eq-cerrar]");
+  if (x) { equipoAbierto = ""; return verEquipo(); }
+  if (c) { equipoAbierto = equipoAbierto === c.dataset.eqClave ? "" : c.dataset.eqClave; await verEquipo(); const i = $("vEquipo").querySelector("[data-eq-form] input"); if (i) i.focus(); return; }
+  if (b) {
+    if (!confirm(`¿Quitarle el acceso a ${b.dataset.eqBaja}? Dejará de poder entrar ahora mismo. Podrás devolvérselo cuando quieras.`)) return;
+    try { await api("panel/equipo", { nombre: b.dataset.eqBaja, accion: "baja" }); } catch (er) { alert(er.message); }
+    return verEquipo();
+  }
+  if (a) {
+    try { await api("panel/equipo", { nombre: a.dataset.eqAlta, accion: "alta" }); } catch (er) { alert(er.message); }
+    return verEquipo();
+  }
+});
+
+$("vEquipo").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target, msg = f.querySelector(".msg"), b = f.querySelector("button[type=submit]");
+  const quien = f.dataset.eqForm;
+  msg.textContent = ""; msg.style.color = ""; b.disabled = true;
+  try {
+    if (quien) await api("panel/equipo", { nombre: quien, rol: undefined, clave: f.clave.value });
+    else await api("panel/equipo", { nombre: f.nombre.value.trim(), rol: f.rol.value, clave: f.clave.value });
+    equipoAbierto = "";
+    await verEquipo();
+  } catch (er) {
+    b.disabled = false; msg.style.color = "#fca5a5"; msg.textContent = er.message;
+  }
+});
 
 if (clave) cargar().catch(() => salir()); else $("clave").focus();
 setInterval(() => { if (clave && !document.hidden && !document.querySelector("dialog[open]")) cargar().catch(() => {}); }, 60000);

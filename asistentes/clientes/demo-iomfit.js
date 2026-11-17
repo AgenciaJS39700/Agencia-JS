@@ -131,6 +131,7 @@ export default {
   ],
   panel: {
     // Adriana, la responsable
+    nombre: "Adriana",
     hash: "4590dc9b187159b0a11fe80c528bb013ba41a3a024581b8a60f4c3f42c19d878",
     // Quien más gestione el estudio, cada uno con su clave
     equipo: [

@@ -72,6 +72,17 @@ a{color:var(--c)}
       <button class="btn sm" id="sig" type="button">Después ›</button>
     </div>
     <div id="lista" aria-live="polite"></div>
+
+    <section class="box" style="margin-top:24px">
+      <h2 style="margin:0 0 4px;font-size:1rem">Mi clave</h2>
+      <p style="color:var(--mu);font-size:.85rem;margin:0 0 12px">Es tuya y solo tuya: cámbiala cuando quieras. Al guardarla tendrás que volver a entrar en los demás aparatos.</p>
+      <form id="fClave">
+        <label for="nueva">Clave nueva <small>(mínimo 8 caracteres, sin espacios)</small></label>
+        <div style="display:flex;gap:8px"><input id="nueva" name="nueva" type="password" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" required minlength="8"><button class="btn" type="button" id="verN" aria-label="Mostrar la clave" aria-pressed="false">👁</button></div>
+        <p class="msg" role="alert" id="mc"></p>
+        <button class="btn main" type="submit" style="margin-top:10px">Guardar mi clave</button>
+      </form>
+    </section>
   </section>
 </main>
 
@@ -156,6 +167,24 @@ $("lista").addEventListener("click", async (e) => {
   const id = +(b.dataset.v || b.dataset.f), vino = !!b.dataset.v;
   const ya = b.getAttribute("aria-pressed") === "true";
   try { await api("profe/asistencia", { id, vino: ya ? null : vino }); await cargar(); } catch (er) {}
+});
+
+$("verN").onclick = () => { const i = $("nueva"), v = i.type === "password"; i.type = v ? "text" : "password"; $("verN").setAttribute("aria-pressed", String(v)); };
+$("fClave").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const b = $("fClave").querySelector("button[type=submit]"), m = $("mc");
+  const nueva = $("nueva").value.replace(/\s+/g, "");
+  m.style.color = ""; m.textContent = "";
+  if (nueva.length < 8) { m.textContent = "La clave tiene que tener al menos 8 caracteres."; return; }
+  b.disabled = true;
+  try {
+    await api("profe/clave", { nueva });
+    clave = nueva;
+    try { (localStorage.getItem(KEY) ? localStorage : sessionStorage).setItem(KEY, nueva); } catch (er) {}
+    $("nueva").value = "";
+    m.style.color = "#86efac"; m.textContent = "Guardada. A partir de ahora entra con esta.";
+  } catch (er) { m.textContent = er.message; }
+  b.disabled = false;
 });
 
 if (clave) cargar().catch(() => salir()); else $("clave").focus();
