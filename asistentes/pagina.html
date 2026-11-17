@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="text-scale" content="scale">
-<link rel="stylesheet" href="/accesibilidad.css">
+<link rel="stylesheet" href="/asistentes/accesibilidad.css">
 <title>Pedir cita</title>
 <meta name="description" content="Pide cita online a cualquier hora y resuelve tus dudas con el asistente.">
 <meta name="theme-color" content="#0f0f10">
@@ -118,6 +118,6 @@ async function iniciar() {
 function alertar() { app.innerHTML = '<p class="err">No hemos podido cargar la página de citas. Recarga en un momento.</p>'; app.removeAttribute("aria-busy"); }
 iniciar().catch(alertar);
 </script>
-<script src="/accesibilidad.js" defer></script>
+<script src="/asistentes/accesibilidad.js" defer></script>
 </body>
 </html>

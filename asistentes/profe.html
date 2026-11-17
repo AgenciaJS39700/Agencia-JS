@@ -7,6 +7,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0f0f10">
 <link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/asistentes/accesibilidad.css">
 <style>
 :root{--c:#e8c766;--bg:#0f0f10;--tx:#fafafa;--mu:#a1a1aa;--ln:rgba(255,255,255,.1);--card:#17171a;--ok:#22c55e;--no:#ef4444}
 *{box-sizing:border-box}
@@ -264,5 +265,6 @@ $("fClave").addEventListener("submit", async (e) => {
 
 if (usuario && clave) cargar().catch(() => salir()); else $("usuario").focus();
 </script>
+<script src="/asistentes/accesibilidad.js" defer></script>
 </body>
 </html>

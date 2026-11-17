@@ -220,6 +220,13 @@ export default {
       const r = await env.ASSETS.fetch(new Request(new URL("/asistentes/panel-sw.js", url), request));
       return new Response(r.body, { status: r.status, headers: { "Content-Type": "text/javascript; charset=utf-8", "Cache-Control": "no-cache" } });
     }
+    // El panel y la página de citas se sirven también desde el dominio del cliente,
+    // donde /accesibilidad.js no existe: se piden bajo /asistentes/, que sí se puentea.
+    const ac = url.pathname.match(/^\/asistentes\/accesibilidad\.(js|css)$/);
+    if (ac && env.ASSETS) {
+      const r = await env.ASSETS.fetch(new Request(new URL("/accesibilidad." + ac[1], url), request));
+      return new Response(r.body, { status: r.status, headers: { "Content-Type": ac[1] === "js" ? "text/javascript; charset=utf-8" : "text/css; charset=utf-8", "Cache-Control": "public, max-age=3600" } });
+    }
     const man = url.pathname.match(/^\/panel\/([a-z0-9-]{2,40})\/app\.webmanifest$/);
     if (man) return manifiesto(man[1]) || new Response("No encontrado", { status: 404 });
     const pag = url.pathname.match(/^\/(c|panel|profe)\/([a-z0-9-]{2,40})\/?$/);
