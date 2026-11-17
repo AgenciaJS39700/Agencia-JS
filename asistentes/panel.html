@@ -32,7 +32,12 @@ h1{font-size:1.25rem;margin:0}h1 small{display:block;font-size:.78rem;color:var(
 .bar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
 .stats[hidden]{display:none!important}   /* con display:grid, el atributo hidden no oculta nada */
-.st{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:12px}.st b{display:block;font-size:1.5rem}.st span{color:var(--mu);font-size:.8rem}
+/* Con 4 cifras, la rejilla de 3 deja una suelta y el importe se parte: que fluyan */
+.stats.flu{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.st{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:12px}.st b{display:block;font-size:1.5rem;white-space:nowrap}.st span{color:var(--mu);font-size:.8rem}
+@media(max-width:440px){.stats.flu{grid-template-columns:1fr 1fr}.stats.flu .st b{font-size:1.25rem}}
+/* En el móvil, las columnas de previsión se van: lo que se paga es lo dado */
+@media(max-width:560px){.tt .opt{display:none}}
 .dia{margin-top:18px}.dia h2{font-size:.95rem;margin:0 0 8px;color:var(--c);display:flex;justify-content:space-between}
 .dia h2 span{color:var(--mu);font-weight:500}
 .cita,.blq{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:start;padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--ln);margin-bottom:8px}
@@ -729,7 +734,7 @@ async function verHoy() {
   if (deu && deu.colgadas.length) avisos.push(`<button class="btn sm" type="button" data-deu="1">${deu.colgadas.length === 1 ? "1 bono se termina antes de sus clases" : deu.colgadas.length + " bonos se terminan antes de sus clases"}</button>`);
 
   $("vHoy").innerHTML =
-    `<div class="stats">
+    `<div class="stats flu">
       <div class="st"><b>${d.reservas}</b><span>reservas hoy</span></div>
       <div class="st"><b>${d.ocupacion}%</b><span>de las plazas</span></div>
       <div class="st"><b>${eur(d.cajaTotal)}</b><span>en caja hoy</span></div>
@@ -766,8 +771,8 @@ async function verHoy() {
   if (duena) api("panel/horas").then((h) => {
     const s = $("hHoras"); if (!s) return;
     s.innerHTML = `<h2>Horas del equipo<span>${h.totalHorasDadas || 0} h dadas · ${h.totalHoras || 0} h el mes entero</span></h2>` +
-      (h.profes && h.profes.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Profesor</th><th>Clases dadas</th><th>Horas dadas</th><th>Mes entero</th><th>Sustituciones</th></tr></thead><tbody>
-        ${h.profes.map((p) => `<tr><td>${esc(p.nombre)}</td><td>${p.dadas}</td><td>${p.horasDadas} h</td><td>${p.clases} clases · ${p.horas} h</td><td>${p.sustituciones || "—"}</td></tr>`).join("")}
+      (h.profes && h.profes.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Profesor</th><th>Clases</th><th>Horas</th><th class="opt">Mes entero</th><th class="opt">Sustituciones</th></tr></thead><tbody>
+        ${h.profes.map((p) => `<tr><td>${esc(p.nombre)}</td><td>${p.dadas}</td><td>${p.horasDadas} h</td><td class="opt">${p.clases} clases · ${p.horas} h</td><td class="opt">${p.sustituciones || "—"}</td></tr>`).join("")}
        </tbody></table></div><p class="vacio">«Dadas» es hasta hoy${h.hasta ? " (" + corto(h.hasta) + ")" : ""}, que es lo que se paga. «Mes entero» es lo que marca el cuadro de clases, con las sustituciones ya aplicadas.</p>` : '<p class="vacio">Sin clases en el cuadro este mes.</p>');
   }).catch(() => { const s = $("hHoras"); if (s) s.innerHTML = '<h2>Horas del equipo</h2><p class="vacio">No se han podido calcular.</p>'; });
 }
