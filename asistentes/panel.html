@@ -762,10 +762,10 @@ async function verHoy() {
   $("vHoy").querySelectorAll("button[data-deu]").forEach((b) => b.addEventListener("click", () => verDeudas(deu)));
   if (duena) api("panel/horas").then((h) => {
     const s = $("hHoras"); if (!s) return;
-    s.innerHTML = `<h2>Horas del equipo<span>${h.totalHoras || 0} h este mes</span></h2>` +
-      (h.profes && h.profes.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Profesor</th><th>Clases</th><th>Horas</th><th>Sustituciones</th></tr></thead><tbody>
-        ${h.profes.map((p) => `<tr><td>${esc(p.nombre)}</td><td>${p.clases}</td><td>${p.horas} h</td><td>${p.sustituciones || "—"}</td></tr>`).join("")}
-       </tbody></table></div><p class="vacio">Cuenta el cuadro de clases del mes con las sustituciones ya aplicadas.</p>` : '<p class="vacio">Sin clases en el cuadro este mes.</p>');
+    s.innerHTML = `<h2>Horas del equipo<span>${h.totalHorasDadas || 0} h dadas · ${h.totalHoras || 0} h el mes entero</span></h2>` +
+      (h.profes && h.profes.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Profesor</th><th>Clases dadas</th><th>Horas dadas</th><th>Mes entero</th><th>Sustituciones</th></tr></thead><tbody>
+        ${h.profes.map((p) => `<tr><td>${esc(p.nombre)}</td><td>${p.dadas}</td><td>${p.horasDadas} h</td><td>${p.clases} clases · ${p.horas} h</td><td>${p.sustituciones || "—"}</td></tr>`).join("")}
+       </tbody></table></div><p class="vacio">«Dadas» es hasta hoy${h.hasta ? " (" + corto(h.hasta) + ")" : ""}, que es lo que se paga. «Mes entero» es lo que marca el cuadro de clases, con las sustituciones ya aplicadas.</p>` : '<p class="vacio">Sin clases en el cuadro este mes.</p>');
   }).catch(() => { const s = $("hHoras"); if (s) s.innerHTML = '<h2>Horas del equipo</h2><p class="vacio">No se han podido calcular.</p>'; });
 }
 function verDeudas(d) {

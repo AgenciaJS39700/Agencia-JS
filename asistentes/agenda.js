@@ -622,21 +622,31 @@ ${gente.length} de ${ses.cap} plazas · ${libres} libre${libres === 1 ? "" : "s"
       if (!porSesiones(cfg)) return res({ mes, sesiones: false, profes: [] });
       const desde = mes + "-01", hasta = mes + "-31";
       const cam = await cambiosDe(env, cfg, desde, hasta);
+      const hoy = ahora().fecha;
       const cuenta = {};
-      const suma = (quien, min, sust) => {
+      // Dos cuentas a la vez: lo que ya ha dado (para pagar a mitad de mes) y
+      // lo que le queda por dar según el cuadro (para prever el mes entero).
+      const suma = (quien, min, sust, dado) => {
         if (!quien) return;
-        const p = (cuenta[quien] = cuenta[quien] || { nombre: quien, clases: 0, min: 0, sustituciones: 0 });
-        p.clases++; p.min += min; if (sust) p.sustituciones++;
+        const p = (cuenta[quien] = cuenta[quien] || { nombre: quien, clases: 0, min: 0, dadas: 0, minDadas: 0, sustituciones: 0 });
+        p.clases++; p.min += min;
+        if (dado) { p.dadas++; p.minDadas += min; }
+        if (sust) p.sustituciones++;
       };
       for (let f = desde; f <= hasta && f.slice(0, 7) === mes; f = sumar(f, 1)) {
         for (const x of sesionesDia(cfg, f)) {
           const sub = cam[`${f}|${x.inicio}|${x.s}`];
-          suma(sub && sub.prof ? sub.prof : x.prof, x.min, !!(sub && sub.prof));
+          suma(sub && sub.prof ? sub.prof : x.prof, x.min, !!(sub && sub.prof), f <= hoy);
         }
       }
+      const h1 = (m) => Math.round((m / 60) * 10) / 10;
       const profes = Object.values(cuenta).sort((a, b) => b.min - a.min)
-        .map((p) => ({ ...p, horas: Math.round((p.min / 60) * 10) / 10 }));
-      return res({ mes, sesiones: true, profes, totalHoras: Math.round((profes.reduce((s, p) => s + p.min, 0) / 60) * 10) / 10 });
+        .map((p) => ({ ...p, horas: h1(p.min), horasDadas: h1(p.minDadas) }));
+      return res({
+        mes, sesiones: true, profes, hasta: mes === hoy.slice(0, 7) ? hoy : "",
+        totalHoras: h1(profes.reduce((s, p) => s + p.min, 0)),
+        totalHorasDadas: h1(profes.reduce((s, p) => s + p.minDadas, 0)),
+      });
     }
 
     if (ruta === "panel/citas" && request.method === "GET") {
