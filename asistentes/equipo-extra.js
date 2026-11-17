@@ -110,7 +110,10 @@ export async function atenderRecados(request, env, cfg, ruta, url, yo) {
         "SELECT recado_id, nombre FROM recados_leidos WHERE recado_id IN (SELECT id FROM recados WHERE slug = ?1)").bind(cfg.slug).all();
       gente = results || [];
     }
+    // Para el desplegable de «¿para quién?» del panel
+    const l = yo.rol === "panel" || yo.rol === "recepcion" ? (await equipo(env, cfg)).filter((p) => p.activo).map((p) => p.nombre) : [];
     return res({
+      equipo: l,
       recados: mios.map((r) => ({
         id: r.id, texto: r.texto, autor: r.autor, para: r.para, fijado: !!r.fijado, caduca: r.caduca, creado: r.creado,
         leido: !!r.leido, leidoPor: gente.filter((g) => g.recado_id === r.id).map((g) => g.nombre),

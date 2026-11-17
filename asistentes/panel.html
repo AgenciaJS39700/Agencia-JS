@@ -91,7 +91,14 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .eqf-d{color:var(--mu);font-size:.84rem;margin:.35rem 0 0;line-height:1.5}
 .eqf-d.av{color:#fca5a5}
 .eqf-b{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.enlace{background:none;border:0;padding:0;font:inherit;font-size:inherit;color:var(--c);text-decoration:underline;cursor:pointer}.eti.ok{background:rgba(34,197,94,.16);color:#86efac}
+.enlace{background:none;border:0;padding:0;font:inherit;font-size:inherit;color:var(--c);text-decoration:underline;cursor:pointer}
+.rec{background:var(--card);border:1px solid var(--ln);border-left:4px solid var(--c);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.rec.nuevo{background:color-mix(in srgb,var(--c) 12%,var(--card))}
+.rec p{margin:0;font-size:.95rem;line-height:1.55;white-space:pre-wrap}
+.rec .de{color:var(--mu);font-size:.78rem;margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rec .de b{color:var(--tx)}
+textarea{width:100%;min-height:84px;padding:.6rem .8rem;border-radius:12px;border:1px solid var(--ln);background:#0f0f10;color:var(--tx);font:inherit}
+.int{display:inline-block;background:rgba(232,199,102,.16);color:var(--c);border-radius:8px;padding:.1rem .45rem;font-size:.78rem;font-weight:700}.eti.ok{background:rgba(34,197,94,.16);color:#86efac}
 .tt{width:100%;border-collapse:collapse;font-size:.86rem}
 .tt th,.tt td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--ln);white-space:nowrap}
 .tt th{color:var(--mu);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
@@ -111,6 +118,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <div style="display:flex;gap:8px"><input id="clave" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" required><button class="btn" type="button" id="ver-clave" aria-label="Mostrar la clave" aria-pressed="false">👁</button></div>
       <label style="display:flex;gap:.5rem;align-items:center;margin:10px 0 12px;color:var(--tx)"><input type="checkbox" id="rec" style="width:auto;min-height:0" checked> Recordar en este dispositivo</label>
       <button class="btn main" style="width:100%" type="submit">Entrar</button>
+      <button class="btn" type="button" id="olvidada" style="width:100%;margin-top:8px;border:0;text-decoration:underline">He olvidado mi contraseña</button>
       <p class="msg" role="alert" id="ml"></p>
     </form>
   </section>
@@ -128,6 +136,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
     <div class="bar">
       <button class="btn main" id="b-nueva" type="button">+ Apuntar cita</button>
       <button class="btn" id="b-cerrar" type="button">Cerrar horas o días</button>
+      <button class="btn" id="b-sust" type="button">Quién da clase</button>
       <button class="btn" id="b-cal" type="button">Ver en mi calendario</button>
       <button class="btn" id="b-push" type="button" hidden>🔔 Avisos al móvil <span class="pro">Pro</span></button>
       <div class="vista" id="vista" role="group" aria-label="Vista" hidden><button type="button" data-v="lista" aria-pressed="true">Lista</button><button type="button" data-v="semana" aria-pressed="false">Semana</button></div>
@@ -136,6 +145,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
     </div>
     <nav class="tabs" id="tabs" role="tablist" hidden>
       <button type="button" data-t="agenda" role="tab" aria-selected="true">Agenda</button>
+      <button type="button" data-t="recados" role="tab" aria-selected="false">Tablón <span id="pinta-sin" class="eti" hidden></span></button>
       <button type="button" data-t="alumnas" role="tab" aria-selected="false">Alumnas</button>
       <button type="button" data-t="pagos" role="tab" aria-selected="false">Cobros</button>
       <button type="button" data-t="facturas" role="tab" aria-selected="false">Facturación</button>
@@ -143,6 +153,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <button type="button" data-t="equipo" role="tab" aria-selected="false">Equipo y claves</button>
     </nav>
     <div id="lista" aria-live="polite"></div>
+    <div id="vRecados" hidden></div>
     <div id="vAlumnas" hidden></div>
     <div id="vPagos" hidden></div>
     <div id="vFacturas" hidden></div>
@@ -221,6 +232,9 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
   <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn main" value="ok">Guardar</button></div>
 </form></dialog>
 
+<dialog id="d-sust" aria-labelledby="ds-t"><h2 id="ds-t">Quién da clase</h2><div id="sustDet"></div>
+  <div class="bar" style="justify-content:flex-end;margin:8px 0 0"><button class="btn" type="button" onclick="this.closest('dialog').close()">Cerrar</button></div></dialog>
+
 <dialog id="d-fac" aria-labelledby="df-t"><form id="ff" method="dialog">
   <h2 id="df-t">Emitir una factura</h2>
   <p class="vacio" style="margin:0 0 12px">Para cobros que no pasan por la web: una formación, un bono regalo, una empresa. Se numera sola en la serie del año.</p>
@@ -293,6 +307,51 @@ $("fl").addEventListener("submit", async (e) => {
   }
 });
 
+/* ---- he olvidado mi contraseña ---- */
+$("olvidada").onclick = async () => {
+  const u = ($("usuario").value || "").trim().toLowerCase();
+  if (!u) { $("ml").style.color = ""; $("ml").textContent = "Escribe primero tu usuario."; $("usuario").focus(); return; }
+  $("ml").style.color = ""; $("ml").textContent = "Enviando…";
+  try {
+    const r = await fetch(`/api/as/${slug}/panel/olvidada`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usuario: u }) });
+    const d = await r.json().catch(() => ({}));
+    $("ml").style.color = "#86efac";
+    $("ml").textContent = d.mensaje || "Si ese usuario existe, le hemos mandado un enlace al correo del estudio.";
+  } catch (e) { $("ml").style.color = "#fca5a5"; $("ml").textContent = "Sin conexión. Inténtalo otra vez."; }
+};
+
+/* ¿Venimos del enlace del correo? Entonces toca poner contraseña nueva. */
+(function () {
+  const q = new URLSearchParams(location.search);
+  const tok = q.get("nueva"), u = q.get("u");
+  if (!tok || !/^[0-9a-f]{48}$/.test(tok)) return;
+  history.replaceState(null, "", location.pathname);
+  $("usuario").value = u || "";
+  $("fl").insertAdjacentHTML("beforebegin",
+    `<form class="box" id="fNueva" style="text-align:left">
+       <h2 style="margin:0 0 4px;font-size:1rem">Pon una contraseña nueva</h2>
+       <p class="vacio" style="margin:0 0 12px">Para el usuario <b>${esc(u || "")}</b>. El enlace vale una hora y una sola vez.</p>
+       <label for="n-clave">Contraseña nueva <small>(mínimo 8 caracteres, sin espacios)</small></label>
+       <input id="n-clave" type="text" autocomplete="new-password" autocapitalize="none" spellcheck="false" required minlength="8">
+       <p class="msg" role="alert" id="n-msg"></p>
+       <div class="bar" style="margin:12px 0 0"><button class="btn main" type="submit">Guardar y entrar</button></div>
+     </form>`);
+  $("fNueva").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const m = $("n-msg"), b = $("fNueva").querySelector("button[type=submit]");
+    m.style.color = "#fca5a5"; m.textContent = ""; b.disabled = true;
+    try {
+      const r = await fetch(`/api/as/${slug}/panel/nueva-clave`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: tok, clave: $("n-clave").value }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) { b.disabled = false; m.textContent = d.error || "No se ha podido cambiar."; return; }
+      usuario = d.usuario; clave = $("n-clave").value;
+      guarda(sessionStorage, usuario, clave);
+      $("fNueva").remove();
+      await cargar().catch(() => { $("ml").textContent = "Contraseña cambiada. Entra con ella."; });
+    } catch (er) { b.disabled = false; m.textContent = "Sin conexión. Inténtalo otra vez."; }
+  });
+})();
+
 async function cargar() {
   const sem = vista === "semana" && negocio && negocio.avanzado;
   if (sem) desde = lunes(desde);
@@ -306,6 +365,7 @@ async function cargar() {
   $("tit").firstChild.textContent = negocio.negocio.nombre;
   const cuandoTxt = sem ? `Semana del ${largo(d.desde)}` : desde === hoyISO() ? "Próximas 2 semanas" : `Del ${largo(d.desde)} al ${largo(d.hasta)}`;
   yo = d.yo || null;
+  api("panel/recados").then((rr) => { const sin = $("pinta-sin"); sin.hidden = !rr.sinLeer; sin.textContent = rr.sinLeer || ""; }).catch(() => {});
   $("sub").textContent = (yo && yo.nombre ? yo.nombre + " · " : "") + cuandoTxt;
   // Recepción atiende el mostrador: agenda, alumnas, cobros y espera. La facturación,
   // las estadísticas y las claves del equipo son de quien gestiona el estudio.
@@ -492,7 +552,7 @@ const eur = (c) => (c / 100).toLocaleString("es-ES", { minimumFractionDigits: c 
 const corto = (f) => String(f || "").slice(0, 10).split("-").reverse().join("/");
 let pestana = "agenda", alumnaAbierta = 0;
 
-const VISTAS = { agenda: "lista", alumnas: "vAlumnas", pagos: "vPagos", facturas: "vFacturas", espera: "vEspera", equipo: "vEquipo" };
+const VISTAS = { agenda: "lista", recados: "vRecados", alumnas: "vAlumnas", pagos: "vPagos", facturas: "vFacturas", espera: "vEspera", equipo: "vEquipo" };
 $("tabs").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-t]");
   if (!b) return;
@@ -500,8 +560,9 @@ $("tabs").addEventListener("click", (e) => {
   $("tabs").querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", String(x.dataset.t === pestana)));
   Object.entries(VISTAS).forEach(([k, id]) => { $(id).hidden = k !== pestana; });
   // los botones de la agenda solo valen en la agenda
-  ["b-nueva", "b-cerrar", "b-cal", "b-ant", "b-sig"].forEach((id) => { $(id).hidden = pestana !== "agenda"; });
+  ["b-nueva", "b-cerrar", "b-sust", "b-cal", "b-ant", "b-sig"].forEach((id) => { $(id).hidden = pestana !== "agenda"; });
   if (negocio && negocio.avanzado) $("vista").hidden = pestana !== "agenda";
+  if (pestana === "recados") verRecados();
   if (pestana === "alumnas") verAlumnas();
   if (pestana === "pagos") verPagos();
   if (pestana === "facturas") verFacturas();
@@ -573,7 +634,9 @@ async function verAlumna(id) {
   $("alumDet").innerHTML =
     `<p class="d">${esc(a.email)}${a.telefono ? " · " + esc(a.telefono) : ""}<br>Alta: ${corto(a.creado)} · Ofertas: ${a.marketing ? "sí" : "no"}</p>
      <div class="bar" style="margin:10px 0"><button class="btn main sm" type="button" id="darBono">+ Dar un bono</button>
-       <button class="btn sm" type="button" id="cobrar">Apuntar un cobro</button></div>
+       <button class="btn sm" type="button" id="cobrar">Apuntar un cobro</button>
+       <button class="btn sm" type="button" id="notaInt">${a.nota_interna ? "Cambiar la nota" : "+ Nota para el equipo"}</button></div>
+     ${a.nota_interna ? `<p class="int" style="display:block;margin:0 0 10px">⚠ ${esc(a.nota_interna)}</p>` : ""}
      <h3 style="font-size:.9rem;color:var(--c);margin:14px 0 6px">Bonos</h3>
      ${d.bonos.length ? d.bonos.map((b) => `<div class="fila" style="cursor:default"><div><b>${esc(b.nombre)}</b><span>${corto(b.inicio)} → ${corto(b.fin)} · ${b.sem ? b.sem + "/semana" : "sin límite"}${b.recurrente && b.stripe_sub ? " · se renueva sola" : ""}</span></div>
         <div>${b.estado === "activo" && b.fin >= hoyISO() ? `<button class="btn sm del" type="button" data-nobono="${b.id}">Dar de baja</button>` : `<span class="eti no">${esc(b.estado)}</span>`}</div></div>`).join("") : '<p class="vacio">Sin bonos.</p>'}
@@ -591,6 +654,12 @@ async function verAlumna(id) {
     if (nif === null) return;
     const dir = prompt("Dirección fiscal (opcional):", a.direccion || "");
     await api("panel/alumna/fiscal", { id, nif, direccion: dir || "" });
+    verAlumna(id);
+  };
+  $("notaInt").onclick = async () => {
+    const n = prompt("Qué tiene que saber el equipo de " + (a.nombre || a.email) + " (una lesión, un embarazo, una operación reciente…).\n\nLo verá el profesor al pasar lista. Ella NO lo ve.", a.nota_interna || "");
+    if (n === null) return;
+    await api("panel/alumna/nota", { id, nota: n });
     verAlumna(id);
   };
   $("darBono").onclick = () => abrirBono(id);
@@ -746,6 +815,112 @@ async function enviarGestoria(d) {
     alert("Enviado a " + r.para + " (" + r.enviadas + " facturas).");
   } catch (er) { alert(er.message); }
 }
+
+/* ---- quién da clase: sustituciones ----
+   En un estudio pequeño alguien se pone malo y lo cubre otra. El horario fijo no
+   se toca: se guarda el cambio de ESE día y la clase aparece en la agenda de quien
+   la cubre. */
+let diaSust = "";
+$("b-sust").onclick = () => { diaSust = desde < hoyISO() ? hoyISO() : desde; verSust(); };
+async function verSust() {
+  const d = await api("panel/dia?fecha=" + diaSust);
+  if (!d.sesiones) { alert("Este negocio no trabaja con cuadro de clases."); return; }
+  $("ds-t").textContent = "Quién da clase el " + (d.dia || corto(d.fecha));
+  $("sustDet").innerHTML =
+    `<div class="bar"><button class="btn sm" type="button" data-sd="-1">‹ Día antes</button>
+      <input type="date" id="sd-fecha" value="${d.fecha}" style="width:auto">
+      <button class="btn sm" type="button" data-sd="1">Día después ›</button></div>` +
+    (d.clases.length ? d.clases.map((c) => `<div class="eqf">
+      <div class="eqf-n"><b>${c.hora} · ${esc(c.nombre)}</b>${c.sustituida ? '<span class="eti">sustituida</span>' : ""}</div>
+      <p class="eqf-d">${esc(c.sala || "")} · ${c.min} min${c.prof ? " · en el cartel: " + esc(c.prof) : ""}${c.nota ? " · " + esc(c.nota) : ""}</p>
+      <div class="eqf-b">
+        <select data-prof="${c.inicio}|${esc(c.servicio)}" style="width:auto;min-width:160px">
+          <option value="">— sin asignar —</option>
+          ${(d.equipo || []).map((n) => `<option value="${esc(n)}"${n === c.da ? " selected" : ""}>${esc(n)}</option>`).join("")}
+        </select>
+        ${c.sustituida ? `<button class="btn sm" type="button" data-quitar="${c.inicio}|${esc(c.servicio)}">Volver al cartel</button>` : ""}
+      </div></div>`).join("")
+      : '<p class="vacio">Ese día no hay clases en el cuadro.</p>');
+  $("sd-fecha").onchange = (e) => { diaSust = e.target.value; verSust(); };
+  $("d-sust").showModal();
+}
+$("sustDet").addEventListener("change", async (e) => {
+  const sel = e.target.closest("[data-prof]");
+  if (!sel) return;
+  const [inicio, servicio] = sel.dataset.prof.split("|");
+  let nota = "";
+  if (sel.value) { const n = prompt("¿Quieres dejar un aviso en esa clase? (opcional)", ""); if (n === null) return; nota = n; }
+  try { await api("panel/sustitucion", { fecha: diaSust, inicio: +inicio, servicio, prof: sel.value, nota }); } catch (er) { alert(er.message); }
+  verSust();
+});
+$("sustDet").addEventListener("click", async (e) => {
+  const d1 = e.target.closest("[data-sd]"), q = e.target.closest("[data-quitar]");
+  if (d1) { diaSust = sumar(diaSust, +d1.dataset.sd); return verSust(); }
+  if (q) {
+    const [inicio, servicio] = q.dataset.quitar.split("|");
+    try { await api("panel/sustitucion", { fecha: diaSust, inicio: +inicio, servicio, prof: "" }); } catch (er) { alert(er.message); }
+    verSust();
+  }
+});
+
+/* ---- tablón de recados ----
+   No es un chat: es un tablón con acuse de lectura, para que se vea de un vistazo
+   quién se ha enterado de lo que hay que saber. */
+async function verRecados() {
+  const d = await api("panel/recados");
+  const duena = (d.yo || {}).rol === "panel";
+  $("vRecados").innerHTML =
+    `<form class="box" id="fRec">
+      <h2>Dejar un recado</h2>
+      <label for="r-texto">Qué hay que saber</label>
+      <textarea id="r-texto" maxlength="600" required placeholder="El lunes la sala Surya está ocupada hasta las 18:00."></textarea>
+      <div class="grid" style="margin-top:10px">
+        <div><label for="r-para">¿Para quién?</label><select id="r-para">
+          <option value="todos">Todo el equipo</option>
+          <option value="profes">Solo los profesores</option>
+          <option value="gestion">Solo gestión y recepción</option>
+          ${(d.equipo || []).map((n) => `<option value="${esc(n)}">Solo ${esc(n)}</option>`).join("")}
+        </select></div>
+        <div><label for="r-caduca">Quitar el ${"día"} <small>(opcional)</small></label><input id="r-caduca" type="date"></div>
+      </div>
+      ${duena ? '<label style="display:flex;gap:.5rem;align-items:center;margin:10px 0 0;color:var(--tx)"><input type="checkbox" id="r-fijado" style="width:auto;min-height:0"> Dejarlo fijado arriba</label>' : ""}
+      <p class="msg" role="alert" id="r-msg"></p>
+      <div class="bar" style="margin:12px 0 0"><button class="btn main" type="submit">Dejar el recado</button></div>
+     </form>` +
+    (d.recados.length
+      ? d.recados.map((r) => `<div class="rec${r.leido ? "" : " nuevo"}">
+          <p>${esc(r.texto)}</p>
+          <div class="de">De <b>${esc(r.autor)}</b> · ${corto(r.creado)}
+            ${r.para === "todos" ? "· para todos" : r.para === "profes" ? "· para los profesores" : r.para === "gestion" ? "· para gestión" : "· solo para " + esc(r.para)}
+            ${r.fijado ? "· fijado" : ""}${r.caduca ? "· hasta el " + corto(r.caduca) : ""}
+            ${r.leido ? "" : `<button class="btn sm" type="button" data-leido="${r.id}">Enterada</button>`}
+            ${duena || r.autor === (d.yo || {}).nombre ? `<button class="btn sm" type="button" data-borrar="${r.id}">Borrar</button>` : ""}
+          </div>
+          ${duena && r.leidoPor.length ? `<p class="vacio" style="margin-top:6px">Lo han leído: ${r.leidoPor.map(esc).join(", ")}</p>` : ""}
+        </div>`).join("")
+      : '<p class="vacio">No hay ningún recado puesto.</p>');
+
+  const sin = $("pinta-sin");
+  sin.hidden = !d.sinLeer; sin.textContent = d.sinLeer || "";
+
+  $("fRec").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const m = $("r-msg"), b = $("fRec").querySelector("button[type=submit]");
+    m.style.color = "#fca5a5"; m.textContent = "";
+    const texto = $("r-texto").value.trim();
+    if (texto.length < 2) { m.textContent = "Escribe el recado."; return; }
+    b.disabled = true;
+    try {
+      await api("panel/recado", { texto, para: $("r-para").value, caduca: $("r-caduca").value || null, fijado: duena && $("r-fijado") ? $("r-fijado").checked : false });
+      verRecados();
+    } catch (er) { b.disabled = false; m.textContent = er.message; }
+  });
+}
+$("vRecados").addEventListener("click", async (e) => {
+  const l = e.target.closest("[data-leido]"), b = e.target.closest("[data-borrar]");
+  if (l) { await api("panel/recado/leido", { id: +l.dataset.leido }).catch(() => {}); return verRecados(); }
+  if (b) { if (!confirm("¿Borrar este recado?")) return; await api("panel/recado/baja", { id: +b.dataset.borrar }).catch((er) => alert(er.message)); return verRecados(); }
+});
 
 /* ---- lista de espera ---- */
 async function verEspera() {
