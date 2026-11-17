@@ -5,6 +5,8 @@
 import { responderAsistente } from "./asistentes/motor.js";
 import { atenderVoz } from "./voz/agenda.js";
 import { atenderAgenda, enviarRecordatorios, manifiesto } from "./asistentes/agenda.js";
+import { avisosDiarios } from "./asistentes/alumnos.js";
+import CLIENTES from "./asistentes/clientes/index.js";
 import { atenderCuenta } from "./mesas/cuenta.js";
 import { registrarMetricas } from "./metricas/registro.js";
 
@@ -283,8 +285,17 @@ export default {
       return json({ error: "No se pudo generar la respuesta" }, 502);
     }
   },
-  // Cron diario: recordatorio por correo de las citas de mañana
+  // Cron diario: recordatorio de las citas de mañana y avisos que sostienen la caja
+  // (bonos a punto de terminar, alumnas que llevan semanas sin venir, reseñas).
   async scheduled(event, env, ctx) {
     ctx.waitUntil(enviarRecordatorios(env).catch((e) => console.error("recordatorios", e && e.message)));
+    ctx.waitUntil((async () => {
+      for (const slug of Object.keys(CLIENTES)) {
+        const cfg = CLIENTES[slug];
+        if (!cfg || cfg.activo === false || !cfg.productos || !cfg.productos.length) continue;
+        try { console.log("avisos", slug, JSON.stringify(await avisosDiarios(env, cfg))); }
+        catch (e) { console.error("avisos", slug, e && e.message); }
+      }
+    })());
   },
 };

@@ -505,6 +505,39 @@ async function verAlumnas(q) {
       : '<p class="vacio">Todavía no hay alumnas dadas de alta.</p>');
   const i = $("qAlum");
   if (i) { let t2; i.oninput = () => { clearTimeout(t2); t2 = setTimeout(() => verAlumnas(i.value.trim()), 350); }; }
+  if (!q) atencion();
+}
+
+/* ---- a quién hay que atender esta semana ----
+   Tres listas cortas que es donde se gana o se pierde el mes: bonos que terminan,
+   alumnas con bono que llevan semanas sin venir, y quien viene sin bono. */
+const wa = (tel, txt) => "https://wa.me/" + String(tel || "").replace(/\D/g, "").replace(/^(\d{9})$/, "34$1") + "?text=" + encodeURIComponent(txt);
+async function atencion() {
+  let d;
+  try { d = await api("panel/atencion"); } catch (e) { return; }
+  const total = d.caducan.length + d.frias.length + d.sinBono.length;
+  if (!total) return;
+  const linea = (a, txt, msg) => `<div class="eqf"><div class="eqf-n"><b>${esc(a.nombre || a.email)}</b></div>
+    <p class="eqf-d">${esc(txt)}</p>
+    <div class="eqf-b">${a.telefono ? `<a class="btn sm" href="${wa(a.telefono, msg)}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
+     <button class="btn sm" type="button" data-alum="${a.id}">Ver ficha</button></div></div>`;
+  const caja = document.createElement("div");
+  caja.className = "box";
+  caja.style.borderColor = "var(--c)";
+  caja.innerHTML =
+    `<h2>Esta semana conviene atender a ${total === 1 ? "1 alumna" : total + " alumnas"}</h2>
+     ${d.caducan.length ? `<p class="vacio" style="margin:8px 0 6px"><b>Se les termina el bono</b></p>` +
+       d.caducan.map((a) => linea(a, `${a.bono} termina el ${corto(a.fin)}`,
+         `Hola ${(a.nombre || "").split(" ")[0]}, te escribo de IOMFIT: tu bono termina el ${corto(a.fin)}. ¿Lo renovamos?`)).join("") : ""}
+     ${d.frias.length ? `<p class="vacio" style="margin:12px 0 6px"><b>Tienen bono y no vienen</b></p>` +
+       d.frias.map((a) => linea(a, `Última clase el ${corto(a.ultima)}`,
+         `Hola ${(a.nombre || "").split(" ")[0]}, te echamos de menos en IOMFIT. ¿Te buscamos un hueco que te venga mejor?`)).join("") : ""}
+     ${d.sinBono.length ? `<p class="vacio" style="margin:12px 0 6px"><b>Vienen sin bono</b></p>` +
+       d.sinBono.map((a) => linea(a, `${a.clases === 1 ? "1 clase" : a.clases + " clases"} este mes y sin bono`,
+         `Hola ${(a.nombre || "").split(" ")[0]}, con lo que vienes a IOMFIT te sale mejor un bono. ¿Te cuento las opciones?`)).join("") : ""}
+     <p class="vacio" style="margin-top:12px">Los correos de bono a punto de terminar y de «te echamos de menos» salen solos cada día; esto es para el toque personal.</p>`;
+  const v = $("vAlumnas");
+  v.insertBefore(caja, v.children[2] || null);
 }
 $("vAlumnas").addEventListener("click", (e) => {
   const f = e.target.closest("[data-alum]");

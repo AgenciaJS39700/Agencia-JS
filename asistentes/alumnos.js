@@ -824,6 +824,39 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     return res({ alumna: a, bonos: bonos.results || [], citas: (citas.results || []).map((c) => ({ ...c, hora: hhmm(c.inicio) })), pagos: pagos.results || [], facturado: fac || { total: 0, n: 0 } });
   }
 
+  // Quién necesita un toque esta semana: lo que decide si el mes cierra bien
+  if (ruta === "panel/atencion" && request.method === "GET") {
+    const hoy = hoyMadrid();
+    const [cad, frias, sin] = await Promise.all([
+      // Bonos que terminan en 10 días y NO se renuevan solos
+      env.CITAS.prepare(
+        `SELECT a.id, a.nombre, a.email, a.telefono, b.nombre AS bono, b.fin
+         FROM bonos b JOIN alumnos a ON a.id = b.alumno_id
+         WHERE b.slug = ?1 AND b.estado = 'activo' AND b.recurrente = 0 AND b.fin BETWEEN ?2 AND ?3
+         ORDER BY b.fin LIMIT 50`).bind(cfg.slug, hoy, sumarDias(hoy, 10)).all(),
+      // Con bono activo y sin pisar el estudio desde hace 21 días
+      env.CITAS.prepare(
+        `SELECT a.id, a.nombre, a.email, a.telefono,
+                (SELECT MAX(fecha) FROM citas c WHERE c.alumno_id = a.id AND c.estado = 'ok' AND c.fecha <= ?2) AS ultima
+         FROM alumnos a WHERE a.slug = ?1
+           AND EXISTS (SELECT 1 FROM bonos b WHERE b.alumno_id = a.id AND b.estado = 'activo' AND b.fin >= ?2)
+           AND NOT EXISTS (SELECT 1 FROM citas c2 WHERE c2.alumno_id = a.id AND c2.estado = 'ok' AND c2.fecha > ?2)
+         LIMIT 50`).bind(cfg.slug, hoy).all(),
+      // Han venido este mes pero no tienen bono: la venta más fácil que hay
+      env.CITAS.prepare(
+        `SELECT a.id, a.nombre, a.email, a.telefono, COUNT(c.id) AS clases
+         FROM alumnos a JOIN citas c ON c.alumno_id = a.id AND c.estado = 'ok' AND c.fecha >= ?2
+         WHERE a.slug = ?1 AND NOT EXISTS (SELECT 1 FROM bonos b WHERE b.alumno_id = a.id AND b.estado = 'activo' AND b.fin >= ?3)
+         GROUP BY a.id ORDER BY clases DESC LIMIT 30`).bind(cfg.slug, sumarDias(hoy, -30), hoy).all(),
+    ]);
+    const corte = sumarDias(hoy, -21);
+    return res({
+      caducan: cad.results || [],
+      frias: (frias.results || []).filter((a) => a.ultima && a.ultima <= corte),
+      sinBono: sin.results || [],
+    });
+  }
+
   if (ruta === "panel/alumna/fiscal" && post) {
     const b = await cuerpo();
     await env.CITAS.prepare("UPDATE alumnos SET nif = ?3, direccion = ?4 WHERE id = ?1 AND slug = ?2")
@@ -946,4 +979,101 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
   }
 
   return null;
+}
+
+/* ---------------------------------------------------------------- avisos diarios
+   Lo que de verdad mueve la caja de un estudio: que un bono no se caiga sin que
+   nadie se entere, y que una alumna que lleva semanas sin venir reciba un gesto
+   antes de darse de baja. Lo lanza el cron diario de worker.js. */
+
+/** Correo de bono a punto de terminar. */
+function correoCaduca(cfg, alumna, bono, dias) {
+  const url = (cfg.negocio.web || `https://agencia-js.com/c/${cfg.slug}`).replace(/\/$/, "") + "/mi-cuenta/";
+  return marco(cfg, dias === 0 ? "Tu bono termina hoy" : `Tu bono termina en ${dias === 1 ? "1 día" : dias + " días"}`,
+    `<p style="font-size:15px;line-height:1.7">Hola ${esc((alumna.nombre || "").split(" ")[0] || "")}, tu <b>${esc(bono.nombre)}</b> termina el <b>${esc(String(bono.fin).slice(0, 10).split("-").reverse().join("/"))}</b>.</p>
+     <p style="font-size:15px;line-height:1.7">Si quieres seguir, puedes renovarlo desde tu cuenta en un minuto y no perder tu sitio en las clases de siempre.</p>
+     ${boton(cfg, url, "Renovar mi bono")}
+     <p style="font-size:13px;color:#555">Si prefieres parar una temporada, no hagas nada: el bono se cierra solo y aquí te esperamos.</p>`);
+}
+
+/** Correo para quien lleva tiempo sin venir teniendo bono. */
+function correoEchamos(cfg, alumna) {
+  const url = (cfg.negocio.web || `https://agencia-js.com/c/${cfg.slug}`).replace(/\/$/, "") + "/reservar/";
+  return marco(cfg, "Te echamos de menos",
+    `<p style="font-size:15px;line-height:1.7">Hola ${esc((alumna.nombre || "").split(" ")[0] || "")}, hace unas semanas que no te vemos por el estudio y tienes el bono activo.</p>
+     <p style="font-size:15px;line-height:1.7">Si se te ha complicado la agenda, dínoslo y buscamos el hueco que mejor te venga. Y si te apetece volver, aquí tienes el horario:</p>
+     ${boton(cfg, url, "Ver clases y reservar")}`);
+}
+
+/** Petición de reseña, una sola vez y solo a quien ya ha venido varias veces. */
+function correoResena(cfg, alumna) {
+  const url = cfg.negocio.resenas || cfg.negocio.mapa || "";
+  return marco(cfg, "¿Nos dejas tu opinión?",
+    `<p style="font-size:15px;line-height:1.7">Hola ${esc((alumna.nombre || "").split(" ")[0] || "")}, gracias por venir a clase estas semanas.</p>
+     <p style="font-size:15px;line-height:1.7">Si te está gustando, nos ayuda muchísimo que lo cuentes en Google: es lo que hace que otras personas del barrio nos encuentren. Son dos minutos.</p>
+     ${url ? boton(cfg, url, "Escribir mi opinión") : ""}
+     <p style="font-size:13px;color:#555">Y si algo no va como esperabas, respóndenos a este correo: preferimos saberlo.</p>`);
+}
+
+/**
+ * Avisos del día para un negocio. Devuelve cuántos correos ha mandado de cada tipo.
+ * Cada aviso se marca en la ficha de la alumna para no repetirlo nunca.
+ */
+export async function avisosDiarios(env, cfg) {
+  const out = { caducan: 0, enfriadas: 0, resenas: 0 };
+  if (!env.CITAS || cfg.activo === false) return out;
+  const hoy = hoyMadrid();
+  const av = { caducaDias: 5, friasDias: 21, resenaClases: 3, ...(cfg.avisosAlumnas || {}) };
+
+  // 1) Bonos que terminan y NO se renuevan solos
+  if (av.caducaDias) {
+    const limite = sumarDias(hoy, av.caducaDias);
+    const { results } = await env.CITAS.prepare(
+      `SELECT b.id, b.nombre, b.fin, a.id AS aid, a.nombre AS alumna, a.email, a.avisado_bono
+       FROM bonos b JOIN alumnos a ON a.id = b.alumno_id
+       WHERE b.slug = ?1 AND b.estado = 'activo' AND b.recurrente = 0
+         AND b.fin BETWEEN ?2 AND ?3 AND a.email IS NOT NULL LIMIT 100`
+    ).bind(cfg.slug, hoy, limite).all();
+    for (const b of results || []) {
+      if (b.avisado_bono && b.avisado_bono >= sumarDias(hoy, -20)) continue;   // ya avisada hace poco
+      const dias = Math.max(0, Math.round((Date.parse(String(b.fin).slice(0, 10) + "T12:00:00Z") - Date.parse(hoy + "T12:00:00Z")) / 864e5));
+      const ok = await correo(env, cfg, b.email, b.alumna, `Tu bono termina pronto · ${cfg.negocio.nombre}`,
+        correoCaduca(cfg, { nombre: b.alumna }, b, dias));
+      if (ok) { out.caducan++; await env.CITAS.prepare("UPDATE alumnos SET avisado_bono = ?2 WHERE id = ?1").bind(b.aid, hoy).run(); }
+    }
+  }
+
+  // 2) Con bono activo y sin venir desde hace semanas
+  if (av.friasDias) {
+    const corte = sumarDias(hoy, -av.friasDias);
+    const { results } = await env.CITAS.prepare(
+      `SELECT a.id, a.nombre, a.email, a.avisado_bono,
+              (SELECT MAX(fecha) FROM citas c WHERE c.alumno_id = a.id AND c.estado = 'ok' AND c.fecha <= ?2) AS ultima
+       FROM alumnos a
+       WHERE a.slug = ?1 AND a.email IS NOT NULL
+         AND EXISTS (SELECT 1 FROM bonos b WHERE b.alumno_id = a.id AND b.estado = 'activo' AND b.fin >= ?2)
+       LIMIT 200`).bind(cfg.slug, hoy).all();
+    for (const a of results || []) {
+      if (!a.ultima || a.ultima > corte) continue;                              // vino hace poco
+      if (a.avisado_bono && a.avisado_bono >= sumarDias(hoy, -30)) continue;    // no acribillar
+      const futura = await env.CITAS.prepare("SELECT 1 FROM citas WHERE alumno_id = ?1 AND estado = 'ok' AND fecha > ?2 LIMIT 1").bind(a.id, hoy).first();
+      if (futura) continue;                                                     // ya tiene clase reservada
+      const ok = await correo(env, cfg, a.email, a.nombre, `Te echamos de menos · ${cfg.negocio.nombre}`, correoEchamos(cfg, a));
+      if (ok) { out.enfriadas++; await env.CITAS.prepare("UPDATE alumnos SET avisado_bono = ?2 WHERE id = ?1").bind(a.id, hoy).run(); }
+    }
+  }
+
+  // 3) Reseña, una sola vez, a quien ya ha venido de verdad
+  if (av.resenaClases && (cfg.negocio.resenas || cfg.negocio.mapa)) {
+    const { results } = await env.CITAS.prepare(
+      `SELECT a.id, a.nombre, a.email, (SELECT COUNT(*) FROM citas c WHERE c.alumno_id = a.id AND c.asistio = 1) AS vino
+       FROM alumnos a WHERE a.slug = ?1 AND a.email IS NOT NULL AND a.resena IS NULL AND a.marketing = 1 LIMIT 200`
+    ).bind(cfg.slug).all();
+    for (const a of results || []) {
+      if ((a.vino || 0) < av.resenaClases) continue;
+      const ok = await correo(env, cfg, a.email, a.nombre, `¿Nos dejas tu opinión? · ${cfg.negocio.nombre}`, correoResena(cfg, a));
+      if (ok) { out.resenas++; await env.CITAS.prepare("UPDATE alumnos SET resena = ?2 WHERE id = ?1").bind(a.id, hoy).run(); }
+    }
+  }
+  return out;
 }

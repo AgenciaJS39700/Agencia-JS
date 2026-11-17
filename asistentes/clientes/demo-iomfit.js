@@ -56,6 +56,9 @@ export default {
     wa: "34622183255",
     web: "https://iomfit-demo.agencia39700.workers.dev/",
     mapa: "https://maps.google.com/?cid=8125878425549589069",
+    // `resenas`: enlace directo a escribir opinión en Google. Mientras no esté, el
+    // correo que pide reseña usa el mapa, que también lleva a su ficha. El enlace
+    // bueno se saca del perfil de empresa de ella (Pedir reseñas → copiar enlace).
     logo: "",
   },
   // Un servicio por tipo de clase: es lo que se reserva
