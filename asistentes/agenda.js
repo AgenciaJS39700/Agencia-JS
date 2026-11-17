@@ -441,7 +441,7 @@ function cors(request, cfg, url) {
  */
 export async function atenderAgenda(request, env, ctx, limitar) {
   const url = new URL(request.url);
-  const m = url.pathname.match(/^\/api\/as\/([a-z0-9-]{2,40})\/([a-z/.]+)$/);
+  const m = url.pathname.match(/^\/api\/as\/([a-z0-9-]{2,40})\/([a-z/.-]+)$/);   // el guion también: hay rutas como panel/nueva-clave
   const cfg = m && CLIENTES[m[1]];
   if (!cfg) return res({ error: "Negocio no encontrado" }, 404);
   const ruta = m[2];
