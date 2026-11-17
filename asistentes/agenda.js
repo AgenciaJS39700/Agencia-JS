@@ -415,7 +415,9 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     if (!env.CITAS) return res({ error: "Agenda no configurada" }, 503);
     const o = request.headers.get("Origin");
     if (o && !mismoSitio(o, url, cfg)) return res({ error: "Origen no permitido" }, 403);
-    const porURL = ruta === "agenda.ics" || ruta === "panel/exportar";
+    // Rutas que se abren como enlace (descarga o suscripción), donde la clave no
+    // puede ir en una cabecera y viaja en ?k=
+    const porURL = ruta === "agenda.ics" || ruta === "panel/exportar" || ruta === "panel/facturacion/csv" || ruta === "panel/factura";
     const clave = porURL ? url.searchParams.get("k") : (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     const yo = await quienEs(env, cfg, clave, "panel");
     if (!yo) {
