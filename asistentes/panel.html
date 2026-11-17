@@ -84,7 +84,13 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .fila:hover{border-color:var(--c)}
 .fila b{display:block}.fila span{color:var(--mu);font-size:.82rem}
 .eti{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .55rem;border-radius:999px;background:rgba(232,199,102,.16);color:var(--c)}
-.eti.no{background:rgba(239,68,68,.16);color:#fca5a5}.eti.ok{background:rgba(34,197,94,.16);color:#86efac}
+.eti.no{background:rgba(239,68,68,.16);color:#fca5a5}
+.eqf{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.eqf-n{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.eqf-n b{font-size:1.02rem}
+.eqf-d{color:var(--mu);font-size:.84rem;margin:.35rem 0 0;line-height:1.5}
+.eqf-d.av{color:#fca5a5}
+.eqf-b{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.eti.ok{background:rgba(34,197,94,.16);color:#86efac}
 .tt{width:100%;border-collapse:collapse;font-size:.86rem}
 .tt th,.tt td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--ln);white-space:nowrap}
 .tt th{color:var(--mu);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
@@ -574,12 +580,13 @@ async function verEquipo() {
   const enHorario = d.horario || [];
   const gente = d.gente.map((p) => {
     const falta = p.rol === "profe" && p.activo && enHorario.length && enHorario.indexOf(p.nombre) < 0;
-    return `<div class="fila" style="cursor:default">
-      <div><b>${esc(p.nombre)}${p.nombre === d.yo ? ' <span class="tag">eres tú</span>' : ""}</b>
-        <span>${p.rol === "panel" ? "Gestiona el estudio: lo ve y lo cambia todo" : "Profesora: solo sus clases y pasar lista"} · ${p.activo ? "entró " + cuando(p.visto) : "sin acceso"}</span>
-        ${falta ? '<span style="color:#fca5a5">Con este nombre no aparece ninguna clase en el horario. Escríbelo igual que en el cuadro de clases.</span>' : ""}</div>
-      <div class="acc">
-        ${p.activo ? '<span class="eti ok">activa</span>' : '<span class="eti no">sin acceso</span>'}
+    return `<div class="eqf">
+      <div class="eqf-n"><b>${esc(p.nombre)}</b>${p.nombre === d.yo ? '<span class="tag">eres tú</span>' : ""}
+        ${p.activo ? '<span class="eti ok">activa</span>' : '<span class="eti no">sin acceso</span>'}</div>
+      <p class="eqf-d">${p.rol === "panel" ? "Gestiona el estudio: lo ve y lo cambia todo." : "Profesora: ve sus clases y pasa lista."}
+        ${p.activo ? (p.visto ? "Entró " + cuando(p.visto) + "." : "Todavía no ha entrado.") : "No puede entrar."}</p>
+      ${falta ? '<p class="eqf-d av">Con este nombre no aparece ninguna clase en el horario. Escríbelo igual que en el cuadro de clases.</p>' : ""}
+      <div class="eqf-b">
         <button class="btn sm" type="button" data-eq-clave="${esc(p.nombre)}">Cambiar clave</button>
         ${p.activo
           ? `<button class="btn sm" type="button" data-eq-baja="${esc(p.nombre)}"${p.nombre === d.yo ? " disabled title='Que te lo quite otra persona del equipo'" : ""}>Quitar acceso</button>`
