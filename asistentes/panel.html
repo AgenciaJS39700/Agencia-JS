@@ -38,6 +38,11 @@ h1{font-size:1.25rem;margin:0}h1 small{display:block;font-size:.78rem;color:var(
 @media(max-width:440px){.stats.flu{grid-template-columns:1fr 1fr}.stats.flu .st b{font-size:1.25rem}}
 /* En el móvil, las columnas de previsión se van: lo que se paga es lo dado */
 @media(max-width:560px){.tt .opt{display:none}}
+.fes{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin:10px 0}
+.fe{display:flex;gap:9px;align-items:flex-start;background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:10px 11px;font-size:.88rem;cursor:pointer}
+.fe.on{border-color:var(--c)}
+.fe input{width:18px;height:18px;margin:1px 0 0;flex:none;accent-color:var(--c)}
+.fe i{display:block;font-style:normal;color:#e8c766;font-size:.78rem;margin-top:2px}
 .ocu{background:var(--ln);border-radius:999px;height:7px;overflow:hidden;min-width:70px;margin-bottom:3px}
 .ocu i{display:block;height:100%;background:var(--c);border-radius:999px}
 .dia{margin-top:18px}.dia h2{font-size:.95rem;margin:0 0 8px;color:var(--c);display:flex;justify-content:space-between}
@@ -762,6 +767,7 @@ async function verHorario() {
            <button class="btn main" type="button" id="h-copiar">Hacer mío el cuadro de clases</button>`}
      </div>
      ${propio ? '<div class="bar"><button class="btn main" type="button" data-hnueva="1">+ Añadir clase</button><button class="btn" type="button" id="h-fabrica">Volver al cuadro de fábrica</button></div>' : ""}
+     <section class="dia" id="hFest"><h2>Festivos y vacaciones<span>cargando…</span></h2></section>
      <section class="dia" id="hOcup"><h2>Cómo van de llenas<span>cargando…</span></h2></section>
      ${ORDEN.map((d) => {
         const l = hor.dias[d] || [];
@@ -775,7 +781,7 @@ async function verHorario() {
           </article>`).join("") || '<p class="vacio">Ese día no hay clases.</p>'}
         </section>`;
       }).join("")}`;
-  pintaOcupacion();
+  pintaFestivos(); pintaOcupacion();
   const cop = $("h-copiar");
   if (cop) cop.onclick = async () => {
     cop.disabled = true;
@@ -788,6 +794,42 @@ async function verHorario() {
     try { await api("panel/horario/archivo", { seguro: true }); verHorario(); } catch (e) { alert(e.message); }
   };
 }
+/* Festivos: cerrar el estudio un día no era el problema; acordarse sí. Los
+   nacionales y los de Andalucía se calculan solos (Semana Santa incluida); los
+   dos del ayuntamiento se proponen marcados para confirmar. */
+async function pintaFestivos(anio) {
+  const s = $("hFest"); if (!s) return;
+  let d;
+  try { d = await api("panel/festivos" + (anio ? "?anio=" + anio : "")); }
+  catch (e) { s.innerHTML = '<h2>Festivos y vacaciones</h2><p class="vacio">No se ha podido cargar.</p>'; return; }
+  const abiertos = d.festivos.filter((f) => !f.cerrado).length;
+  const hoyA = new Date().getFullYear();
+  s.innerHTML = `<h2>Festivos y vacaciones<span>${abiertos ? (abiertos === 1 ? "1 sin cerrar" : abiertos + " sin cerrar") : "todos cerrados"}</span></h2>
+    <div class="bar">
+      <select id="fAnio" style="width:auto" aria-label="Año">${[hoyA, hoyA + 1].map((a) => `<option value="${a}"${a === d.anio ? " selected" : ""}>${a}</option>`).join("")}</select>
+      <button class="btn main" type="button" id="fCerrar">Cerrar los marcados</button>
+      <button class="btn" type="button" id="fAbrir">Volver a abrirlos</button>
+    </div>
+    <div class="fes">${d.festivos.map((f) => `<label class="fe${f.cerrado ? " on" : ""}">
+       <input type="checkbox" value="${f.fecha}"${f.cerrado ? " checked" : ""}>
+       <span><b>${esc(corto(f.fecha))}</b> · ${esc(f.semana)}<br>${esc(f.nombre)}
+       ${f.confirmar ? '<i class="av">lo fija el ayuntamiento: confírmalo</i>' : ""}</span></label>`).join("")}</div>
+    <p class="vacio">${esc(d.aviso)} Para las vacaciones de un periodo entero, usa «Cerrar horas o días» en la Agenda.</p>`;
+  $("fAnio").onchange = () => pintaFestivos(+$("fAnio").value);
+  const marcados = () => [...s.querySelectorAll(".fe input:checked")].map((i) => i.value);
+  $("fCerrar").onclick = async () => {
+    const f = marcados(); if (!f.length) return alert("Marca los días que quieras cerrar.");
+    try { const r = await api("panel/festivos/cerrar", { fechas: f }); alert(r.cerrados ? `Cerrados ${r.cerrados} días.` : "Ya estaban todos cerrados."); pintaFestivos(d.anio); cargar(); }
+    catch (e) { alert(e.message); }
+  };
+  $("fAbrir").onclick = async () => {
+    const f = marcados(); if (!f.length) return alert("Marca los días que quieras volver a abrir.");
+    if (!confirm("¿Volver a abrir esos días? La gente podrá reservar en ellos.")) return;
+    try { await api("panel/festivos/cerrar", { fechas: f, abrir: true }); pintaFestivos(d.anio); cargar(); }
+    catch (e) { alert(e.message); }
+  };
+}
+
 /* Cómo va de llena cada clase: el dato que decide si se cierra, se mueve de hora
    o se cambia de profesor. Una clase al 20 % ocho semanas seguidas cuesta dinero. */
 async function pintaOcupacion(semanas) {

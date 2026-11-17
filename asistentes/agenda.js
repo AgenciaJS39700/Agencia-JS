@@ -28,6 +28,7 @@ import { atenderPanelFacturas } from "./facturas.js";
 import { recuperarAcceso, atenderRecados, atenderSustituciones, recadosDe, cambiosDe, dirigidoA } from "./equipo-extra.js";
 import { conHorario, atenderHorario } from "./horario.js";
 import { anotador, atenderRegistro } from "./registro.js";
+import { atenderFestivos } from "./festivos.js";
 
 const conPrefijo = (t) => { const d = String(t || "").replace(/\D/g, ""); return d.length === 9 ? "34" + d : d; };
 
@@ -703,6 +704,8 @@ ${gente.length} de ${ses.cap} plazas · ${libres} libre${libres === 1 ? "" : "s"
     if (pg1) return pg1;
     const ph1 = await atenderHorario(request, env, cfg, cfgArchivo, ruta, url, yo, apuntar);
     if (ph1) return ph1;
+    const pv1 = await atenderFestivos(request, env, cfg, ruta, url, yo, apuntar);
+    if (pv1) return pv1;
     const pr1 = await atenderRecados(request, env, cfg, ruta, url, yo);
     if (pr1) return pr1;
     const ps1 = await atenderSustituciones(request, env, cfg, ruta, url, yo, apuntar);
