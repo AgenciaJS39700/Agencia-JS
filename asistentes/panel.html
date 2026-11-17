@@ -667,7 +667,7 @@ async function verFacturas(mes) {
           ${p.tipo === "rectificativa" ? "" : `<button class="btn sm" type="button" data-rect="${p.id}" data-num="${esc(p.numero)}">Rectificar</button>`}</td></tr>`).join("")}
        </tbody></table></div>` : '<p class="vacio">Ese mes no tiene ninguna factura emitida.</p>'}
 
-     <p class="vacio" style="margin-top:14px">Datos fiscales de la factura: <b>${esc(d.fiscal.nombre)}</b>${d.fiscal.nif ? " · NIF " + esc(d.fiscal.nif) : ""}${d.fiscal.iva ? " · IVA " + d.fiscal.iva + " %" : " · sin IVA"}.${d.fiscal.exento ? " " + esc(d.fiscal.exento) : ""}</p>`;
+     <p class="vacio" style="margin-top:14px">Las facturas salen a nombre de <b>${esc(d.fiscal.nombre)}</b>${d.fiscal.nif ? " · NIF " + esc(d.fiscal.nif) : ""}, con <b>${d.fiscal.iva ? "IVA del " + d.fiscal.iva + " %" : "IVA exento"}</b> por defecto (al emitir una a mano puedes ponerle otro).${d.fiscal.exento ? " " + esc(d.fiscal.exento) : ""}</p>`;
 
   $("fMes").onchange = (e) => verFacturas(e.target.value);
   $("facNueva").onclick = facturaNueva;
