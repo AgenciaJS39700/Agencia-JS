@@ -697,8 +697,29 @@ async function verAlumna(id) {
      <p class="vacio" style="margin:0 0 8px">Facturado a esta alumna: <b>${eur((d.facturado || {}).total || 0)}</b> en ${((d.facturado || {}).n || 0) === 1 ? "1 factura" : ((d.facturado || {}).n || 0) + " facturas"}.
       ${a.nif ? "NIF " + esc(a.nif) + "." : '<button class="enlace" type="button" id="datosFis">Añadir NIF y dirección</button>'}</p>
      ${d.pagos.length ? `<div class="tt-w"><table class="tt"><tbody>${d.pagos.map((p) => `<tr${p.tipo === "rectificativa" ? ' style="color:#fca5a5"' : ""}><td>${corto(p.fecha)}</td><td>${esc(p.concepto)}</td><td>${eur(p.importe)}</td><td>${esc(p.metodo)}</td>
-       <td>${p.numero ? `<a class="btn sm" href="/api/as/${slug}/panel/factura?id=${p.id}&${acc()}" target="_blank" rel="noopener">${esc(p.numero)}</a>` : (p.estado === "pagado" ? '<span class="eti">sin factura</span>' : `<span class="eti no">${esc(p.estado)}</span>`)}</td></tr>`).join("")}</tbody></table></div>` : '<p class="vacio">Sin pagos.</p>'}`;
+       <td>${p.numero ? `<a class="btn sm" href="/api/as/${slug}/panel/factura?id=${p.id}&${acc()}" target="_blank" rel="noopener">${esc(p.numero)}</a>` : (p.estado === "pagado" ? '<span class="eti">sin factura</span>' : `<span class="eti no">${esc(p.estado)}</span>`)}</td></tr>`).join("")}</tbody></table></div>` : '<p class="vacio">Sin pagos.</p>'}
+     <h3 style="font-size:.9rem;color:var(--c);margin:16px 0 6px">Sus datos</h3>
+     <p class="vacio" style="margin:0 0 8px">Si pide una copia de lo que guardáis de ella, o que la borréis, se hace desde aquí.</p>
+     <div class="bar" style="margin:0">
+       <a class="btn sm" href="/api/as/${slug}/panel/alumna/datos?id=${id}&${acc()}" download>Descargar sus datos</a>
+       <button class="btn sm del" type="button" id="borrarAl">Borrar sus datos</button></div>`;
   $("d-alum").showModal();
+  // Borrar a una alumna a petición suya: se enseña exactamente qué se va y qué se
+  // queda (las facturas emitidas, que la ley obliga a guardar) antes de tocar nada.
+  $("borrarAl").onclick = async () => {
+    try { await api("panel/alumna/borrar", { id }); }
+    catch (er) {
+      if (!er.datos || !er.datos.confirmar) return alert(er.message);
+      if (!confirm(er.message + "\n\n¿Lo borro?")) return;
+      if (!confirm(`Última comprobación: vas a borrar a ${er.datos.nombre}. Escrito queda que fue a petición suya. ¿Seguro?`)) return;
+      try {
+        const r = await api("panel/alumna/borrar", { id, seguro: true });
+        $("d-alum").close();
+        alert(r.facturas ? `Borrada. Se quedan ${r.facturas === 1 ? "su factura emitida" : "sus " + r.facturas + " facturas emitidas"}, sueltas de la ficha, porque la ley obliga a guardarlas.` : "Borrada. No queda nada suyo.");
+        verAlumnas();
+      } catch (e2) { alert(e2.message); }
+    }
+  };
   const df = $("datosFis");
   if (df) df.onclick = async () => {
     const nif = prompt("NIF o CIF de " + (a.nombre || a.email) + " (para que sus facturas lo lleven):", a.nif || "");

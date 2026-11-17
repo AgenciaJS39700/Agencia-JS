@@ -481,7 +481,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     }
     // Rutas que se abren como enlace (descarga o suscripción), donde la clave no
     // puede ir en una cabecera y viaja en ?k=
-    const porURL = ruta === "agenda.ics" || ruta === "panel/exportar" || ruta === "panel/facturacion/csv" || ruta === "panel/factura" || ruta === "panel/lista";
+    const porURL = ruta === "agenda.ics" || ruta === "panel/exportar" || ruta === "panel/facturacion/csv" || ruta === "panel/factura" || ruta === "panel/lista" || ruta === "panel/alumna/datos";
     // El navegador manda «Bearer usuario:contraseña»; los enlaces de descarga, ?u= y ?k=
     const cab = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     const corte = cab.indexOf(":");

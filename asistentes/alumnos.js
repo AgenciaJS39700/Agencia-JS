@@ -900,6 +900,76 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url, apuntar)
     return res({ ok: true });
   }
 
+  /* ---- lo que el estudio guarda de una alumna: dárselo y borrarlo ----
+     Cualquiera puede pedir una copia de sus datos y que se le borren. Hasta
+     ahora había que entrar en la base de datos a mano, que es como no poder
+     hacerlo. Las facturas emitidas son la excepción: la ley obliga a
+     guardarlas, así que se dice claro en vez de prometer un borrado que no
+     sería verdad. */
+  if (ruta === "panel/alumna/datos" && request.method === "GET") {
+    const id = +url.searchParams.get("id") || 0;
+    const a = await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1 AND slug = ?2").bind(id, cfg.slug).first();
+    if (!a) return res({ error: "No encontrada" }, 404);
+    const [citas, bonos, pagos, espera] = await Promise.all([
+      env.CITAS.prepare("SELECT codigo, servicio_n, fecha, inicio, estado, asistio, nota, origen, creada FROM citas WHERE slug=?1 AND alumno_id=?2 ORDER BY fecha").bind(cfg.slug, id).all(),
+      env.CITAS.prepare("SELECT nombre, estado, inicio, fin, sem, tipos, recurrente FROM bonos WHERE slug=?1 AND alumno_id=?2 ORDER BY id").bind(cfg.slug, id).all(),
+      env.CITAS.prepare("SELECT fecha, concepto, importe, estado, metodo, numero, tipo FROM pagos WHERE slug=?1 AND alumno_id=?2 ORDER BY id").bind(cfg.slug, id).all(),
+      env.CITAS.prepare("SELECT servicio, fecha, inicio FROM espera WHERE slug=?1 AND alumno_id=?2").bind(cfg.slug, id).all(),
+    ]);
+    const { clave, pass_salt, pass_iter, reset_tok, ...ficha } = a;   // el hash de su contraseña no es un dato suyo que entregar
+    const doc = {
+      estudio: cfg.negocio.nombre,
+      sacado: new Date().toISOString(),
+      aviso: "Copia de todo lo que el estudio guarda de esta persona. La contraseña no se incluye porque se guarda cifrada y no se puede leer.",
+      ficha, clases: citas.results || [], bonos: bonos.results || [],
+      pagos: (pagos.results || []).map((p) => ({ ...p, importe: (p.importe / 100).toFixed(2) + " €" })),
+      listaDeEspera: espera.results || [],
+    };
+    return new Response(JSON.stringify(doc, null, 2), {
+      headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store",
+        "Content-Disposition": `attachment; filename="datos-${(a.nombre || "alumna").toLowerCase().replace(/[^a-z0-9]+/g, "-")}.json"` },
+    });
+  }
+
+  if (ruta === "panel/alumna/borrar" && post) {
+    const b = await cuerpo();
+    const id = +b.id || 0;
+    const a = await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1 AND slug = ?2").bind(id, cfg.slug).first();
+    if (!a) return res({ error: "No encontrada" }, 404);
+    const cuenta = async (t, extra = "") => {
+      const r = await env.CITAS.prepare(`SELECT COUNT(*) AS n FROM ${t} WHERE slug = ?1 AND alumno_id = ?2 ${extra}`).bind(cfg.slug, id).first().catch(() => null);
+      return r ? r.n : 0;
+    };
+    const [nc, nb, np, nf, ne] = await Promise.all([
+      cuenta("citas"), cuenta("bonos"), cuenta("pagos", "AND numero IS NULL"),
+      cuenta("pagos", "AND numero IS NOT NULL"), cuenta("espera"),
+    ]);
+    if (!b.seguro) {
+      return res({
+        confirmar: true,
+        nombre: a.nombre || a.email,
+        borra: { clases: nc, bonos: nb, cobros: np, espera: ne },
+        guarda: nf,
+        mensaje: `Se borra su ficha, sus datos de contacto, su contraseña, ${nc} clases, ${nb} bonos, ${np} cobros sin factura y ${ne} apuntes en lista de espera. ` +
+          (nf ? `Sus ${nf === 1 ? "1 factura emitida se queda" : nf + " facturas emitidas se quedan"}: la ley obliga a guardarlas y llevan su nombre y su NIF tal como se emitieron. Dejan de estar enlazadas con la ficha.` : "No tiene ninguna factura emitida, así que no queda nada suyo.") +
+          " Esto no se puede deshacer.",
+      }, 409);
+    }
+    // Las facturas emitidas se quedan como se emitieron; se sueltan de la ficha
+    await env.CITAS.batch([
+      env.CITAS.prepare("UPDATE pagos SET alumno_id = NULL WHERE slug = ?1 AND alumno_id = ?2 AND numero IS NOT NULL").bind(cfg.slug, id),
+      env.CITAS.prepare("DELETE FROM pagos WHERE slug = ?1 AND alumno_id = ?2 AND numero IS NULL").bind(cfg.slug, id),
+      env.CITAS.prepare("DELETE FROM citas WHERE slug = ?1 AND alumno_id = ?2").bind(cfg.slug, id),
+      env.CITAS.prepare("DELETE FROM bonos WHERE slug = ?1 AND alumno_id = ?2").bind(cfg.slug, id),
+      env.CITAS.prepare("DELETE FROM espera WHERE slug = ?1 AND alumno_id = ?2").bind(cfg.slug, id),
+      env.CITAS.prepare("DELETE FROM al_sesiones WHERE alumno_id = ?1").bind(id),
+      env.CITAS.prepare("DELETE FROM alumnos WHERE id = ?1 AND slug = ?2").bind(id, cfg.slug),
+    ]);
+    await env.CITAS.prepare("DELETE FROM al_codigos WHERE slug = ?1 AND email = ?2").bind(cfg.slug, a.email || "").run().catch(() => {});
+    if (apuntar) await apuntar("alumna", `borró a ${a.nombre || a.email} a petición suya (se quedan ${nf} facturas emitidas, por obligación legal)`);
+    return res({ ok: true, facturas: nf });
+  }
+
   // Quién debe dinero y quién va a quedarse colgada: el agujero que no se ve
   // hasta que alguien se planta en recepción sin bono.
   if (ruta === "panel/deudas" && request.method === "GET") {
