@@ -857,6 +857,15 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url) {
     });
   }
 
+  // Nota interna: lo que hay que tener en cuenta de esa alumna (una lesión, un
+  // embarazo, una operación reciente). La ve el equipo al pasar lista, nunca ella.
+  if (ruta === "panel/alumna/nota" && post) {
+    const b = await cuerpo();
+    await env.CITAS.prepare("UPDATE alumnos SET nota_interna = ?3 WHERE id = ?1 AND slug = ?2")
+      .bind(+b.id || 0, cfg.slug, limpiar(b.nota, 300) || null).run();
+    return res({ ok: true });
+  }
+
   if (ruta === "panel/alumna/fiscal" && post) {
     const b = await cuerpo();
     await env.CITAS.prepare("UPDATE alumnos SET nif = ?3, direccion = ?4 WHERE id = ?1 AND slug = ?2")

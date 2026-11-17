@@ -25,6 +25,7 @@ import { correo, marco } from "./correo.js";
 import { atenderAlumnos, atenderPanelAlumnos, alumnaDeLaSesion, compruebaBono, avisarEspera, crearPagoEvento } from "./alumnos.js";
 import { atenderEventos, atenderPanelEventos } from "./eventos.js";
 import { atenderPanelFacturas } from "./facturas.js";
+import { recuperarAcceso, atenderRecados, atenderSustituciones, recadosDe, cambiosDe } from "./equipo-extra.js";
 
 const conPrefijo = (t) => { const d = String(t || "").replace(/\D/g, ""); return d.length === 9 ? "34" + d : d; };
 
@@ -102,7 +103,7 @@ export function salNueva() {
 export const normUsuario = (u) =>
   String(u == null ? "" : u).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9._-]/g, "").slice(0, 40);
 
-async function equipo(env, cfg) {
+export async function equipo(env, cfg) {
   let filas = [], ultimos = [];
   try {
     const [a, v] = await env.CITAS.batch([
@@ -446,11 +447,20 @@ export async function atenderAgenda(request, env, ctx, limitar) {
   const ruta = m[2];
   const ip = request.headers.get("CF-Connecting-IP") || "desconocida";
 
-  /* ---- panel y calendario (clave del negocio) ---- */
+  /* ---- panel y calendario (acceso del negocio) ---- */
   if (ruta.startsWith("panel/") || ruta === "agenda.ics") {
     if (!env.CITAS) return res({ error: "Agenda no configurada" }, 503);
     const o = request.headers.get("Origin");
     if (o && !mismoSitio(o, url, cfg)) return res({ error: "Origen no permitido" }, 403);
+
+    // Olvidar la contraseña: estas dos van ANTES de pedir acceso, claro.
+    // El enlace sale siempre al correo del estudio, nunca a uno que escriba quien lo pide.
+    if ((ruta === "panel/olvidada" || ruta === "panel/nueva-clave") && request.method === "POST") {
+      if (!limitar(ip)) return res({ error: "Demasiados intentos. Espera unos minutos." }, 429);
+      let b; try { b = await cuerpo(request); } catch (e) { return res({ error: "JSON no válido" }, 400); }
+      const r = await recuperarAcceso(env, cfg, ruta, b);
+      return res(r.cuerpo, r.estado);
+    }
     // Rutas que se abren como enlace (descarga o suscripción), donde la clave no
     // puede ir en una cabecera y viaja en ?k=
     const porURL = ruta === "agenda.ics" || ruta === "panel/exportar" || ruta === "panel/facturacion/csv" || ruta === "panel/factura";
@@ -481,6 +491,24 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       if (!serv || !RE_FECHA.test(fecha)) return res({ error: "Servicio o fecha no válidos" }, 400);
       return res({ fecha, huecos: (await huecosDia(env, cfg, fecha, serv, true)).map(hhmm) });
     }
+    // El cuadro de clases de un día con quién lo da: es lo que necesita el panel
+    // para poner un sustituto cuando alguien falla.
+    if (ruta === "panel/dia" && request.method === "GET") {
+      const f = RE_FECHA.test(url.searchParams.get("fecha") || "") ? url.searchParams.get("fecha") : ahora().fecha;
+      if (!porSesiones(cfg)) return res({ fecha: f, clases: [], sesiones: false });
+      const cam = await cambiosDe(env, cfg, f, f);
+      const l = await equipo(env, cfg);
+      return res({
+        fecha: f, dia: legible(f), sesiones: true,
+        equipo: l.filter((p) => p.activo).map((p) => p.nombre),
+        clases: sesionesDia(cfg, f).map((x) => {
+          const sub = cam[`${f}|${x.inicio}|${x.s}`];
+          return { hora: x.h, inicio: x.inicio, servicio: x.s, nombre: x.nombre, sala: x.sala, min: x.min, plazas: x.cap,
+                   prof: x.prof || "", da: sub && sub.prof ? sub.prof : x.prof || "", sustituida: !!(sub && sub.prof), nota: sub ? sub.nota || "" : "" };
+        }),
+      });
+    }
+
     if (ruta === "panel/citas" && request.method === "GET") {
       const desde = RE_FECHA.test(url.searchParams.get("desde") || "") ? url.searchParams.get("desde") : ahora().fecha;
       const dias = Math.min(Math.max(+url.searchParams.get("dias") || 14, 1), 92);
@@ -509,6 +537,10 @@ export async function atenderAgenda(request, env, ctx, limitar) {
           }),
       });
     }
+    const pr1 = await atenderRecados(request, env, cfg, ruta, url, yo);
+    if (pr1) return pr1;
+    const ps1 = await atenderSustituciones(request, env, cfg, ruta, url, yo);
+    if (ps1) return ps1;
     const pf1 = await atenderPanelFacturas(request, env, cfg, ruta, url);
     if (pf1) return pf1;
     const pa1 = await atenderPanelAlumnos(request, env, cfg, ruta, url);
@@ -581,6 +613,10 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       return res({ ok: true, dias: fechas.length });
     }
     if (ruta === "panel/desbloquear") { await env.CITAS.prepare("DELETE FROM bloqueos WHERE slug = ? AND id = ?").bind(cfg.slug, +b.id || 0).run(); return res({ ok: true }); }
+    const pr2 = await atenderRecados(request, env, cfg, ruta, url, yo);
+    if (pr2) return pr2;
+    const ps2 = await atenderSustituciones(request, env, cfg, ruta, url, yo);
+    if (ps2) return ps2;
     const pf2 = await atenderPanelFacturas(request, env, cfg, ruta, url);
     if (pf2) return pf2;
     const pa2 = await atenderPanelAlumnos(request, env, cfg, ruta, url);
@@ -603,6 +639,9 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       return res({ error: "Usuario o contraseña incorrectos" }, 401);
     }
 
+    const prf = await atenderRecados(request, env, cfg, ruta, url, profe);
+    if (prf) return prf;
+
     /* Cada profesora cambia su propia clave sin tener que pedírselo a nadie. */
     if (ruta === "profe/clave" && request.method === "POST") {
       let b; try { b = await cuerpo(request); } catch (e) { return res({ error: "JSON no válido" }, 400); }
@@ -621,28 +660,44 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       const desde = RE_FECHA.test(url.searchParams.get("desde") || "") ? url.searchParams.get("desde") : ahora().fecha;
       const dias = Math.min(Math.max(+url.searchParams.get("dias") || 7, 1), 31);
       const hasta = sumar(desde, dias - 1);
-      const { results } = await env.CITAS.prepare(
-        "SELECT id, codigo, servicio, servicio_n, fecha, inicio, nombre, telefono, email, nota, estado, asistio FROM citas WHERE slug = ? AND fecha BETWEEN ? AND ? ORDER BY fecha, inicio"
-      ).bind(cfg.slug, desde, hasta).all();
-      const citas = results || [];
+      // La nota interna (una lesión, un embarazo, lo que haya que tener en cuenta) viaja
+      // con la lista: es justo cuando el profesor la necesita.
+      const [c1, cam] = await Promise.all([
+        env.CITAS.prepare(
+          `SELECT c.id, c.codigo, c.servicio, c.servicio_n, c.fecha, c.inicio, c.nombre, c.telefono, c.email, c.nota,
+                  c.estado, c.asistio, a.nota_interna
+           FROM citas c LEFT JOIN alumnos a ON a.id = c.alumno_id
+           WHERE c.slug = ? AND c.fecha BETWEEN ? AND ? ORDER BY c.fecha, c.inicio`).bind(cfg.slug, desde, hasta).all(),
+        cambiosDe(env, cfg, desde, hasta),
+      ]);
+      const citas = c1.results || [];
       const dias2 = [];
       for (let f = desde; f <= hasta; f = sumar(f, 1)) {
-        const mias = porSesiones(cfg) ? sesionesDia(cfg, f).filter((x) => x.prof === profe.nombre) : [];
+        // Con sustitución, la clase es de quien la da ESE día, no de quien figura en el cartel
+        const todas = porSesiones(cfg) ? sesionesDia(cfg, f) : [];
+        const mias = todas.filter((x) => {
+          const sub = cam[`${f}|${x.inicio}|${x.s}`];
+          return (sub && sub.prof ? sub.prof : x.prof) === profe.nombre;
+        });
         if (!mias.length) continue;
         dias2.push({
           fecha: f, dia: legible(f),
           clases: mias.map((x) => {
             const g = citas.filter((c) => c.fecha === f && c.inicio === x.inicio && c.servicio === x.s);
+            const sub = cam[`${f}|${x.inicio}|${x.s}`];
             return {
               hora: x.h, nombre: x.nombre, sala: x.sala, min: x.min, plazas: x.cap,
+              cubre: sub && sub.prof === profe.nombre && x.prof !== profe.nombre ? x.prof : "",
+              aviso: sub ? sub.nota || "" : "",
               apuntadas: g.filter((c) => c.estado === "ok").length,
-              gente: g.map((c) => ({ id: c.id, nombre: c.nombre, telefono: c.telefono, nota: c.nota, estado: c.estado, asistio: c.asistio, codigo: c.codigo })),
+              gente: g.map((c) => ({ id: c.id, nombre: c.nombre, telefono: c.telefono, nota: c.nota, interna: c.nota_interna || "", estado: c.estado, asistio: c.asistio, codigo: c.codigo })),
             };
           }),
         });
       }
       visto(env, cfg, profe.nombre, ctx);
-      return res({ profe: profe.nombre, negocio: cfg.negocio.nombre, color: cfg.color, desde, dias: dias2 });
+      const recs = await recadosDe(env, cfg, profe).catch(() => []);
+      return res({ profe: profe.nombre, rol: profe.rol, negocio: cfg.negocio.nombre, color: cfg.color, desde, dias: dias2, sinLeer: recs.filter((r) => !r.leido).length });
     }
 
     if (ruta === "profe/asistencia" && request.method === "POST") {
