@@ -38,6 +38,8 @@ h1{font-size:1.25rem;margin:0}h1 small{display:block;font-size:.78rem;color:var(
 @media(max-width:440px){.stats.flu{grid-template-columns:1fr 1fr}.stats.flu .st b{font-size:1.25rem}}
 /* En el móvil, las columnas de previsión se van: lo que se paga es lo dado */
 @media(max-width:560px){.tt .opt{display:none}}
+.ocu{background:var(--ln);border-radius:999px;height:7px;overflow:hidden;min-width:70px;margin-bottom:3px}
+.ocu i{display:block;height:100%;background:var(--c);border-radius:999px}
 .dia{margin-top:18px}.dia h2{font-size:.95rem;margin:0 0 8px;color:var(--c);display:flex;justify-content:space-between}
 .dia h2 span{color:var(--mu);font-weight:500}
 .cita,.blq{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:start;padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--ln);margin-bottom:8px}
@@ -760,6 +762,7 @@ async function verHorario() {
            <button class="btn main" type="button" id="h-copiar">Hacer mío el cuadro de clases</button>`}
      </div>
      ${propio ? '<div class="bar"><button class="btn main" type="button" data-hnueva="1">+ Añadir clase</button><button class="btn" type="button" id="h-fabrica">Volver al cuadro de fábrica</button></div>' : ""}
+     <section class="dia" id="hOcup"><h2>Cómo van de llenas<span>cargando…</span></h2></section>
      ${ORDEN.map((d) => {
         const l = hor.dias[d] || [];
         return `<section class="dia"><h2>${DIAS[d].charAt(0).toUpperCase() + DIAS[d].slice(1)}<span>${l.length === 1 ? "1 clase" : l.length + " clases"}</span></h2>
@@ -772,6 +775,7 @@ async function verHorario() {
           </article>`).join("") || '<p class="vacio">Ese día no hay clases.</p>'}
         </section>`;
       }).join("")}`;
+  pintaOcupacion();
   const cop = $("h-copiar");
   if (cop) cop.onclick = async () => {
     cop.disabled = true;
@@ -784,6 +788,29 @@ async function verHorario() {
     try { await api("panel/horario/archivo", { seguro: true }); verHorario(); } catch (e) { alert(e.message); }
   };
 }
+/* Cómo va de llena cada clase: el dato que decide si se cierra, se mueve de hora
+   o se cambia de profesor. Una clase al 20 % ocho semanas seguidas cuesta dinero. */
+async function pintaOcupacion(semanas) {
+  const s = $("hOcup"); if (!s) return;
+  let d;
+  try { d = await api("panel/horario/ocupacion?semanas=" + (semanas || 8)); }
+  catch (e) { s.innerHTML = '<h2>Cómo van de llenas</h2><p class="vacio">No se ha podido calcular.</p>'; return; }
+  const barra = (c) => `<div class="ocu"><i style="width:${Math.min(100, c.porcentaje)}%"></i></div>`;
+  s.innerHTML = `<h2>Cómo van de llenas<span>${d.media}% de media · ${d.semanas} semanas</span></h2>
+    <div class="bar"><select id="hOcupSem" style="width:auto" aria-label="Semanas que se miran">
+      ${[4, 8, 12, 26].map((n) => `<option value="${n}"${n === d.semanas ? " selected" : ""}>últimas ${n} semanas</option>`).join("")}
+    </select></div>
+    ${d.flojas.length ? `<div class="box" style="margin-bottom:12px"><b>${d.flojas.length === 1 ? "Una clase no llena" : d.flojas.length + " clases no llenan"}</b>
+      <p class="d" style="margin:.3rem 0 0">Llevan 3 semanas o más por debajo del ${d.umbral} % de sus plazas: ${d.flojas.map((c) => esc(DIAS[c.dia] + " " + c.hora + " · " + c.nombre)).join(" · ")}. Mirar de moverlas de hora, juntarlas con otra o cambiarles el profesor.</p></div>` : ""}
+    ${d.clases.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Clase</th><th>Media</th><th>Lleno</th><th class="opt">Veces</th></tr></thead><tbody>
+      ${d.clases.map((c) => `<tr><td>${esc(DIAS[c.dia])} ${esc(c.hora)}<div class="d">${esc(c.nombre)}${c.prof ? " · " + esc(c.prof) : ""}</div></td>
+        <td>${c.media} de ${c.plazas}</td><td>${barra(c)}<span class="d">${c.porcentaje}%</span></td><td class="opt">${c.veces}</td></tr>`).join("")}
+     </tbody></table></div><p class="vacio">Cuenta las clases ya dadas desde el ${corto(d.desde)}. Las anuladas no suman.</p>`
+      : '<p class="vacio">Todavía no hay clases dadas que contar.</p>'}`;
+  const sel = $("hOcupSem");
+  if (sel) sel.onchange = () => pintaOcupacion(+sel.value);
+}
+
 $("vHorario").addEventListener("click", async (e) => {
   const nueva = e.target.closest("[data-hnueva]"), ed = e.target.closest("[data-hedit]"), ba = e.target.closest("[data-hbaja]");
   if (nueva) return claseDialogo(null, 1);

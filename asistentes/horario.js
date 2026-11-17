@@ -62,6 +62,71 @@ async function reservadas(env, cfg, dia, hora, servicio, hoy) {
 }
 const min2 = (t) => { const [a, b] = String(t).split(":").map(Number); return a * 60 + b; };
 
+/* ---------------------------------------------------------------- ocupación */
+/**
+ * Cómo va de llena cada clase del cuadro en las últimas semanas. Es el dato que
+ * decide si una clase se cierra, se mueve de hora o se cambia de profesor, y
+ * hasta ahora no estaba en ninguna parte: el panel contaba el dinero, no las
+ * sillas vacías.
+ */
+export async function ocupacionDe(env, cfg, semanas = 8, umbral = 40) {
+  const hoy = new Date(Date.now() + 3600000).toISOString().slice(0, 10);
+  const desde = new Date(Date.now() + 3600000 - semanas * 7 * 86400000).toISOString().slice(0, 10);
+  const { results } = await env.CITAS.prepare(
+    `SELECT fecha, inicio, servicio, COUNT(*) AS n FROM citas
+     WHERE slug = ?1 AND estado = 'ok' AND fecha >= ?2 AND fecha < ?3
+     GROUP BY fecha, inicio, servicio`).bind(cfg.slug, desde, hoy).all();
+  // Cuántas veces ha caído cada clase en la ventana y cuánta gente vino a cada una
+  const porSlot = {};
+  for (const r of results || []) {
+    const d = new Date(r.fecha + "T12:00:00Z").getUTCDay();
+    const k = `${d}|${r.inicio}|${r.servicio}`;
+    (porSlot[k] = porSlot[k] || []).push({ fecha: r.fecha, n: r.n });
+  }
+  const ses = cfg.negocio.sesiones || {};
+  const fuera = [];
+  for (const [d, lista] of Object.entries(ses)) {
+    for (const x of lista || []) {
+      const inicio = min2(x.h);
+      const k = `${d}|${inicio}|${x.s}`;
+      const dadas = veces(+d, desde, hoy);
+      if (!dadas) continue;
+      const hechas = (porSlot[k] || []).sort((a, b) => a.fecha.localeCompare(b.fecha));
+      const total = hechas.reduce((s, v) => s + v.n, 0);
+      const cap = x.cap || 1;
+      const media = total / dadas;
+      // Semanas seguidas por debajo del umbral, contando hacia atrás desde la última
+      let seguidas = 0;
+      const ultimas = new Array(semanas).fill(0);
+      hechas.forEach((v) => { const j = semanaDe(v.fecha, desde); if (j >= 0 && j < semanas) ultimas[j] = v.n; });
+      for (let i = ultimas.length - 1; i >= 0; i--) { if ((ultimas[i] / cap) * 100 < umbral) seguidas++; else break; }
+      fuera.push({
+        dia: +d, hora: x.h, servicio: x.s, nombre: x.nombre || x.s, sala: x.sala || "", prof: x.prof || "",
+        plazas: cap, veces: dadas, media: Math.round(media * 10) / 10,
+        porcentaje: Math.round((media / cap) * 100), seguidas, ultimas,
+      });
+    }
+  }
+  fuera.sort((a, b) => a.porcentaje - b.porcentaje);
+  return {
+    semanas, umbral, desde,
+    clases: fuera,
+    flojas: fuera.filter((c) => c.porcentaje < umbral && c.seguidas >= 3),
+    media: fuera.length ? Math.round(fuera.reduce((s, c) => s + c.porcentaje, 0) / fuera.length) : 0,
+  };
+}
+/** Cuántas veces cae ese día de la semana entre dos fechas (sin contar la de hoy). */
+function veces(d, desde, hasta) {
+  let n = 0;
+  for (let t = Date.parse(desde + "T12:00:00Z"); t < Date.parse(hasta + "T12:00:00Z"); t += 86400000) {
+    if (new Date(t).getUTCDay() === d) n++;
+  }
+  return n;
+}
+function semanaDe(fecha, desde) {
+  return Math.floor((Date.parse(fecha + "T12:00:00Z") - Date.parse(desde + "T12:00:00Z")) / (7 * 86400000));
+}
+
 /* ---------------------------------------------------------------- rutas del panel */
 export async function atenderHorario(request, env, cfg, cfgArchivo, ruta, url, yo, apuntar) {
   if (!ruta.startsWith("panel/horario")) return null;
@@ -69,6 +134,12 @@ export async function atenderHorario(request, env, cfg, cfgArchivo, ruta, url, y
   if (!cfgArchivo.negocio || !cfgArchivo.negocio.sesiones) return res({ error: "Este negocio no trabaja con cuadro de clases." }, 400);
   const post = request.method === "POST";
   const hoy = new Date(Date.now() + 3600000).toISOString().slice(0, 10);
+
+  if (ruta === "panel/horario/ocupacion" && request.method === "GET") {
+    const sem = Math.min(26, Math.max(2, +url.searchParams.get("semanas") || 8));
+    const um = Math.min(90, Math.max(10, +url.searchParams.get("umbral") || 40));
+    return res(await ocupacionDe(env, cfg, sem, um));
+  }
 
   if (ruta === "panel/horario" && request.method === "GET") {
     const dias = await cuadroDe(env, cfg.slug);
