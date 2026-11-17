@@ -6,7 +6,7 @@ import { responderAsistente } from "./asistentes/motor.js";
 import { atenderVoz } from "./voz/agenda.js";
 import { atenderAgenda, enviarRecordatorios, manifiesto } from "./asistentes/agenda.js";
 import { avisosDiarios } from "./asistentes/alumnos.js";
-import CLIENTES from "./asistentes/clientes/index.js";
+import { CLIENTES } from "./asistentes/clientes/index.js";
 import { atenderCuenta } from "./mesas/cuenta.js";
 import { registrarMetricas } from "./metricas/registro.js";
 
