@@ -102,10 +102,12 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 <body>
 <main class="wrap">
   <section class="login" id="login">
-    <h1>Panel de citas</h1>
-    <p>Escribe la clave que te dio Agencia JS.</p>
+    <h1>Panel del estudio</h1>
+    <p>Entra con tu usuario y tu contraseña.</p>
     <form id="fl" class="box" style="text-align:left">
-      <label for="clave">Clave</label>
+      <label for="usuario">Usuario</label>
+      <input id="usuario" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required style="margin-bottom:10px">
+      <label for="clave">Contraseña</label>
       <div style="display:flex;gap:8px"><input id="clave" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" required><button class="btn" type="button" id="ver-clave" aria-label="Mostrar la clave" aria-pressed="false">👁</button></div>
       <label style="display:flex;gap:.5rem;align-items:center;margin:10px 0 12px;color:var(--tx)"><input type="checkbox" id="rec" style="width:auto;min-height:0" checked> Recordar en este dispositivo</label>
       <button class="btn main" style="width:100%" type="submit">Entrar</button>
@@ -245,41 +247,48 @@ const hoyISO = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid
 const sumar = (f, n) => new Date(Date.parse(f + "T12:00:00Z") + n * 864e5).toISOString().slice(0, 10);
 const largo = (f) => { const t = new Date(f + "T12:00:00Z").toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }); return t.charAt(0).toUpperCase() + t.slice(1); };
 const KEY = "ajs-panel-" + slug;
-let clave = "", desde = hoyISO(), negocio = null, vista = "lista", ultimo = null;
+let clave = "", usuario = "", desde = hoyISO(), negocio = null, vista = "lista", ultimo = null, yo = null;
 const lunes = (f) => sumar(f, -((new Date(f + "T12:00:00Z").getUTCDay() + 6) % 7));
 try { vista = localStorage.getItem("ajs-vista") === "semana" ? "semana" : "lista"; } catch (e) { /* sin almacenamiento */ }
 $("mf").href = `/panel/${slug}/app.webmanifest`;
-try { clave = localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || ""; } catch (e) { /* sin almacenamiento */ }
+try {
+  const g = JSON.parse(localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || "null");
+  if (g && g.u) { usuario = g.u; clave = g.c; }
+} catch (e) { /* sin almacenamiento */ }
+const guarda = (donde, u, c) => { try { donde.setItem(KEY, JSON.stringify({ u, c })); } catch (e) {} };
+/* Los enlaces de descarga no pueden llevar cabeceras: el acceso viaja en la dirección */
+const acc = () => `u=${encodeURIComponent(usuario)}&k=${encodeURIComponent(clave)}`;
 
 async function api(ruta, cuerpo) {
-  const r = await fetch(`/api/as/${slug}/${ruta}`, { method: cuerpo ? "POST" : "GET", headers: { Authorization: "Bearer " + clave, ...(cuerpo ? { "Content-Type": "application/json" } : {}) }, body: cuerpo ? JSON.stringify(cuerpo) : undefined });
+  const r = await fetch(`/api/as/${slug}/${ruta}`, { method: cuerpo ? "POST" : "GET", headers: { Authorization: "Bearer " + usuario + ":" + clave, ...(cuerpo ? { "Content-Type": "application/json" } : {}) }, body: cuerpo ? JSON.stringify(cuerpo) : undefined });
   const d = await r.json().catch(() => ({}));
-  if (r.status === 401) { salir(); throw new Error(d.error || "Clave incorrecta"); }
+  if (r.status === 401) { salir(); throw new Error(d.error || "Usuario o contraseña incorrectos"); }
   if (!r.ok) throw new Error(d.mensaje || d.error || "Error");
   return d;
 }
-function salir() { clave = ""; try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch (e) {} $("app").hidden = true; $("login").hidden = false; }
+function salir() { clave = ""; usuario = ""; yo = null; try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch (e) {} $("app").hidden = true; $("login").hidden = false; }
 $("salir").onclick = salir;
 $("ver-clave").onclick = () => { const i = $("clave"), v = i.type === "password"; i.type = v ? "text" : "password"; $("ver-clave").setAttribute("aria-pressed", String(v)); };
 
 $("fl").addEventListener("submit", async (e) => {
   e.preventDefault();
-  // Se guarda aparte: si la clave no vale para el panel, api() la borra y aún hay que probarla como profesor
-  const escrita = $("clave").value.replace(/[\u2010-\u2015\u2212]/g, "-").replace(/\s+/g, "");
-  clave = escrita; $("ml").textContent = "Comprobando…";
-  try { await cargar(); try { ($("rec").checked ? localStorage : sessionStorage).setItem(KEY, clave); } catch (er) {} $("ml").textContent = ""; }
+  // Se guardan aparte: si no valen para el panel, api() los borra y aún hay que probarlos como profesor
+  const u = $("usuario").value.trim().toLowerCase();
+  const c = $("clave").value.replace(/[\u2010-\u2015\u2212]/g, "-").replace(/\s+/g, "");
+  usuario = u; clave = c; $("ml").textContent = "Comprobando…";
+  try { await cargar(); guarda($("rec").checked ? localStorage : sessionStorage, u, c); $("ml").textContent = ""; }
   catch (er) {
-    // Una sola puerta: si la clave no es del estudio, se prueba como profesor y se le lleva a lo suyo
+    // Una sola puerta: si no son del estudio, se prueban como profesor y se le lleva a lo suyo
     try {
-      const r = await fetch(`/api/as/${slug}/profe/clases?dias=1`, { headers: { Authorization: "Bearer " + escrita } });
+      const r = await fetch(`/api/as/${slug}/profe/clases?dias=1`, { headers: { Authorization: "Bearer " + u + ":" + c } });
       if (r.ok) {
-        try { ($("rec").checked ? localStorage : sessionStorage).setItem("ajs-profe-" + slug, escrita); } catch (er2) {}
+        try { ($("rec").checked ? localStorage : sessionStorage).setItem("ajs-profe-" + slug, JSON.stringify({ u, c })); } catch (er2) {}
         $("ml").textContent = "Entrando en tus clases…";
         location.href = "/profe/" + slug;
         return;
       }
     } catch (er3) { /* sin conexión: se enseña el error de siempre */ }
-    clave = "";
+    clave = ""; usuario = "";
     $("ml").textContent = er.message;
   }
 });
@@ -296,7 +305,19 @@ async function cargar() {
   document.title = "Citas · " + negocio.nombre;
   $("tit").firstChild.textContent = negocio.negocio.nombre;
   const cuandoTxt = sem ? `Semana del ${largo(d.desde)}` : desde === hoyISO() ? "Próximas 2 semanas" : `Del ${largo(d.desde)} al ${largo(d.hasta)}`;
-  $("sub").textContent = (d.yo && d.yo.nombre ? d.yo.nombre + " · " : "") + cuandoTxt;
+  yo = d.yo || null;
+  $("sub").textContent = (yo && yo.nombre ? yo.nombre + " · " : "") + cuandoTxt;
+  // Recepción atiende el mostrador: agenda, alumnas, cobros y espera. La facturación,
+  // las estadísticas y las claves del equipo son de quien gestiona el estudio.
+  const duena = !yo || yo.rol === "panel";
+  $("tabs").querySelectorAll("button[data-t]").forEach((x) => {
+    const solo = x.dataset.t === "facturas" || x.dataset.t === "equipo";
+    x.hidden = solo && !duena;
+  });
+  if (!duena && (pestana === "facturas" || pestana === "equipo")) {
+    const ag = $("tabs").querySelector('button[data-t="agenda"]');
+    if (ag) ag.click();
+  }
   $("login").hidden = true; $("app").hidden = false;
   $("tabs").hidden = !negocio.gestion;
   const ok = d.citas.filter((c) => c.estado === "ok"), hoy = hoyISO(), fin7 = sumar(hoy, 6);
@@ -419,7 +440,7 @@ $("p-act").onclick = async () => {
   } catch (e) { $("p-est").textContent = e.message; } finally { b.disabled = false; }
 };
 $("p-prueba").onclick = async () => { try { await api("panel/push/prueba", {}); $("p-est").textContent = "Enviado: en unos segundos debería sonar el aviso."; } catch (e) { $("p-est").textContent = e.message; } };
-if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", (e) => { if (e.data === "recargar" && clave) cargar().catch(() => {}); });
+if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", (e) => { if (e.data === "recargar" && usuario && clave) cargar().catch(() => {}); });
 
 /* apuntar cita (llamadas, mostrador) */
 async function horas() {
@@ -461,7 +482,7 @@ $("fc").addEventListener("submit", async (e) => {
 });
 
 /* calendario */
-$("b-cal").onclick = () => { $("ics").textContent = `${location.origin}/api/as/${slug}/agenda.ics?k=${encodeURIComponent(clave)}`; $("d-cal").showModal(); };
+$("b-cal").onclick = () => { $("ics").textContent = `${location.origin}/api/as/${slug}/agenda.ics?${acc()}`; $("d-cal").showModal(); };
 $("copiar").onclick = async () => { try { await navigator.clipboard.writeText($("ics").textContent); $("copiar").textContent = "Copiado ✓"; } catch (e) { $("copiar").textContent = "Cópialo a mano"; } };
 
 
@@ -497,7 +518,7 @@ async function verAlumnas(q) {
       <div class="st"><b>${t.bonos || 0}</b><span>bonos activos</span></div>
       <div class="st"><b>${eur(t.mes || 0)}</b><span>cobrado este mes</span></div></div>
      <div class="bar bus"><input id="qAlum" placeholder="Buscar por nombre, correo o teléfono" value="${esc(q || "")}" style="flex:1;min-width:200px">
-      <a class="btn" href="/api/as/${slug}/panel/exportar?que=alumnas&k=${encodeURIComponent(clave)}" download>Exportar CSV</a></div>
+      <a class="btn" href="/api/as/${slug}/panel/exportar?que=alumnas&${acc()}" download>Exportar CSV</a></div>
      <p class="vacio">${(t.ofertas || 0) === 1 ? "1 alumna ha aceptado" : (t.ofertas || 0) + " alumnas han aceptado"} recibir ofertas y novedades por correo.</p>` +
     (d.alumnas.length ? d.alumnas.map((a) => `<div class="fila" data-alum="${a.id}">
        <div><b>${esc(a.nombre || a.email)}</b><span>${esc(a.email)}${a.telefono ? " · " + esc(a.telefono) : ""} · ${(a.clases || 0) === 1 ? "1 clase" : (a.clases || 0) + " clases"}</span></div>
@@ -562,7 +583,7 @@ async function verAlumna(id) {
      <p class="vacio" style="margin:0 0 8px">Facturado a esta alumna: <b>${eur((d.facturado || {}).total || 0)}</b> en ${((d.facturado || {}).n || 0) === 1 ? "1 factura" : ((d.facturado || {}).n || 0) + " facturas"}.
       ${a.nif ? "NIF " + esc(a.nif) + "." : '<button class="enlace" type="button" id="datosFis">Añadir NIF y dirección</button>'}</p>
      ${d.pagos.length ? `<div class="tt-w"><table class="tt"><tbody>${d.pagos.map((p) => `<tr${p.tipo === "rectificativa" ? ' style="color:#fca5a5"' : ""}><td>${corto(p.fecha)}</td><td>${esc(p.concepto)}</td><td>${eur(p.importe)}</td><td>${esc(p.metodo)}</td>
-       <td>${p.numero ? `<a class="btn sm" href="/api/as/${slug}/panel/factura?id=${p.id}&k=${encodeURIComponent(clave)}" target="_blank" rel="noopener">${esc(p.numero)}</a>` : (p.estado === "pagado" ? '<span class="eti">sin factura</span>' : `<span class="eti no">${esc(p.estado)}</span>`)}</td></tr>`).join("")}</tbody></table></div>` : '<p class="vacio">Sin pagos.</p>'}`;
+       <td>${p.numero ? `<a class="btn sm" href="/api/as/${slug}/panel/factura?id=${p.id}&${acc()}" target="_blank" rel="noopener">${esc(p.numero)}</a>` : (p.estado === "pagado" ? '<span class="eti">sin factura</span>' : `<span class="eti no">${esc(p.estado)}</span>`)}</td></tr>`).join("")}</tbody></table></div>` : '<p class="vacio">Sin pagos.</p>'}`;
   $("d-alum").showModal();
   const df = $("datosFis");
   if (df) df.onclick = async () => {
@@ -613,7 +634,7 @@ async function verPagos() {
   $("vPagos").innerHTML =
     `<div class="stats"><div class="st"><b>${eur(d.total)}</b><span>desde el ${corto(d.desde)}</span></div>
       <div class="st"><b>${d.n}</b><span>cobros</span></div></div>
-     <div class="bar"><a class="btn" href="/api/as/${slug}/panel/exportar?que=pagos&k=${encodeURIComponent(clave)}" download>Exportar CSV</a></div>` +
+     <div class="bar"><a class="btn" href="/api/as/${slug}/panel/exportar?que=pagos&${acc()}" download>Exportar CSV</a></div>` +
     (d.pagos.length ? `<div class="tt-w"><table class="tt"><thead><tr><th>Fecha</th><th>Alumna</th><th>Concepto</th><th>Importe</th><th>Forma</th><th>Estado</th></tr></thead><tbody>
        ${d.pagos.map((p) => `<tr><td>${corto(p.fecha)}</td><td>${esc(p.alumna || "—")}</td><td>${esc(p.concepto)}</td><td>${eur(p.importe)}</td><td>${esc(p.metodo)}</td><td>${p.estado === "pagado" ? '<span class="eti ok">pagado</span>' : `<span class="eti no">${esc(p.estado)}</span>`}</td></tr>`).join("")}
        </tbody></table></div>` : '<p class="vacio">Todavía no hay cobros.</p>');
@@ -639,7 +660,7 @@ async function verFacturas(mes) {
   $("vFacturas").innerHTML =
     `<div class="bar">${selMes(d.meses, d.mes)}
       <button class="btn main" type="button" id="facNueva">+ Emitir una factura</button>
-      <a class="btn" id="facCsv" href="/api/as/${slug}/panel/facturacion/csv?mes=${d.mes}&k=${encodeURIComponent(clave)}" download>Descargar libro (CSV)</a>
+      <a class="btn" id="facCsv" href="/api/as/${slug}/panel/facturacion/csv?mes=${d.mes}&${acc()}" download>Descargar libro (CSV)</a>
       <button class="btn" type="button" id="facEnviar">Enviar a la gestoría</button></div>
 
      <div class="stats"><div class="st"><b>${eur(t.total)}</b><span>facturado en ${esc(d.mesTexto)}</span></div>
@@ -663,7 +684,7 @@ async function verFacturas(mes) {
          ${sinIva ? "" : `<td>${eur(p.iva || 0)}</td>`}
          <td><b>${eur(p.importe)}</b></td>
          <td>${esc(p.metodo)}</td>
-         <td class="acc"><a class="btn sm" href="/api/as/${slug}/panel/factura?id=${p.id}&k=${encodeURIComponent(clave)}" target="_blank" rel="noopener">Ver</a>
+         <td class="acc"><a class="btn sm" href="/api/as/${slug}/panel/factura?id=${p.id}&${acc()}" target="_blank" rel="noopener">Ver</a>
           ${p.tipo === "rectificativa" ? "" : `<button class="btn sm" type="button" data-rect="${p.id}" data-num="${esc(p.numero)}">Rectificar</button>`}</td></tr>`).join("")}
        </tbody></table></div>` : '<p class="vacio">Ese mes no tiene ninguna factura emitida.</p>'}
 
@@ -711,7 +732,7 @@ $("ff").addEventListener("submit", async (e) => {
     $("d-fac").close();
     verFacturas(mesFac);
     if (confirm("Emitida la factura " + r.numero + ".\n\n¿Quieres verla ahora para imprimirla o guardarla en PDF?")) {
-      window.open(`/api/as/${slug}/panel/factura?id=${r.id}&k=${encodeURIComponent(clave)}`, "_blank", "noopener");
+      window.open(`/api/as/${slug}/panel/factura?id=${r.id}&${acc()}`, "_blank", "noopener");
     }
   } catch (er) { msg.textContent = er.message; }
 });
@@ -739,6 +760,11 @@ async function verEspera() {
 /* ---- equipo y claves ----
    Una persona, una clave. Lo que se cambia aquí manda desde el momento en que se guarda. */
 let equipoAbierto = "";
+const PAPEL = {
+  panel: "Gestiona el estudio: lo ve y lo cambia todo.",
+  recepcion: "Recepción: agenda, alumnas, cobros y lista de espera.",
+  profe: "Profesora: ve sus clases y pasa lista.",
+};
 function cuando(t) {
   if (!t) return "todavía no ha entrado";
   const d = new Date(t), h = Math.round((Date.now() - d.getTime()) / 36e5);
@@ -754,39 +780,44 @@ async function verEquipo() {
     const falta = p.rol === "profe" && p.activo && enHorario.length && enHorario.indexOf(p.nombre) < 0;
     return `<div class="eqf">
       <div class="eqf-n"><b>${esc(p.nombre)}</b>${p.nombre === d.yo ? '<span class="tag">eres tú</span>' : ""}
+        <span class="tag">usuario: ${esc(p.usuario)}</span>
         ${p.activo ? '<span class="eti ok">activa</span>' : '<span class="eti no">sin acceso</span>'}</div>
-      <p class="eqf-d">${p.rol === "panel" ? "Gestiona el estudio: lo ve y lo cambia todo." : "Profesora: ve sus clases y pasa lista."}
+      <p class="eqf-d">${PAPEL[p.rol] || PAPEL.profe}
         ${p.activo ? (p.visto ? "Entró " + cuando(p.visto) + "." : "Todavía no ha entrado.") : "No puede entrar."}</p>
       ${falta ? '<p class="eqf-d av">Con este nombre no aparece ninguna clase en el horario. Escríbelo igual que en el cuadro de clases.</p>' : ""}
       <div class="eqf-b">
-        <button class="btn sm" type="button" data-eq-clave="${esc(p.nombre)}">Cambiar clave</button>
+        <button class="btn sm" type="button" data-eq-clave="${esc(p.nombre)}">Cambiar contraseña</button>
         ${p.activo
           ? `<button class="btn sm" type="button" data-eq-baja="${esc(p.nombre)}"${p.nombre === d.yo ? " disabled title='Que te lo quite otra persona del equipo'" : ""}>Quitar acceso</button>`
           : `<button class="btn sm" type="button" data-eq-alta="${esc(p.nombre)}">Devolver acceso</button>`}
       </div>
     </div>
     ${equipoAbierto === p.nombre ? `<form class="box" data-eq-form="${esc(p.nombre)}" style="margin:-4px 0 12px">
-      <label for="eq-c">Clave nueva para ${esc(p.nombre)} <small>(mínimo 8 caracteres, sin espacios)</small></label>
-      <input id="eq-c" name="clave" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" required minlength="8" placeholder="Escribe la clave nueva">
+      <label for="eq-c">Contraseña nueva para ${esc(p.nombre)} <small>(mínimo 8 caracteres, sin espacios)</small></label>
+      <input id="eq-c" name="clave" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" required minlength="8" placeholder="Escribe la contraseña nueva">
       <p class="msg" role="alert"></p>
-      <div class="bar" style="margin:10px 0 0"><button class="btn main" type="submit">Guardar la clave</button>
+      <div class="bar" style="margin:10px 0 0"><button class="btn main" type="submit">Guardar la contraseña</button>
         <button class="btn" type="button" data-eq-cerrar>Dejarlo</button></div>
-      <p class="vacio" style="margin-top:6px">Apúntala y dásela a ${esc(p.nombre)}. Aquí no se puede volver a ver: si se pierde, se pone otra.</p>
+      <p class="vacio" style="margin-top:6px">Entrará con el usuario <b>${esc(p.usuario)}</b> y esta contraseña. Apúntala y dásela: aquí no se puede volver a ver.</p>
     </form>` : ""}`;
   }).join("");
 
   $("vEquipo").innerHTML =
-    `<p class="vacio">Cada persona entra en <b>/panel</b> con su propia clave y el sistema la lleva a lo suyo: quien gestiona el estudio ve todo; una profesora ve solo sus clases y pasa lista. Cuando alguien se va, quítale el acceso aquí.</p>` +
+    `<p class="vacio">Cada persona entra en <b>/panel</b> con <b>su usuario y su contraseña</b>, y el sistema la lleva a lo suyo. Cuando alguien se va, quítale el acceso aquí.</p>
+     <p class="vacio" style="margin-top:4px">· <b>Gestiona el estudio</b>: lo ve y lo cambia todo, también la facturación y las claves.<br>· <b>Recepción</b>: agenda, alumnas, cobros y lista de espera. Sin facturación, sin estadísticas y sin claves.<br>· <b>Profesora</b>: solo sus clases y pasar lista.</p>` +
     gente +
     `<form class="box" id="fEqNueva">
       <h2>Añadir una persona</h2>
       <div class="grid">
         <div><label for="eq-n">Nombre</label><input id="eq-n" name="nombre" required maxlength="40" placeholder="Nombre de pila"></div>
-        <div><label for="eq-r">¿Qué puede hacer?</label><select id="eq-r" name="rol">
-          <option value="profe">Profesora: solo sus clases</option>
-          <option value="panel">Gestiona el estudio: todo</option></select></div>
-        <div class="full"><label for="eq-k">Su clave <small>(mínimo 8 caracteres, sin espacios)</small></label>
-          <input id="eq-k" name="clave" required minlength="8" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="La clave con la que entrará"></div>
+        <div><label for="eq-u">Usuario <small>(con el que entra)</small></label>
+          <input id="eq-u" name="usuario" maxlength="40" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Si lo dejas vacío, su nombre"></div>
+        <div class="full"><label for="eq-r">¿Qué puede hacer?</label><select id="eq-r" name="rol">
+          <option value="profe">Profesora: solo sus clases y pasar lista</option>
+          <option value="recepcion">Recepción: agenda, alumnas y cobros</option>
+          <option value="panel">Gestiona el estudio: todo, también facturación</option></select></div>
+        <div class="full"><label for="eq-k">Su contraseña <small>(mínimo 8 caracteres, sin espacios)</small></label>
+          <input id="eq-k" name="clave" required minlength="8" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="La contraseña con la que entrará"></div>
       </div>
       <p class="msg" role="alert"></p>
       <div class="bar" style="margin:12px 0 0"><button class="btn main" type="submit">Dar acceso</button></div>
@@ -816,8 +847,8 @@ $("vEquipo").addEventListener("submit", async (e) => {
   const quien = f.dataset.eqForm;
   msg.textContent = ""; msg.style.color = ""; b.disabled = true;
   try {
-    if (quien) await api("panel/equipo", { nombre: quien, rol: undefined, clave: f.clave.value });
-    else await api("panel/equipo", { nombre: f.nombre.value.trim(), rol: f.rol.value, clave: f.clave.value });
+    if (quien) await api("panel/equipo", { nombre: quien, clave: f.clave.value });
+    else await api("panel/equipo", { nombre: f.nombre.value.trim(), usuario: f.usuario.value.trim(), rol: f.rol.value, clave: f.clave.value });
     equipoAbierto = "";
     await verEquipo();
   } catch (er) {
@@ -825,8 +856,8 @@ $("vEquipo").addEventListener("submit", async (e) => {
   }
 });
 
-if (clave) cargar().catch(() => salir()); else $("clave").focus();
-setInterval(() => { if (clave && !document.hidden && !document.querySelector("dialog[open]")) cargar().catch(() => {}); }, 60000);
+if (usuario && clave) cargar().catch(() => salir()); else $("usuario").focus();
+setInterval(() => { if (usuario && clave && !document.hidden && !document.querySelector("dialog[open]")) cargar().catch(() => {}); }, 60000);
 </script>
 <script src="/accesibilidad.js" defer></script>
 </body>

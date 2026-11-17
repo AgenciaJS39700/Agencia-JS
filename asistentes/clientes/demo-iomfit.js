@@ -132,18 +132,21 @@ export default {
   // Adriana no está aquí: entra como responsable del estudio y desde el panel ve
   // todo, incluidas sus clases, y pasa lista igual. Una persona, una clave.
   profes: [
-    { nombre: "Sandra", hash: "deffe2cd54e36216eea16de1a6354ec081b2c2c6cf84ba7bf8c0220de5dd60f8" },
-    { nombre: "Sus", hash: "738c74b0920a362bef1f76b13d9508a90c329ec1d01e1707f0dcfd53868380e8" },
-    { nombre: "Juanjo", hash: "1e8fe2c729bdba3a9c5256cbc025b95cda60a580c16dfc0e178bdb53de32165c" },
-    { nombre: "Sergio", hash: "308382be604b5993087bce0db0702efd40a774134bbd6cd662c1d6813059f870" },
+    { nombre: "Sandra", usuario: "sandra", hash: "deffe2cd54e36216eea16de1a6354ec081b2c2c6cf84ba7bf8c0220de5dd60f8" },
+    { nombre: "Sus", usuario: "sus", hash: "738c74b0920a362bef1f76b13d9508a90c329ec1d01e1707f0dcfd53868380e8" },
+    { nombre: "Juanjo", usuario: "juanjo", hash: "1e8fe2c729bdba3a9c5256cbc025b95cda60a580c16dfc0e178bdb53de32165c" },
+    { nombre: "Sergio", usuario: "sergio", hash: "308382be604b5993087bce0db0702efd40a774134bbd6cd662c1d6813059f870" },
   ],
   panel: {
     // Adriana, la responsable
     nombre: "Adriana",
+    usuario: "adriana",
     hash: "4590dc9b187159b0a11fe80c528bb013ba41a3a024581b8a60f4c3f42c19d878",
-    // Quien más gestione el estudio, cada uno con su clave
+    // Quien más atienda el mostrador. `rol: "recepcion"` ve la agenda, las alumnas,
+    // los cobros y la lista de espera, pero NO la facturación, ni las estadísticas,
+    // ni las claves del equipo: eso es solo de quien gestiona el estudio.
     equipo: [
-      { nombre: "Recepción", hash: "080aeb5d14bf151d037043da295baf8470cc13ae55150f6f94aee3f9ff51e4fe" },
+      { nombre: "Recepción", usuario: "recepcion", rol: "recepcion", hash: "080aeb5d14bf151d037043da295baf8470cc13ae55150f6f94aee3f9ff51e4fe" },
     ],
   },
   dominios: ["https://iomfit-demo.agencia39700.workers.dev"],

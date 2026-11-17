@@ -51,9 +51,11 @@ a{color:var(--c)}
 <main class="wrap">
   <section class="login box" id="login">
     <h1>Mis clases<small>Acceso para profesores</small></h1>
-    <p>Entra con la clave que te ha dado el estudio para ver quién viene a tus clases y pasar lista.</p>
+    <p>Entra con tu usuario y tu contraseña para ver quién viene a tus clases y pasar lista.</p>
     <form id="fl">
-      <label for="clave">Tu clave</label>
+      <label for="usuario">Tu usuario</label>
+      <input id="usuario" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required style="margin-bottom:10px">
+      <label for="clave">Tu contraseña</label>
       <div style="display:flex;gap:8px"><input id="clave" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" required><button class="btn" type="button" id="ver" aria-label="Mostrar la clave" aria-pressed="false">👁</button></div>
       <label style="display:flex;gap:.5rem;align-items:center;margin:10px 0 12px;color:var(--tx)"><input type="checkbox" id="rec" style="width:auto;min-height:0" checked> Recordar en este dispositivo</label>
       <button class="btn main" type="submit" style="width:100%">Entrar</button>
@@ -93,14 +95,18 @@ const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&":
 const hoyISO = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" }).format(new Date());
 const sumar = (f, n) => new Date(Date.parse(f + "T12:00:00Z") + n * 864e5).toISOString().slice(0, 10);
 const KEY = "ajs-profe-" + slug;
-let clave = "";
-try { clave = localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || ""; } catch (e) {}
+let clave = "", usuario = "";
+try {
+  const g = JSON.parse(localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || "null");
+  if (g && g.u) { usuario = g.u; clave = g.c; }
+} catch (e) {}
+const guarda = (donde, u, c) => { try { donde.setItem(KEY, JSON.stringify({ u, c })); } catch (e) {} };
 let desde = hoyISO();
 
 async function api(ruta, cuerpo) {
   const r = await fetch(`/api/as/${slug}/${ruta}`, {
     method: cuerpo ? "POST" : "GET",
-    headers: { Authorization: "Bearer " + clave, ...(cuerpo ? { "Content-Type": "application/json" } : {}) },
+    headers: { Authorization: "Bearer " + usuario + ":" + clave, ...(cuerpo ? { "Content-Type": "application/json" } : {}) },
     body: cuerpo ? JSON.stringify(cuerpo) : undefined,
   });
   const d = await r.json().catch(() => ({}));
@@ -108,7 +114,7 @@ async function api(ruta, cuerpo) {
   return d;
 }
 function salir() {
-  clave = "";
+  clave = ""; usuario = "";
   try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch (e) {}
   $("app").hidden = true; $("login").hidden = false;
 }
@@ -116,23 +122,26 @@ $("salir").onclick = salir;
 $("ver").onclick = () => { const i = $("clave"), v = i.type === "password"; i.type = v ? "text" : "password"; $("ver").setAttribute("aria-pressed", String(v)); };
 $("fl").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const escrita = $("clave").value.trim();
-  clave = escrita;
+  const u = $("usuario").value.trim().toLowerCase();
+  const c = $("clave").value.trim();
+  usuario = u; clave = c;
   try {
     await cargar();
-    try { ($("rec").checked ? localStorage : sessionStorage).setItem(KEY, clave); } catch (er) {}
+    guarda($("rec").checked ? localStorage : sessionStorage, u, c);
   } catch (er) {
+    // La misma puerta en los dos sentidos: si son del estudio, al panel completo
     try {
-      const r = await fetch(`/api/as/${slug}/panel/citas?dias=1`, { headers: { Authorization: "Bearer " + escrita } });
+      const r = await fetch(`/api/as/${slug}/panel/citas?dias=1`, { headers: { Authorization: "Bearer " + u + ":" + c } });
       if (r.ok) {
-        try { ($("rec").checked ? localStorage : sessionStorage).setItem("ajs-panel-" + slug, escrita); } catch (e2) {}
+        try { ($("rec").checked ? localStorage : sessionStorage).setItem("ajs-panel-" + slug, JSON.stringify({ u, c })); } catch (e2) {}
         location.href = "/panel/" + slug;
         return;
       }
     } catch (e3) { /* sin conexión */ }
-    $("ml").textContent = er.message; clave = "";
+    $("ml").textContent = er.message; clave = ""; usuario = "";
   }
 });
+
 $("ant").onclick = () => { desde = sumar(desde, -7); cargar(); };
 $("sig").onclick = () => { desde = sumar(desde, 7); cargar(); };
 $("hoy").onclick = () => { desde = hoyISO(); cargar(); };
@@ -180,14 +189,14 @@ $("fClave").addEventListener("submit", async (e) => {
   try {
     await api("profe/clave", { nueva });
     clave = nueva;
-    try { (localStorage.getItem(KEY) ? localStorage : sessionStorage).setItem(KEY, nueva); } catch (er) {}
+    guarda(localStorage.getItem(KEY) ? localStorage : sessionStorage, usuario, nueva);
     $("nueva").value = "";
     m.style.color = "#86efac"; m.textContent = "Guardada. A partir de ahora entra con esta.";
   } catch (er) { m.textContent = er.message; }
   b.disabled = false;
 });
 
-if (clave) cargar().catch(() => salir()); else $("clave").focus();
+if (usuario && clave) cargar().catch(() => salir()); else $("usuario").focus();
 </script>
 </body>
 </html>

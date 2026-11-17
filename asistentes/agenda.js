@@ -85,11 +85,28 @@ function mismoSitio(origen, url, cfg) {
    (las que el propio negocio cambia desde el panel). La base de datos MANDA: si
    alguien aparece ahí, su línea del archivo deja de valer. Así se cambia una clave
    o se da de baja a una persona sin tocar el código ni volver a publicar. */
+/* Contraseñas del equipo: las que se ponen desde el panel van cifradas con PBKDF2
+   y sal propia. Las que vienen escritas en el archivo del cliente son el SHA-256 de
+   siempre, y solo existen hasta que esa persona se pone la suya. */
+const ITER_EQ = 100000;
+const deHex = (h) => new Uint8Array((String(h).match(/.{2}/g) || []).map((x) => parseInt(x, 16)));
+export async function hashClave(clave, salHex, iter) {
+  const k = await crypto.subtle.importKey("raw", new TextEncoder().encode(String(clave)), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: deHex(salHex), iterations: iter }, k, 256);
+  return [...new Uint8Array(bits)].map((x) => x.toString(16).padStart(2, "0")).join("");
+}
+export function salNueva() {
+  return [...crypto.getRandomValues(new Uint8Array(16))].map((x) => x.toString(16).padStart(2, "0")).join("");
+}
+/** El usuario se normaliza siempre igual: minúsculas, sin espacios ni acentos. */
+export const normUsuario = (u) =>
+  String(u == null ? "" : u).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9._-]/g, "").slice(0, 40);
+
 async function equipo(env, cfg) {
   let filas = [], ultimos = [];
   try {
     const [a, v] = await env.CITAS.batch([
-      env.CITAS.prepare("SELECT nombre, rol, hash, activo FROM accesos WHERE slug = ?").bind(cfg.slug),
+      env.CITAS.prepare("SELECT nombre, usuario, rol, hash, pass_salt, pass_iter, activo FROM accesos WHERE slug = ?").bind(cfg.slug),
       env.CITAS.prepare("SELECT nombre, visto FROM vistos WHERE slug = ?").bind(cfg.slug),
     ]);
     filas = a.results || []; ultimos = v.results || [];
@@ -97,23 +114,42 @@ async function equipo(env, cfg) {
   // El último acceso va aparte a propósito: así anotarlo no convierte a nadie en
   // «clave propia» y las claves del archivo siguen mandando hasta que se cambien.
   const visto = Object.fromEntries(ultimos.map((x) => [x.nombre, x.visto]));
+  const rolOk = (r) => (r === "panel" || r === "recepcion" || r === "profe" ? r : "profe");
   const gobierna = new Set(filas.map((f) => f.nombre));
-  const lista = filas.map((f) => ({ nombre: f.nombre, rol: f.rol === "panel" ? "panel" : "profe", hash: f.hash, activo: !!f.activo, visto: visto[f.nombre] || null, propia: true }));
+  const lista = filas.map((f) => ({
+    nombre: f.nombre, usuario: f.usuario || normUsuario(f.nombre), rol: rolOk(f.rol), hash: f.hash,
+    sal: f.pass_salt || null, iter: f.pass_iter || ITER_EQ, activo: !!f.activo, visto: visto[f.nombre] || null, propia: true,
+  }));
   const delArchivo = [];
-  if (cfg.panel && cfg.panel.hash) delArchivo.push({ nombre: cfg.panel.nombre || "Responsable", rol: "panel", hash: cfg.panel.hash });
-  for (const p of (cfg.panel && cfg.panel.equipo) || []) delArchivo.push({ nombre: p.nombre, rol: "panel", hash: p.hash });
-  for (const p of cfg.profes || []) delArchivo.push({ nombre: p.nombre, rol: "profe", hash: p.hash });
-  for (const p of delArchivo) if (p.hash && !gobierna.has(p.nombre)) lista.push({ ...p, activo: true, visto: visto[p.nombre] || null, propia: false });
+  if (cfg.panel && cfg.panel.hash) delArchivo.push({ nombre: cfg.panel.nombre || "Responsable", usuario: cfg.panel.usuario, rol: "panel", hash: cfg.panel.hash });
+  for (const p of (cfg.panel && cfg.panel.equipo) || []) delArchivo.push({ nombre: p.nombre, usuario: p.usuario, rol: p.rol === "panel" ? "panel" : "recepcion", hash: p.hash });
+  for (const p of cfg.profes || []) delArchivo.push({ nombre: p.nombre, usuario: p.usuario, rol: "profe", hash: p.hash });
+  for (const p of delArchivo) {
+    if (!p.hash || gobierna.has(p.nombre)) continue;
+    lista.push({ ...p, usuario: normUsuario(p.usuario || p.nombre), sal: null, iter: ITER_EQ, activo: true, visto: visto[p.nombre] || null, propia: false });
+  }
   return lista;
 }
 
-/** Devuelve a quién pertenece la clave, o null. Solo cuenta si está de alta. */
-async function quienEs(env, cfg, clave, rol) {
-  if (!clave) return null;
-  const suyo = await sha256(clave);
+/**
+ * Comprueba usuario + contraseña y devuelve a esa persona, o null.
+ * Pedir las dos cosas (y no solo una clave) es lo que convierte esto en un acceso
+ * de verdad: una clave suelta que circula por WhatsApp no dice quién entró.
+ */
+async function quienEs(env, cfg, usuario, clave, roles) {
+  const u = normUsuario(usuario);
+  if (!u || !clave) return null;
   const l = await equipo(env, cfg);
-  return l.find((p) => p.activo && p.rol === rol && igual(suyo, p.hash)) || null;
+  const p = l.find((x) => x.activo && x.usuario === u && roles.includes(x.rol));
+  if (!p) return null;
+  const vale = p.sal
+    ? igual(await hashClave(clave, p.sal, p.iter), p.hash)   // puesta desde el panel
+    : igual(await sha256(clave), p.hash);                    // la de partida del archivo
+  return vale ? p : null;
 }
+
+/** Partes del panel que solo ve quien gestiona el estudio, no recepción. */
+const SOLO_DUENA = (ruta) => ruta.startsWith("panel/factura") || ruta === "panel/equipo" || ruta === "panel/stats";
 
 /** Deja constancia del último acceso, sin hacer esperar a quien entra. */
 function visto(env, cfg, nombre, ctx) {
@@ -418,11 +454,18 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     // Rutas que se abren como enlace (descarga o suscripción), donde la clave no
     // puede ir en una cabecera y viaja en ?k=
     const porURL = ruta === "agenda.ics" || ruta === "panel/exportar" || ruta === "panel/facturacion/csv" || ruta === "panel/factura";
-    const clave = porURL ? url.searchParams.get("k") : (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-    const yo = await quienEs(env, cfg, clave, "panel");
+    // El navegador manda «Bearer usuario:contraseña»; los enlaces de descarga, ?u= y ?k=
+    const cab = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+    const corte = cab.indexOf(":");
+    const usuario = porURL ? url.searchParams.get("u") : (corte > 0 ? cab.slice(0, corte) : "");
+    const clave = porURL ? url.searchParams.get("k") : (corte > 0 ? cab.slice(corte + 1) : "");
+    const yo = await quienEs(env, cfg, usuario, clave, ["panel", "recepcion"]);
     if (!yo) {
       if (!limitar(ip)) return res({ error: "Demasiados intentos. Espera unos minutos." }, 429);
-      return res({ error: "Clave incorrecta" }, 401);
+      return res({ error: "Usuario o contraseña incorrectos" }, 401);
+    }
+    if (SOLO_DUENA(ruta) && yo.rol !== "panel") {
+      return res({ error: "Tu acceso no llega a esta parte del panel. Pídeselo a quien gestiona el estudio." }, 403);
     }
     if (ruta === "agenda.ics") {
       const desde = sumar(ahora().fecha, -30);
@@ -447,7 +490,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
         env.CITAS.prepare("SELECT id, fecha, inicio, fin, motivo FROM bloqueos WHERE slug = ? AND fecha BETWEEN ? AND ? ORDER BY fecha, inicio").bind(cfg.slug, desde, hasta),
       ]);
       visto(env, cfg, yo.nombre, ctx);
-      return res({ negocio: configPublica(cfg), yo: { nombre: yo.nombre, rol: yo.rol }, desde, hasta, citas: c.results || [], bloqueos: b.results || [] });
+      return res({ negocio: configPublica(cfg), yo: { nombre: yo.nombre, usuario: yo.usuario, rol: yo.rol }, desde, hasta, citas: c.results || [], bloqueos: b.results || [] });
     }
     /* ---- equipo: quién entra y con qué clave ---- */
     if (ruta === "panel/equipo" && request.method === "GET") {
@@ -459,8 +502,11 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       return res({
         yo: yo.nombre,
         horario: [...enHorario].sort((a, b2) => a.localeCompare(b2, "es")),
-        gente: l.map((p) => ({ nombre: p.nombre, rol: p.rol, activo: p.activo, visto: p.visto, propia: p.propia }))
-          .sort((a, b2) => (a.rol === b2.rol ? a.nombre.localeCompare(b2.nombre, "es") : a.rol === "panel" ? -1 : 1)),
+        gente: l.map((p) => ({ nombre: p.nombre, usuario: p.usuario, rol: p.rol, activo: p.activo, visto: p.visto, propia: p.propia }))
+          .sort((a, b2) => {
+            const peso = { panel: 0, recepcion: 1, profe: 2 };
+            return peso[a.rol] - peso[b2.rol] || a.nombre.localeCompare(b2.nombre, "es");
+          }),
       });
     }
     const pf1 = await atenderPanelFacturas(request, env, cfg, ruta, url);
@@ -494,24 +540,34 @@ export async function atenderAgenda(request, env, ctx, limitar) {
         }
         const activo = b.accion === "alta" ? 1 : 0;
         await env.CITAS.prepare(
-          "INSERT INTO accesos (slug, nombre, rol, hash, activo, creado) VALUES (?1, ?2, ?3, ?4, ?5, ?6) ON CONFLICT(slug, nombre) DO UPDATE SET activo = ?5"
-        ).bind(cfg.slug, nombre, actual.rol, actual.hash, activo, hoy).run();
+          `INSERT INTO accesos (slug, nombre, usuario, rol, hash, pass_salt, pass_iter, activo, creado)
+           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9) ON CONFLICT(slug, nombre) DO UPDATE SET activo = ?8`
+        ).bind(cfg.slug, nombre, actual.usuario, actual.rol, actual.hash, actual.sal, actual.iter, activo, hoy).run();
         return res({ ok: true });
       }
 
-      // Sin rol en la petición (solo se cambia la clave), se queda con el que ya tenía.
-      const rol = b.rol === "panel" || b.rol === "profe" ? b.rol : actual ? actual.rol : "profe";
+      // Sin papel en la petición (solo se cambia la contraseña), se queda con el que tenía.
+      const rol = ["panel", "recepcion", "profe"].includes(b.rol) ? b.rol : actual ? actual.rol : "profe";
       const clave = String(b.clave == null ? "" : b.clave).replace(/\s+/g, "");
+      const usuario = normUsuario(b.usuario || (actual && actual.usuario) || nombre);
+      if (usuario.length < 3) return res({ error: "El usuario tiene que tener al menos 3 letras o números, sin espacios." }, 400);
+      const repe = l.find((p) => p.usuario === usuario && p.nombre !== nombre);
+      if (repe) return res({ error: `Ese usuario ya lo tiene ${repe.nombre}. Pon otro.` }, 400);
       if (actual && rol !== actual.rol && actual.rol === "panel" && ultimoJefe(nombre)) {
         return res({ error: "Es la única persona que gestiona el estudio. Da de alta a otra antes de cambiarle el papel." }, 400);
       }
-      if (!actual && !clave) return res({ error: "Ponle una clave para que pueda entrar." }, 400);
-      if (clave && (clave.length < 8 || clave.length > 60)) return res({ error: "La clave tiene que tener entre 8 y 60 caracteres, sin espacios." }, 400);
-      const hash = clave ? await sha256(clave) : actual.hash;
+      if (!actual && !clave) return res({ error: "Ponle una contraseña para que pueda entrar." }, 400);
+      if (clave && (clave.length < 8 || clave.length > 60)) return res({ error: "La contraseña tiene que tener entre 8 y 60 caracteres, sin espacios." }, 400);
+      // Las contraseñas puestas aquí van cifradas con PBKDF2 y sal propia
+      const sal = clave ? salNueva() : actual.sal;
+      const hash = clave ? await hashClave(clave, sal, ITER_EQ) : actual.hash;
+      const iter = clave ? ITER_EQ : actual.iter;
       await env.CITAS.prepare(
-        "INSERT INTO accesos (slug, nombre, rol, hash, activo, creado) VALUES (?1, ?2, ?3, ?4, 1, ?5) ON CONFLICT(slug, nombre) DO UPDATE SET rol = ?3, hash = ?4, activo = 1"
-      ).bind(cfg.slug, nombre, rol, hash, hoy).run();
-      return res({ ok: true, nuevo: !actual });
+        `INSERT INTO accesos (slug, nombre, usuario, rol, hash, pass_salt, pass_iter, activo, creado)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 1, ?8)
+         ON CONFLICT(slug, nombre) DO UPDATE SET usuario = ?3, rol = ?4, hash = ?5, pass_salt = ?6, pass_iter = ?7, activo = 1`
+      ).bind(cfg.slug, nombre, usuario, rol, hash, sal, iter, hoy).run();
+      return res({ ok: true, nuevo: !actual, usuario });
     }
     if (ruta === "panel/cita") { const r = await reservar(env, cfg, b, "panel", ctx); return res(r, r.estado); }
     if (ruta === "panel/cancelar") { const c = await cancelar(env, cfg, "id = ?", [+b.id || 0], ctx, "negocio"); return c ? res({ ok: true }) : res({ error: "Cita no encontrada" }, 404); }
@@ -539,11 +595,12 @@ export async function atenderAgenda(request, env, ctx, limitar) {
     if (!env.CITAS) return res({ error: "Agenda no configurada" }, 503);
     const o = request.headers.get("Origin");
     if (o && !mismoSitio(o, url, cfg)) return res({ error: "Origen no permitido" }, 403);
-    const clave = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-    const profe = await quienEs(env, cfg, clave, "profe");
+    const cabP = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+    const cp = cabP.indexOf(":");
+    const profe = await quienEs(env, cfg, cp > 0 ? cabP.slice(0, cp) : "", cp > 0 ? cabP.slice(cp + 1) : "", ["profe"]);
     if (!profe) {
       if (!limitar(ip)) return res({ error: "Demasiados intentos. Espera unos minutos." }, 429);
-      return res({ error: "Clave incorrecta" }, 401);
+      return res({ error: "Usuario o contraseña incorrectos" }, 401);
     }
 
     /* Cada profesora cambia su propia clave sin tener que pedírselo a nadie. */
@@ -551,10 +608,12 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       let b; try { b = await cuerpo(request); } catch (e) { return res({ error: "JSON no válido" }, 400); }
       const nueva = String(b.nueva == null ? "" : b.nueva).replace(/\s+/g, "");
       if (nueva.length < 8 || nueva.length > 60) return res({ error: "La clave nueva tiene que tener entre 8 y 60 caracteres, sin espacios." }, 400);
-      if (igual(await sha256(nueva), profe.hash)) return res({ error: "Esa es la clave que ya tienes." }, 400);
+      const sal = salNueva();
       await env.CITAS.prepare(
-        "INSERT INTO accesos (slug, nombre, rol, hash, activo, creado) VALUES (?1, ?2, 'profe', ?3, 1, ?4) ON CONFLICT(slug, nombre) DO UPDATE SET hash = ?3, activo = 1"
-      ).bind(cfg.slug, profe.nombre, await sha256(nueva), new Date().toISOString()).run();
+        `INSERT INTO accesos (slug, nombre, usuario, rol, hash, pass_salt, pass_iter, activo, creado)
+         VALUES (?1, ?2, ?3, 'profe', ?4, ?5, ?6, 1, ?7)
+         ON CONFLICT(slug, nombre) DO UPDATE SET usuario = ?3, hash = ?4, pass_salt = ?5, pass_iter = ?6, activo = 1`
+      ).bind(cfg.slug, profe.nombre, profe.usuario, await hashClave(nueva, sal, ITER_EQ), sal, ITER_EQ, new Date().toISOString()).run();
       return res({ ok: true });
     }
 
