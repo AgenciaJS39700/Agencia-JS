@@ -859,6 +859,11 @@ async function pintaOcupacion(semanas) {
   try { d = await api("panel/horario/ocupacion?semanas=" + (semanas || 8)); }
   catch (e) { s.innerHTML = '<h2>Cómo van de llenas</h2><p class="vacio">No se ha podido calcular.</p>'; return; }
   const barra = (c) => `<div class="ocu"><i style="width:${Math.min(100, c.porcentaje)}%"></i></div>`;
+  if (d.sinDatos) {
+    s.innerHTML = `<h2>Cómo van de llenas<span>sin datos todavía</span></h2>
+      <p class="vacio">En las últimas ${d.semanas} semanas no hay ninguna reserva de la que tirar. En cuanto empiece a entrar gente, aquí verás qué clases llenan y cuáles no.</p>`;
+    return;
+  }
   s.innerHTML = `<h2>Cómo van de llenas<span>${d.media}% de media · ${d.semanas} semanas</span></h2>
     <div class="bar"><select id="hOcupSem" style="width:auto" aria-label="Semanas que se miran">
       ${[4, 8, 12, 26].map((n) => `<option value="${n}"${n === d.semanas ? " selected" : ""}>últimas ${n} semanas</option>`).join("")}

@@ -108,10 +108,14 @@ export async function ocupacionDe(env, cfg, semanas = 8, umbral = 40) {
     }
   }
   fuera.sort((a, b) => a.porcentaje - b.porcentaje);
+  // Sin reservas en toda la ventana no hay nada que leer: un estudio recién
+  // puesto en marcha no tiene «28 clases que no llenan», tiene cero historial.
+  const apuntadas = (results || []).reduce((s, r) => s + r.n, 0);
   return {
-    semanas, umbral, desde,
+    semanas, umbral, desde, apuntadas,
+    sinDatos: apuntadas === 0,
     clases: fuera,
-    flojas: fuera.filter((c) => c.porcentaje < umbral && c.seguidas >= 3),
+    flojas: apuntadas === 0 ? [] : fuera.filter((c) => c.porcentaje < umbral && c.seguidas >= 3 && c.veces >= 3),
     media: fuera.length ? Math.round(fuera.reduce((s, c) => s + c.porcentaje, 0) / fuera.length) : 0,
   };
 }
