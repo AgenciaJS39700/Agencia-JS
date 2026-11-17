@@ -300,6 +300,17 @@ export async function reservar(env, cfg, datos, origen = "chat", ctx) {
     if (n && n.n >= a.maxPorTelefono) return { ok: false, estado: 429, mensaje: ses ? "Ya tienes muchas clases reservadas con este teléfono. Anula alguna o escríbenos." : "Ya tienes varias citas pendientes con este teléfono. Para más, contacta con el negocio." };
   }
 
+  // Si reserva sin entrar en su cuenta (el caso normal del formulario y del panel),
+  // la atamos a su ficha por email o teléfono. Si no, la clase no cuenta en su cuenta
+  // y el profesor no ve su nota interna: la reserva queda huérfana.
+  let alumnoId = datos.alumno_id || null;
+  if (!alumnoId && (email || tel)) {
+    const al = await env.CITAS.prepare(
+      "SELECT id FROM alumnos WHERE slug = ?1 AND ((?2 <> '' AND lower(email) = ?2) OR (?3 <> '' AND telefono = ?3)) ORDER BY (lower(email) = ?2) DESC LIMIT 1"
+    ).bind(cfg.slug, email || "", tel || "").first().catch(() => null);
+    if (al) alumnoId = al.id;
+  }
+
   for (let intento = 0; intento < 3; intento++) {
     const cod = codigo();
     try {
@@ -312,7 +323,7 @@ export async function reservar(env, cfg, datos, origen = "chat", ctx) {
          SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?14
          WHERE ${ocupadas} < ?13
            AND NOT EXISTS (SELECT 1 FROM bloqueos WHERE slug = ?1 AND fecha = ?5 AND inicio < ?7 AND fin > ?6)`
-      ).bind(cfg.slug, cod, serv.id, ses ? ses.nombre : serv.nombre, fecha, inicio, fin, nombre, tel, email || null, nota || null, origen, cupo, datos.alumno_id || null).run();
+      ).bind(cfg.slug, cod, serv.id, ses ? ses.nombre : serv.nombre, fecha, inicio, fin, nombre, tel, email || null, nota || null, origen, cupo, alumnoId).run();
       if (!r.meta || !r.meta.changes) return { ok: false, estado: 409, mensaje: ses ? "Esa clase acaba de llenarse. Elige otra hora." : "Ese hueco acaba de ocuparse. Elige otra hora." };
       const nomServ = ses ? ses.nombre : serv.nombre;
       const cita = { id: r.meta.last_row_id, codigo: cod, servicio_n: nomServ, precio: serv.precio, sala: ses ? ses.sala : "", fecha, inicio, fin, nombre, telefono: tel, email, nota, origen };
@@ -513,12 +524,26 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       const desde = RE_FECHA.test(url.searchParams.get("desde") || "") ? url.searchParams.get("desde") : ahora().fecha;
       const dias = Math.min(Math.max(+url.searchParams.get("dias") || 14, 1), 92);
       const hasta = sumar(desde, dias - 1);
-      const [c, b] = await env.CITAS.batch([
-        env.CITAS.prepare("SELECT id, codigo, servicio, servicio_n, fecha, inicio, fin, nombre, telefono, email, nota, origen, estado, asistio, creada FROM citas WHERE slug = ? AND fecha BETWEEN ? AND ? ORDER BY fecha, inicio").bind(cfg.slug, desde, hasta),
+      const [c, b, nt] = await env.CITAS.batch([
+        env.CITAS.prepare(
+          `SELECT c.id, c.codigo, c.servicio, c.servicio_n, c.fecha, c.inicio, c.fin, c.nombre, c.telefono, c.email, c.nota,
+                  c.origen, c.estado, c.asistio, c.creada, c.alumno_id, a.nota_interna
+           FROM citas c LEFT JOIN alumnos a ON a.id = c.alumno_id
+           WHERE c.slug = ? AND c.fecha BETWEEN ? AND ? ORDER BY c.fecha, c.inicio`).bind(cfg.slug, desde, hasta),
         env.CITAS.prepare("SELECT id, fecha, inicio, fin, motivo FROM bloqueos WHERE slug = ? AND fecha BETWEEN ? AND ? ORDER BY fecha, inicio").bind(cfg.slug, desde, hasta),
+        env.CITAS.prepare("SELECT email, telefono, nota_interna FROM alumnos WHERE slug = ? AND nota_interna IS NOT NULL AND nota_interna <> ''").bind(cfg.slug),
       ]);
+      const xMail = {}, xTel = {};
+      for (const a2 of nt.results || []) {
+        if (a2.email) xMail[String(a2.email).toLowerCase()] = a2.nota_interna;
+        if (a2.telefono) xTel[String(a2.telefono)] = a2.nota_interna;
+      }
+      const citasP = (c.results || []).map((x) => ({
+        ...x,
+        interna: x.nota_interna || xMail[String(x.email || "").toLowerCase()] || xTel[String(x.telefono || "")] || "",
+      }));
       visto(env, cfg, yo.nombre, ctx);
-      return res({ negocio: configPublica(cfg), yo: { nombre: yo.nombre, usuario: yo.usuario, rol: yo.rol }, desde, hasta, citas: c.results || [], bloqueos: b.results || [] });
+      return res({ negocio: configPublica(cfg), yo: { nombre: yo.nombre, usuario: yo.usuario, rol: yo.rol }, desde, hasta, citas: citasP, bloqueos: b.results || [] });
     }
     /* ---- equipo: quién entra y con qué clave ---- */
     if (ruta === "panel/equipo" && request.method === "GET") {
@@ -662,15 +687,24 @@ export async function atenderAgenda(request, env, ctx, limitar) {
       const hasta = sumar(desde, dias - 1);
       // La nota interna (una lesión, un embarazo, lo que haya que tener en cuenta) viaja
       // con la lista: es justo cuando el profesor la necesita.
-      const [c1, cam] = await Promise.all([
+      const [c1, cam, notas] = await Promise.all([
         env.CITAS.prepare(
           `SELECT c.id, c.codigo, c.servicio, c.servicio_n, c.fecha, c.inicio, c.nombre, c.telefono, c.email, c.nota,
                   c.estado, c.asistio, a.nota_interna
            FROM citas c LEFT JOIN alumnos a ON a.id = c.alumno_id
            WHERE c.slug = ? AND c.fecha BETWEEN ? AND ? ORDER BY c.fecha, c.inicio`).bind(cfg.slug, desde, hasta).all(),
         cambiosDe(env, cfg, desde, hasta),
+        // Red de seguridad: si la reserva no quedó atada a la ficha, buscamos la nota
+        // por email o teléfono. Una lesión no puede perderse por un dato sin casar.
+        env.CITAS.prepare("SELECT email, telefono, nota_interna FROM alumnos WHERE slug = ? AND nota_interna IS NOT NULL AND nota_interna <> ''").bind(cfg.slug).all().catch(() => ({ results: [] })),
       ]);
       const citas = c1.results || [];
+      const porMail = {}, porTel = {};
+      for (const a2 of notas.results || []) {
+        if (a2.email) porMail[String(a2.email).toLowerCase()] = a2.nota_interna;
+        if (a2.telefono) porTel[String(a2.telefono)] = a2.nota_interna;
+      }
+      const interna = (c) => c.nota_interna || porMail[String(c.email || "").toLowerCase()] || porTel[String(c.telefono || "")] || "";
       const dias2 = [];
       for (let f = desde; f <= hasta; f = sumar(f, 1)) {
         // Con sustitución, la clase es de quien la da ESE día, no de quien figura en el cartel
@@ -690,7 +724,7 @@ export async function atenderAgenda(request, env, ctx, limitar) {
               cubre: sub && sub.prof === profe.nombre && x.prof !== profe.nombre ? x.prof : "",
               aviso: sub ? sub.nota || "" : "",
               apuntadas: g.filter((c) => c.estado === "ok").length,
-              gente: g.map((c) => ({ id: c.id, nombre: c.nombre, telefono: c.telefono, nota: c.nota, interna: c.nota_interna || "", estado: c.estado, asistio: c.asistio, codigo: c.codigo })),
+              gente: g.map((c) => ({ id: c.id, nombre: c.nombre, telefono: c.telefono, nota: c.nota, interna: interna(c), estado: c.estado, asistio: c.asistio, codigo: c.codigo })),
             };
           }),
         });

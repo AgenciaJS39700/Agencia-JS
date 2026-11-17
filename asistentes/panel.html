@@ -427,7 +427,7 @@ function citaHTML(c) {
   return `<article class="cita${c.estado !== "ok" ? " cx" : ""}"><div class="h">${hhmm(c.inicio)}<small>${hhmm(c.fin)}</small></div>
   <div><div class="n">${esc(c.nombre)}${c.estado !== "ok" ? '<span class="tag">cancelada</span>' : ""}<span class="tag">${esc({ chat: "online", voz: "teléfono IA", panel: "en el local" }[c.origen] || c.origen)}</span></div>
   <div class="d">${esc(c.servicio_n)}${c.telefono ? ` · <a href="tel:${tel}">${tel}</a> · <a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : " · sin teléfono"}${c.email ? " · " + esc(c.email) : ""}</div>
-  ${c.nota ? `<div class="d">Nota: ${esc(c.nota)}</div>` : ""}<div class="d" style="color:var(--mu);font-size:.78rem">Código ${esc(c.codigo)}</div></div>
+  ${c.nota ? `<div class="d">Nota: ${esc(c.nota)}</div>` : ""}${c.interna ? `<div class="d int">⚠︎ ${esc(c.interna)}</div>` : ""}<div class="d" style="color:var(--mu);font-size:.78rem">Código ${esc(c.codigo)}</div></div>
   <div class="acc">${c.estado === "ok" ? `
     <button class="btn sm asis" data-vino="${c.id}" type="button" aria-pressed="${c.asistio === 1}" aria-label="Marcar que ${esc(c.nombre)} vino">Vino</button>
     <button class="btn sm asis no" data-falto="${c.id}" type="button" aria-pressed="${c.asistio === 0}" aria-label="Marcar que ${esc(c.nombre)} no vino">No vino</button>
