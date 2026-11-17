@@ -97,7 +97,16 @@ CREATE TABLE IF NOT EXISTS accesos (
   rol    TEXT NOT NULL DEFAULT 'profe',   -- 'panel' (gestiona todo) | 'profe' (solo sus clases)
   hash   TEXT NOT NULL,
   activo INTEGER NOT NULL DEFAULT 1,
-  visto  TEXT,                            -- último acceso
   creado TEXT NOT NULL
 );
 CREATE UNIQUE INDEX IF NOT EXISTS accesos_slug_nombre ON accesos (slug, nombre);
+
+-- Último acceso de cada persona del equipo. Va aparte de `accesos` a propósito:
+-- anotarlo no convierte a nadie en «clave propia», así las claves escritas en el
+-- archivo del cliente siguen mandando hasta que alguien las cambie de verdad.
+CREATE TABLE IF NOT EXISTS vistos (
+  slug   TEXT NOT NULL,
+  nombre TEXT NOT NULL,
+  visto  TEXT NOT NULL,
+  PRIMARY KEY (slug, nombre)
+);

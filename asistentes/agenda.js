@@ -85,18 +85,24 @@ function mismoSitio(origen, url, cfg) {
    alguien aparece ahí, su línea del archivo deja de valer. Así se cambia una clave
    o se da de baja a una persona sin tocar el código ni volver a publicar. */
 async function equipo(env, cfg) {
-  let filas = [];
+  let filas = [], ultimos = [];
   try {
-    const r = await env.CITAS.prepare("SELECT nombre, rol, hash, activo, visto FROM accesos WHERE slug = ?").bind(cfg.slug).all();
-    filas = r.results || [];
-  } catch (e) { /* tabla aún sin crear: seguimos con el archivo */ }
+    const [a, v] = await env.CITAS.batch([
+      env.CITAS.prepare("SELECT nombre, rol, hash, activo FROM accesos WHERE slug = ?").bind(cfg.slug),
+      env.CITAS.prepare("SELECT nombre, visto FROM vistos WHERE slug = ?").bind(cfg.slug),
+    ]);
+    filas = a.results || []; ultimos = v.results || [];
+  } catch (e) { /* tablas aún sin crear: seguimos con el archivo */ }
+  // El último acceso va aparte a propósito: así anotarlo no convierte a nadie en
+  // «clave propia» y las claves del archivo siguen mandando hasta que se cambien.
+  const visto = Object.fromEntries(ultimos.map((x) => [x.nombre, x.visto]));
   const gobierna = new Set(filas.map((f) => f.nombre));
-  const lista = filas.map((f) => ({ nombre: f.nombre, rol: f.rol === "panel" ? "panel" : "profe", hash: f.hash, activo: !!f.activo, visto: f.visto, propia: true }));
+  const lista = filas.map((f) => ({ nombre: f.nombre, rol: f.rol === "panel" ? "panel" : "profe", hash: f.hash, activo: !!f.activo, visto: visto[f.nombre] || null, propia: true }));
   const delArchivo = [];
   if (cfg.panel && cfg.panel.hash) delArchivo.push({ nombre: cfg.panel.nombre || "Responsable", rol: "panel", hash: cfg.panel.hash });
   for (const p of (cfg.panel && cfg.panel.equipo) || []) delArchivo.push({ nombre: p.nombre, rol: "panel", hash: p.hash });
   for (const p of cfg.profes || []) delArchivo.push({ nombre: p.nombre, rol: "profe", hash: p.hash });
-  for (const p of delArchivo) if (p.hash && !gobierna.has(p.nombre)) lista.push({ ...p, activo: true, visto: null, propia: false });
+  for (const p of delArchivo) if (p.hash && !gobierna.has(p.nombre)) lista.push({ ...p, activo: true, visto: visto[p.nombre] || null, propia: false });
   return lista;
 }
 
@@ -110,8 +116,9 @@ async function quienEs(env, cfg, clave, rol) {
 
 /** Deja constancia del último acceso, sin hacer esperar a quien entra. */
 function visto(env, cfg, nombre, ctx) {
-  const t = new Date().toISOString();
-  const p = env.CITAS.prepare("UPDATE accesos SET visto = ?3 WHERE slug = ?1 AND nombre = ?2").bind(cfg.slug, nombre, t).run().catch(() => {});
+  const p = env.CITAS.prepare(
+    "INSERT INTO vistos (slug, nombre, visto) VALUES (?1, ?2, ?3) ON CONFLICT(slug, nombre) DO UPDATE SET visto = ?3"
+  ).bind(cfg.slug, nombre, new Date().toISOString()).run().catch(() => {});
   if (ctx && ctx.waitUntil) ctx.waitUntil(p);
 }
 
