@@ -916,12 +916,15 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url, apuntar)
       env.CITAS.prepare("SELECT fecha, concepto, importe, estado, metodo, numero, tipo FROM pagos WHERE slug=?1 AND alumno_id=?2 ORDER BY id").bind(cfg.slug, id).all(),
       env.CITAS.prepare("SELECT servicio, fecha, inicio FROM espera WHERE slug=?1 AND alumno_id=?2").bind(cfg.slug, id).all(),
     ]);
-    const { clave, pass_salt, pass_iter, reset_tok, ...ficha } = a;   // el hash de su contraseña no es un dato suyo que entregar
+    // Ni el hash de su contraseña ni el token de baja se entregan: no son datos
+    // suyos, son cerrojos. Se quitan por nombre exacto y se comprueba al final.
+    const { pass_hash, pass_salt, pass_iter, baja_token, ...ficha } = a;
     const doc = {
       estudio: cfg.negocio.nombre,
       sacado: new Date().toISOString(),
       aviso: "Copia de todo lo que el estudio guarda de esta persona. La contraseña no se incluye porque se guarda cifrada y no se puede leer.",
-      ficha, clases: citas.results || [], bonos: bonos.results || [],
+      ficha: Object.fromEntries(Object.entries(ficha).filter(([k]) => !/hash|salt|iter|token|pass/i.test(k))),
+      clases: citas.results || [], bonos: bonos.results || [],
       pagos: (pagos.results || []).map((p) => ({ ...p, importe: (p.importe / 100).toFixed(2) + " €" })),
       listaDeEspera: espera.results || [],
     };
@@ -930,6 +933,8 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url, apuntar)
         "Content-Disposition": `attachment; filename="datos-${(a.nombre || "alumna").toLowerCase().replace(/[^a-z0-9]+/g, "-")}.json"` },
     });
   }
+
+  const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 
   if (ruta === "panel/alumna/borrar" && post) {
     const b = await cuerpo();
@@ -950,7 +955,7 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url, apuntar)
         nombre: a.nombre || a.email,
         borra: { clases: nc, bonos: nb, cobros: np, espera: ne },
         guarda: nf,
-        mensaje: `Se borra su ficha, sus datos de contacto, su contraseña, ${nc} clases, ${nb} bonos, ${np} cobros sin factura y ${ne} apuntes en lista de espera. ` +
+        mensaje: `Se borra su ficha, sus datos de contacto, su contraseña, ${plural(nc, "clase", "clases")}, ${plural(nb, "bono", "bonos")}, ${plural(np, "cobro sin factura", "cobros sin factura")} y ${plural(ne, "apunte en lista de espera", "apuntes en lista de espera")}. ` +
           (nf ? `Sus ${nf === 1 ? "1 factura emitida se queda" : nf + " facturas emitidas se quedan"}: la ley obliga a guardarlas y llevan su nombre y su NIF tal como se emitieron. Dejan de estar enlazadas con la ficha.` : "No tiene ninguna factura emitida, así que no queda nada suyo.") +
           " Esto no se puede deshacer.",
       }, 409);
