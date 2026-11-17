@@ -91,7 +91,9 @@ export default {
     { id: "emb2", nombre: "Embarazo y postparto · 2 días por semana", precio: 5500, meses: 1, sem: 2, tipos: ["maternidad"], recurrente: true },
     { id: "emb1", nombre: "Embarazo y postparto · 1 día por semana", precio: 4000, meses: 1, sem: 1, tipos: ["maternidad"], recurrente: true },
     { id: "salsa", nombre: "Salsa y bachata · 1 día por semana", precio: 4000, meses: 1, sem: 1, tipos: ["baile"], recurrente: true },
-    { id: "familia", nombre: "Yoga en Familia · 1 día por semana", precio: 5500, meses: 1, sem: 1, tipos: ["taller"], recurrente: true },
+    // El taller de familia es UN viernes al mes, así que no puede ser un bono semanal:
+    // es una entrada por taller, al precio que ellos publican (20 € un adulto y un peque).
+    { id: "familia", nombre: "Taller Yoga en Familia · un adulto y un peque", precio: 2000, dias: 1, sem: 1, tipos: ["taller"], nota: "Cada peque o acompañante de más, 5 € que se pagan en el estudio." },
     { id: "online", nombre: "Yoga o pilates online · 1 día por semana", precio: 2800, meses: 1, sem: 1, tipos: ["bienestar", "fuerza"], online: true, recurrente: true },
     { id: "ilim21", nombre: "Bono Ilimitado 21 días", precio: 3900, dias: 21, sem: 0, tipos: ["bienestar", "fuerza"], nuevas: true, nota: "Solo para quien empieza: 21 días de todo lo que quieras." },
     { id: "suelta", nombre: "Clase suelta", precio: 1200, dias: 1, sem: 1, tipos: ["bienestar", "fuerza", "maternidad", "baile"] },
