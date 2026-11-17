@@ -26,6 +26,7 @@ import { atenderAlumnos, atenderPanelAlumnos, alumnaDeLaSesion, compruebaBono, a
 import { atenderEventos, atenderPanelEventos } from "./eventos.js";
 import { atenderPanelFacturas } from "./facturas.js";
 import { recuperarAcceso, atenderRecados, atenderSustituciones, recadosDe, cambiosDe, dirigidoA } from "./equipo-extra.js";
+import { conHorario, atenderHorario } from "./horario.js";
 
 const conPrefijo = (t) => { const d = String(t || "").replace(/\D/g, ""); return d.length === 9 ? "34" + d : d; };
 
@@ -453,8 +454,12 @@ function cors(request, cfg, url) {
 export async function atenderAgenda(request, env, ctx, limitar) {
   const url = new URL(request.url);
   const m = url.pathname.match(/^\/api\/as\/([a-z0-9-]{2,40})\/([a-z/.-]+)$/);   // el guion también: hay rutas como panel/nueva-clave
-  const cfg = m && CLIENTES[m[1]];
-  if (!cfg) return res({ error: "Negocio no encontrado" }, 404);
+  const cfgArchivo = m && CLIENTES[m[1]];
+  if (!cfgArchivo) return res({ error: "Negocio no encontrado" }, 404);
+  // El cuadro de clases puede llevarlo el propio negocio desde el panel: si lo ha
+  // hecho suyo, manda esa tabla y no el archivo. Copia por petición, nunca se
+  // toca el objeto del cliente, que es compartido.
+  const cfg = await conHorario(env, cfgArchivo);
   const ruta = m[2];
   const ip = request.headers.get("CF-Connecting-IP") || "desconocida";
 
@@ -691,6 +696,8 @@ ${gente.length} de ${ses.cap} plazas · ${libres} libre${libres === 1 ? "" : "s"
           }),
       });
     }
+    const ph1 = await atenderHorario(request, env, cfg, cfgArchivo, ruta, url, yo, null);
+    if (ph1) return ph1;
     const pr1 = await atenderRecados(request, env, cfg, ruta, url, yo);
     if (pr1) return pr1;
     const ps1 = await atenderSustituciones(request, env, cfg, ruta, url, yo);

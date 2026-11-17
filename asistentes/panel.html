@@ -153,6 +153,7 @@ textarea{width:100%;min-height:84px;padding:.6rem .8rem;border-radius:12px;borde
       <button type="button" data-t="hoy" role="tab" aria-selected="false">Hoy</button>
       <button type="button" data-t="agenda" role="tab" aria-selected="true">Agenda</button>
       <button type="button" data-t="recados" role="tab" aria-selected="false">Tablón <span id="pinta-sin" class="eti" hidden></span></button>
+      <button type="button" data-t="horario" role="tab" aria-selected="false">Horario</button>
       <button type="button" data-t="alumnas" role="tab" aria-selected="false">Alumnas</button>
       <button type="button" data-t="pagos" role="tab" aria-selected="false">Cobros</button>
       <button type="button" data-t="facturas" role="tab" aria-selected="false">Facturación</button>
@@ -162,6 +163,7 @@ textarea{width:100%;min-height:84px;padding:.6rem .8rem;border-radius:12px;borde
     <div id="lista" aria-live="polite"></div>
     <div id="vHoy" hidden></div>
     <div id="vRecados" hidden></div>
+    <div id="vHorario" hidden></div>
     <div id="vAlumnas" hidden></div>
     <div id="vPagos" hidden></div>
     <div id="vFacturas" hidden></div>
@@ -182,6 +184,29 @@ textarea{width:100%;min-height:84px;padding:.6rem .8rem;border-radius:12px;borde
   </div>
   <p class="msg" role="alert" id="mn"></p>
   <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn main" id="ok-n" value="ok">Guardar</button></div>
+</form></dialog>
+
+<dialog id="d-hora" aria-labelledby="dh-t"><form id="fh" method="dialog">
+  <h2 id="dh-t">Añadir clase</h2>
+  <p class="d">Esto es lo que verá y podrá reservar la gente en la web.</p>
+  <input type="hidden" name="id_">
+  <div class="grid">
+    <div><label for="h-dia">Día de la semana</label>
+      <select id="h-dia" name="dia" required>
+        <option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option>
+        <option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option><option value="0">Domingo</option>
+      </select></div>
+    <div><label for="h-h">Hora</label><input id="h-h" name="hora" type="time" step="300" required></div>
+    <div class="full"><label for="h-serv">Actividad</label><select id="h-serv" name="servicio" required></select></div>
+    <div class="full"><label for="h-nom">Nombre que se ve en la web</label><input id="h-nom" name="nombre" maxlength="80" placeholder="Si lo dejas vacío, el de la actividad"></div>
+    <div><label for="h-min">Dura (minutos)</label><input id="h-min" name="min" type="number" min="5" max="300" step="5" required></div>
+    <div><label for="h-cap">Plazas</label><input id="h-cap" name="cap" type="number" min="1" max="200" required></div>
+    <div><label for="h-sala">Sala</label><input id="h-sala" name="sala" maxlength="60" list="h-salas"><datalist id="h-salas"></datalist></div>
+    <div><label for="h-prof">Profesor</label><input id="h-prof" name="prof" maxlength="40" list="h-profes"><datalist id="h-profes"></datalist></div>
+    <div class="full"><label for="h-nota">Nota en el cartel (opcional)</label><input id="h-nota" name="nota" maxlength="120" placeholder="Nivel iniciación, trae esterilla…"></div>
+  </div>
+  <p class="msg" role="alert" id="mh"></p>
+  <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn main" value="ok">Guardar</button></div>
 </form></dialog>
 
 <dialog id="d-cerrar" aria-labelledby="dc-t"><form id="fc" method="dialog">
@@ -285,7 +310,7 @@ async function api(ruta, cuerpo) {
   const r = await fetch(`/api/as/${slug}/${ruta}`, { method: cuerpo ? "POST" : "GET", headers: { Authorization: "Bearer " + usuario + ":" + clave, ...(cuerpo ? { "Content-Type": "application/json" } : {}) }, body: cuerpo ? JSON.stringify(cuerpo) : undefined });
   const d = await r.json().catch(() => ({}));
   if (r.status === 401) { salir(); throw new Error(d.error || "Usuario o contraseña incorrectos"); }
-  if (!r.ok) throw new Error(d.mensaje || d.error || "Error");
+  if (!r.ok) { const e = new Error(d.mensaje || d.error || "Error"); e.datos = d; e.estado = r.status; throw e; }
   return d;
 }
 function salir() { clave = ""; usuario = ""; yo = null; try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch (e) {} $("app").hidden = true; $("login").hidden = false; }
@@ -379,10 +404,10 @@ async function cargar() {
   // las estadísticas y las claves del equipo son de quien gestiona el estudio.
   const duena = !yo || yo.rol === "panel";
   $("tabs").querySelectorAll("button[data-t]").forEach((x) => {
-    const solo = x.dataset.t === "facturas" || x.dataset.t === "equipo";
+    const solo = x.dataset.t === "facturas" || x.dataset.t === "equipo" || x.dataset.t === "horario";
     x.hidden = solo && !duena;
   });
-  if (!duena && (pestana === "facturas" || pestana === "equipo")) {
+  if (!duena && (pestana === "facturas" || pestana === "equipo" || pestana === "horario")) {
     const ag = $("tabs").querySelector('button[data-t="agenda"]');
     if (ag) ag.click();
   }
@@ -567,7 +592,7 @@ const eur = (c) => (c / 100).toLocaleString("es-ES", { minimumFractionDigits: c 
 const corto = (f) => String(f || "").slice(0, 10).split("-").reverse().join("/");
 let pestana = "agenda", alumnaAbierta = 0, aterrizado = false;
 
-const VISTAS = { hoy: "vHoy", agenda: "lista", recados: "vRecados", alumnas: "vAlumnas", pagos: "vPagos", facturas: "vFacturas", espera: "vEspera", equipo: "vEquipo" };
+const VISTAS = { hoy: "vHoy", agenda: "lista", recados: "vRecados", horario: "vHorario", alumnas: "vAlumnas", pagos: "vPagos", facturas: "vFacturas", espera: "vEspera", equipo: "vEquipo" };
 $("tabs").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-t]");
   if (!b) return;
@@ -580,6 +605,7 @@ $("tabs").addEventListener("click", (e) => {
   $("resumen").hidden = pestana === "hoy";
   if (negocio && negocio.avanzado) $("vista").hidden = pestana !== "agenda";
   if (pestana === "hoy") verHoy();
+  if (pestana === "horario") verHorario();
   if (pestana === "recados") verRecados();
   if (pestana === "alumnas") verAlumnas();
   if (pestana === "pagos") verPagos();
@@ -716,6 +742,105 @@ $("fb").addEventListener("submit", async (e) => {
 });
 
 /* ---- cobros ---- */
+/* ---- horario ----
+   El cuadro de clases, en manos del estudio. Mientras venga «de fábrica» solo se
+   mira; en cuanto se copia al panel, se edita aquí y la web reserva por esto. */
+const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+const ORDEN = [1, 2, 3, 4, 5, 6, 0];   // la semana empieza en lunes, como la ve la gente
+let hor = null;
+async function verHorario() {
+  $("vHorario").innerHTML = '<p class="vacio">Cargando…</p>';
+  hor = await api("panel/horario");
+  const propio = hor.fuente === "panel";
+  $("vHorario").innerHTML =
+    `<div class="box" style="margin-bottom:14px">
+      ${propio
+        ? `<b>El cuadro de clases lo llevas tú.</b><p class="d" style="margin:.3rem 0 0">Lo que pongas aquí es lo que se puede reservar en la web, desde el momento en que lo guardas. ${hor.clases} clases a la semana.</p>`
+        : `<b>El cuadro viene de fábrica.</b><p class="d" style="margin:.3rem 0 .6rem">Son las ${hor.clases} clases con las que se montó la web. Para poder moverlas tú, cópialas al panel: a partir de ahí mandas tú y no hace falta avisarnos para cambiar nada.</p>
+           <button class="btn main" type="button" id="h-copiar">Hacer mío el cuadro de clases</button>`}
+     </div>
+     ${propio ? '<div class="bar"><button class="btn main" type="button" data-hnueva="1">+ Añadir clase</button><button class="btn" type="button" id="h-fabrica">Volver al cuadro de fábrica</button></div>' : ""}
+     ${ORDEN.map((d) => {
+        const l = hor.dias[d] || [];
+        return `<section class="dia"><h2>${DIAS[d].charAt(0).toUpperCase() + DIAS[d].slice(1)}<span>${l.length === 1 ? "1 clase" : l.length + " clases"}</span></h2>
+         ${l.map((c) => `<article class="cita">
+           <div class="h">${esc(c.hora)}<small>${c.min} min</small></div>
+           <div><div class="n">${esc(c.nombre)}${c.servicioOk ? "" : '<span class="tag">actividad desconocida</span>'}</div>
+            <div class="d">${esc(c.sala || "sin sala")} · ${c.cap} plaza${c.cap === 1 ? "" : "s"}${c.prof ? " · " + esc(c.prof) : " · sin profesor"}${c.nota ? " · " + esc(c.nota) : ""}</div></div>
+           <div class="acc">${propio ? `<button class="btn sm" type="button" data-hedit="${c.id}" data-hdia="${d}">Cambiar</button>
+             <button class="btn sm del" type="button" data-hbaja="${c.id}" data-hnom="${esc(c.nombre)}">Quitar</button>` : ""}</div>
+          </article>`).join("") || '<p class="vacio">Ese día no hay clases.</p>'}
+        </section>`;
+      }).join("")}`;
+  const cop = $("h-copiar");
+  if (cop) cop.onclick = async () => {
+    cop.disabled = true;
+    try { const r = await api("panel/horario/copiar", {}); alert(`Listo: ${r.clases} clases copiadas. Ya puedes moverlas tú.`); verHorario(); }
+    catch (e) { cop.disabled = false; alert(e.message); }
+  };
+  const fab = $("h-fabrica");
+  if (fab) fab.onclick = async () => {
+    if (!confirm("Esto borra el cuadro que has montado y vuelve al de fábrica. No se puede deshacer.")) return;
+    try { await api("panel/horario/archivo", { seguro: true }); verHorario(); } catch (e) { alert(e.message); }
+  };
+}
+$("vHorario").addEventListener("click", async (e) => {
+  const nueva = e.target.closest("[data-hnueva]"), ed = e.target.closest("[data-hedit]"), ba = e.target.closest("[data-hbaja]");
+  if (nueva) return claseDialogo(null, 1);
+  if (ed) {
+    const d = +ed.dataset.hdia, c = (hor.dias[d] || []).find((x) => String(x.id) === ed.dataset.hedit);
+    return claseDialogo(c, d);
+  }
+  if (ba) {
+    const id = +ba.dataset.hbaja;
+    try {
+      await api("panel/horario/baja", { id });
+      verHorario();
+    } catch (er) {
+      // El motor avisa si hay gente apuntada: se decide con ese dato delante
+      if (er.datos && er.datos.confirmar) {
+        if (confirm(er.message + "\n\n¿La quito igualmente?")) {
+          try { await api("panel/horario/baja", { id, aunque: true }); verHorario(); } catch (e2) { alert(e2.message); }
+        }
+      } else alert(er.message);
+    }
+  }
+});
+function claseDialogo(c, dia) {
+  const f = $("fh");
+  $("dh-t").textContent = c ? "Cambiar clase" : "Añadir clase";
+  f.id_.value = c ? c.id : "";
+  f.dia.value = String(dia);
+  f.hora.value = c ? c.hora : "10:00";
+  f.servicio.innerHTML = hor.servicios.map((s) => `<option value="${esc(s.id)}" data-min="${s.min}"${c && c.servicio === s.id ? " selected" : ""}>${esc(s.nombre)}</option>`).join("");
+  f.nombre.value = c ? c.nombre : "";
+  f.min.value = c ? c.min : (hor.servicios[0] ? hor.servicios[0].min : 60);
+  f.cap.value = c ? c.cap : 12;
+  f.sala.value = c ? c.sala : "";
+  f.prof.value = c ? c.prof : "";
+  f.nota.value = c ? c.nota : "";
+  $("h-salas").innerHTML = hor.salas.map((s) => `<option value="${esc(s)}">`).join("");
+  $("h-profes").innerHTML = hor.profes.map((s) => `<option value="${esc(s)}">`).join("");
+  $("mh").textContent = "";
+  $("d-hora").showModal();
+}
+$("fh").addEventListener("submit", async (e) => {
+  if (e.submitter && e.submitter.value === "x") return;
+  e.preventDefault();
+  const f = $("fh"), msg = $("mh");
+  msg.style.color = "#fca5a5"; msg.textContent = "";
+  try {
+    const r = await api("panel/horario/clase", {
+      id: f.id_.value || undefined, dia: +f.dia.value, hora: f.hora.value, servicio: f.servicio.value,
+      nombre: f.nombre.value.trim(), min: +f.min.value, cap: +f.cap.value,
+      sala: f.sala.value.trim(), prof: f.prof.value.trim(), nota: f.nota.value.trim(),
+    });
+    $("d-hora").close();
+    if (r.movida && r.colgadas) alert(`Hecho. Ojo: había ${r.colgadas === 1 ? "1 reserva" : r.colgadas + " reservas"} en el hueco de antes. Esas reservas siguen en la agenda a su hora vieja; avísalas tú.`);
+    verHorario();
+  } catch (er) { msg.textContent = er.message; }
+});
+
 /* ---- hoy ----
    La pantalla de entrada: cómo va el día, qué falta por hacer y cuánto hay en
    caja. Si para saber cómo va el día hay que pasear por cuatro pestañas, nadie
