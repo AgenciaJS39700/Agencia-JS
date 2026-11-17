@@ -888,12 +888,12 @@ async function verRecados() {
       <div class="bar" style="margin:12px 0 0"><button class="btn main" type="submit">Dejar el recado</button></div>
      </form>` +
     (d.recados.length
-      ? d.recados.map((r) => `<div class="rec${r.leido ? "" : " nuevo"}">
+      ? d.recados.map((r) => `<div class="rec${r.leido || !r.mio ? "" : " nuevo"}">
           <p>${esc(r.texto)}</p>
           <div class="de">De <b>${esc(r.autor)}</b> · ${corto(r.creado)}
             ${r.para === "todos" ? "· para todos" : r.para === "profes" ? "· para los profesores" : r.para === "gestion" ? "· para gestión" : "· solo para " + esc(r.para)}
             ${r.fijado ? "· fijado" : ""}${r.caduca ? "· hasta el " + corto(r.caduca) : ""}
-            ${r.leido ? "" : `<button class="btn sm" type="button" data-leido="${r.id}">Enterada</button>`}
+            ${r.leido || !r.mio ? "" : `<button class="btn sm" type="button" data-leido="${r.id}">Enterada</button>`}
             ${duena || r.autor === (d.yo || {}).nombre ? `<button class="btn sm" type="button" data-borrar="${r.id}">Borrar</button>` : ""}
           </div>
           ${duena && r.leidoPor.length ? `<p class="vacio" style="margin-top:6px">Lo han leído: ${r.leidoPor.map(esc).join(", ")}</p>` : ""}

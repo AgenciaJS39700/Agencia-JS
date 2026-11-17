@@ -79,11 +79,16 @@ export async function recuperarAcceso(env, cfg, ruta, b) {
 
 /* ---------------------------------------------------------------- recados del equipo */
 
-const paraMi = (r, yo) =>
+/** ¿Este recado va dirigido a esta persona? (lo que cuenta como «sin leer»). */
+const dirigidoA = (r, yo) =>
   r.para === "todos" ||
   (r.para === "profes" && yo.rol === "profe") ||
   (r.para === "gestion" && (yo.rol === "panel" || yo.rol === "recepcion")) ||
   r.para === yo.nombre;
+
+/** ¿Lo ve en el tablón? Quien gestiona el estudio ve el tablón entero, porque lo
+    administra; y cualquiera ve siempre lo que ha escrito él. */
+const paraMi = (r, yo) => yo.rol === "panel" || r.autor === yo.nombre || dirigidoA(r, yo);
 
 /** Los recados vivos que le tocan a esta persona, con si ya los ha leído. */
 export async function recadosDe(env, cfg, yo) {
@@ -116,9 +121,10 @@ export async function atenderRecados(request, env, cfg, ruta, url, yo) {
       equipo: l,
       recados: mios.map((r) => ({
         id: r.id, texto: r.texto, autor: r.autor, para: r.para, fijado: !!r.fijado, caduca: r.caduca, creado: r.creado,
-        leido: !!r.leido, leidoPor: gente.filter((g) => g.recado_id === r.id).map((g) => g.nombre),
+        leido: !!r.leido, mio: dirigidoA(r, yo),
+        leidoPor: gente.filter((g) => g.recado_id === r.id).map((g) => g.nombre),
       })),
-      sinLeer: mios.filter((r) => !r.leido).length,
+      sinLeer: mios.filter((r) => !r.leido && dirigidoA(r, yo)).length,
       yo: { nombre: yo.nombre, rol: yo.rol },
     });
   }
