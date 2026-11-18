@@ -54,7 +54,7 @@ export default {
       "Método propio YTSO® (Yoga Terapéutico Suelo y Órganos), creado por Adriana Eslava, la fundadora.",
       "Qué llevar: esterilla, ropa cómoda, toalla y agua. Llega 5 minutos antes. Dos salas: Chandra y Surya.",
       "Si no puedes venir, anula tu plaza para que la coja otra persona; puedes recuperar la clase en otro horario dentro del mismo mes, según plazas.",
-      "Estamos en Avda. José Ribera 11, en Teatinos (Málaga), con aparcamiento fácil en la zona y cerca del Hospital Clínico y de la Universidad.",
+      "Estamos en Avda. José Ribera 11, en Teatinos (Málaga), en la zona del campus universitario y del Hospital Clínico. Si preguntan por autobuses, líneas concretas o aparcamiento, di que no tienes ese dato y pásalo al estudio: no te lo inventes.",
       "Talleres y encuentros: Yoga Nidra & Breathwork, Círculo de Mujeres y TribuEncuentro de Maternidad (gratuito, una vez al mes, con matrona, enfermera y fisioterapeuta).",
     ],
     wa: "34622183255",
