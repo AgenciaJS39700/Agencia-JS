@@ -59,7 +59,7 @@ export default {
     ],
     wa: "34622183255",
     web: "https://iomfit-demo.agencia39700.workers.dev/",
-    mapa: "https://maps.google.com/?cid=8125878425549589069",
+    mapa: "https://www.google.com/maps/search/?api=1&query=IOMFIT%20Yoga%20%26%20Pilates%20Studio%2C%20Avda.%20Jos%C3%A9%20Ribera%2011%2C%2029010%20M%C3%A1laga",   // el cid viejo estaba muerto
     // `resenas`: enlace directo a escribir opinión en Google. Mientras no esté, el
     // correo que pide reseña usa el mapa, que también lleva a su ficha. El enlace
     // bueno se saca del perfil de empresa de ella (Pedir reseñas → copiar enlace).
