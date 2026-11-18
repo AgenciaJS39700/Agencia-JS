@@ -23,6 +23,8 @@
 import { correo, marco, boton, esc } from "./correo.js";
 import { confirmaEntrada } from "./eventos.js";
 import { emitirFactura, facturaHTML } from "./facturas.js";
+import { avisarMoviles } from "./push.js";
+import { avanzado } from "./agenda.js";
 
 const STRIPE = "https://api.stripe.com/v1";
 const DIAS_SESION = 120;
@@ -765,6 +767,33 @@ async function aplicaPago(env, cfg, s) {
   const a = await env.CITAS.prepare("SELECT * FROM alumnos WHERE id = ?1").bind(alumnoId).first();
   const b = await env.CITAS.prepare("SELECT * FROM bonos WHERE id = ?1").bind(bonoId).first();
   if (a && b) await correo(env, cfg, a.email, a.nombre, `Bono activado · ${cfg.negocio.nombre}`, correoBono(cfg, b, producto(cfg, prodId) || {}));
+  // Y avisamos al negocio: una venta es justo lo que hay que saber en el momento.
+  // Hasta ahora solo se enteraba la alumna y el dinero entraba en silencio.
+  if (a && b) await avisarVenta(env, cfg, a, b, s.amount_total || 0, !!sub);
+}
+
+/** Aviso al estudio de que alguien ha comprado: correo y, en plan Avanzado, al móvil. */
+async function avisarVenta(env, cfg, alumna, bono, importe, recurrente) {
+  const to = cfg.avisos && cfg.avisos.email;
+  const eur = (c) => (c / 100).toLocaleString("es-ES", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }) + " €";
+  const titulo = `💳 ${eur(importe)} · ${bono.nombre}`;
+  const quien = alumna.nombre || alumna.email;
+  if (to) {
+    await correo(env, cfg, to, cfg.negocio.nombre, `${titulo} · ${quien}`,
+      marco(cfg, "Nueva compra", `
+        <p style="font-size:15px;line-height:1.7"><b>${esc(quien)}</b> acaba de comprar <b>${esc(bono.nombre)}</b> por <b>${esc(eur(importe))}</b>${recurrente ? " (se renueva sola cada mes)" : ""}.</p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;margin:12px 0">
+         <tr><td style="padding:6px 0;color:#555">Alumna</td><td style="padding:6px 0;text-align:right"><b>${esc(quien)}</b></td></tr>
+         <tr><td style="padding:6px 0;color:#555">Correo</td><td style="padding:6px 0;text-align:right">${esc(alumna.email || "")}</td></tr>
+         ${alumna.telefono ? `<tr><td style="padding:6px 0;color:#555">Teléfono</td><td style="padding:6px 0;text-align:right">${esc(alumna.telefono)}</td></tr>` : ""}
+         <tr><td style="padding:6px 0;color:#555">Válido hasta</td><td style="padding:6px 0;text-align:right">${esc(bono.fin || "")}</td></tr>
+        </table>
+        <p style="font-size:13px;color:#555">La factura ya está emitida y en el libro del mes.</p>
+        ${boton(cfg, "Ver en el panel", `https://agencia-js.com/panel/${cfg.slug}`)}`)).catch(() => {});
+  }
+  if (avanzado(cfg)) {
+    await avisarMoviles(env, cfg.slug, titulo, `${quien}${recurrente ? " · cuota mensual" : ""}. Factura emitida.`).catch(() => {});
+  }
 }
 
 /* ---------------------------------------------------------------- lista de espera: avisar */
