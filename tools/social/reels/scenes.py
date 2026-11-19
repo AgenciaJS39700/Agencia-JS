@@ -69,32 +69,30 @@ EXP = lambda t: S(PILL('Expectativa ✨','#86efac','rgba(34,197,94,.12)','rgba(3
 REA = lambda t: S(PILL('Realidad 😬') + f'<div class="fact">{t}</div>', 'or')
 TELL = lambda lab, inner: S('<div class="pill">Dime que tu web es antigua…</div>' + f'<div class="lab">{lab}</div>' + inner, 'or')
 
+RATE = lambda item, score, why, bad=False: S(f'<div class="pill"{"" if bad else " style=\'color:#86efac;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.5)\'"}>Puntuamos 📝</div>'
+       f'<div class="lab">{item}</div><div class="counter" style="color:{"#fb923c" if bad else "#86efac"}">{score}<span style="font-size:140px;color:#8a8a93">/10</span></div><p>{why}</p>', 'or' if bad else '')
+GOT = lambda pedi, llego: S('<div class="pill" style="color:#86efac;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.5)">Lo que pedí 🛒</div>'
+       f'<div class="fact" style="font-size:72px">{pedi}</div>'
+       '<div class="pill" style="margin-top:90px">Lo que me llegó 📦</div>'
+       f'<div class="fact" style="font-size:72px">{llego}</div>', 'or')
+
 REELS = {
- 'reel-2026-11-17-web-antigua': [
-   S('<div class="pill">Trend 👀</div><h1>Dime que tu web es antigua <span class="g">sin decirme</span> que es antigua</h1>', 'or'),
-   TELL('Nada más entrar…', '<div class="old"><div class="mar">★ Bienvenidos a nuestra web ★</div><div class="cnt">Visitas: 000127</div></div>'),
-   TELL('Para llamarte…', '<div class="fact">hay que <span class="g">copiar el número a mano</span> porque no se puede pulsar.</div>'),
-   TELL('Desde el móvil…', '<div class="fact">hay que <span class="g">hacer zoom</span> para leer cualquier cosa.</div>'),
-   TELL('Al final de la página…', '<div class="old"><div class="uc">🚧 Página en construcción 🚧</div><p>© 2015 · Todos los derechos reservados</p></div>'),
-   END('¿Te has visto <span class="g">reflejado</span>?', 'Te decimos gratis qué cambiar primero en tu web.'),
+ 'reel-2026-11-24-puntuamos': [
+   S('<div class="pill">Trend 📝</div><h1>Puntuamos cosas que vemos <span class="g">en webs de negocios</span></h1><p>Del 1 al 10. Sin piedad (pero con cariño).</p>'),
+   RATE('Botón de WhatsApp siempre a la vista', '10', 'Un toque y el cliente ya te está escribiendo.'),
+   RATE('Música que suena sola al entrar', '1', 'Nadie quiere sustos en el autobús.', True),
+   RATE('Horario actualizado y festivos', '9', 'Evita que alguien vaya y se encuentre cerrado.'),
+   RATE('Ventana emergente nada más entrar', '2', 'Antes de saber qué haces, ya le pides algo.', True),
+   RATE('Fotos reales de tu local y tu trabajo', '10', 'Dan más confianza que cualquier foto de catálogo.'),
+   END('¿Qué nota sacaría <span class="g">la tuya</span>?', 'Te la puntuamos gratis y te decimos qué subir primero.'),
  ],
- 'reel-2026-11-19-expectativa-realidad': [
-   S('<div class="pill">Expectativa vs realidad</div><h1>Un cliente te busca <span class="g">en Google</span></h1><p>Lo que imaginas… y lo que pasa a veces.</p>'),
-   EXP('Te encuentra a la primera y ve que <span class="g" style="color:#86efac">estás abierto</span>.'),
-   REA('Tu ficha dice que cierras a las 14:00. <span class="g">Hoy abres hasta las 20:00.</span>'),
-   EXP('Entra en tu web y <span class="g" style="color:#86efac">te llama</span> en un toque.'),
-   REA('La web no se ve bien en el móvil y <span class="g">no encuentra el teléfono</span>.'),
-   REA('Cierra la pestaña y <span class="g">llama al siguiente</span> de la lista.'),
-   END('Que la realidad sea <span class="g">la expectativa</span>', 'Web, ficha de Google, tarjetas NFC de reseñas y vídeos para tu negocio.'),
- ],
- 'reel-2026-11-21-navidad-finde': [
-   S('<div class="pill">Navidad 🎄</div><h1>Las luces ya se encienden. <span class="g">¿Y tu negocio?</span></h1><p>4 cosas para dejar listas este fin de semana.</p>', 'or'),
-   S('<div class="lab">01 · Tu ficha de Google</div><div class="fact">Pon ya el <span class="g">horario de las fiestas</span>, festivos incluidos.</div>', 'or'),
-   S('<div class="lab">02 · Tu web</div><div class="fact">Que se vea tu <span class="g">tarjeta regalo o tu pack</span> de Navidad en la portada.</div>', 'or'),
-   S('<div class="lab">03 · Tus redes</div><div class="fact">Graba un vídeo de <span class="g">tu escaparate o tu local</span> decorado.</div>', 'or'),
-   S('<div class="lab">04 · Tus clientes</div><div class="fact">Ten a mano un QR o tarjeta para que <span class="g">dejen su opinión</span> al pagar.</div>', 'or'),
-   S('<h1 style="font-size:96px">¿Cuántas <span class="g">tienes ya</span>?</h1><p>Guárdalo para este fin de semana 🔖</p>' + CHECKS(['Horario de fiestas', 'Regalo en la web', 'Vídeo del local', 'QR de opiniones']), 'or'),
-   END('Llega a Navidad <span class="g">a punto</span>', 'Te ayudamos con la web, la ficha de Google, las tarjetas NFC y los vídeos.'),
+ 'reel-2026-11-27-pedi-vs-llego': [
+   S('<div class="pill">Black Friday 🛒</div><h1>Lo que pedí vs lo que me llegó: <span class="g">versión web</span></h1><p>Hoy todo el mundo compra online. ¿Tu web está a la altura?</p>', 'or'),
+   GOT('Una web moderna y rápida', 'Una plantilla que tarda una eternidad en cargar en el móvil'),
+   GOT('Que mis clientes me llamen', 'Un formulario escondido que no le llega a nadie'),
+   GOT('Aparecer cuando me buscan', 'Una web que ni Google sabe de qué va'),
+   GOT('Poder cambiar mi horario', 'Tener que pedirlo por correo y esperar semanas'),
+   END('Que te llegue <span class="g">lo que pediste</span>', 'Web, ficha de Google, tarjetas NFC de reseñas y vídeos para tu negocio.'),
  ],
 }
 
