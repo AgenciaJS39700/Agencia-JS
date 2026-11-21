@@ -24,7 +24,8 @@ import { correo, marco, boton, esc } from "./correo.js";
 import { confirmaEntrada } from "./eventos.js";
 import { emitirFactura, facturaHTML } from "./facturas.js";
 import { avisarMoviles } from "./push.js";
-import { avanzado } from "./agenda.js";
+import { avanzado, onlineDeClase } from "./agenda.js";
+import { conHorario } from "./horario.js";
 
 const STRIPE = "https://api.stripe.com/v1";
 const DIAS_SESION = 120;
@@ -691,12 +692,14 @@ async function miCuenta(env, cfg, a) {
   const sem = lunes(hoy);
   const usadas = await env.CITAS.prepare("SELECT COUNT(*) AS n FROM citas WHERE slug = ?1 AND alumno_id = ?2 AND estado = 'ok' AND fecha BETWEEN ?3 AND ?4")
     .bind(cfg.slug, a.id, sem, sumarDias(sem, 6)).first();
+  // El cuadro de clases, para poder darle el enlace de sus clases online
+  const cfgH = await conHorario(env, cfg).catch(() => cfg);
   return {
     dentro: true,
     alumna: { id: a.id, email: a.email, nombre: a.nombre, telefono: a.telefono, marketing: !!a.marketing, pass: !!a.pass_hash },
     bonos: bonos.map((b) => ({ id: b.id, nombre: b.nombre, fin: b.fin, finTexto: legible(b.fin), sem: b.sem, recurrente: !!(b.recurrente && b.stripe_sub), tipos: b.tipos ? b.tipos.split(",") : [] })),
     semana: { usadas: usadas ? usadas.n : 0, desde: sem },
-    proximas: (proximas.results || []).map((c) => ({ ...c, hora: hhmm(c.inicio), dia: legible(c.fecha) })),
+    proximas: (proximas.results || []).map((c) => ({ ...c, hora: hhmm(c.inicio), dia: legible(c.fecha), ...onlineDeClase(cfgH, c.fecha, c.inicio, c.servicio) })),
     pasadas: (pasadas.results || []).map((c) => ({ ...c, hora: hhmm(c.inicio), dia: legible(c.fecha) })),
     pagos: (pagos.results || []).map((p) => ({ ...p, texto: euros(p.importe) })),
   };

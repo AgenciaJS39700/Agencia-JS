@@ -184,12 +184,25 @@ const ag = (cfg) => ({ paso: 30, capacidad: 1, antelacionMin: 60, diasMax: 60, f
 export const porSesiones = (cfg) => !!(cfg.negocio && cfg.negocio.sesiones);
 
 /** Sesiones de un día concreto (ya resueltas con su duración y plazas). */
+/**
+ * El enlace de una clase online concreta, para quien ya la tiene reservada.
+ * Sale del cuadro de clases, así que si la profesora cambia el enlace, las
+ * reservas que ya existen pasan a ver el nuevo sin tocar nada.
+ * Devuelve { online, enlace } y nunca lanza.
+ */
+export function onlineDeClase(cfg, fecha, inicio, servicio) {
+  try {
+    const s = (sesionesDia(cfg, fecha) || []).find((x) => x.inicio === inicio && x.s === servicio);
+    return s && s.on ? { online: true, enlace: s.enlace || "" } : { online: false, enlace: "" };
+  } catch (e) { return { online: false, enlace: "" }; }
+}
+
 function sesionesDia(cfg, fecha) {
   const a = ag(cfg);
   if (a.festivos.includes(fecha)) return [];
   return ((cfg.negocio.sesiones || {})[dow(fecha)] || []).map((x) => {
     const serv = cfg.servicios.find((s) => s.id === x.s);
-    return { h: x.h, inicio: min2(x.h), s: x.s, nombre: x.nombre || (serv && serv.nombre) || x.s, min: x.min || (serv && serv.min) || 60, cap: x.cap || a.capacidad, sala: x.sala || "", prof: x.prof || "", on: !!x.on, nota: x.nota || "" };
+    return { h: x.h, inicio: min2(x.h), s: x.s, nombre: x.nombre || (serv && serv.nombre) || x.s, min: x.min || (serv && serv.min) || 60, cap: x.cap || a.capacidad, sala: x.sala || "", prof: x.prof || "", on: !!x.on, enlace: x.enlace || "", nota: x.nota || "" };
   }).sort((p, q) => p.inicio - q.inicio);
 }
 
@@ -329,7 +342,8 @@ export async function reservar(env, cfg, datos, origen = "chat", ctx) {
       ).bind(cfg.slug, cod, serv.id, ses ? ses.nombre : serv.nombre, fecha, inicio, fin, nombre, tel, email || null, nota || null, origen, cupo, alumnoId).run();
       if (!r.meta || !r.meta.changes) return { ok: false, estado: 409, mensaje: ses ? "Esa clase acaba de llenarse. Elige otra hora." : "Ese hueco acaba de ocuparse. Elige otra hora." };
       const nomServ = ses ? ses.nombre : serv.nombre;
-      const cita = { id: r.meta.last_row_id, codigo: cod, servicio_n: nomServ, precio: serv.precio, sala: ses ? ses.sala : "", fecha, inicio, fin, nombre, telefono: tel, email, nota, origen };
+      const cita = { id: r.meta.last_row_id, codigo: cod, servicio_n: nomServ, precio: serv.precio, sala: ses ? ses.sala : "", fecha, inicio, fin, nombre, telefono: tel, email, nota, origen,
+        online: ses ? !!ses.on : false, enlace: ses && ses.on ? (ses.enlace || "") : "" };
       const avisos = Promise.all([
         avisarNegocio(env, cfg, cita, "nueva"),
         origen !== "panel" && cfg.avisos && cfg.avisos.whatsapp ? plantillaWhatsApp(env, cfg.avisos.whatsapp, "cita_nueva", [cfg.negocio.nombre, nombre + (origen === "voz" ? " (por teléfono)" : ""), nomServ, `${legible(fecha)} a las ${hhmm(inicio)}`, tel]) : null,
@@ -364,11 +378,20 @@ async function cancelar(env, cfg, where, binds, ctx, quien) {
 
 /* ---------------------------------------------------------------- correos de las citas (el envío está en correo.js) */
 function bloque(c) {
-  return `<p style="font-size:15px;line-height:1.7;background:#f6f6f8;padding:14px 16px;border-radius:10px;margin:14px 0"><b>${esc(legible(c.fecha))} · ${hhmm(c.inicio)}</b><br>${esc(c.servicio_n)}<br>A nombre de ${esc(c.nombre)} · ${esc(c.telefono)}${c.nota ? "<br>Nota: " + esc(c.nota) : ""}<br>Código: <b>${esc(c.codigo)}</b></p>`;
+  return `<p style="font-size:15px;line-height:1.7;background:#f6f6f8;padding:14px 16px;border-radius:10px;margin:14px 0"><b>${esc(legible(c.fecha))} · ${hhmm(c.inicio)}</b><br>${esc(c.servicio_n)}${c.online ? " · <b>clase online</b>" : ""}<br>A nombre de ${esc(c.nombre)} · ${esc(c.telefono)}${c.nota ? "<br>Nota: " + esc(c.nota) : ""}<br>Código: <b>${esc(c.codigo)}</b></p>`;
+}
+/**
+ * El enlace de la clase online, solo en el correo de quien la tiene reservada.
+ * No sale en el horario público: ahí la clase se ve, pero el enlace no.
+ */
+function bloqueOnline(c) {
+  if (!c.online) return "";
+  if (!c.enlace) return `<p style="font-size:14px;line-height:1.6;background:#fff6e5;padding:12px 14px;border-radius:10px;margin:14px 0">Es una <b>clase online</b>. Te enviaremos el enlace para entrar antes de que empiece.</p>`;
+  return `<p style="font-size:14px;line-height:1.6;background:#eef6f0;padding:12px 14px;border-radius:10px;margin:14px 0">Es una <b>clase online</b>. Entra desde aquí a la hora de la clase:<br><a href="${esc(c.enlace)}" style="color:#111;font-weight:700;word-break:break-all">${esc(c.enlace)}</a><br><span style="color:#555">Este enlace es para ti; no lo compartas.</span></p>`;
 }
 function plantillaCliente(cfg, c, titulo, pie) {
   const anular = `https://agencia-js.com/c/${cfg.slug}#anular`;
-  return marco(cfg, titulo, `${bloque(c)}<p style="font-size:14px;line-height:1.6">${esc(pie || "Si no puedes venir, anúlala para que otra persona pueda usar el hueco:")}</p>${pie ? "" : `<p><a href="${anular}" style="color:#111;font-weight:700">Anular o cambiar mi cita</a></p>`}`);
+  return marco(cfg, titulo, `${bloque(c)}${bloqueOnline(c)}<p style="font-size:14px;line-height:1.6">${esc(pie || "Si no puedes venir, anúlala para que otra persona pueda usar el hueco:")}</p>${pie ? "" : `<p><a href="${anular}" style="color:#111;font-weight:700">Anular o cambiar mi cita</a></p>`}`);
 }
 async function avisarNegocio(env, cfg, c, tipo) {
   const to = cfg.avisos && cfg.avisos.email;
@@ -384,8 +407,13 @@ export async function enviarRecordatorios(env) {
   // 1) Víspera: correo (si dejó email) y WhatsApp (si el negocio lo tiene activado y está montada la API de Meta)
   const { results } = await env.CITAS.prepare("SELECT * FROM citas WHERE fecha = ? AND estado = 'ok' AND recordada = 0 LIMIT 300").bind(manana).all();
   for (const c of results || []) {
-    const cfg = CLIENTES[c.slug];
-    if (!cfg || cfg.activo === false) continue;
+    const cfgArchivo = CLIENTES[c.slug];
+    if (!cfgArchivo || cfgArchivo.activo === false) continue;
+    // Con el cuadro del panel encima, para que el recordatorio lleve el enlace
+    // de la clase online tal y como esté hoy, no como estaba al reservar.
+    const cfg = await conHorario(env, cfgArchivo).catch(() => cfgArchivo);
+    const ses = (sesionesDia(cfg, c.fecha) || []).find((x) => x.inicio === c.inicio && x.s === c.servicio);
+    if (ses && ses.on) { c.online = true; c.enlace = ses.enlace || ""; }
     const [m, w] = await Promise.all([
       c.email ? correo(env, cfg, c.email, c.nombre, `Recordatorio: mañana a las ${hhmm(c.inicio)} · ${cfg.negocio.nombre}`, plantillaCliente(cfg, c, "Te esperamos mañana")) : false,
       cfg.avisos && cfg.avisos.whatsappCliente && c.telefono ? plantillaWhatsApp(env, conPrefijo(c.telefono), "cita_recordatorio", [c.nombre.split(" ")[0], cfg.negocio.nombre, c.servicio_n, `mañana a las ${hhmm(c.inicio)}`, c.codigo, cfg.slug]) : false,

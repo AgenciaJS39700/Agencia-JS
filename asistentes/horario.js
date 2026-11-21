@@ -17,6 +17,16 @@ const res = (datos, estado = 200) =>
 const RE_HORA = /^([01]?\d|2[0-3]):([0-5]\d)$/;
 const limpiar = (s, n) => String(s == null ? "" : s).replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, n);
 const normHora = (h) => { const m = RE_HORA.exec(String(h || "").trim()); return m ? String(+m[1]).padStart(2, "0") + ":" + m[2] : ""; };
+/**
+ * El enlace de la clase online (Zoom, Meet, el que usen).
+ * Solo https: un enlace que no lo sea no se guarda, porque acabaría en el correo
+ * de una alumna. Se devuelve "" cuando no vale, nunca a medias.
+ */
+const normEnlace = (s) => {
+  const t = limpiar(s, 400);
+  if (!t) return "";
+  try { return new URL(t).protocol === "https:" ? t : ""; } catch (e) { return ""; }
+};
 export const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 
 /** Las filas del cuadro guardado, agrupadas por día como las espera el motor. */
@@ -25,7 +35,7 @@ export async function cuadroDe(env, slug) {
   let r;
   try {
     r = await env.CITAS.prepare(
-      "SELECT id, dia, hora, servicio, nombre, min, cap, sala, prof, nota FROM horario WHERE slug = ? AND activo = 1 ORDER BY dia, hora").bind(slug).all();
+      "SELECT id, dia, hora, servicio, nombre, min, cap, sala, prof, nota, online, enlace FROM horario WHERE slug = ? AND activo = 1 ORDER BY dia, hora").bind(slug).all();
   } catch (e) { return null; }   // si la tabla aún no existe, el archivo sigue mandando
   const filas = r.results || [];
   if (!filas.length) return null;
@@ -34,6 +44,7 @@ export async function cuadroDe(env, slug) {
     (dias[f.dia] = dias[f.dia] || []).push({
       h: f.hora, s: f.servicio, nombre: f.nombre || "", min: f.min || 0, cap: f.cap || 0,
       sala: f.sala || "", prof: f.prof || "", nota: f.nota || "", id: f.id,
+      on: f.online ? 1 : 0, enlace: f.enlace || "",
     });
   }
   return dias;
@@ -161,6 +172,7 @@ export async function atenderHorario(request, env, cfg, cfgArchivo, ruta, url, y
           nombre: x.nombre || (sv && sv.nombre) || x.s,
           min: x.min || (sv && sv.min) || 60, cap: x.cap || 1,
           sala: x.sala || "", prof: x.prof || "", nota: x.nota || "",
+          on: x.on ? 1 : 0, enlace: x.enlace || "",
           servicioOk: !!sv,
         };
       }).sort((p, q) => p.hora.localeCompare(q.hora))])),
@@ -182,9 +194,10 @@ export async function atenderHorario(request, env, cfg, cfgArchivo, ruta, url, y
       for (const x of l || []) {
         const sv = cfgArchivo.servicios.find((s) => s.id === x.s);
         filas.push(env.CITAS.prepare(
-          "INSERT INTO horario (slug, dia, hora, servicio, nombre, min, cap, sala, prof, nota, activo, creado) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,1,?11)"
+          "INSERT INTO horario (slug, dia, hora, servicio, nombre, min, cap, sala, prof, nota, online, enlace, activo, creado) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,1,?13)"
         ).bind(cfg.slug, +d, normHora(x.h), x.s, x.nombre || (sv && sv.nombre) || x.s,
-          x.min || (sv && sv.min) || 60, x.cap || 1, x.sala || "", x.prof || "", x.nota || "", ahora));
+          x.min || (sv && sv.min) || 60, x.cap || 1, x.sala || "", x.prof || "", x.nota || "",
+          x.on ? 1 : 0, normEnlace(x.enlace), ahora));
       }
     }
     if (!filas.length) return res({ error: "El archivo no tiene ninguna clase que copiar." }, 400);
@@ -210,12 +223,17 @@ export async function atenderHorario(request, env, cfg, cfgArchivo, ruta, url, y
     const choca = (dias[dia] || []).find((x) => x.h === hora && x.s === sv.id && x.id !== id);
     if (choca) return res({ error: `Ya hay ${choca.nombre || sv.nombre} ese día a las ${hora}.` }, 400);
 
+    // Una clase online sin enlace sigue siendo online: el enlace se puede pegar después.
+    const online = b.on ? 1 : 0;
+    const enlace = online ? normEnlace(b.enlace) : "";
+    if (online && limpiar(b.enlace, 400) && !enlace) return res({ error: "El enlace de la clase online tiene que empezar por https://" }, 400);
+
     const campos = [cfg.slug, dia, hora, sv.id, limpiar(b.nombre, 80) || sv.nombre,
-      min, cap, limpiar(b.sala, 60), limpiar(b.prof, 40), limpiar(b.nota, 120)];
+      min, cap, limpiar(b.sala, 60), limpiar(b.prof, 40), limpiar(b.nota, 120), online, enlace];
     if (id) {
       const antes = Object.values(dias).flat().find((x) => x.id === id);
       await env.CITAS.prepare(
-        "UPDATE horario SET dia=?2, hora=?3, servicio=?4, nombre=?5, min=?6, cap=?7, sala=?8, prof=?9, nota=?10 WHERE id=?11 AND slug=?1"
+        "UPDATE horario SET dia=?2, hora=?3, servicio=?4, nombre=?5, min=?6, cap=?7, sala=?8, prof=?9, nota=?10, online=?11, enlace=?12 WHERE id=?13 AND slug=?1"
       ).bind(...campos, id).run();
       // Si la clase se mueve de hueco, las reservas que ya había se quedan donde estaban
       const movida = antes && (antes.h !== hora || antes.s !== sv.id);
@@ -225,7 +243,7 @@ export async function atenderHorario(request, env, cfg, cfgArchivo, ruta, url, y
       return res({ ok: true, colgadas, movida: !!movida });
     }
     const r = await env.CITAS.prepare(
-      "INSERT INTO horario (slug, dia, hora, servicio, nombre, min, cap, sala, prof, nota, activo, creado) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,1,?11)"
+      "INSERT INTO horario (slug, dia, hora, servicio, nombre, min, cap, sala, prof, nota, online, enlace, activo, creado) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,1,?13)"
     ).bind(...campos, new Date().toISOString()).run();
     if (apuntar) await apuntar("horario", `añadió ${limpiar(b.nombre, 80) || sv.nombre} el ${DIAS[dia]} a las ${hora}`);
     return res({ ok: true, id: r.meta.last_row_id });

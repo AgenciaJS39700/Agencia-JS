@@ -211,6 +211,8 @@ textarea{width:100%;min-height:84px;padding:.6rem .8rem;border-radius:12px;borde
     <div><label for="h-sala">Sala</label><input id="h-sala" name="sala" maxlength="60" list="h-salas"><datalist id="h-salas"></datalist></div>
     <div><label for="h-prof">Profesor</label><input id="h-prof" name="prof" maxlength="40" list="h-profes"><datalist id="h-profes"></datalist></div>
     <div class="full"><label for="h-nota">Nota en el cartel (opcional)</label><input id="h-nota" name="nota" maxlength="120" placeholder="Nivel iniciación, trae esterilla…"></div>
+    <div class="full"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input id="h-on" name="on" type="checkbox" style="width:auto;margin:0"> También se da online</label></div>
+    <div class="full" id="h-enl-caja" hidden><label for="h-enl">Enlace de la clase online</label><input id="h-enl" name="enlace" type="url" maxlength="400" placeholder="https://zoom.us/j/…"><small style="display:block;color:#9aa0ab;margin-top:.3rem">Lo pegas de Zoom, Meet o el que uses. Solo lo recibe quien reserva la clase, en su correo y en su cuenta. Puedes dejarlo vacío y ponerlo luego.</small></div>
   </div>
   <p class="msg" role="alert" id="mh"></p>
   <div class="bar" style="justify-content:flex-end;margin:0"><button class="btn" value="x" formnovalidate>Cancelar</button><button class="btn main" value="ok">Guardar</button></div>
@@ -795,7 +797,7 @@ async function verHorario() {
         return `<section class="dia"><h2>${DIAS[d].charAt(0).toUpperCase() + DIAS[d].slice(1)}<span>${l.length === 1 ? "1 clase" : l.length + " clases"}</span></h2>
          ${l.map((c) => `<article class="cita">
            <div class="h">${esc(c.hora)}<small>${c.min} min</small></div>
-           <div><div class="n">${esc(c.nombre)}${c.servicioOk ? "" : '<span class="tag">actividad desconocida</span>'}</div>
+           <div><div class="n">${esc(c.nombre)}${c.servicioOk ? "" : '<span class="tag">actividad desconocida</span>'}${c.on ? '<span class="tag">online</span>' : ""}${c.on && !c.enlace ? '<span class="tag" style="background:#7c2d12;color:#fed7aa">falta el enlace</span>' : ""}</div>
             <div class="d">${esc(c.sala || "sin sala")} · ${c.cap} plaza${c.cap === 1 ? "" : "s"}${c.prof ? " · " + esc(c.prof) : " · sin profesor"}${c.nota ? " · " + esc(c.nota) : ""}</div></div>
            <div class="acc">${propio ? `<button class="btn sm" type="button" data-hedit="${c.id}" data-hdia="${d}">Cambiar</button>
              <button class="btn sm del" type="button" data-hbaja="${c.id}" data-hnom="${esc(c.nombre)}">Quitar</button>` : ""}</div>
@@ -914,11 +916,15 @@ function claseDialogo(c, dia) {
   f.sala.value = c ? c.sala : "";
   f.prof.value = c ? c.prof : "";
   f.nota.value = c ? c.nota : "";
+  f.on.checked = !!(c && c.on);
+  f.enlace.value = c ? (c.enlace || "") : "";
+  $("h-enl-caja").hidden = !f.on.checked;
   $("h-salas").innerHTML = hor.salas.map((s) => `<option value="${esc(s)}">`).join("");
   $("h-profes").innerHTML = hor.profes.map((s) => `<option value="${esc(s)}">`).join("");
   $("mh").textContent = "";
   $("d-hora").showModal();
 }
+$("h-on").addEventListener("change", (e) => { $("h-enl-caja").hidden = !e.target.checked; });
 $("fh").addEventListener("submit", async (e) => {
   if (e.submitter && e.submitter.value === "x") return;
   e.preventDefault();
@@ -929,6 +935,7 @@ $("fh").addEventListener("submit", async (e) => {
       id: f.id_.value || undefined, dia: +f.dia.value, hora: f.hora.value, servicio: f.servicio.value,
       nombre: f.nombre.value.trim(), min: +f.min.value, cap: +f.cap.value,
       sala: f.sala.value.trim(), prof: f.prof.value.trim(), nota: f.nota.value.trim(),
+      on: f.on.checked ? 1 : 0, enlace: f.on.checked ? f.enlace.value.trim() : "",
     });
     $("d-hora").close();
     if (r.movida && r.colgadas) alert(`Hecho. Ojo: había ${r.colgadas === 1 ? "1 reserva" : r.colgadas + " reservas"} en el hueco de antes. Esas reservas siguen en la agenda a su hora vieja; avísalas tú.`);
