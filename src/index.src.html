@@ -16,7 +16,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="Agencia JS">
 <meta name="application-name" content="Agencia JS">
-<link rel="preload" as="image" href="/img/portada/construnorte-pc.webp" fetchpriority="high">
+<link rel="preload" as="image" media="(min-width:768px)" href="/img/portada/construnorte-pc.webp" imagesrcset="/img/portada/construnorte-pc-m.webp 720w, /img/portada/construnorte-pc.webp 1200w" imagesizes="(max-width:1023px) 46vw, 660px" fetchpriority="high">
 <!-- Al tener dominio, cambia estas rutas por URLs absolutas (https://tudominio.com/img/...) para que se vean al compartir -->
 <link rel="canonical" href="https://agencia-js.com/">
 <meta property="og:url" content="https://agencia-js.com/">
@@ -695,6 +695,9 @@ body.n3{margin:0;background:var(--n-bg);color:var(--n-tx);font-family:Inter,ui-s
  .n-faq summary{font-size:16px}
 }
 
+
+/* relojes y pantallas muy pequeñas (menos de 300 px): botones flotantes y logo a escala */
+@media (max-width:300px){.cb-fab,.n3 .cb-fab{width:42px!important;height:42px!important;right:8px!important;bottom:8px!important}.cb-fab svg{width:20px;height:20px}.n-logo{font-size:.95rem;white-space:nowrap}.n-logo img{width:24px;height:24px}}
 </style>
 </head>
 <body class="n3">
@@ -769,7 +772,7 @@ requestAnimationFrame(fr)})(t0);
 <div class="n-wrap">
 <div class="n-stage">
 <a class="n-lap" href="https://constru-norte-demo.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="hero_demo_construnorte" aria-label="Abrir la demo de ConstruNorte, web inmobiliaria">
-<div class="n-lap-s"><img src="/img/portada/construnorte-pc.webp" alt="Web de ejemplo de ConstruNorte, inmobiliaria con recorrido virtual" width="1200" height="750" fetchpriority="high"></div>
+<div class="n-lap-s"><!-- en móvil el portátil no se muestra: no se descarga --><picture><source media="(max-width:767px)" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><img src="/img/portada/construnorte-pc.webp" srcset="/img/portada/construnorte-pc-m.webp 720w, /img/portada/construnorte-pc.webp 1200w" sizes="(max-width:1023px) 46vw, 660px" alt="Web de ejemplo de ConstruNorte, inmobiliaria con recorrido virtual" width="1200" height="750" fetchpriority="high"></picture></div>
 <div class="n-lap-b"></div>
 </a>
 <a class="n-ph" href="https://nacar-demo.agencia39700.workers.dev/" target="_blank" rel="noopener" data-cta="hero_demo_nacar" aria-label="Abrir la demo de Nácar, salón de uñas"><img src="/img/portada/nacar-movil.webp" alt="Web de ejemplo de Nácar, salón de uñas, en el móvil" width="420" height="909"></a>
