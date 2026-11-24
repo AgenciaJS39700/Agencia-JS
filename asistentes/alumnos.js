@@ -199,10 +199,15 @@ export async function compruebaBono(env, cfg, alumno, servicioId, fecha) {
 /**
  * La cuenta de Stripe que cobra. Cada negocio puede tener la suya:
  * con cfg.stripe = "IOMFIT" se usan los secretos STRIPE_SK_IOMFIT y STRIPE_WHSEC_IOMFIT.
- * Sin eso, se usan STRIPE_SECRET_KEY y STRIPE_WEBHOOK_SECRET (los de la demo).
+ * Sin cfg.stripe se usan STRIPE_SECRET_KEY y STRIPE_WEBHOOK_SECRET (los de la demo).
+ *
+ * SIN RESPALDO A PROPÓSITO: si un negocio declara cfg.stripe y su secreto todavía no
+ * está puesto, los pagos quedan apagados y se ve el aviso de "pagos no activados".
+ * Antes caía a la clave genérica, y eso significaba cobrar el dinero de las alumnas
+ * de un cliente en la cuenta de otro. Es preferible que no se pueda pagar.
  */
-export const claveStripe = (env, cfg) => (cfg.stripe && env["STRIPE_SK_" + cfg.stripe]) || env.STRIPE_SECRET_KEY || "";
-export const firmaWebhook = (env, cfg) => (cfg.stripe && env["STRIPE_WHSEC_" + cfg.stripe]) || env.STRIPE_WEBHOOK_SECRET || "";
+export const claveStripe = (env, cfg) => cfg.stripe ? (env["STRIPE_SK_" + cfg.stripe] || "") : (env.STRIPE_SECRET_KEY || "");
+export const firmaWebhook = (env, cfg) => cfg.stripe ? (env["STRIPE_WHSEC_" + cfg.stripe] || "") : (env.STRIPE_WEBHOOK_SECRET || "");
 
 async function stripe(env, cfg, metodo, ruta, params, idem) {
   const cab = { Authorization: `Bearer ${claveStripe(env, cfg)}` };
@@ -253,12 +258,19 @@ async function tocaMatricula(env, cfg, alumno, p) {
   return !(r && r.n);
 }
 
-/** Crea el pago en Stripe: suscripción si el bono es recurrente, pago único si no. */
-async function crearPago(env, cfg, alumno, p, volverA, promo) {
+/**
+ * Crea el pago en Stripe.
+ * `auto` lo decide la alumna al comprar: un producto con `recurrente: true` ADMITE
+ * renovación automática, pero solo se cobra sola si ella marca la casilla. Si no,
+ * es un pago único y el mes que viene vuelve a pagar cuando quiera. Lo pidió IOMFIT:
+ * venían de una plataforma que domiciliaba a todo el mundo y generaba quejas.
+ */
+async function crearPago(env, cfg, alumno, p, volverA, promo, auto) {
   if (!claveStripe(env, cfg)) return { error: "Los pagos online todavía no están activados en este negocio." };
+  const rec = !!(p.recurrente && auto);
   const moneda = cfg.moneda || "eur";
   const params = new URLSearchParams();
-  params.set("mode", p.recurrente ? "subscription" : "payment");
+  params.set("mode", rec ? "subscription" : "payment");
   params.set("success_url", `${volverA}?pago=ok&s={CHECKOUT_SESSION_ID}`);
   params.set("cancel_url", `${volverA}?pago=no`);
   params.set("customer_email", alumno.email);
@@ -278,13 +290,13 @@ async function crearPago(env, cfg, alumno, p, volverA, promo) {
     params.set(`line_items[${i}][quantity]`, "1");
     i++;
   };
-  linea(`${p.nombre} · ${cfg.negocio.nombre}`, p.precio, p.recurrente);
+  linea(`${p.nombre} · ${cfg.negocio.nombre}`, p.precio, rec);
   if (promo) {
     // Cupón de Stripe: en los bonos mensuales se aplica a los meses que diga el código
     const cp = new URLSearchParams();
     if (promo.tipo === "importe") { cp.set("amount_off", String(promo.valor)); cp.set("currency", moneda); }
     else cp.set("percent_off", String(promo.valor));
-    if (p.recurrente) {
+    if (rec) {
       if (promo.meses <= 0) cp.set("duration", "forever");
       else if (promo.meses === 1) cp.set("duration", "once");
       else { cp.set("duration", "repeating"); cp.set("duration_in_months", String(promo.meses)); }
@@ -295,14 +307,14 @@ async function crearPago(env, cfg, alumno, p, volverA, promo) {
     else console.error("Stripe no aceptó el cupón:", JSON.stringify(cup.datos).slice(0, 200));
   }
   if (await tocaMatricula(env, cfg, alumno, p)) {
-    if (p.recurrente) {
+    if (rec) {
       // En una suscripción la matrícula va como cargo de alta, no como línea mensual
       params.set("subscription_data[metadata][matricula]", String(cfg.matricula.precio));
     } else linea(cfg.matricula.nombre, cfg.matricula.precio, false);
   }
-  if (p.recurrente) params.set("subscription_data[metadata][slug]", cfg.slug);
-  if (p.recurrente) params.set("subscription_data[metadata][alumno]", String(alumno.id));
-  if (p.recurrente) params.set("subscription_data[metadata][producto]", p.id);
+  if (rec) params.set("subscription_data[metadata][slug]", cfg.slug);
+  if (rec) params.set("subscription_data[metadata][alumno]", String(alumno.id));
+  if (rec) params.set("subscription_data[metadata][producto]", p.id);
 
   const r = await stripe(env, cfg, "POST", "/checkout/sessions", params, `${cfg.slug}-${alumno.id}-${p.id}-${Date.now()}`);
   if (!r.ok || !r.datos.url) {
@@ -357,7 +369,7 @@ async function activarBono(env, cfg, alumnoId, prodId, extra) {
     `INSERT INTO bonos (slug, alumno_id, producto, nombre, estado, inicio, fin, sem, tipos, recurrente, stripe_sub, stripe_cust)
      VALUES (?1, ?2, ?3, ?4, 'activo', ?5, ?6, ?7, ?8, ?9, ?10, ?11)`
   ).bind(cfg.slug, alumnoId, p.id, p.nombre, hoy, caduca(p, hoy), p.sem || 0, (p.tipos || []).join(","),
-    p.recurrente ? 1 : 0, (extra && extra.sub) || null, (extra && extra.cust) || null).run();
+    (extra && extra.sub) ? 1 : 0, (extra && extra.sub) || null, (extra && extra.cust) || null).run();
   return r.meta.last_row_id;
 }
 
@@ -385,7 +397,7 @@ function correoBono(cfg, b, p) {
     `<p style="font-size:15px;line-height:1.7">Ya está. Tu <b>${esc(p.nombre)}</b> está activo.</p>
      <p style="font-size:15px;line-height:1.7;background:#f6f6f8;padding:14px 16px;border-radius:10px">
       Válido hasta el <b>${esc(legible(b.fin))}</b>${p.sem ? `<br>${p.sem} ${p.sem === 1 ? "clase" : "clases"} por semana` : "<br>Clases sin límite"}
-      ${p.recurrente ? "<br>Se renueva solo cada mes. Puedes darlo de baja cuando quieras desde tu cuenta." : ""}</p>
+      ${b.recurrente ? "<br>Se renueva solo cada mes. Puedes darlo de baja cuando quieras desde tu cuenta." : "<br>Pago único: no se renueva solo."}</p>
      ${boton(cfg, (cfg.negocio.web || "") + "reservar/", "Reservar mi primera clase")}`);
 }
 function correoEspera(cfg, c) {
@@ -633,7 +645,7 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
       if (!x.ok) return r({ error: x.error || "Ese código no es válido." }, 400);
       promo = x.promo;
     }
-    const x = await crearPago(env, cfg, alumna, p, sitio + "mi-cuenta/", promo);
+    const x = await crearPago(env, cfg, alumna, p, sitio + "mi-cuenta/", promo, b.auto !== false);
     return x.error ? r({ error: x.error }, 400) : r(x);
   }
 

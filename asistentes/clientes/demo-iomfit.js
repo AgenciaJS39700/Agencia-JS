@@ -105,6 +105,17 @@ export default {
   ],
   matricula: { precio: 1500, nombre: "Matrícula", nota: "Se paga una sola vez. Con el Bono Ilimitado no hay matrícula.", exentos: ["ilimitado", "ilim21", "prueba", "suelta"] },
 
+  // Cuenta de Stripe propia del estudio: el dinero va directo a su banco, no pasa por
+  // Agencia JS. Los secretos van en el Worker `agencia-js` → Settings → Variables and Secrets:
+  //   STRIPE_SK_IOMFIT     → la clave secreta de SU cuenta (sk_test_… para probar, sk_live_… al publicar)
+  //   STRIPE_WHSEC_IOMFIT  → el whsec_… del webhook que cree en SU cuenta, apuntando a
+  //                          https://agencia-js.com/api/as/demo-iomfit/stripe
+  //                          con los eventos checkout.session.completed, invoice.paid,
+  //                          invoice.payment_failed y customer.subscription.deleted.
+  // Hasta que esos dos secretos existan, los pagos salen apagados a propósito (no hay
+  // respaldo a la clave genérica: cobrar en la cuenta equivocada sería mucho peor).
+  stripe: "IOMFIT",
+
   salud: false,
   urgencia: "",
   chips: ["Quiero reservar una clase", "¿Cuánto cuesta el Bono Ilimitado?", "Estoy embarazada, ¿puedo venir?"],
