@@ -116,6 +116,16 @@ export default {
   // respaldo a la clave genérica: cobrar en la cuenta equivocada sería mucho peor).
   stripe: "IOMFIT",
 
+  // Transición desde Momoyoga: en enero la web está publicada y las alumnas pueden crear
+  // su cuenta, ver el horario y los precios, pero las reservas siguen en Momoyoga. El 1 de
+  // febrero se abren aquí y se cierran allí. Dos sistemas reservando la misma clase a la
+  // vez venderían las mismas plazas dos veces. El panel sí puede apuntar a gente a mano.
+  // Para terminar la transición basta con borrar estas dos líneas.
+  // DESCOMENTAR el día que se publique la web (previsto el 1 de enero de 2027). Mientras
+  // esto siga comentado, la demo acepta reservas con normalidad y se puede enseñar.
+  // reservasDesde: "2027-02-01",
+  // reservasAviso: "Estamos estrenando web. Durante enero las reservas se siguen haciendo como siempre; aquí puedes ir creando tu cuenta y ver el horario. El 1 de febrero se abren las reservas en esta página.",
+
   salud: false,
   urgencia: "",
   chips: ["Quiero reservar una clase", "¿Cuánto cuesta el Bono Ilimitado?", "Estoy embarazada, ¿puedo venir?"],

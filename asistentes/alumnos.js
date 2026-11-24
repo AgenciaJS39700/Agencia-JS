@@ -24,7 +24,7 @@ import { correo, marco, boton, esc } from "./correo.js";
 import { confirmaEntrada } from "./eventos.js";
 import { emitirFactura, facturaHTML } from "./facturas.js";
 import { avisarMoviles } from "./push.js";
-import { avanzado, onlineDeClase } from "./agenda.js";
+import { avanzado, onlineDeClase, transicion } from "./agenda.js";
 import { conHorario } from "./horario.js";
 
 const STRIPE = "https://api.stripe.com/v1";
@@ -431,6 +431,7 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
         ({ id, nombre, precio, meses, dias, sem, tipos, recurrente: !!recurrente, destacado: !!destacado, nota: nota || "", nuevas: !!nuevas, online: !!online })),
       matricula: cfg.matricula || null,
       pagos: !!claveStripe(env, cfg),
+      transicion: transicion(cfg) || undefined,
     });
   }
 
@@ -644,6 +645,10 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
     const b = await cuerpo();
     const p = producto(cfg, String(b.producto || ""));
     if (!p) return r({ error: "Ese bono no existe." }, 400);
+    // En transición no se venden bonos: empezarían a contar mientras la alumna
+    // todavía reserva en la plataforma anterior, y perdería días pagados.
+    const tr = transicion(cfg);
+    if (tr) return r({ error: tr }, 403);
     if (!p.precio) {   // la clase de prueba no se cobra: se activa directamente
       const id = await activarBono(env, cfg, alumna.id, p.id, null);
       return r({ ok: true, gratis: true, bono: id });

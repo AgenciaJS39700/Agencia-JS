@@ -86,6 +86,13 @@ a{color:var(--c)}
     <div id="lista" aria-live="polite"></div>
 
     <section class="box" style="margin-top:24px">
+      <h2 style="margin:0 0 4px;font-size:1rem">Las alumnas</h2>
+      <p style="color:var(--mu);font-size:.85rem;margin:0 0 12px">Busca a cualquier alumna para ver su aviso de salud, su bono y cuándo vino por última vez. Los cobros no se ven desde aquí.</p>
+      <input id="qal" type="search" placeholder="Buscar por nombre o teléfono" autocomplete="off" style="width:100%">
+      <div id="lal" aria-live="polite" style="margin-top:12px"></div>
+    </section>
+
+    <section class="box" style="margin-top:24px">
       <h2 style="margin:0 0 4px;font-size:1rem">Dejar un recado al equipo</h2>
       <p style="color:var(--mu);font-size:.85rem;margin:0 0 12px">Lo verán todos al entrar: la responsable, recepción y el resto de profesores.</p>
       <form id="fRec">
@@ -175,6 +182,7 @@ async function cargar() {
   $("sub").textContent = d.negocio;
   $("login").hidden = true; $("app").hidden = false;
   verRecados();
+  verAlumnas("");
   $("lista").innerHTML = d.dias.length ? d.dias.map((x) => `
     <section class="dia"><h2>${esc(x.dia.charAt(0).toUpperCase() + x.dia.slice(1))}${x.fecha === hoyISO() ? " · hoy" : ""}</h2>
       ${x.clases.map((c) => `<article class="cl">
@@ -191,6 +199,35 @@ async function cargar() {
       </article>`).join("")}
     </section>`).join("") : '<p class="vacio">No tienes clases esta semana.</p>';
 }
+
+/* ---- las alumnas ----
+   El profesorado ve a quién da clase y sus avisos de salud; el dinero no sale de aquí. */
+let ALUM = null;
+async function verAlumnas(q) {
+  const caja = $("lal");
+  if (!ALUM) {
+    try { ALUM = (await api("profe/alumnas")).alumnas || []; }
+    catch (e) { caja.innerHTML = '<p class="vacio">No se han podido cargar.</p>'; return; }
+  }
+  const t = (q || "").trim().toLowerCase();
+  const l = t ? ALUM.filter((a) => (a.nombre + " " + a.telefono).toLowerCase().includes(t)) : ALUM;
+  if (!ALUM.length) { caja.innerHTML = '<p class="vacio">Todavía no hay alumnas dadas de alta.</p>'; return; }
+  if (!l.length) { caja.innerHTML = '<p class="vacio">Nadie con ese nombre.</p>'; return; }
+  const ver = t ? l : l.slice(0, 25);
+  caja.innerHTML = `<ul style="list-style:none;padding:0;margin:0">${ver.map((a) => `
+    <li style="padding:10px 0;border-top:1px solid var(--ln)">
+      <b>${esc(a.nombre)}</b>
+      ${a.telefono ? ` <a href="tel:${esc(a.telefono)}" style="font-size:.85rem">${esc(a.telefono)}</a>` : ""}
+      <div style="color:var(--mu);font-size:.82rem;margin-top:2px">
+        ${a.bono ? esc(a.bono) + (a.bonoFin ? " · hasta " + corto(a.bonoFin) : "") : "Sin bono activo"}
+        ${a.ultima ? " · última clase " + corto(a.ultima) : ""}
+        ${a.vino ? " · " + a.vino + (a.vino === 1 ? " clase" : " clases") : ""}
+      </div>
+      ${a.interna ? `<div style="margin-top:6px;padding:8px 10px;border-radius:10px;background:#3a2a0b;color:#f7e3b0;font-size:.85rem">⚠ ${esc(a.interna)}</div>` : ""}
+    </li>`).join("")}</ul>
+    ${!t && ALUM.length > 25 ? `<p class="vacio" style="padding-top:10px">Se muestran 25 de ${ALUM.length}. Busca por nombre para encontrar a alguien.</p>` : ""}`;
+}
+$("qal").addEventListener("input", (e) => verAlumnas(e.target.value));
 
 /* ---- tablón del equipo ---- */
 async function verRecados() {

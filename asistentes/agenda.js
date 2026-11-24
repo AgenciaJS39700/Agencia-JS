@@ -283,11 +283,29 @@ async function clases(env, cfg, desde, dias) {
   return out;
 }
 
+/**
+ * Si el negocio está en periodo de transición desde otra plataforma, devuelve el aviso
+ * que hay que enseñar; si no, cadena vacía. `cfg.reservasDesde` es la fecha (AAAA-MM-DD)
+ * a partir de la cual se admiten reservas aquí. El panel sí puede reservar: el estudio
+ * tiene que poder apuntar a alguien a mano desde el primer día.
+ */
+export function transicion(cfg) {
+  const d = cfg && cfg.reservasDesde;
+  if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return "";
+  if (ahora().fecha >= d) return "";
+  return cfg.reservasAviso || `Las reservas se abren aquí el ${d.split("-").reverse().join("/")}. Hasta entonces, reserva como siempre.`;
+}
+
 /* ---------------------------------------------------------------- reservar */
 /** Valida y guarda una cita de forma atómica (nunca dos citas en el mismo hueco por encima de la capacidad). */
 export async function reservar(env, cfg, datos, origen = "chat", ctx) {
   const a = ag(cfg);
   if (cfg.activo === false) return { ok: false, estado: 403, mensaje: "Este negocio no está aceptando citas online ahora mismo." };
+  // Periodo de transición: la web está publicada y la gente puede crear su cuenta, ver el
+  // horario y los precios, pero las reservas siguen en el sistema anterior hasta esa fecha.
+  // Dos sistemas aceptando reservas de la misma clase venderían las mismas plazas dos veces.
+  const tr = transicion(cfg);
+  if (tr && origen !== "panel") return { ok: false, estado: 403, mensaje: tr };
   const serv = cfg.servicios.find((s) => s.id === datos.servicio);
   const fecha = String(datos.fecha || ""), hora = String(datos.hora || "");
   const nombre = limpiar(datos.nombre, 60), tel = soloTel(datos.telefono), email = limpiar(datos.email, 120).toLowerCase(), nota = limpiar(datos.nota, 200);
@@ -923,6 +941,28 @@ ${gente.length} de ${ses.cap} plazas · ${libres} libre${libres === 1 ? "" : "s"
       return res({ profe: profe.nombre, rol: profe.rol, negocio: cfg.negocio.nombre, color: cfg.color, desde, dias: dias2, sinLeer: recs.filter((r) => !r.leido).length });
     }
 
+    /* Las alumnas, para el profesorado.
+       Ven a quién dan clase y sus avisos de salud, que es lo que necesitan para dar una
+       clase segura. NO ven dinero: ni pagos, ni importes, ni datos fiscales. Eso es del
+       panel de la responsable. */
+    if (ruta === "profe/alumnas" && request.method === "GET") {
+      const q = limpiar(url.searchParams.get("q") || "", 40).toLowerCase();
+      const { results } = await env.CITAS.prepare(
+        `SELECT a.id, a.nombre, a.email, a.telefono, a.nota_interna,
+                (SELECT COUNT(*) FROM citas c WHERE c.alumno_id = a.id AND c.asistio = 1) AS vino,
+                (SELECT MAX(fecha) FROM citas c WHERE c.alumno_id = a.id AND c.estado = 'ok') AS ultima,
+                (SELECT b.nombre FROM bonos b WHERE b.alumno_id = a.id AND b.estado = 'activo' AND b.fin >= date('now') ORDER BY b.fin DESC LIMIT 1) AS bono,
+                (SELECT b.fin FROM bonos b WHERE b.alumno_id = a.id AND b.estado = 'activo' AND b.fin >= date('now') ORDER BY b.fin DESC LIMIT 1) AS bonoFin
+         FROM alumnos a WHERE a.slug = ?1 ORDER BY a.nombre LIMIT 600`).bind(cfg.slug).all();
+      const todas = (results || []).map((a2) => ({
+        id: a2.id, nombre: a2.nombre || a2.email, telefono: a2.telefono || "",
+        interna: a2.nota_interna || "", vino: a2.vino || 0, ultima: a2.ultima || "",
+        bono: a2.bono || "", bonoFin: a2.bonoFin || "",
+      }));
+      const lista = q ? todas.filter((a2) => (a2.nombre + " " + a2.telefono).toLowerCase().includes(q)) : todas;
+      return res({ alumnas: lista, total: todas.length });
+    }
+
     if (ruta === "profe/asistencia" && request.method === "POST") {
       let b; try { b = await cuerpo(request); } catch (e) { return res({ error: "JSON no válido" }, 400); }
       const marca = b.vino === null || b.vino === undefined ? null : (b.vino ? 1 : 0);
@@ -996,7 +1036,9 @@ ${gente.length} de ${ses.cap} plazas · ${libres} libre${libres === 1 ? "" : "s"
     if (!porSesiones(cfg)) return r({ error: "Este negocio no trabaja por clases" }, 400);
     const desde = RE_FECHA.test(url.searchParams.get("desde") || "") ? url.searchParams.get("desde") : ahora().fecha;
     const dias = Math.min(Math.max(+url.searchParams.get("dias") || 7, 1), 21);
-    return r({ desde, dias: await clases(env, cfg, desde, dias) });
+    // El aviso de transición viaja con el horario: la web lo enseña arriba del todo
+    // en vez de dejar que la alumna lo descubra al darle a reservar.
+    return r({ desde, dias: await clases(env, cfg, desde, dias), transicion: transicion(cfg) || undefined });
   }
 
   if (request.method === "GET" && (ruta === "dias" || ruta === "huecos")) {
