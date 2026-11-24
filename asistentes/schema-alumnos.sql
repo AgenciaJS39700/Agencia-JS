@@ -110,3 +110,12 @@ CREATE TABLE IF NOT EXISTS vistos (
   visto  TEXT NOT NULL,
   PRIMARY KEY (slug, nombre)
 );
+
+-- ---------------------------------------------------------------------------
+-- Añadidos del 24/11/2026 (avisos de cobro y cumpleaños). Correr sueltos:
+-- D1 no admite «ADD COLUMN IF NOT EXISTS», así que si ya existen, da error y se ignora.
+--
+--   ALTER TABLE alumnos ADD COLUMN nacimiento TEXT;      -- 'AAAA-MM-DD' o '--MM-DD' si no quiere dar el año
+--   ALTER TABLE alumnos ADD COLUMN felicitado TEXT;      -- año en que se le felicitó, para no repetir
+--   ALTER TABLE alumnos ADD COLUMN avisado_cobro TEXT;   -- fecha del último aviso de cobro próximo
+-- ---------------------------------------------------------------------------

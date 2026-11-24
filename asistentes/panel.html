@@ -599,6 +599,12 @@ $("copiar").onclick = async () => { try { await navigator.clipboard.writeText($(
 /* Alumnas, cobros y lista de espera: lo que antes había que mirar en una plataforma aparte. */
 const eur = (c) => (c / 100).toLocaleString("es-ES", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }) + " €";
 const corto = (f) => String(f || "").slice(0, 10).split("-").reverse().join("/");
+// Cumpleaños: '1988-03-24' → '24/03/1988'; '--03-24' (sin año) → '24/03'
+const cumpleTexto = (f) => {
+  const t = String(f || "");
+  if (t.startsWith("--")) { const [, m, d] = t.split("-"); return `${d}/${m}`; }
+  return corto(t);
+};
 let pestana = "agenda", alumnaAbierta = 0, aterrizado = false;
 
 const VISTAS = { hoy: "vHoy", agenda: "lista", recados: "vRecados", horario: "vHorario", alumnas: "vAlumnas", pagos: "vPagos", facturas: "vFacturas", espera: "vEspera", equipo: "vEquipo" };
@@ -685,10 +691,11 @@ async function verAlumna(id) {
   const a = d.alumna;
   $("da-t").textContent = a.nombre || a.email;
   $("alumDet").innerHTML =
-    `<p class="d">${esc(a.email)}${a.telefono ? " · " + esc(a.telefono) : ""}<br>Alta: ${corto(a.creado)} · Ofertas: ${a.marketing ? "sí" : "no"}</p>
+    `<p class="d">${esc(a.email)}${a.telefono ? " · " + esc(a.telefono) : ""}<br>Alta: ${corto(a.creado)} · Ofertas: ${a.marketing ? "sí" : "no"}${a.nacimiento ? " · Cumple: " + cumpleTexto(a.nacimiento) : ""}</p>
      <div class="bar" style="margin:10px 0"><button class="btn main sm" type="button" id="darBono">+ Dar un bono</button>
        <button class="btn sm" type="button" id="cobrar">Apuntar un cobro</button>
-       <button class="btn sm" type="button" id="notaInt">${a.nota_interna ? "Cambiar la nota" : "+ Nota para el equipo"}</button></div>
+       <button class="btn sm" type="button" id="notaInt">${a.nota_interna ? "Cambiar la nota" : "+ Nota para el equipo"}</button>
+       <button class="btn sm" type="button" id="cumpleBtn">${a.nacimiento ? "Cambiar el cumpleaños" : "+ Cumpleaños"}</button></div>
      ${a.nota_interna ? `<p class="int" style="display:block;margin:0 0 10px">⚠ ${esc(a.nota_interna)}</p>` : ""}
      <h3 style="font-size:.9rem;color:var(--c);margin:14px 0 6px">Bonos</h3>
      ${d.bonos.length ? d.bonos.map((b) => `<div class="fila" style="cursor:default"><div><b>${esc(b.nombre)}</b><span>${corto(b.inicio)} → ${corto(b.fin)} · ${b.sem ? b.sem + "/semana" : "sin límite"}${b.recurrente && b.stripe_sub ? " · se renueva sola" : ""}</span></div>
@@ -734,6 +741,13 @@ async function verAlumna(id) {
     const n = prompt("Qué tiene que saber el equipo de " + (a.nombre || a.email) + " (una lesión, un embarazo, una operación reciente…).\n\nLo verá el profesor al pasar lista. Ella NO lo ve.", a.nota_interna || "");
     if (n === null) return;
     await api("panel/alumna/nota", { id, nota: n });
+    verAlumna(id);
+  };
+  $("cumpleBtn").onclick = async () => {
+    const n = prompt("Fecha de nacimiento de " + (a.nombre || a.email) + ".\n\nEscríbela como AAAA-MM-DD (por ejemplo 1988-03-24).\nSi no sabes el año, pon solo MM-DD (03-24).\nDéjalo en blanco para quitarla.", a.nacimiento || "");
+    if (n === null) return;
+    const r = await api("panel/alumna/cumple", { id, nacimiento: n.trim() });
+    if (r && r.error) { alert(r.error); return; }
     verAlumna(id);
   };
   $("darBono").onclick = () => abrirBono(id);

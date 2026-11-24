@@ -43,6 +43,21 @@ const correoLimpio = (v) => String(v || "").trim().toLowerCase().slice(0, 254);
 const RE_MAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/;
 const soloTel = (v) => String(v || "").replace(/[^\d+ ]/g, "").trim().slice(0, 16);
 const euros = (c) => (c / 100).toLocaleString("es-ES", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }) + " €";
+/** Fecha de nacimiento: 'AAAA-MM-DD' completo, o '--MM-DD' si no quiere dar el año. "" si no vale. */
+function fechaNacimiento(v) {
+  const t = String(v == null ? "" : v).trim();
+  if (!t) return "";
+  let m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(t);
+  if (m) {
+    const [a, mes, dia] = [+m[1], +m[2], +m[3]];
+    const hoy = new Date().getUTCFullYear();
+    if (a < 1900 || a > hoy || mes < 1 || mes > 12 || dia < 1 || dia > 31) return "";
+    return `${m[1]}-${m[2]}-${m[3]}`;
+  }
+  m = /^-{0,2}(\d{2})-(\d{2})$/.exec(t);
+  if (m && +m[1] >= 1 && +m[1] <= 12 && +m[2] >= 1 && +m[2] <= 31) return `--${m[1]}-${m[2]}`;
+  return "";
+}
 
 /* ---------------------------------------------------------------- contraseñas */
 // PBKDF2-SHA256 con sal propia por persona. Workers admite 100.000 iteraciones como máximo.
@@ -575,11 +590,13 @@ export async function atenderAlumnos(request, env, ctx, cfg, ruta, url, cab, ori
     const b = await cuerpo();
     const nombre = limpiar(b.nombre, 60), tel = soloTel(b.telefono);
     const marketing = b.marketing ? 1 : 0;
+    const nac = fechaNacimiento(b.nacimiento);
     await env.CITAS.prepare(
       `UPDATE alumnos SET nombre = ?2, telefono = ?3, marketing = ?4,
        marketing_fecha = CASE WHEN ?4 = 1 AND marketing = 0 THEN datetime('now') WHEN ?4 = 0 THEN NULL ELSE marketing_fecha END,
-       baja_token = COALESCE(baja_token, ?5) WHERE id = ?1`
-    ).bind(alumna.id, nombre || alumna.nombre, tel, marketing, alAzar(16)).run();
+       baja_token = COALESCE(baja_token, ?5),
+       nacimiento = CASE WHEN ?6 = '' THEN NULL ELSE ?6 END WHERE id = ?1`
+    ).bind(alumna.id, nombre || alumna.nombre, tel, marketing, alAzar(16), nac).run();
     // Cambiar la contraseña (o ponerla por primera vez si entró con código)
     if (b.pass) {
       const flojo = passFloja(b.pass, alumna.email);
@@ -696,7 +713,7 @@ async function miCuenta(env, cfg, a) {
   const cfgH = await conHorario(env, cfg).catch(() => cfg);
   return {
     dentro: true,
-    alumna: { id: a.id, email: a.email, nombre: a.nombre, telefono: a.telefono, marketing: !!a.marketing, pass: !!a.pass_hash },
+    alumna: { id: a.id, email: a.email, nombre: a.nombre, telefono: a.telefono, marketing: !!a.marketing, pass: !!a.pass_hash, nacimiento: a.nacimiento || "" },
     bonos: bonos.map((b) => ({ id: b.id, nombre: b.nombre, fin: b.fin, finTexto: legible(b.fin), sem: b.sem, recurrente: !!(b.recurrente && b.stripe_sub), tipos: b.tipos ? b.tipos.split(",") : [] })),
     semana: { usadas: usadas ? usadas.n : 0, desde: sem },
     proximas: (proximas.results || []).map((c) => ({ ...c, hora: hhmm(c.inicio), dia: legible(c.fecha), ...onlineDeClase(cfgH, c.fecha, c.inicio, c.servicio) })),
@@ -731,6 +748,14 @@ async function procesaStripe(env, cfg, ev) {
     await env.CITAS.prepare("UPDATE bonos SET fin = ?2, estado = 'activo' WHERE id = ?1").bind(b.id, caduca(p || { meses: 1 }, hoyMadrid())).run();
     await env.CITAS.prepare("INSERT OR IGNORE INTO pagos (slug, alumno_id, bono_id, concepto, importe, estado, stripe_id) VALUES (?1,?2,?3,?4,?5,'pagado',?6)")
       .bind(b.slug, b.alumno_id, b.id, b.nombre + " (renovación)", ev.data.object.amount_paid || 0, ev.data.object.id).run();
+    // Acuse de recibo a la alumna: el correo que pedía IOMFIT («hemos recibido tu pago de diciembre»).
+    // Se manda después de estirar el bono para que la fecha nueva salga ya correcta.
+    const bono = await env.CITAS.prepare("SELECT * FROM bonos WHERE id = ?1").bind(b.id).first();
+    const al = await env.CITAS.prepare("SELECT nombre, email FROM alumnos WHERE id = ?1").bind(b.alumno_id).first();
+    if (al && al.email) {
+      await correo(env, cfg, al.email, al.nombre, `Hemos recibido tu pago · ${cfg.negocio.nombre}`,
+        correoPagoRecibido(cfg, al, bono || b, ev.data.object.amount_paid || 0)).catch(() => {});
+    }
     return;
   }
   if (t === "invoice.payment_failed") {
@@ -895,6 +920,16 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url, apuntar)
     const b = await cuerpo();
     await env.CITAS.prepare("UPDATE alumnos SET nota_interna = ?3 WHERE id = ?1 AND slug = ?2")
       .bind(+b.id || 0, cfg.slug, limpiar(b.nota, 300) || null).run();
+    return res({ ok: true });
+  }
+
+  // Cumpleaños desde el panel: muchas alumnas lo dicen en persona, no por la web.
+  if (ruta === "panel/alumna/cumple" && post) {
+    const b = await cuerpo();
+    const nac = fechaNacimiento(b.nacimiento);
+    if (b.nacimiento && !nac) return res({ error: "Fecha no válida. Usa el formato AAAA-MM-DD, o MM-DD si no sabes el año." }, 400);
+    await env.CITAS.prepare("UPDATE alumnos SET nacimiento = ?3 WHERE id = ?1 AND slug = ?2")
+      .bind(+b.id || 0, cfg.slug, nac || null).run();
     return res({ ok: true });
   }
 
@@ -1148,6 +1183,43 @@ function correoCaduca(cfg, alumna, bono, dias) {
      <p style="font-size:13px;color:#555">Si prefieres parar una temporada, no hagas nada: el bono se cierra solo y aquí te esperamos.</p>`);
 }
 
+/** Acuse de recibo de un pago ya cobrado (renovación mensual de una suscripción). */
+function correoPagoRecibido(cfg, alumna, bono, importe) {
+  const url = (cfg.negocio.web || `https://agencia-js.com/c/${cfg.slug}`).replace(/\/$/, "") + "/mi-cuenta/";
+  return marco(cfg, "Hemos recibido tu pago",
+    `<p style="font-size:15px;line-height:1.7">Hola ${esc((alumna.nombre || "").split(" ")[0] || "")}, gracias. Tu pago se ha realizado correctamente.</p>
+     <p style="font-size:15px;line-height:1.7;background:#f6f6f8;padding:14px 16px;border-radius:10px">
+      <b>${esc(bono.nombre)}</b>${importe ? ` · <b>${esc(euros(importe))}</b>` : ""}
+      <br>Activo hasta el <b>${esc(legible(String(bono.fin).slice(0, 10)))}</b>
+      ${bono.sem ? `<br>${bono.sem} ${bono.sem === 1 ? "clase" : "clases"} por semana` : "<br>Clases sin límite"}</p>
+     ${boton(cfg, url, "Ver mi cuenta")}
+     <p style="font-size:13px;color:#555">Tienes todos tus pagos y tus clases en tu cuenta, cuando los necesites.</p>`);
+}
+
+/** Aviso previo al cobro automático: el que evita la sorpresa de «me han cobrado de más». */
+function correoCobroProximo(cfg, alumna, bono, dias, precio) {
+  const url = (cfg.negocio.web || `https://agencia-js.com/c/${cfg.slug}`).replace(/\/$/, "") + "/mi-cuenta/";
+  const cuando = dias === 0 ? "hoy" : dias === 1 ? "mañana" : `el ${legible(String(bono.fin).slice(0, 10))}`;
+  return marco(cfg, "Tu bono se renueva pronto",
+    `<p style="font-size:15px;line-height:1.7">Hola ${esc((alumna.nombre || "").split(" ")[0] || "")}, te avisamos antes de cobrarte nada.</p>
+     <p style="font-size:15px;line-height:1.7;background:#f6f6f8;padding:14px 16px;border-radius:10px">
+      <b>${esc(cuando.charAt(0).toUpperCase() + cuando.slice(1))}</b> se renueva tu <b>${esc(bono.nombre)}</b>${precio ? ` y se te cobrarán <b>${esc(euros(precio))}</b>` : ""}.
+      ${bono.sem ? `<br>Ahora tienes <b>${bono.sem} ${bono.sem === 1 ? "clase" : "clases"} por semana</b>.` : ""}</p>
+     <p style="font-size:15px;line-height:1.7">Si quieres <b>cambiar de bono</b> (por ejemplo, pasar de dos días a uno) o <b>parar la renovación</b>, hazlo desde tu cuenta antes de esa fecha y no se te cobrará de más.</p>
+     ${boton(cfg, url, "Cambiar o parar mi bono")}
+     <p style="font-size:13px;color:#555">Si todo sigue igual, no tienes que hacer nada.</p>`);
+}
+
+/** Felicitación de cumpleaños. */
+function correoCumple(cfg, alumna) {
+  const url = (cfg.negocio.web || `https://agencia-js.com/c/${cfg.slug}`).replace(/\/$/, "") + "/reservar/";
+  return marco(cfg, "¡Feliz cumpleaños!",
+    `<p style="font-size:17px;line-height:1.7">Hola ${esc((alumna.nombre || "").split(" ")[0] || "")}, ¡muchas felicidades! 🎉</p>
+     <p style="font-size:15px;line-height:1.7">De parte de todo el equipo de ${esc(cfg.negocio.nombre)}: que lo pases muy bien y que tengas un año estupendo.</p>
+     ${cfg.cumple && cfg.cumple.texto ? `<p style="font-size:15px;line-height:1.7;background:#f6f6f8;padding:14px 16px;border-radius:10px">${esc(cfg.cumple.texto)}</p>` : ""}
+     ${boton(cfg, url, "Ver clases y reservar")}`);
+}
+
 /** Correo para quien lleva tiempo sin venir teniendo bono. */
 function correoEchamos(cfg, alumna) {
   const url = (cfg.negocio.web || `https://agencia-js.com/c/${cfg.slug}`).replace(/\/$/, "") + "/reservar/";
@@ -1172,10 +1244,10 @@ function correoResena(cfg, alumna) {
  * Cada aviso se marca en la ficha de la alumna para no repetirlo nunca.
  */
 export async function avisosDiarios(env, cfg) {
-  const out = { caducan: 0, enfriadas: 0, resenas: 0 };
+  const out = { caducan: 0, cobros: 0, enfriadas: 0, resenas: 0, cumples: 0 };
   if (!env.CITAS || cfg.activo === false) return out;
   const hoy = hoyMadrid();
-  const av = { caducaDias: 5, friasDias: 21, resenaClases: 3, ...(cfg.avisosAlumnas || {}) };
+  const av = { caducaDias: 5, cobroDias: 4, friasDias: 21, resenaClases: 3, cumple: true, ...(cfg.avisosAlumnas || {}) };
 
   // 1) Bonos que terminan y NO se renuevan solos
   if (av.caducaDias) {
@@ -1192,6 +1264,26 @@ export async function avisosDiarios(env, cfg) {
       const ok = await correo(env, cfg, b.email, b.alumna, `Tu bono termina pronto · ${cfg.negocio.nombre}`,
         correoCaduca(cfg, { nombre: b.alumna }, b, dias));
       if (ok) { out.caducan++; await env.CITAS.prepare("UPDATE alumnos SET avisado_bono = ?2 WHERE id = ?1").bind(b.aid, hoy).run(); }
+    }
+  }
+
+  // 1 bis) Bonos que SÍ se renuevan solos: avisar ANTES de cobrar.
+  // Es lo que evita el «me han cobrado dos días y yo quería uno»: da margen a cambiarlo.
+  if (av.cobroDias) {
+    const limite = sumarDias(hoy, av.cobroDias);
+    const { results } = await env.CITAS.prepare(
+      `SELECT b.id, b.nombre, b.fin, b.sem, b.producto, a.id AS aid, a.nombre AS alumna, a.email, a.avisado_cobro
+       FROM bonos b JOIN alumnos a ON a.id = b.alumno_id
+       WHERE b.slug = ?1 AND b.estado = 'activo' AND b.recurrente = 1 AND b.stripe_sub IS NOT NULL
+         AND b.fin BETWEEN ?2 AND ?3 AND a.email IS NOT NULL LIMIT 100`
+    ).bind(cfg.slug, hoy, limite).all();
+    for (const b of results || []) {
+      if (b.avisado_cobro && b.avisado_cobro >= sumarDias(hoy, -20)) continue;   // uno por ciclo, no uno por día
+      const dias = Math.max(0, Math.round((Date.parse(String(b.fin).slice(0, 10) + "T12:00:00Z") - Date.parse(hoy + "T12:00:00Z")) / 864e5));
+      const p = producto(cfg, b.producto) || {};
+      const ok = await correo(env, cfg, b.email, b.alumna, `Tu bono se renueva pronto · ${cfg.negocio.nombre}`,
+        correoCobroProximo(cfg, { nombre: b.alumna }, b, dias, p.precio || 0));
+      if (ok) { out.cobros++; await env.CITAS.prepare("UPDATE alumnos SET avisado_cobro = ?2 WHERE id = ?1").bind(b.aid, hoy).run(); }
     }
   }
 
@@ -1225,6 +1317,21 @@ export async function avisosDiarios(env, cfg) {
       if ((a.vino || 0) < av.resenaClases) continue;
       const ok = await correo(env, cfg, a.email, a.nombre, `¿Nos dejas tu opinión? · ${cfg.negocio.nombre}`, correoResena(cfg, a));
       if (ok) { out.resenas++; await env.CITAS.prepare("UPDATE alumnos SET resena = ?2 WHERE id = ?1").bind(a.id, hoy).run(); }
+    }
+  }
+
+  // 4) Cumpleaños. Solo a quien haya dado la fecha; una vez al año y en su día.
+  // La fecha se guarda como 'AAAA-MM-DD' o como '--MM-DD' si no quiso dar el año: comparamos los 5 últimos.
+  if (av.cumple) {
+    const mmdd = hoy.slice(5), anio = hoy.slice(0, 4);
+    const { results } = await env.CITAS.prepare(
+      `SELECT id, nombre, email FROM alumnos
+       WHERE slug = ?1 AND email IS NOT NULL AND nacimiento IS NOT NULL
+         AND substr(nacimiento, -5) = ?2 AND (felicitado IS NULL OR felicitado <> ?3) LIMIT 200`
+    ).bind(cfg.slug, mmdd, anio).all();
+    for (const a of results || []) {
+      const ok = await correo(env, cfg, a.email, a.nombre, `¡Feliz cumpleaños! · ${cfg.negocio.nombre}`, correoCumple(cfg, a));
+      if (ok) { out.cumples++; await env.CITAS.prepare("UPDATE alumnos SET felicitado = ?2 WHERE id = ?1").bind(a.id, anio).run(); }
     }
   }
   return out;
