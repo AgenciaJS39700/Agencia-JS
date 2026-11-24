@@ -118,4 +118,5 @@ CREATE TABLE IF NOT EXISTS vistos (
 --   ALTER TABLE alumnos ADD COLUMN nacimiento TEXT;      -- 'AAAA-MM-DD' o '--MM-DD' si no quiere dar el año
 --   ALTER TABLE alumnos ADD COLUMN felicitado TEXT;      -- año en que se le felicitó, para no repetir
 --   ALTER TABLE alumnos ADD COLUMN avisado_cobro TEXT;   -- fecha del último aviso de cobro próximo
+--   ALTER TABLE alumnos ADD COLUMN sin_matricula INTEGER NOT NULL DEFAULT 0;  -- exenta: ya venía de otra plataforma
 -- ---------------------------------------------------------------------------

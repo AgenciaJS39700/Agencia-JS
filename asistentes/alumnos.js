@@ -251,9 +251,18 @@ const conDescuento = (precio, p) => p.tipo === "importe" ? Math.max(0, precio - 
 const textoPromo = (p) => p.tipo === "importe" ? `${euros(p.valor)} de descuento` : `${p.valor} % de descuento`;
 
 /** ¿Le toca pagar matrícula? Solo la primera vez y según el bono. */
+/**
+ * ¿Hay que cobrar matrícula? Solo a quien nunca ha pagado nada aquí.
+ *
+ * `sin_matricula` existe para las alumnas que vienen de otra plataforma: llevan años en
+ * el estudio y no tienen ni un pago en nuestra base, así que el sistema las tomaría por
+ * nuevas y les cobraría la matrícula al contratar su primer bono. Se marcan exentas al
+ * darlas de alta y no se les cobra.
+ */
 async function tocaMatricula(env, cfg, alumno, p) {
   const m = cfg.matricula;
   if (!m || !m.precio || (m.exentos || []).includes(p.id)) return false;
+  if (alumno && alumno.sin_matricula) return false;
   const r = await env.CITAS.prepare("SELECT COUNT(*) AS n FROM pagos WHERE slug = ?1 AND alumno_id = ?2 AND estado = 'pagado'").bind(cfg.slug, alumno.id).first();
   return !(r && r.n);
 }
@@ -932,6 +941,15 @@ export async function atenderPanelAlumnos(request, env, cfg, ruta, url, apuntar)
     const b = await cuerpo();
     await env.CITAS.prepare("UPDATE alumnos SET nota_interna = ?3 WHERE id = ?1 AND slug = ?2")
       .bind(+b.id || 0, cfg.slug, limpiar(b.nota, 300) || null).run();
+    return res({ ok: true });
+  }
+
+  // Exención de matrícula: para las alumnas que vienen de otra plataforma.
+  if (ruta === "panel/alumna/matricula" && post) {
+    const b = await cuerpo();
+    await env.CITAS.prepare("UPDATE alumnos SET sin_matricula = ?3 WHERE id = ?1 AND slug = ?2")
+      .bind(+b.id || 0, cfg.slug, b.exenta ? 1 : 0).run();
+    if (apuntar) await apuntar("alumna", `${b.exenta ? "eximió de" : "volvió a aplicar"} la matrícula a la alumna nº ${+b.id || 0}`);
     return res({ ok: true });
   }
 
