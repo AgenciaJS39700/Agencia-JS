@@ -1,4 +1,4 @@
-# Contenido de los carruseles 23 – 29 nov 2026 (Agencia JS)
+# Contenido de los carruseles 30 nov – 6 dic 2026 (Agencia JS)
 def V(n, title, text, tip, label='Truco'):
     return (f'<div class="num">{n}</div><h2>{title}</h2><p>{text}</p>'
             f'<div class="fix"><b>{label}</b><span>{tip}</span></div>', {})
@@ -46,59 +46,55 @@ def BIO(title, lines, ok):
             f'<div style="display:flex;align-items:center;gap:22px;margin-bottom:22px"><div style="width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#3a9bff,#e8c766)"></div><b style="font-size:38px">tunegocio</b></div>{body}</div>'
             f'<div class="{cls}" style="margin-top:30px"><i>{ico}</i><span style="font-size:32px">{"Se entiende qué haces, dónde y cómo escribirte." if ok else "No dice qué haces ni cómo contactar."}</span></div>', {})
 
+def VS(a, b):
+    return f'<div class="pair"><div><b>A</b>{a}</div><em>o</em><div class="b"><b>B</b>{b}</div></div>'
+
+def FAQ(q, a):
+    return (f'<div class="step">Nos preguntáis</div><h2 style="font-size:68px">{q}</h2>'
+            f'<div class="real"><b>Respuesta</b><span>{a}</span></div>', {})
+
 POSTS = [
- ('2026-11-23-diccionario', [
-   ('<div class="tag">Sin tecnicismos 📖</div><h1>El diccionario de tu web <span class="g">explicado fácil</span></h1><p style="margin-top:44px">6 palabras que te dicen siempre y nadie te explica.</p>', {}),
-   TERM('Dominio', 'El nombre de tu web, lo que escribes en el navegador.', 'tunegocio.com. Que esté a tu nombre, no al de otra persona.'),
-   TERM('Hosting', 'El «local» donde vive tu web en internet. Se paga como un alquiler.', 'Si no se renueva, tu web desaparece aunque el dominio siga siendo tuyo.'),
-   TERM('Certificado SSL', 'El candado junto a la dirección. Cifra lo que el cliente escribe.', 'Sin él, el navegador avisa con un «No seguro».'),
-   TERM('SEO local', 'Todo lo que ayuda a que te encuentren cuando buscan tu servicio cerca.', 'Web clara, ficha de Google completa y reseñas de clientes reales.'),
-   TERM('Ficha de Google', 'Tu perfil gratuito en Google Maps y en el buscador.', 'Horario, fotos, teléfono y reseñas, todo en un vistazo.'),
-   TERM('Tarjeta NFC', 'Una tarjeta que, al acercar el móvil, abre un enlace al momento.', 'Por ejemplo, la página para dejar tu opinión en Google.'),
-   (cta('¿Qué palabra <span class="g">te faltaba</span>?', 'Pregúntanos cualquier duda de tu web, sin tecnicismos.', 'Comenta 👇'), {}),
+ ('2026-11-30-ficha-diciembre', [
+   ('<div class="tag">Checklist de diciembre 🎄</div><h1>Tu ficha de Google, <span class="g">lista para las fiestas</span></h1><p style="margin-top:44px">Puentes, festivos y compras de Navidad: es cuando más te buscan. Repásala en 10 minutos.</p>', {}),
+   BLOCK('Paso 1', 'Horario de festivos', ['Pon el «horario especial» de los festivos de diciembre', 'Incluye Nochebuena, Navidad y Nochevieja', 'Así nadie se encuentra la persiana bajada']),
+   BLOCK('Paso 2', 'Fotos y novedades', ['Sube fotos recientes del local decorado', 'Publica tus horarios o productos de Navidad', 'Quita fotos viejas que ya no te representan']),
+   BLOCK('Paso 3', 'Contacto y reseñas', ['Comprueba teléfono y enlace a tu web', 'Responde las reseñas pendientes, buenas y malas', 'Pon fácil opinar a tus clientes contentos']),
+   (cta('¿La revisamos <span class="g">contigo</span>?', 'Te decimos gratis qué le falta a tu ficha antes de las fiestas.', 'Escríbenos 👇'), {}),
  ]),
- ('2026-11-25-encuesta', [
-   ('<div class="tag">Encuesta rápida 🗳️</div><h1 style="font-size:72px;margin-bottom:20px">¿Cómo te encuentra <span class="g">tu cliente nuevo</span>?</h1>'
-    '<div class="opt" style="padding:24px 36px;margin-top:20px;font-size:38px"><b style="width:64px;height:64px;font-size:32px">A</b>Buscando en Google o Maps</div>'
-    '<div class="opt" style="padding:24px 36px;margin-top:20px;font-size:38px"><b style="width:64px;height:64px;font-size:32px">B</b>Por Instagram o TikTok</div>'
-    '<div class="opt" style="padding:24px 36px;margin-top:20px;font-size:38px"><b style="width:64px;height:64px;font-size:32px">C</b>Boca a boca</div>'
-    '<div class="opt" style="padding:24px 36px;margin-top:20px;font-size:38px"><b style="width:64px;height:64px;font-size:32px">D</b>Pasa por delante del local</div>'
-    '<p style="margin-top:28px;font-size:32px">Responde con una letra en comentarios 👇</p>', {'foot': 'Desliza →'}),
-   ('<div class="tag">Y según tu respuesta…</div>'
-    '<div class="check"><i>A</i><span>Cuida tu ficha de Google: horario, fotos y reseñas al día.</span></div>'
-    '<div class="check"><i>B</i><span>Que tu bio lleve a una web que cargue rápido en el móvil.</span></div>'
-    '<div class="check"><i>C</i><span>Ponles fácil recomendarte: un enlace o una tarjeta para opinar.</span></div>'
-    '<div class="check"><i>D</i><span>Que tu escaparate tenga un QR o tu web visible.</span></div>', {}),
-   (cta('¿Cuál es <span class="g">la tuya</span>?', 'Te decimos gratis qué mejorar primero según cómo te encuentran.', 'Comenta A, B, C o D 👇'), {}),
+ ('2026-12-02-videos-navidad', [
+   ('<div class="tag">Consejos rápidos 🎬</div><h1>4 vídeos de Navidad <span class="g">que puedes grabar con el móvil</span></h1><p style="margin-top:44px">Sin guion largo ni equipo. Solo luz natural y 15 segundos.</p>', {}),
+   V(1, 'Decorando el local', 'Un antes y después del escaparate o del mostrador, en cámara rápida.', 'Graba siempre en vertical y desde el mismo sitio.', 'Truco'),
+   V(2, 'Tu producto estrella', 'Envuélvelo para regalo y enséñalo de cerca, con detalle.', 'Busca la luz de una ventana, nunca de frente.', 'Truco'),
+   V(3, 'El equipo felicita', 'Todos a cámara diciendo una frase cada uno. Natural, sin ensayar mucho.', 'Una toma corta por persona y se montan seguidas.', 'Truco'),
+   V(4, 'Horario de fiestas', 'Tú contándolo en 10 segundos delante del local.', 'Ponle subtítulos: muchos lo ven sin sonido.', 'Truco'),
+   (cta('¿Prefieres que <span class="g">lo hagamos nosotros</span>?', 'Vídeos verticales personalizados para tu negocio, listos para publicar.', 'Pídenos info 👇'), {}),
  ]),
- ('2026-11-26-mitos-resenas', [
-   ('<div class="tag">Reseñas de Google ⭐</div><h1>5 mitos sobre las reseñas <span class="g">que frenan a tu negocio</span></h1><p style="margin-top:44px">Desliza y dinos cuál te creías 👉</p>', {}),
-   MYTH('«Solo opinan los que se enfadan»', 'Muchos clientes contentos opinarían, pero nadie se lo pide. Pedirlo en el momento ayuda.'),
-   MYTH('«Pedir una reseña queda mal»', 'Si lo haces al final de un buen servicio y sin insistir, es de lo más natural.'),
-   MYTH('«A una mala reseña mejor no responder»', 'Una respuesta educada y con solución también la leen los clientes que vienen detrás.'),
-   MYTH('«Comprar reseñas es un atajo»', 'Las reseñas falsas van contra las normas de Google y pueden acabar eliminadas.'),
-   MYTH('«Ya tengo reseñas, no hace falta más»', 'Las recientes cuentan: muestran que tu negocio sigue vivo y atendiendo bien.'),
-   (cta('¿Cuál <span class="g">te creías</span>?', 'Con una tarjeta NFC tus clientes abren tu página de reseñas al instante. Opinan si quieren, en un toque.', 'Pregúntanos 👇'), {}),
+ ('2026-12-03-web-para-todos', [
+   ('<div class="tag">3 de diciembre ♿</div><h1>¿Tu web la puede usar <span class="g">todo el mundo</span>?</h1><p style="margin-top:44px">Hoy es el Día Internacional de las Personas con Discapacidad. Revisa estas 5 cosas.</p>', {}),
+   BLOCK('Check 1 y 2', 'Que se lea bien', ['Texto con buen contraste sobre el fondo', 'Letra que se pueda ampliar sin romper la página']),
+   BLOCK('Check 3 y 4', 'Que se use bien', ['Botones grandes y fáciles de pulsar en el móvil', 'Que se pueda navegar también con el teclado']),
+   BLOCK('Check 5', 'Que se entienda todo', ['Fotos con texto alternativo para los lectores de pantalla', 'Vídeos con subtítulos', 'Formularios con etiquetas claras']),
+   (cta('Una web <span class="g">para todos</span>', 'Diseñamos webs accesibles, rápidas y fáciles de usar desde el móvil.', 'Te la revisamos gratis 👇'), {}),
  ]),
- ('2026-11-28-bio-antes-despues', [
-   ('<div class="tag">Antes / después ✨</div><h1>Tu bio de Instagram <span class="g">en 30 segundos</span></h1><p style="margin-top:44px">Es lo primero que lee quien llega a tu perfil.</p>', {}),
-   BIO('La bio que no vende', ['Bienvenidos 🌸✨', 'Pasión por lo que hacemos', 'Desde siempre'], False),
-   BIO('La bio que trae clientes', ['✂️ Peluquería · color y cortes', '📍 Calle Mayor 5 · L a S', '📲 Cita por WhatsApp 👇', '🔗 tunegocio.com'], True),
-   ('<div class="step">La fórmula</div><h2>4 líneas y listo</h2>'
-    '<div class="check"><i>1</i><span>Qué haces, en palabras normales</span></div>'
-    '<div class="check"><i>2</i><span>Dónde estás y cuándo abres</span></div>'
-    '<div class="check"><i>3</i><span>Cómo pedir cita o comprar</span></div>'
-    '<div class="check"><i>4</i><span>Enlace a tu web o tu WhatsApp</span></div>', {}),
-   (cta('¿Aprueba <span class="g">tu bio</span>?', 'Si tu enlace lleva a una web lenta o desactualizada, te ayudamos.', 'Escríbenos 👇'), {}),
+ ('2026-12-05-preguntas-nfc', [
+   ('<div class="tag">Tarjetas NFC ⭐</div><h1>Lo que más nos preguntáis <span class="g">de las tarjetas de reseñas</span></h1><p style="margin-top:44px">4 respuestas cortas. Desliza 👉</p>', {}),
+   FAQ('¿El cliente necesita instalar una app?', 'No. Acerca el móvil a la tarjeta y se abre tu página de reseñas de Google. El móvil necesita tener NFC.'),
+   FAQ('¿Asegura que me dejen 5 estrellas?', 'No, y desconfía de quien lo prometa. Lo que hace es ponérselo fácil a quien quiera opinar.'),
+   FAQ('¿Dónde la pongo?', 'Donde termina el servicio: en el mostrador, en la caja o en la mesa. A la vista y a mano.'),
+   FAQ('¿Cuándo la ofrezco?', 'Al final de un buen servicio, con naturalidad y sin insistir. «Si te ha gustado, aquí puedes contarlo».'),
+   (cta('¿Te queda <span class="g">alguna duda</span>?', 'Pregúntanos lo que quieras de las tarjetas NFC de reseñas.', 'Comenta 👇'), {}),
  ]),
- ('2026-11-29-carta-navidad', [
-   ('<div class="tag">Querido Papá Noel 🎅</div><h1>Este año <span class="g">mi negocio</span> ha sido bueno y pide…</h1><p style="margin-top:44px">Marca los tuyos y cuéntanos tu número 👉</p>', {}),
-   ('<div class="step">Mi carta</div>'
-    '<div class="check"><i>1</i><span>Una web que se vea bien en el móvil</span></div>'
-    '<div class="check"><i>2</i><span>Que me encuentren en Google cuando me buscan cerca</span></div>'
-    '<div class="check"><i>3</i><span>Que mis clientes contentos se animen a opinar</span></div>'
-    '<div class="check"><i>4</i><span>Un vídeo que cuente lo que hago</span></div>'
-    '<div class="check"><i>5</i><span>Dejar de pelearme con la web los domingos</span></div>', {}),
-   (cta('¿Qué número <span class="g">pedirías</span>?', 'Web, SEO local, tarjetas NFC de reseñas y vídeos para tu negocio. Sin esperar al 25.', 'Comenta 👇'), {}),
+ ('2026-12-06-esto-o-esto', [
+   ('<div class="tag">Juego de domingo 🎲</div><h1>¿Esto o esto? <span class="g">Versión clientes</span></h1><p style="margin-top:44px">Elige lo que prefieren los tuyos y te decimos qué significa para tu negocio 👉</p>', {}),
+   ('<div class="step">Ronda 1</div><h2 style="font-size:64px">Para pedir cita…</h2>' + VS('Escribir por WhatsApp', 'Llamar por teléfono') +
+    '<div class="step" style="margin-top:60px">Ronda 2</div><h2 style="font-size:64px">Antes de venir…</h2>' + VS('Ver precios en la web', 'Preguntar el precio'), {}),
+   ('<div class="step">Ronda 3</div><h2 style="font-size:64px">Para encontrarte…</h2>' + VS('Buscar en Google Maps', 'Buscarte en Instagram') +
+    '<div class="step" style="margin-top:60px">Ronda 4</div><h2 style="font-size:64px">Para opinar…</h2>' + VS('Un toque con el móvil', 'Buscar tu ficha a mano'), {}),
+   ('<div class="step">Lo que significa</div>'
+    '<div class="check"><i>1</i><span>WhatsApp a un toque, visible en tu web y tu bio</span></div>'
+    '<div class="check"><i>2</i><span>Precios orientativos que ahorran preguntas</span></div>'
+    '<div class="check"><i>3</i><span>Ficha de Google completa y perfil con enlace a tu web</span></div>'
+    '<div class="check"><i>4</i><span>Una forma rápida de dejar su opinión</span></div>', {}),
+   (cta('¿Qué has elegido <span class="g">tú</span>?', 'Pon tus 4 letras en comentarios. Ejemplo: A B A A', 'Comenta 👇'), {}),
  ]),
 ]

@@ -76,23 +76,30 @@ GOT = lambda pedi, llego: S('<div class="pill" style="color:#86efac;background:r
        '<div class="pill" style="margin-top:90px">Lo que me llegó 📦</div>'
        f'<div class="fact" style="font-size:72px">{llego}</div>', 'or')
 
+WRAP = lambda lab, big, sub, extra='': S(PILL('Tu año 2026 · versión negocio 🎧','#c4b5fd','rgba(167,139,250,.12)','rgba(167,139,250,.5)')
+       + f'<div class="lab">{lab}</div><div class="fact" style="font-size:92px">{big}</div><p>{sub}</p>', extra)
+DOOR = lambda n, tip, sub: S(f'<div class="pill" style="color:#fca5a5;background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.5)">Casilla {n} 🎁</div>'
+       f'<div class="counter" style="color:#e8c766;font-size:260px">{n}</div><div class="fact" style="font-size:80px;margin-top:30px">{tip}</div><p>{sub}</p>')
+
 REELS = {
- 'reel-2026-11-24-puntuamos': [
-   S('<div class="pill">Trend 📝</div><h1>Puntuamos cosas que vemos <span class="g">en webs de negocios</span></h1><p>Del 1 al 10. Sin piedad (pero con cariño).</p>'),
-   RATE('Botón de WhatsApp siempre a la vista', '10', 'Un toque y el cliente ya te está escribiendo.'),
-   RATE('Música que suena sola al entrar', '1', 'Nadie quiere sustos en el autobús.', True),
-   RATE('Horario actualizado y festivos', '9', 'Evita que alguien vaya y se encuentre cerrado.'),
-   RATE('Ventana emergente nada más entrar', '2', 'Antes de saber qué haces, ya le pides algo.', True),
-   RATE('Fotos reales de tu local y tu trabajo', '10', 'Dan más confianza que cualquier foto de catálogo.'),
-   END('¿Qué nota sacaría <span class="g">la tuya</span>?', 'Te la puntuamos gratis y te decimos qué subir primero.'),
+ 'reel-2026-12-01-resumen-ano': [
+   S('<div class="pill" style="color:#c4b5fd;background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.5)">Trend 🎧</div><h1>Ya salen los resúmenes del año… <span class="g">este es el de tu negocio</span></h1><p>Si te ves en alguno, no eres el único.</p>'),
+   WRAP('Tu canción más escuchada', '«¿A qué hora abrís mañana?» 🔁', 'La has oído en bucle todo el año.'),
+   WRAP('Tu momento del día', 'Mensajes a las 23:00 💬', 'Clientes con ganas de reservar… y tú ya dormido.', 'or'),
+   WRAP('Tu frase del año', '«Ya te paso la web… bueno, búscanos en Google» 🙈', 'La web que siempre ibas a actualizar.', 'or'),
+   WRAP('Tu cliente fiel', 'Vino todo el año… y nunca dejó su opinión ⭐', 'Porque nadie se lo puso fácil.'),
+   S('<div class="pill" style="color:#86efac;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.5)">El resumen que quieres en 2027 ✨</div>'
+     + CHECKS(['Horario y precios claros en tu web', 'WhatsApp a un toque', 'Una ficha de Google cuidada', 'Opinar en un toque con NFC'])),
+   END('¿Cuál ha sido <span class="g">tu momento del año</span>?', 'Web, SEO local, tarjetas NFC de reseñas y vídeos para tu negocio.'),
  ],
- 'reel-2026-11-27-pedi-vs-llego': [
-   S('<div class="pill">Black Friday 🛒</div><h1>Lo que pedí vs lo que me llegó: <span class="g">versión web</span></h1><p>Hoy todo el mundo compra online. ¿Tu web está a la altura?</p>', 'or'),
-   GOT('Una web moderna y rápida', 'Una plantilla que tarda una eternidad en cargar en el móvil'),
-   GOT('Que mis clientes me llamen', 'Un formulario escondido que no le llega a nadie'),
-   GOT('Aparecer cuando me buscan', 'Una web que ni Google sabe de qué va'),
-   GOT('Poder cambiar mi horario', 'Tener que pedirlo por correo y esperar semanas'),
-   END('Que te llegue <span class="g">lo que pediste</span>', 'Web, ficha de Google, tarjetas NFC de reseñas y vídeos para tu negocio.'),
+ 'reel-2026-12-04-calendario-adviento': [
+   S('<div class="pill" style="color:#fca5a5;background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.5)">Adviento 🎄</div><h1>El calendario de Adviento <span class="g">de tu negocio</span></h1><p>Una casilla, una mejora pequeña. Abre las 5 👇</p>', 'or'),
+   DOOR(1, 'Horario de fiestas en tu ficha de Google', 'Para que nadie vaya y se encuentre cerrado.'),
+   DOOR(2, 'Botón de WhatsApp visible en tu web', 'Que pedir cita sea cuestión de un toque.'),
+   DOOR(3, 'Fotos nuevas del local decorado', 'Lo real da más confianza que cualquier foto de catálogo.'),
+   DOOR(4, 'Un vídeo vertical de 15 segundos', 'Enseña lo que haces, aunque sea con el móvil.'),
+   DOOR(5, 'Ponles fácil dejar su opinión', 'Por ejemplo, con una tarjeta NFC en el mostrador.'),
+   END('¿Cuál abres <span class="g">primero</span>?', 'Te ayudamos con cualquiera de las 5, sin esperar a enero.'),
  ],
 }
 
